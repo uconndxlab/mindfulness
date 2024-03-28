@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 #template
 Route::get('/', function () {
@@ -8,11 +9,10 @@ Route::get('/', function () {
 });
 
 
+//login
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('show.login');
 
-Route::get('/login', function () {
-    return view('login');
-});
 
-Route::get('/register', function () {
-    return view('register');
-});
+//registration
+Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('show.registration');
+
