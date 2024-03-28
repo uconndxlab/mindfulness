@@ -13,6 +13,6 @@ Route::get('/login', function () {
     return view('login');
 });
 
-Route::get('/createAccount', function () {
-    return view('createAccount');
+Route::get('/register', function () {
+    return view('register');
 });
