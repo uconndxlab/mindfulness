@@ -6,7 +6,6 @@ use App\Http\Controllers\PageNavController;
 use App\Http\Controllers\NoteController;
 
 //login
-Route::get('/', [AuthController::class, 'loginPage'])->name('login.show');
 Route::get('/login', [AuthController::class, 'loginPage'])->name('login.show');
 
 //registration
@@ -14,15 +13,19 @@ Route::get('/account-creation', [AuthController::class, 'registrationPage'])->na
 
 
 //Page Navigation - the controller is not totally necessary
+// Route::middleware(['auth'])->group(function () {
+// });
+Route::redirect("/","/explore");
 Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
 Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
 Route::get('/explore', [PageNavController::class, 'exploreMainPage'])->name('explore');
 Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
 Route::get('/profile', [PageNavController::class, 'profilePage'])->name('profile');
 
+
 //notes CRUD routes
-//TODO should not be web accessible
 Route::resource('note', NoteController::class);
+
 // Route::get('/note', [NoteController::class, 'index'])->name('note.index');
 // Route::get('/note/create', [NoteController::class, 'create'])->name('note.create');
 // Route::post('/note', [NoteController::class,'store'])->name('note.store');
