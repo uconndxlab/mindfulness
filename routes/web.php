@@ -22,8 +22,6 @@ Route::post('/account-creation', [AuthController::class,'register'])->name('regi
 
 //NAVIGATION
 //Page Navigation - the controller is not totally necessary
-// Route::middleware(['auth'])->group(function () {
-// });
 Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
 Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
 Route::get('/explore', [PageNavController::class, 'exploreMainPage'])->name('explore');
