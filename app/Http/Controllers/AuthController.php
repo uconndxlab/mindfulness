@@ -2,7 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -11,33 +17,48 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function authenticate(Request $request) : void
+    //login function
+    public function authenticate(Request $request)
     {
-        //TODO login - use user controller?
-        //$this->ensureIsNotRateLimited();
-
         $credentials = $request->only('email', 'password');
 
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (!$user) { 
+            return back()->withErrors(['email' => 'Email not found.']);
+        }
+
         if (Auth::attempt($credentials)) {
-            // Authentication passed...
-            return redirect()->intended('dashboard'); // Redirect to a dashboard or any other page after successful login
+            return redirect()->intended('explore');
+        }
+
+        return back()->withErrors(['password' => 'Invalid credentials.']);
     }
-
-
-        
-    }
-
-
-
-
 
     public function registrationPage()
     {
         return view('auth.register');
     }
 
-    public function register(Request $request)
+    //account registration
+    public function register(Request $request) : RedirectResponse
     {
-        //TODO make a user, - user model? using user controller?
+        $request->validate([
+            'name' => ['required','string','max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password'=> ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+        
+        $user = User::create([
+            'name' => $request->name,
+            'email'=> $request->email,
+            'password'=> Hash::make($request->password),
+        ]);
+
+        event(new Registered($user));
+
+        Auth::login($user);
+
+        return redirect(route('welcome'));
     }
 }
