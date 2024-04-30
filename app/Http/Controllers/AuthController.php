@@ -21,18 +21,17 @@ class AuthController extends Controller
     //login function
     public function authenticate(Request $request)
     {
+        //check user first
         $credentials = $request->only('email', 'password');
-
         $user = User::where('email', $credentials['email'])->first();
-
         if (!$user) { 
             return back()->withErrors(['email' => 'Email not found.']);
         }
 
+        //check authentication
         if (Auth::attempt($credentials)) {
             return redirect()->intended('explore');
         }
-
         return back()->withErrors(['password' => 'Invalid credentials.']);
     }
 
@@ -45,6 +44,7 @@ class AuthController extends Controller
     public function register(Request $request) : RedirectResponse
     {
         //TODO - finish validation - custom error messages, confirmed?
+        //validate inputs
         try {
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
@@ -55,16 +55,16 @@ class AuthController extends Controller
             return redirect()->back()->withErrors($e->errors())->withInput();
         }
 
+        //create user
         $user = User::create([
             'name' => $request->name,
             'email'=> $request->email,
             'password'=> Hash::make($request->password),
         ]);
 
+        //login and redirect
         event(new Registered($user));
-
         Auth::login($user);
-
         return redirect(route('welcome'));
     }
 }
