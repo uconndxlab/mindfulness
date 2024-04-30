@@ -10,11 +10,14 @@ Route::redirect("/","/login");
 //AUTHENTICATION
 //login page
 Route::get('/login', [AuthController::class, 'loginPage'])->name('login');
-//login form
+//login request
 Route::post('/login', [AuthController::class,'authenticate'])->name('login.submit');
 
 //registration page
 Route::get('/account-creation', [AuthController::class, 'registrationPage'])->name('register');
+//registration request
+Route::post('/account-creation', [AuthController::class,'register'])->name('register.submit');
+
 
 
 //NAVIGATION

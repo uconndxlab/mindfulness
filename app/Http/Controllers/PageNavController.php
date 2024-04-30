@@ -13,7 +13,7 @@ class PageNavController extends Controller
 
     public function voiceSelectPage()
     {
-        return view("auth.voiceSelect");
+        return view("auth.voice-select");
     }
 
     public function exploreMainPage()

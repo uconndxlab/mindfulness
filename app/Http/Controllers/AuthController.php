@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rules;
+use Illuminate\Validation\Rules\Password;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
@@ -43,12 +44,17 @@ class AuthController extends Controller
     //account registration
     public function register(Request $request) : RedirectResponse
     {
-        $request->validate([
-            'name' => ['required','string','max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password'=> ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
-        
+        //TODO - finish validation - custom error messages, confirmed?
+        try {
+            $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required',  'string',  'lowercase',  'email',  'max:255',  'unique:'.User::class],
+                'password'=> ['required', Password::defaults()],
+            ]);
+        } catch (ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        }
+
         $user = User::create([
             'name' => $request->name,
             'email'=> $request->email,

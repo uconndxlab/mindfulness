@@ -38,7 +38,7 @@
 
 
                     <div class="form-group">
-                        <button type="submit" class="btn btn-primary">LOGIN</button>
+                        <button type="submit" class="btn btn-primary">LOG IN</button>
                     </div>
                 </form>
                 <div class="text-center mt-3">
