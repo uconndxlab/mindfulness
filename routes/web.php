@@ -5,17 +5,22 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PageNavController;
 use App\Http\Controllers\NoteController;
 
-//login
-Route::get('/login', [AuthController::class, 'loginPage'])->name('login.show');
+Route::redirect("/","/login");
 
-//registration
-Route::get('/account-creation', [AuthController::class, 'registrationPage'])->name('registration.show');
+//AUTHENTICATION
+//login page
+Route::get('/login', [AuthController::class, 'loginPage'])->name('login');
+//login form
+Route::post('/login', [AuthController::class,'authenticate'])->name('login.submit');
+
+//registration page
+Route::get('/account-creation', [AuthController::class, 'registrationPage'])->name('register');
 
 
+//NAVIGATION
 //Page Navigation - the controller is not totally necessary
 // Route::middleware(['auth'])->group(function () {
 // });
-Route::redirect("/","/explore");
 Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
 Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
 Route::get('/explore', [PageNavController::class, 'exploreMainPage'])->name('explore');
@@ -23,7 +28,7 @@ Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal
 Route::get('/profile', [PageNavController::class, 'profilePage'])->name('profile');
 
 
-//notes CRUD routes
+//NOTES
 Route::resource('note', NoteController::class);
 
 // Route::get('/note', [NoteController::class, 'index'])->name('note.index');

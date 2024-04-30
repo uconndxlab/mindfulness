@@ -11,10 +11,25 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function login(Request $request)
+    public function authenticate(Request $request) : void
     {
         //TODO login - use user controller?
+        //$this->ensureIsNotRateLimited();
+
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+            // Authentication passed...
+            return redirect()->intended('dashboard'); // Redirect to a dashboard or any other page after successful login
     }
+
+
+        
+    }
+
+
+
+
 
     public function registrationPage()
     {
