@@ -18,10 +18,9 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    //login function
     public function authenticate(Request $request)
     {
-        //check user first
+        //check if user exists first
         $credentials = $request->only('email', 'password');
         $user = User::where('email', $credentials['email'])->first();
         if (!$user) { 
@@ -33,6 +32,11 @@ class AuthController extends Controller
             return redirect()->intended('explore');
         }
         return back()->withErrors(['password' => 'Invalid credentials.']);
+    }
+
+    public function logout() {
+        Auth::logout();
+        return redirect()->route('login');
     }
 
     public function registrationPage()
