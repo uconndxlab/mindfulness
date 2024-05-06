@@ -17,6 +17,20 @@ class PageNavController extends Controller
     {
         return view("auth.voice-select");
     }
+    
+    public function journalPage()
+    {
+        return view("profile.journal");
+    }
+
+    public function profilePage()
+    {
+        //get the url that redirected user to this page
+        $backRoute = url()->previous();
+        $showProfileLink = false;
+        return view("profile.accountInformation", compact("backRoute", "showProfileLink"));
+    }
+
     public function exploreHomePage()
     {
         Session::put('last_explore_page', 'explore');
@@ -39,16 +53,4 @@ class PageNavController extends Controller
     }
     }
 
-    public function journalPage()
-    {
-        return view("profile.journal");
-    }
-
-    public function profilePage()
-    {
-        //get the url that redirected user to this page
-        $backRoute = url()->previous();
-        $showProfileLink = false;
-        return view("profile.accountInformation", compact("backRoute", "showProfileLink"));
-    }
 }
