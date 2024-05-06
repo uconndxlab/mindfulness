@@ -18,8 +18,6 @@ Route::get('/account-creation', [AuthController::class, 'registrationPage'])->na
 //registration request
 Route::post('/account-creation', [AuthController::class,'register'])->name('register.submit');
 
-
-
 //NAVIGATION
 //Page Navigation - the controller is not totally necessary
 Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');

@@ -42,4 +42,12 @@
         </div>
     </div>
 </div>
+
+
+
+
+<!-- component example -->
+<x-bottom-nav>
+    jon &#9829
+</x-bottom-nav>
 @endsection
