@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PageNavController;
@@ -35,6 +36,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/explore', [PageNavController::class, 'exploreHomePage'])->name('explore.home');
     Route::get('/explore/weekly', [PageNavController::class, 'exploreWeekly'])->name('explore.weekly');
     
+    //TODO - USER, all
+    Route::put('', [UserController::class, 'updateVoice'])->name('');
+    Route::put('', [UserController::class, 'updateName'])->name('');
+    Route::put('', [UserController::class, 'updatePassword'])->name('');
     
     //NOTES
     Route::resource('note', NoteController::class);
