@@ -18,21 +18,27 @@ Route::get('/account-creation', [AuthController::class, 'registrationPage'])->na
 //registration request
 Route::post('/account-creation', [AuthController::class,'register'])->name('register.submit');
 
-//NAVIGATION
-//Page Navigation - the controller is not totally necessary
-Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
-Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
-Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
-Route::get('/profile', [PageNavController::class, 'profilePage'])->name('profile');
-//explore pages
-Route::get('', [PageNavController::class, 'explorePages'])->name('explore.resume');
-Route::get('/explore', [PageNavController::class, 'exploreHomePage'])->name('explore.home');
-Route::get('/explore/weekly', [PageNavController::class, 'exploreWeekly'])->name('explore.weekly');
 
+//AUTH protected routes
+Route::middleware('auth')->group(function () {
+    //logout
+    Route::get('/logout', [AuthController::class,'logout'])->name('logout');
 
-
-//NOTES
-Route::resource('note', NoteController::class);
+    //NAVIGATION
+    //Page Navigation - the controller is not totally necessary
+    Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
+    Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
+    Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
+    Route::get('/profile', [PageNavController::class, 'profilePage'])->name('profile');
+    //explore pages
+    Route::get('', [PageNavController::class, 'explorePages'])->name('explore.resume');
+    Route::get('/explore', [PageNavController::class, 'exploreHomePage'])->name('explore.home');
+    Route::get('/explore/weekly', [PageNavController::class, 'exploreWeekly'])->name('explore.weekly');
+    
+    
+    //NOTES
+    Route::resource('note', NoteController::class);
+});
 
 // Route::get('/note', [NoteController::class, 'index'])->name('note.index');
 // Route::get('/note/create', [NoteController::class, 'create'])->name('note.create');

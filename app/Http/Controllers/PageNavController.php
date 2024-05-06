@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
@@ -17,7 +16,7 @@ class PageNavController extends Controller
     {
         return view("auth.voice-select");
     }
-    
+
     public function journalPage()
     {
         return view("profile.journal");

@@ -17,6 +17,11 @@
                             <a class="nav-link" href="{{ $backRoute }}">< Back</a>
                         </li>
                     @endif
+                    @if(Request::route()->getName() == 'explore.home')
+                    <li class="nav-item">
+                            <a class="nav-link" href="{{ route('logout') }}">Logout</a>
+                        </li>
+                    @endif
                 </ul>
                 <ul class="navbar-nav">
                     <!-- show if not set OR true -->
