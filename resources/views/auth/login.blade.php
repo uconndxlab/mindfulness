@@ -42,12 +42,4 @@
         </div>
     </div>
 </div>
-
-
-
-
-<!-- component example -->
-<x-bottom-nav>
-    component example
-</x-bottom-nav>
 @endsection

@@ -32,6 +32,9 @@ class PageNavController extends Controller
 
     public function profilePage()
     {
-        return view("profile.accountInformation");
+        //TODO adjust backRoute
+        $backRoute = route("explore.home");
+        $showProfileLink = false;
+        return view("profile.accountInformation", compact("backRoute", "showProfileLink"));
     }
 }
