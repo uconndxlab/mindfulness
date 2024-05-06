@@ -30,7 +30,7 @@ class PageNavController extends Controller
     }
 
     public function explorePages() {
-        //called when browse button is clicked - checks session for saved browse page
+        //check session for last used explore page - resume on this page
         $lastExplorePage = Session::get('last_explore_page');
         if ($lastExplorePage && Str::startsWith($lastExplorePage, 'explore/')) {
             return redirect()->to($lastExplorePage);
@@ -46,8 +46,8 @@ class PageNavController extends Controller
 
     public function profilePage()
     {
-        //TODO adjust backRoute
-        $backRoute = route("explore.home");
+        //get the url that redirected user to this page
+        $backRoute = url()->previous();
         $showProfileLink = false;
         return view("profile.accountInformation", compact("backRoute", "showProfileLink"));
     }
