@@ -15,10 +15,14 @@ class PageNavController extends Controller
     {
         return view("auth.voice-select");
     }
-
-    public function exploreMainPage()
+    public function exploreHomePage()
     {
-        return view("explore.main");
+        return view("explore.home");
+    }
+
+    public function exploreWeekly() {
+        $backRoute = route('explore.home');
+        return view('explore.weekly', compact('backRoute'));
     }
 
     public function journalPage()

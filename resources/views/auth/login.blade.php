@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('layouts.auth')
 
 @section('title', 'Log In')
 
@@ -48,6 +48,6 @@
 
 <!-- component example -->
 <x-bottom-nav>
-    jon &#9829
+    component example
 </x-bottom-nav>
 @endsection

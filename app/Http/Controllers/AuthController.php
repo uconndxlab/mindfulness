@@ -30,7 +30,7 @@ class AuthController extends Controller
 
         //check authentication
         if (Auth::attempt($credentials)) {
-            return redirect()->intended('explore');
+            return redirect()->intended('explore.home');
         }
         return back()->withErrors(['password' => 'Invalid credentials.']);
     }

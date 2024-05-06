@@ -22,7 +22,10 @@ Route::post('/account-creation', [AuthController::class,'register'])->name('regi
 //Page Navigation - the controller is not totally necessary
 Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
 Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
-Route::get('/explore', [PageNavController::class, 'exploreMainPage'])->name('explore');
+Route::get('/explore', [PageNavController::class, 'exploreHomePage'])->name('explore.home');
+//TODO figure out what to do with explore pages
+Route::get('/explore/weekly', [PageNavController::class, 'exploreWeekly'])->name('explore.weekly');
+
 Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
 Route::get('/profile', [PageNavController::class, 'profilePage'])->name('profile');
 
