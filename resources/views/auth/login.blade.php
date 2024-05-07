@@ -38,7 +38,7 @@
                 <hr class="my-4">
                 <span class="text-muted">OR</span>
             </div>
-            <a href="{{ route('register') }}" class="btn btn-primary">SIGN UP</a>
+            <a class="btn btn-primary" href="{{ route('register') }}">SIGN UP</a>
         </div>
     </div>
 </div>
