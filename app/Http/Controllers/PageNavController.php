@@ -37,17 +37,20 @@ class PageNavController extends Controller
         $week2List = array("Compass1", "Compass2", "Compass3", "Compass4", "Compass5");
         $week3List = array("Compass1", "Compass2", "Compass3", "Compass4", "Compass5", "Compass6");
         $week4List = array("Compass1", "Compass2", "Compass3", "Compass4", "Compass5", "Compass6");
+
+        //track explore page
         Session::put('last_explore_page', 'explore');
         return view("explore.home", compact("week1List", "week2List", "week3List", "week4List"));
     }
 
-    public function exploreWeekly($contentKey, $fromBrowse=false) {
+    public function exploreWeekly($contentKey) {
         $backRoute = route('explore.home');
+        //track explore page
         Session::put('last_explore_page', 'explore/'.$contentKey);
         return view('explore.weekly', compact('backRoute', 'contentKey'));
     }
 
-    public function exploreResume() {
+    public function exploreBrowseBtn() {
         //double click functionality - if clicking browse while on an explore page
         $prevUrl = url()->previous();
         $path = parse_url($prevUrl, PHP_URL_PATH);

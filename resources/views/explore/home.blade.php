@@ -11,7 +11,7 @@
         <div class="row mb-3 border justify-content-center d-flex align-items-stretch">
             @for ($j = 1; $j < 3; $j++)
             <div class="col-4">
-                <div class="p-2 bg-light d-flex flex-column h-100">
+                <div class="p-2 bg-success d-flex flex-column h-100">
                     <p>{{ 'Week '.($i * 2 + $j).':' }}</p>
                     @foreach (${'week'.($i * 2 + $j).'List'} as $item)
                         <div class="p-1">
