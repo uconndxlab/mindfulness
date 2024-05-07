@@ -19,7 +19,7 @@
                     @endif
                 </ul>
                 <ul class="navbar-nav">
-                    <!-- show if it is not set OR if it is true -->
+                    <!-- if not set, assume true -->
                     @if(!isset($showProfileLink) || $showProfileLink)
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('profile') }}">Hi, {{ Auth::user()->name }}</a>
@@ -46,8 +46,8 @@
             <div class="container-fluid">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <!-- logic to set active - checks the route -->
-                        <a class="nav-link {{ Str::startsWith(Request::route()->getName(), 'explore.') ? 'active' : ''}}" href="{{ route('explore.resume') }}">
+                        <!-- check the routename to set which is active -->
+                        <a class="nav-link {{ Str::startsWith(Request::route()->getName(), 'explore.') ? 'active' : ''}}" href="{{ route('explore.browse') }}">
                             <span>Browse</span>
                         </a>
                     </li>
