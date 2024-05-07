@@ -6,7 +6,7 @@
 <div class="col-md-5">
     <div class="text-left">
         <h1 class="display-3 font-weight-bold">Welcome!</h1>
-        <p class="lead">Welcome text goes here. It can wrap all the way to the next line.</p>
+        <p class="lead">Welcome text goes here. It can wrap on to the following line.</p>
     </div>
     <div class="text-center">
         <div class="embed-responsive embed-responsive-16by9">

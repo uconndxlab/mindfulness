@@ -37,10 +37,12 @@ class PageNavController extends Controller
         $week2List = array("Compass1", "Compass2", "Compass3", "Compass4", "Compass5");
         $week3List = array("Compass1", "Compass2", "Compass3", "Compass4", "Compass5", "Compass6");
         $week4List = array("Compass1", "Compass2", "Compass3", "Compass4", "Compass5", "Compass6");
+        $week5List = array("Compass1", "Compass2", "Compass3", "Compass4", "Compass5", "Compass6");
+        $week6List = array("Compass1", "Compass2", "Compass3", "Compass4", "Compass5", "Compass6");
 
         //track explore page
         Session::put('last_explore_page', 'explore');
-        return view("explore.home", compact("week1List", "week2List", "week3List", "week4List"));
+        return view("explore.home", compact("week1List", "week2List", "week3List", "week4List", "week5List", "week6List"));
     }
 
     public function exploreWeekly($contentKey) {
