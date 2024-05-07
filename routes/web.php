@@ -32,9 +32,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
     Route::get('/profile', [PageNavController::class, 'profilePage'])->name('profile');
     //explore pages
-    Route::get('', [PageNavController::class, 'explorePages'])->name('explore.resume');
+    Route::get('', [PageNavController::class, 'exploreResume'])->name('explore.resume');
     Route::get('/explore', [PageNavController::class, 'exploreHomePage'])->name('explore.home');
-    Route::get('/explore/weekly', [PageNavController::class, 'exploreWeekly'])->name('explore.weekly');
+    Route::get('/explore/{contentKey}', [PageNavController::class, 'exploreWeekly'])->name('explore.weekly');
     
     //TODO - USER, all
     Route::put('', [UserController::class, 'updateVoice'])->name('');

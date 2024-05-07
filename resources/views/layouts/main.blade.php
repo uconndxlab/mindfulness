@@ -19,7 +19,7 @@
                     @endif
                 </ul>
                 <ul class="navbar-nav">
-                    <!-- show if not set OR true -->
+                    <!-- show if it is not set OR if it is true -->
                     @if(!isset($showProfileLink) || $showProfileLink)
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('profile') }}">Hi, {{ Auth::user()->name }}</a>
@@ -34,8 +34,12 @@
             </div>
         </nav>
 
-        <div class="container">
-            @yield('content')
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    @yield('content')
+                </div>
+            </div>
         </div>
 
         <nav class="navbar fixed-bottom navbar-expand-lg navbar-light bg-light">
