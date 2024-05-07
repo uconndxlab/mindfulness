@@ -3,8 +3,10 @@
 @section('title', 'Home')
 
 @section('content')
-<div>
-    <p>Mindfulness Guides</p>
+<div class="col-md-8">
+    <div class="text-left">
+        <h1 class="display font-weight-bold">Mindfulness Guides:</h1>
+    </div>
 
     <div class="container">
         @for ($i = 0; $i < 2; $i++)

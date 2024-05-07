@@ -31,7 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
     Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
     Route::get('/profile', [PageNavController::class, 'profilePage'])->name('profile');
-    //explore pages+
+    //explore pages
     Route::get('', [PageNavController::class, 'exploreBrowseBtn'])->name('explore.browse');
     Route::get('/explore', [PageNavController::class, 'exploreHomePage'])->name('explore.home');
     Route::get('/explore/{contentKey}', [PageNavController::class, 'exploreWeekly'])->name('explore.weekly');
