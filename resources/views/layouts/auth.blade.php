@@ -7,7 +7,11 @@
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     </head>
 
-    <body>
-        @yield('content')
+    <body class="d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+        <div class="container">
+            <div class="row justify-content-center">
+                @yield('content')
+            </div>
+        </div>
     </body>
 </html>
