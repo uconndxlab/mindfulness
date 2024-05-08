@@ -6,7 +6,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PageNavController;
 use App\Http\Controllers\NoteController;
 
-Route::redirect("/","/login");
+//default
+Route::redirect("/","/explore");
 
 //AUTHENTICATION
 //login page
@@ -37,9 +38,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/explore/{contentKey}', [PageNavController::class, 'exploreWeekly'])->name('explore.weekly');
     
     //TODO - USER, all
-    Route::put('', [UserController::class, 'updateVoice'])->name('');
-    Route::put('', [UserController::class, 'updateName'])->name('');
-    Route::put('', [UserController::class, 'updatePassword'])->name('');
+    Route::put('', [UserController::class, 'updateVoice'])->name('user.update.voice');
+    Route::put('/user/name/{newName}', [UserController::class, 'updateName'])->name('user.update.name');
+    //??? encryption
+    Route::put('/user/pass/{newName}', [UserController::class, 'updatePassword'])->name('');
     
     //NOTES
     Route::resource('note', NoteController::class);
