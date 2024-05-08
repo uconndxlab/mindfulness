@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('voiceId')->nullable();
+        Schema::table('notes', function (Blueprint $table) {
+            $table->string('word_otd')->nullable(false)->default('relax');
         });
+
+        //set all vals to 'relax as default 
+        \DB::table('notes')->update(['word_otd' => 'relax']);
     }
 
     /**
@@ -21,8 +24,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('voiceId');
+        Schema::table('notes', function (Blueprint $table) {
+            $table->dropColumn('word_otd');
         });
     }
 };
