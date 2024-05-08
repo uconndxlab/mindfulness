@@ -32,16 +32,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
     Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
     Route::get('/profile', [PageNavController::class, 'profilePage'])->name('profile');
+
+    //back button
+    Route::get('/backBtn', [PageNavController::class, 'backButton'])->name('button.back');
+
     //explore pages
-    Route::get('', [PageNavController::class, 'exploreBrowseBtn'])->name('explore.browse');
+    Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
     Route::get('/explore', [PageNavController::class, 'exploreHomePage'])->name('explore.home');
     Route::get('/explore/{contentKey}', [PageNavController::class, 'exploreWeekly'])->name('explore.weekly');
     
-    //TODO - USER, all
-    Route::put('', [UserController::class, 'updateVoice'])->name('user.update.voice');
-    Route::put('/user/name/{newName}', [UserController::class, 'updateName'])->name('user.update.name');
-    //??? encryption
-    Route::put('/user/pass/{newName}', [UserController::class, 'updatePassword'])->name('');
+    //User updates
+    Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
+    Route::put('/user/update/namePass', [UserController::class, 'updateNamePass'])->name('user.update.namePass');
     
     //NOTES
     Route::resource('note', NoteController::class);

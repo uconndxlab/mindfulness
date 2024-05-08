@@ -22,12 +22,23 @@ class PageNavController extends Controller
         return view("profile.journal");
     }
 
+    public function backButton() {
+        //back button functionality - get route, forget key, redirect
+        $backRoute = Session::get("back_route");
+        Session::forget("back_route");
+        return redirect()->to($backRoute);
+    }
+
     public function profilePage()
     {
-        //get the url that redirected user to this page
-        $backRoute = url()->previous();
-        $showProfileLink = false;
-        return view("profile.accountInformation", compact("backRoute", "showProfileLink"));
+        //set nav bar buttons
+        $showBackBtn = true;
+        $hideProfileLink = true;
+        //if returning from profile submission, do not reset back_route
+        if (parse_url(url()->previous(), PHP_URL_PATH) != "/profile") {
+            Session::put("back_route", url()->previous());
+        }
+        return view("profile.accountInformation", compact("showBackBtn", "hideProfileLink"));
     }
 
     public function exploreHomePage()
@@ -44,17 +55,17 @@ class PageNavController extends Controller
     }
 
     public function exploreWeekly($contentKey) {
-        $backRoute = route('explore.home');
-        //track explore page
+        //set back_route
+        $showBackBtn = true;
+        Session::put("back_route", '/explore');
+        //track explore page for browse button
         Session::put('last_explore_page', 'explore/'.$contentKey);
-        return view('explore.weekly', compact('backRoute', 'contentKey'));
+        return view('explore.weekly', compact('showBackBtn', 'contentKey'));
     }
 
-    public function exploreBrowseBtn() {
+    public function exploreBrowseButton() {
         //double click functionality - if clicking browse while on an explore page
-        $prevUrl = url()->previous();
-        $path = parse_url($prevUrl, PHP_URL_PATH);
-        if (Str::startsWith($path, '/explore')) {
+        if (Str::startsWith(parse_url(url()->previous(), PHP_URL_PATH), '/explore')) {
             return redirect()->route('explore.home');
         }
 
