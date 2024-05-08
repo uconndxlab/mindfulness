@@ -16,16 +16,15 @@
     <body>
         <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
             <ul class="navbar-nav mr-auto">
-                <!-- show back if backRoute is set -->
-                @if(isset($backRoute))
+                @if(isset($showBackBtn) && $showBackBtn)
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ $backRoute }}">< Back</a>
+                        <a class="nav-link" href="{{ route('button.back') }}">< Back</a>
                     </li>
                 @endif
             </ul>
             <ul class="navbar-nav">
-                <!-- if not set, assume true -->
-                @if(!isset($showProfileLink) || $showProfileLink)
+                <!-- if not set or not true, show it -->
+                @if(!(isset($hideProfileLink) && $hideProfileLink))
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('profile') }}">Hi, {{ Auth::user()->name }}</a>
                     </li>
