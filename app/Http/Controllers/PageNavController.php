@@ -19,6 +19,7 @@ class PageNavController extends Controller
 
     public function journalPage()
     {
+        //TODO - load in list of notes from user
         return view("profile.journal");
     }
 
