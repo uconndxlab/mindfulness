@@ -41,23 +41,4 @@
 </div>
 
 
-<!-- <div class="container mt-4">
-    <h2>Past Notes:</h2>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <label for="past_notes">Select a Note:</label>
-                <select class="form-control" id="past_notes">
-                    <option value="" selected disabled>Select a note...</option>
-                    @foreach($notesList as $note)
-                    <option value="{{ $note->id }}">{{$note->note}}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div id="note_content"></div>
-        </div>
-    </div>
-</div> -->
 @endsection

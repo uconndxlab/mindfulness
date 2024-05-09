@@ -31,7 +31,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             return redirect()->intended('explore');
         }
-        return back()->withErrors(['password' => 'Invalid credentials.']);
+        return back()->withErrors(['password' => 'Invalid credentials.'])->withInput();
     }
 
     public function logout() {
