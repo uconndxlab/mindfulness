@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Note;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NoteController extends Controller
 {
@@ -28,7 +29,18 @@ class NoteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'note'=> ['required', 'string', 'max:1027'],
+            'word_otd'=> ['required', 'in:Relax,Compassion,Other'],
+        ]);
+        
+        $note = Note::create([
+            'note' => $request->note,
+            'word_otd'=> $request->word_otd,
+            'user_id'=> Auth::id(),
+        ]);
+
+        return back()->with('success', 'Note saved.');
     }
 
     /**

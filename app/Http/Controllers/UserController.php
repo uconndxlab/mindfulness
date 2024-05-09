@@ -12,6 +12,9 @@ class UserController extends Controller
     public function updateVoice(Request $request) {
         //check for voiceId
         if ($request->filled('voiceId')) {
+            $request->validate([
+                'voiceId'=> ['in:someName,otherName']
+            ]);
             //get user
             $user = Auth::user();
     
