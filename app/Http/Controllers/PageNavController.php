@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Module;
+use App\Models\Lesson;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -48,15 +50,21 @@ class PageNavController extends Controller
 
     public function exploreHomePage()
     {
-        //example lists for content
-        $week1List = array("Compass1", "Compass2", "Compass3", "Compass4", "Compass5", "Compass6", "Compass7","Compass8");
-        $week2List = array("Compass1", "Compass2", "Compass3", "Compass4", "Compass5");
-        $week3List = array("Compass1", "Compass2", "Compass3", "Compass4", "Compass5", "Compass6");
-        $week4List = array("Compass1", "Compass2", "Compass3", "Compass4", "Compass5", "Compass6");
+        //get list of modules
+        $modules = Module::orderBy('module_number', 'asc')->get();
+
+        //get associated lessons for each module
+        foreach ($modules as $module) {
+            $lessons = Lesson::where('module_id', $module->id)
+                                ->orderBy('lesson_number', 'asc')
+                                ->select('id', 'title')
+                                ->get();
+            $module->lessons = $lessons;
+        }
 
         //track explore page
         Session::put('last_explore_page', 'explore');
-        return view("explore.home", compact("week1List", "week2List", "week3List", "week4List"));
+        return view("explore.home", compact('modules'));
     }
 
     public function exploreLesson($contentKey) {
