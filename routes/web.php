@@ -39,7 +39,7 @@ Route::middleware('auth')->group(function () {
     //explore pages
     Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
     Route::get('/explore', [PageNavController::class, 'exploreHomePage'])->name('explore.home');
-    Route::get('/explore/{contentKey}', [PageNavController::class, 'exploreWeekly'])->name('explore.weekly');
+    Route::get('/explore/{contentKey}', [PageNavController::class, 'exploreLesson'])->name('explore.lesson');
     
     //User updates
     Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
