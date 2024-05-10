@@ -10,6 +10,9 @@
                 margin-top: 4rem;
                 margin-bottom: 4rem;
             }
+            .note-content {
+                word-wrap: break-word;
+            }
         </style>
     </head>
 

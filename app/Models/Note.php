@@ -15,14 +15,4 @@ class Note extends Model
         'user_id',
         'word_otd',
     ];
-
-    public function setNoteAttribute($value)
-    {
-        $this->attributes['note'] = Crypt::encryptString($value);
-    }
-
-    public function getNoteAttribute($value)
-    {
-        return Crypt::decryptString($value);
-    }
 }

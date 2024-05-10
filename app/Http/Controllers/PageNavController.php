@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Note;
 
 class PageNavController extends Controller
 {
@@ -19,8 +21,10 @@ class PageNavController extends Controller
 
     public function journalPage()
     {
-        //TODO - load in list of notes from user
-        return view("profile.journal");
+        // //get user
+        $id = Auth::id();
+        $notes = Note::where('user_id', $id)->orderBy('created_at', 'desc')->get();
+        return view("profile.journal", compact("notes"));
     }
 
     public function backButton() {
