@@ -59,13 +59,13 @@ class PageNavController extends Controller
         return view("explore.home", compact("week1List", "week2List", "week3List", "week4List"));
     }
 
-    public function exploreWeekly($contentKey) {
+    public function exploreLesson($contentKey) {
         //set back_route
         $showBackBtn = true;
         Session::put("back_route", '/explore');
         //track explore page for browse button
         Session::put('last_explore_page', 'explore/'.$contentKey);
-        return view('explore.weekly', compact('showBackBtn', 'contentKey'));
+        return view('explore.lesson', compact('showBackBtn', 'contentKey'));
     }
 
     public function exploreBrowseButton() {
