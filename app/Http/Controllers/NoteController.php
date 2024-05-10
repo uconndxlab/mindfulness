@@ -31,7 +31,7 @@ class NoteController extends Controller
     {
         $request->validate([
             'note'=> ['required', 'string', 'max:1027'],
-            'word_otd'=> ['required', 'in:Relax,Compassion,Other'],
+            'word_otd'=> ['required', 'in:relax,compassion,other'],
         ]);
         
         $note = Note::create([
