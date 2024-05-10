@@ -8,7 +8,10 @@
     EXPLORE PAGE - II
     </p>
     <p>
-        Content to load: {{ $contentKey }}
+        Lesson ID: {{ $contentKey }}
+    </p>
+    <p>
+        ^ This informs what content to load on this page
     </p>
 </div>
 @endsection
