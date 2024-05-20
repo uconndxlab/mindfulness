@@ -30,7 +30,7 @@ class PageNavController extends Controller
         //formatting the date
         foreach ($notes as $note) {
             $date = Carbon::parse($note->created_at);
-            // $date->setTimezone(new \DateTimeZone('EST'));
+            $date->setTimezone(new \DateTimeZone('EST'));
             $note->formatted_date = $date->diffForHumans().', '.$date->toFormattedDayDateString();
         }
         return view("profile.journal", compact("notes"));
@@ -74,13 +74,15 @@ class PageNavController extends Controller
         return view("explore.home", compact('modules'));
     }
 
-    public function exploreLesson($contentKey) {
+    public function exploreLesson($lessonId) {
         //set back_route
         $showBackBtn = true;
         Session::put("back_route", '/explore');
         //track explore page for browse button
-        Session::put('last_explore_page', 'explore/'.$contentKey);
-        return view('explore.lesson', compact('showBackBtn', 'contentKey'));
+        Session::put('last_explore_page', 'explore/'.$lessonId);
+        //get the lesson info
+        $lesson = Lesson::select('id', 'title')->find($lessonId);
+        return view('explore.lesson', compact('showBackBtn', 'lessonId', 'lesson'));
     }
 
     public function exploreBrowseButton() {
