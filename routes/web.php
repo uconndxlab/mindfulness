@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -47,6 +48,13 @@ Route::middleware('auth')->group(function () {
     
     //NOTES
     Route::resource('note', NoteController::class);
+
+
+    //ADMIN ONLY
+    Route::middleware('admin')->group(function () {
+        //Content upload
+        Route::get('/admin/contentUpload', [ContentController::class,'contentUploadPage'])->name('admin.upload');
+    });
 });
 
 // Route::get('/note', [NoteController::class, 'index'])->name('note.index');
