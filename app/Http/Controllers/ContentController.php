@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 class ContentController extends Controller
 {
     public function contentUploadPage() {
-        return view('admin.contentUpload');
+        //adjust navbars
+        $showBackBtn = true;
+        $hideBottomNav = true;
+        $hideProfileLink = true;
+        return view('admin.contentUpload', compact('showBackBtn', 'hideBottomNav', 'hideProfileLink'));
+    }
+
+    public function uploadContent() { 
+
     }
 }

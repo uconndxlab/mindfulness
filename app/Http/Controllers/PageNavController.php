@@ -38,6 +38,11 @@ class PageNavController extends Controller
 
     public function backButton() {
         //back button functionality - get route, forget key, redirect
+
+        //if from admin page, hardcode back button
+        if (parse_url(url()->previous(), PHP_URL_PATH) == "/admin/contentUpload") {
+            return redirect()->route('profile');
+        }
         $backRoute = Session::get("back_route");
         Session::forget("back_route");
         return redirect()->to($backRoute);
@@ -48,8 +53,9 @@ class PageNavController extends Controller
         //set nav bar buttons
         $showBackBtn = true;
         $hideProfileLink = true;
-        //if returning from profile submission, do not reset back_route
-        if (parse_url(url()->previous(), PHP_URL_PATH) != "/profile") {
+        //if returning from profile submission or admin page, do not reset back_route
+        $prev_path = parse_url(url()->previous(), PHP_URL_PATH);
+        if ($prev_path != "/profile" && $prev_path != "/admin/contentUpload") {
             Session::put("back_route", url()->previous());
         }
         return view("profile.accountInformation", compact("showBackBtn", "hideProfileLink"));
