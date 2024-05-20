@@ -53,8 +53,11 @@ Route::middleware('auth')->group(function () {
     //ADMIN ONLY
     Route::middleware('admin')->group(function () {
         //Content upload
-        Route::get('/admin/contentUpload', [ContentController::class,'contentUploadPage'])->name('admin.content');
-        Route::post('/admin/contentUpload', [ContentController::class,'uploadContent'])->name('admin.upload');
+        Route::get('/admin', [ContentController::class,'adminPage'])->name('admin.browse');
+        Route::get('/admin/lesson/create', [ContentController::class,'newLessonPage'])->name('admin.lesson.create');
+        Route::post('/admin/lesson', [ContentController::class, 'storeLesson'])->name('admin.lesson.store');
+        Route::get('/admin/lesson/{lessonId}', [ContentController::class,'showLessonPage'])->name('admin.lesson.show');
+        Route::put('/admin/lesson/{lessonId}', [ContentController::class,'updateLesson'])->name('admin.lesson.update');
     });
 });
 

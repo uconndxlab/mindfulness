@@ -39,12 +39,16 @@ class PageNavController extends Controller
     public function backButton() {
         //back button functionality - get route, forget key, redirect
 
-        //if from admin page, hardcode back button
-        if (parse_url(url()->previous(), PHP_URL_PATH) == "/admin/contentUpload") {
-            return redirect()->route('profile');
+        //if from admin page, get separate session variable
+        $prev_path = parse_url(url()->previous(), PHP_URL_PATH);
+        if (Str::startsWith($prev_path, '/admin')) {
+            $backRoute = Session::get("admin_back_route");
+            Session::forget("admin_back_route");
         }
-        $backRoute = Session::get("back_route");
-        Session::forget("back_route");
+        else {
+            $backRoute = Session::get("back_route");
+            Session::forget("back_route");
+        }
         return redirect()->to($backRoute);
     }
 
@@ -55,14 +59,13 @@ class PageNavController extends Controller
         $hideProfileLink = true;
         //if returning from profile submission or admin page, do not reset back_route
         $prev_path = parse_url(url()->previous(), PHP_URL_PATH);
-        if ($prev_path != "/profile" && $prev_path != "/admin/contentUpload") {
+        if ($prev_path != "/profile" && !Str::startsWith($prev_path, '/admin')) {
             Session::put("back_route", url()->previous());
         }
         return view("profile.accountInformation", compact("showBackBtn", "hideProfileLink"));
     }
 
-    public function exploreHomePage()
-    {
+    public function getModulesList() {
         //get list of modules
         $modules = Module::orderBy('module_number', 'asc')->get();
 
@@ -74,7 +77,13 @@ class PageNavController extends Controller
                                 ->get();
             $module->lessons = $lessons;
         }
+        return $modules;
+    }
 
+    public function exploreHomePage()
+    {
+        //get list of modules
+        $modules = $this->getModulesList();
         //track explore page
         Session::put('last_explore_page', 'explore');
         return view("explore.home", compact('modules'));

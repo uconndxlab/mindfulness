@@ -11,7 +11,7 @@
     @endif
     <form method="POST" action="{{ route('note.store') }}">
         @csrf
-        <div class="form-group"">
+        <div class="form-group">
             <label class="font-weight-bold" for="word_otd">Word of the day:</label>
             <select class="form-control" id="word_otd" name="word_otd">
                 <option value="relax">Relax</option>
@@ -29,6 +29,7 @@
             </span>
             @enderror
         </div>
+
         <div class="text-center">
             <div class="form-group">
                 <button type="submit" class="btn btn-success">SAVE NOTE</button>
