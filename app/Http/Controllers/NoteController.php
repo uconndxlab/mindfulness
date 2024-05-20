@@ -13,7 +13,7 @@ class NoteController extends Controller
      */
     public function index()
     {
-        return 'index';
+        //
     }
 
     /**
@@ -21,7 +21,7 @@ class NoteController extends Controller
      */
     public function create()
     {
-        return 'create';
+        //
     }
 
     /**
@@ -48,7 +48,7 @@ class NoteController extends Controller
      */
     public function show(Note $note)
     {
-        return 'show';
+        //
     }
 
     /**
@@ -56,7 +56,7 @@ class NoteController extends Controller
      */
     public function edit(Note $note)
     {
-        return 'edit';
+        //
     }
 
     /**

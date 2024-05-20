@@ -1,17 +1,16 @@
 @extends('layouts.main')
 
-@section('title', 'Weekly')
+@section('title', $lesson->title)
 
 @section('content')
-<div>
-    <p>
-    EXPLORE PAGE - II
-    </p>
-    <p>
-        Lesson ID: {{ $contentKey }}
-    </p>
-    <p>
-        ^ This informs what content to load on this page
-    </p>
+<div class="col-md-8">
+    <div class="text-left">
+        <h1 class="display font-weight-bold">{{ $lesson->title }}</h1>
+    </div>
+
+    <div class="container mt-4">
+            Content
+    </div>
+
 </div>
 @endsection

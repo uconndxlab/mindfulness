@@ -16,7 +16,7 @@
                     <p>{{ $module->name }}:</p>
                     @foreach ($module->lessons as $lesson)
                         <div class="p-1">
-                            <a class="btn btn-primary btn-block" href="{{ route('explore.lesson', ['contentKey' => $lesson->id]) }}">{{ $lesson->title }}</a>
+                            <a class="btn btn-primary btn-block" href="{{ route('explore.lesson', ['lessonId' => $lesson->id]) }}">{{ $lesson->title }}</a>
                         </div>
                     @endforeach
                 </div>
