@@ -11,13 +11,15 @@
             $selected = old('module', $lesson->module_id);
             $title = old('title', $lesson->title);
             $description = old('description', $lesson->description);
+            $method = "PUT";
         }
         else {
             $header = "New Lesson:";
             $submissionRoute = route('admin.lesson.store');
-            $selected = old('module');
+            $selected = old('module', $moduleId);
             $title = old('title');
             $description = old('description');
+            $method = "POST";
         }
     @endphp
 
@@ -31,7 +33,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ $submissionRoute }}">
+    <form method={{ $method }} action="{{ $submissionRoute }}" enctype="multipart/form-data">
         @csrf
         
         <div class="form-group">
@@ -72,9 +74,9 @@
         </div>
 
         <div class="form-group">
-            <label for="fileInput" class="form-label">Choose File</label>
+            <label for="file" class="form-label">Choose File</label>
             <input class="form-control @error('file') is-invalid @enderror" type="file" id="file" name="file">
-            @error('title')
+            @error('file')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
                 </span>

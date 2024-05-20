@@ -34,7 +34,7 @@ class ContentController extends Controller
         return view("explore.home", compact('modules', 'fromAdmin', 'showBackBtn', 'hideBottomNav', 'hideProfileLink'));
     }
 
-    public function newLessonPage() {
+    public function newLessonPage(Request $request) {
         //show page for creating a new lesson
 
         //adjust navbars
@@ -42,11 +42,50 @@ class ContentController extends Controller
         $hideBottomNav = true;
         $hideProfileLink = true;
 
+        //tracking module that was clicked
+        $moduleId = $request->moduleId;
+
         Session::put("admin_back_route", '/admin');
 
         $modules = Module::orderBy('module_number', 'asc')->get();
 
-        return view('admin.lessonUpload', compact('showBackBtn', 'hideBottomNav', 'hideProfileLink', 'modules'));
+        return view('admin.lessonUpload', compact('showBackBtn', 'hideBottomNav', 'hideProfileLink', 'modules', 'moduleId'));
+    }
+
+    public function storeLesson(Request $request) {
+        //store a new lesson
+        try {
+            $request->validate([
+                'title' => ['required', 'string', 'max:255'],
+                'module' => ['required', 'exists:modules,id'],
+                'description' => ['nullable', 'string', 'max:1027'],
+                'file'=> ['nullable', 'mimes:mp4,mp3,wav,ogg', 'max:40960'],
+            ]);
+        } catch (ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        }
+
+        //upload file
+        $filePath = null;
+        if ($request->hasFile('file')) {
+            $filePath = $request->file('file')->store('content');
+        }
+
+        //update module lesson count
+        $module = Module::find($request->module);
+        $module->lesson_count = Lesson::where('module_id', $module->id)->count() + 1;
+        $module->save();
+
+        //create lesson
+        $lesson = Lesson::create([
+            'title' => $request->title,
+            'module_id' => $request->module,
+            'lesson_number' => $module->lesson_count,
+            'description' => $request->description,
+            'file_path' => $filePath,
+        ]);
+
+        return redirect()->route('admin.browse')->with('success', 'Lesson created successfully!');
     }
 
     public function showLessonPage($lessonId) {
@@ -65,18 +104,11 @@ class ContentController extends Controller
         return view('admin.lessonUpload', compact('showBackBtn', 'hideBottomNav', 'hideProfileLink', 'modules', 'lesson'));
     }
 
-    public function storeLesson(Request $request) {
-        //store a new lesson
-        try {
-            $request->validate([
-                //update validation for moduleid
-                'title' => ['required', 'string', 'max:255'],
-                'module' => ['required', 'string', 'in:relax,compassion,other'],
-                'description' => ['string', 'max:1027'],
-                'file'=> ['extensions:m4a,mp3,mp4'],
-            ]);
-        } catch (ValidationException $e) {
-            return redirect()->back()->withErrors($e->errors())->withInput();
-        }
+    public function updateLesson($lessonId) {
+        
+    }
+
+    public function deleteLesson($lessonId) {
+        
     }
 }
