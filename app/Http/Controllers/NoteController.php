@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Note;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class NoteController extends Controller
 {
@@ -29,10 +30,14 @@ class NoteController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'note'=> ['required', 'string', 'max:1027'],
-            'word_otd'=> ['required', 'in:relax,compassion,other'],
-        ]);
+        try {
+            $request->validate([
+                'note'=> ['required', 'string', 'max:1027'],
+                'word_otd'=> ['required', 'in:relax,compassion,other'],
+            ]);
+        } catch (ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        }
         
         $note = Note::create([
             'note' => $request->note,

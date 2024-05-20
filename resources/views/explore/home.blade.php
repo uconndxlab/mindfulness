@@ -4,8 +4,14 @@
 
 @section('content')
 <div class="col-md-8">
+    @php
+        $adminCheck = isset($fromAdmin) && $fromAdmin && Auth::user()->isAdmin();
+        $route = $adminCheck ? 'admin.lesson.show' : 'explore.lesson';
+        $header = $adminCheck ? '***EDIT MODULES:***' : 'Mindfulness Modules:';
+    @endphp
+
     <div class="text-left">
-        <h1 class="display font-weight-bold">Mindfulness Modules:</h1>
+        <h1 class="display font-weight-bold">{{ $header }}</h1>
     </div>
 
     <div class="container">
@@ -16,9 +22,14 @@
                     <p>{{ $module->name }}:</p>
                     @foreach ($module->lessons as $lesson)
                         <div class="p-1">
-                            <a class="btn btn-primary btn-block" href="{{ route('explore.lesson', ['lessonId' => $lesson->id]) }}">{{ $lesson->title }}</a>
+                            <a class="btn btn-primary btn-block" href="{{ route($route, ['lessonId' => $lesson->id]) }}">{{ $lesson->title }}</a>
                         </div>
                     @endforeach
+                    @if ($adminCheck)
+                        <div class="p-1">
+                            <a class="btn btn-success btn-block" href="{{ route('admin.lesson.create') }}">+</a>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
