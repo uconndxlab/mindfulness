@@ -14,6 +14,12 @@
         <h1 class="display font-weight-bold">{{ $header }}</h1>
     </div>
 
+    @if (session('success'))
+    <div class="alert alert-success" role="alert">
+        {{ session('success') }}
+    </div>
+    @endif
+
     <div class="container">
         @foreach ($modules as $module)
         <div class="row mb-3 border justify-content-center d-flex align-items-stretch">
@@ -27,7 +33,7 @@
                     @endforeach
                     @if ($adminCheck)
                         <div class="p-1">
-                            <a class="btn btn-success btn-block" href="{{ route('admin.lesson.create') }}">+</a>
+                            <a class="btn btn-success btn-block" href="{{ route('admin.lesson.create', ['moduleId' => $module->id]) }}">+</a>
                         </div>
                     @endif
                 </div>

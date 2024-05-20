@@ -13,4 +13,12 @@ class Lesson extends Model
     {
         return $this->belongsTo(Module::class);
     }
+
+    protected $fillable = [
+        'title',
+        'module_id',
+        'lesson_number',
+        'description',
+        'file_path',
+    ];
 }
