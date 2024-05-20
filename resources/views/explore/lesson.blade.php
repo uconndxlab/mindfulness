@@ -8,7 +8,7 @@
         <h1 class="display font-weight-bold">{{ $lesson->title }}</h1>
     </div>
 
-    <div class="container mt-4">
+    <div class="container manual-margin-top">
             Content
     </div>
 

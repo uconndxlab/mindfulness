@@ -48,6 +48,14 @@
                 <button type="submit" class="btn btn-primary">SAVE</button>
             </div>
         </div>
-        </form>
+    </form>
+
+    @if (auth::user()->isAdmin())
+        <div class="text-center">
+            <div class="form-group">
+                <a href="{{ route('admin.content') }}" class="btn btn-primary">ADMIN: Content Upload</a>
+            </div>
+        </div>
+    @endif
 </div>
 @endsection

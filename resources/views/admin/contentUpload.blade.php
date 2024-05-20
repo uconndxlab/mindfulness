@@ -1,48 +1,32 @@
-@extends('layouts.auth')
+@extends('layouts.main')
 
 @section('title', 'Content Upload')
 
 @section('content')
-<div class="col-md-4">
+<div class="col-md-6">
+    <div class="text-left">
+        <h1 class="display font-weight-bold">Content Upload:</h1>
+    </div>
+
     @if (session('success'))
     <div class="alert alert-success" role="alert">
         {{ session('success') }}
     </div>
     @endif
 
-    <form method="POST" action="{{ route('user.update.namePass') }}">
+    <form method="POST" action="{{ route('admin.upload') }}">
         @csrf
-        @Method('put')
         
         <div class="form-group">
-            <label for="name">CONTENT PAGE</label>
-            <input id="name" type="name" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name', Auth::user()->name) }}">
-            @error('name')
+            <label for="title">Title</label>
+            <input id="title" class="form-control @error('title') is-invalid @enderror" name="title" value="{{ old('title') }}">
+            @error('title')
             <span class="invalid-feedback" role="alert">
                 <strong>{{ $message }}</strong>
                 </span>
                 @enderror
         </div>
         
-        <div class="form-group">
-            <label for="password">New Password</label>
-            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password">
-            @error('password')
-            <span class="invalid-feedback" role="alert">
-                <strong>{{ $message }}</strong>
-            </span>
-            @enderror
-        </div>
-
-        <div class="form-group">
-            <label for="oldPass">Enter old password to confirm changes:</label>
-            <input id="oldPass" type="password" class="form-control @error('oldPass') is-invalid @enderror" name="oldPass">
-            @error('oldPass')
-            <span class="invalid-feedback" role="alert">
-                <strong>{{ $message }}</strong>
-            </span>
-            @enderror
-        </div>
         <div class="text-center">
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">SAVE</button>
