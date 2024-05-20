@@ -37,7 +37,10 @@
     </form>
     <h3 class="font-weight-bold">Previous Notes:</h3>
     @foreach ($notes as $note)
-        <h5 class="font-weight-bold">{{ $note->word_otd }} (Created at: {{ $note->created_at }})</h5>
+        <h5 class="font-weight-bold d-flex justify-content-between">
+            <span>{{ $note->word_otd }}</span>
+            <span>{{ $note->formatted_date }}</span>
+        </h5>
         <p class="note-content">{{ $note->note }}</p>
     @endforeach
 </div>

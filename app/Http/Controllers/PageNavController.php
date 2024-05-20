@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Module;
 use App\Models\Lesson;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -23,9 +24,15 @@ class PageNavController extends Controller
 
     public function journalPage()
     {
-        // //get user
+        //get user
         $id = Auth::id();
         $notes = Note::where('user_id', $id)->orderBy('created_at', 'desc')->get();
+        //formatting the date
+        foreach ($notes as $note) {
+            $date = Carbon::parse($note->created_at);
+            // $date->setTimezone(new \DateTimeZone('EST'));
+            $note->formatted_date = $date->diffForHumans().', '.$date->toFormattedDayDateString();
+        }
         return view("profile.journal", compact("notes"));
     }
 
