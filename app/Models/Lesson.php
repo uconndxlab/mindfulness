@@ -20,5 +20,8 @@ class Lesson extends Model
         'lesson_number',
         'description',
         'file_path',
+        'file_name',
+        'sub_header',
+        'end_behavior'
     ];
 }
