@@ -58,9 +58,11 @@ class ContentController extends Controller
         try {
             $request->validate([
                 'title' => ['required', 'string', 'max:255'],
+                'sub_header' => ['nullable', 'string', 'max:255'],
                 'module' => ['required', 'exists:modules,id'],
                 'description' => ['nullable', 'string', 'max:1027'],
                 'file'=> ['nullable', 'mimes:mp4,mp3,wav,ogg', 'max:40960'],
+                'end_behavior' => ['required', 'in:none,quiz,journal'],
             ]);
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
@@ -68,8 +70,10 @@ class ContentController extends Controller
 
         //upload file
         $filePath = null;
+        $file_name = null;
         if ($request->hasFile('file')) {
             $filePath = $request->file('file')->store('content');
+            $file_name = $request->file('file')->getClientOriginalName();
         }
 
         //update module lesson count
@@ -80,10 +84,13 @@ class ContentController extends Controller
         //create lesson
         $lesson = Lesson::create([
             'title' => $request->title,
+            'sub_header' => $request->sub_header,
             'module_id' => $request->module,
             'lesson_number' => $module->lesson_count,
             'description' => $request->description,
             'file_path' => $filePath,
+            'file_name' => $file_name,
+            'end_behavior' => $request->end_behavior
         ]);
 
         return redirect()->route('admin.browse')->with('success', 'Lesson created successfully!');
@@ -100,7 +107,7 @@ class ContentController extends Controller
         Session::put("admin_back_route", '/admin');
 
         $modules = Module::orderBy('module_number', 'asc')->get();
-        $lesson = Lesson::select('id', 'title', 'module_id', 'file_path', 'description')->find($lessonId);
+        $lesson = Lesson::find($lessonId);
 
         return view('admin.lessonUpload', compact('showBackBtn', 'hideBottomNav', 'hideProfileLink', 'modules', 'lesson'));
     }
@@ -109,9 +116,11 @@ class ContentController extends Controller
         try {
             $request->validate([
                 'title' => ['required', 'string', 'max:255'],
+                'sub_header' => ['nullable', 'string', 'max:255'],
                 'module' => ['required', 'exists:modules,id'],
                 'description' => ['nullable', 'string', 'max:1027'],
                 'file'=> ['nullable', 'mimes:mp4,mp3,wav,ogg', 'max:40960'],
+                'end_behavior' => ['required', 'in:none,quiz,journal']
             ]);
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
@@ -119,6 +128,8 @@ class ContentController extends Controller
 
         $lesson = Lesson::find($lessonId);
         $lesson->title = $request->title;
+        $lesson->sub_header = $request->sub_header;
+        $lesson->end_behavior = $request->end_behavior;
         if ($lesson->module_id != $request->module) {
             //lesson count on old module
             $module = Module::find($lesson->module_id);
@@ -168,6 +179,7 @@ class ContentController extends Controller
                 //save new
                 $newFilePath = $newFile->store('content');
                 $lesson->file_path = $newFilePath;
+                $lesson->file_name = $newFile->getClientOriginalName();
             }
         }
 

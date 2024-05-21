@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('lessons', function (Blueprint $table) {
-            $table->string('file_path')->nullable();
-            $table->string('description')->nullable();
+            $table->string('sub_header')->nullable()->after('title');
+            $table->string('file_name')->nullable()->after('updated_at');
+            $table->enum('end_behavior', ['quiz', 'journal', 'none'])->default('none');
         });
     }
 
@@ -23,8 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('lessons', function (Blueprint $table) {
-            $table->dropColumn('file_path');
-            $table->dropColumn('description');
+            $table->dropColumn('sub_header');
+            $table->dropColumn('file_name');
+            $table->dropColumn('end_behavior');
         });
     }
 };
