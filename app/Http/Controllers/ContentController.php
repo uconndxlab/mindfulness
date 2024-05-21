@@ -120,21 +120,26 @@ class ContentController extends Controller
         $lesson = Lesson::find($lessonId);
         $lesson->title = $request->title;
         if ($lesson->module_id != $request->module) {
-            //lesson count
+            //lesson count on old module
             $module = Module::find($lesson->module_id);
-            $module->lesson_count = Lesson::where('module_id', $module->id)->count() + 1;
+            $module->lesson_count--;
             $module->save();
-
+            
             //adjusting lesson numbers
-            $lessonsAfter = Lesson::where('lesson_number' > $lesson->lesson_number);
+            $lessonsAfter = Lesson::where('module_id', $lesson->module_id)
+                                    ->where('lesson_number', '>', $lesson->lesson_number)
+                                    ->get();
             foreach ($lessonsAfter as $lessonAfter) {
                 $lessonAfter->lesson_number--;
                 $lessonAfter->save();
             }
-
+            
             //assign lesson to module
             $lesson->module_id = $request->module;
+            $module = Module::find($lesson->module_id);
+            $module->lesson_count++;
             $lesson->lesson_number = $module->lesson_count;
+            $module->save();
         }
         $lesson->description = $request->description;
 
@@ -181,9 +186,19 @@ class ContentController extends Controller
             }
         }
         $module = Module::find($lesson->module_id);
+
+        //adjusting lesson numbers
+        $lessonsAfter = Lesson::where('module_id', $module->id)
+                                ->where('lesson_number', '>', $lesson->lesson_number)
+                                ->get();
+        foreach ($lessonsAfter as $lessonAfter) {
+            $lessonAfter->lesson_number--;
+            $lessonAfter->save();
+        }
+
         $lesson->delete();
         //adjust module
-        $module->lesson_count = Lesson::where('module_id', $module->id)->count();
+        $module->lesson_count--;
         $module->save();
 
         return redirect()->route('admin.browse')->with('success', 'Lesson deleted.');

@@ -57,7 +57,7 @@
         </div>
 
         <div class="form-group">
-            <label for="title">Lesson Title</label>
+            <label for="title">Title</label>
             <input id="title" class="form-control @error('title') is-invalid @enderror" name="title" value="{{ $title }}">
             @error('title')
                 <span class="invalid-feedback" role="alert">
@@ -68,7 +68,7 @@
 
         <div class="form-group">
             <label for="description">Description</label>
-            <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" value="{{ $description }}"></textarea>
+            <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5">{{ $description }}</textarea>
             @error('description')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
@@ -91,17 +91,17 @@
                 <button type="submit" class="btn btn-primary">SAVE</button>
             </div>
         </div>
-        @if (isset($lesson))
-            <form method="POST" action="{{ route('admin.lesson.delete', ['lessonId' => $lesson->id])}}">
-            @csrf
-            @method("DELETE")
-                <div class="text-center">
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-danger">DELETE</button>
-                    </div>
-                </div>
-            </form>
-        @endif
     </form>
+    @if (isset($lesson))
+        <form method="POST" action="{{ route('admin.lesson.delete', ['lessonId' => $lesson->id])}}">
+        @csrf
+        @method("DELETE")
+            <div class="text-center">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-danger">DELETE</button>
+                </div>
+            </div>
+        </form>
+    @endif
 </div>
 @endsection
