@@ -116,12 +116,37 @@
             @enderror
         </div>
 
+        
+        <h3 class="font-weight-bold">Quiz Details: ***If applicable</h3>
+        <div class="form-group">
+            <label for="quiz_question" class="font-weight-bold">Question:</label>
+            <input type="text" class="form-control" id="quiz_question" name="quiz_question" value="{{ old('quiz_question') }}">
+        </div>
+
+        @for ($i = 1; $i <= 5; $i++)
+            <div class="form-group">
+                <label for="option_{{ $i }}" class="font-weight-bold">Option {{ $i }}:</label>
+                <input type="text" class="form-control" id="option_{{ $i }}" name="option_{{ $i }}" value="{{ old('option_'.$i) }}">
+            </div>
+
+            <div class="form-group">
+                <label for="feedback_{{ $i }}" class="font-weight-bold">Feedback {{ $i }}:</label>
+                <textarea type="text" class="form-control" id="feedback_{{ $i }}" name="feedback_{{ $i }}">{{ old('feedback_'.$i) }}</textarea>
+            </div>
+        @endfor
+
+        <div class="form-group">
+            <label for="quiz_correct_answer" class="font-weight-bold">Correct Answer (number):</label>
+            <input type="number" class="form-control" id="quiz_correct_answer" name="quiz_correct_answer" value="{{ old('quiz_correct_answer') }}">
+        </div>
+
         <div class="text-center">
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">SAVE</button>
             </div>
         </div>
     </form>
+
     @if (isset($lesson))
         <form method="POST" action="{{ route('admin.lesson.delete', ['lessonId' => $lesson->id])}}">
         @csrf
