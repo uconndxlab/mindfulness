@@ -58,6 +58,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/lesson', [ContentController::class, 'storeLesson'])->name('admin.lesson.store');
         Route::get('/admin/lesson/{lessonId}', [ContentController::class,'showLessonPage'])->name('admin.lesson.show');
         Route::put('/admin/lesson/{lessonId}', [ContentController::class,'updateLesson'])->name('admin.lesson.update');
+        Route::delete('/admin/lesson/{lessonId}', [ContentController::class, 'deleteLesson'])->name('admin.lesson.delete');
     });
 });
 

@@ -24,7 +24,7 @@
     @endphp
 
     <div class="text-left">
-        <h1 class="display font-weight-bold">Content Upload:</h1>
+        <h1 class="display font-weight-bold">{{ $header }}</h1>
     </div>
 
     @if (session('success'))
@@ -33,8 +33,11 @@
     </div>
     @endif
 
-    <form method={{ $method }} action="{{ $submissionRoute }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ $submissionRoute }}" enctype="multipart/form-data">
         @csrf
+        @if ($method == "PUT")
+            @method("PUT")
+        @endif
         
         <div class="form-group">
             <label for="module">Module</label>
@@ -88,6 +91,17 @@
                 <button type="submit" class="btn btn-primary">SAVE</button>
             </div>
         </div>
-        </form>
+        @if (isset($lesson))
+            <form method="POST" action="{{ route('admin.lesson.delete', ['lessonId' => $lesson->id])}}">
+            @csrf
+            @method("DELETE")
+                <div class="text-center">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-danger">DELETE</button>
+                    </div>
+                </div>
+            </form>
+        @endif
+    </form>
 </div>
 @endsection
