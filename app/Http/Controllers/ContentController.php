@@ -216,14 +216,14 @@ class ContentController extends Controller
                 $newFileHash = hash_file('md5', $newFile->getRealPath());
                 //if path saved in db
                 if ($lesson->file_path) {
-                    $currentFilePath = storage_path('app/'.$lesson->file_path);
+                    $currentFilePath = storage_path('app/public/'.$lesson->file_path);
                     //if file exists
                     if (file_exists($currentFilePath)) {
                         $currentFileHash = hash_file('md5', $currentFilePath);
                         //if file is not the same
                         if ($newFileHash !== $currentFileHash) {
                             //delete old
-                            Storage::disk()->delete($lesson->file_path);
+                            Storage::disk()->delete('public/'.$lesson->file_path);
                         }
                         else {
                             $sameFile = true;
@@ -252,11 +252,11 @@ class ContentController extends Controller
     }
 
     public function deleteLesson($lessonId) {
-        $lesson = Lesson::find($lessonId);
+        $lesson = Lesson::findOrFail($lessonId);
         //delete content
         if ($lesson->file_path) {
-            if (file_exists(storage_path('app/puiblic/'.$lesson->file_path))) {
-                Storage::disk()->delete($lesson->file_path);
+            if (file_exists(storage_path('app/public/'.$lesson->file_path))) {
+                Storage::disk()->delete('public/'.$lesson->file_path);
             }
         }
         $module = Module::find($lesson->module_id);
