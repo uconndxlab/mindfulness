@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Module;
 use App\Models\Lesson;
+use App\Models\Quiz;
+use App\Models\Note;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Note;
+use Illuminate\Http\Request;
+
 
 class PageNavController extends Controller
 {
@@ -80,7 +83,7 @@ class PageNavController extends Controller
         return $modules;
     }
 
-    public function exploreHomePage()
+    public function exploreHome()
     {
         //get list of modules
         $modules = $this->getModulesList();
@@ -97,7 +100,42 @@ class PageNavController extends Controller
         Session::put('last_explore_page', 'explore/'.$lessonId);
         //get the lesson info
         $lesson = Lesson::find($lessonId);
-        return view('explore.lesson', compact('showBackBtn', 'lessonId', 'lesson'));
+        //get quizid
+        $quizId = null;
+        if ($lesson->end_behavior == 'quiz') {
+            $quizId = Quiz::where('lesson_id', $lesson->id)->value('id');
+        }
+        return view('explore.lesson', compact('showBackBtn', 'lessonId', 'lesson', 'quizId'));
+    }
+
+    public function exploreQuiz($quizId) {
+        //quiz info
+        $quiz = Quiz::find($quizId);
+        $showBackBtn = true;
+        //set routes for browse and back buttons
+        Session::put("back_route", '/explore/'.$quiz->lesson_id);
+        Session::put('last_explore_page', 'explore/quiz/'.$quizId);
+        //get activity title
+        $activityTitle = Lesson::find($quiz->lesson_id)->value('title');
+        return view('explore.quiz', compact('showBackBtn', 'quiz', 'activityTitle'));
+    }
+
+    public function submitQuiz(Request $request, $quizId)
+    {
+        //get quiz and chceck answer
+        $quiz = Quiz::find($quizId);
+        $selectedOption = intval($request->answer);
+        $isCorrect = $quiz->correct_answer == $selectedOption+1;
+        $feedback = null;
+        
+        //convert options and get feedback
+        $options = json_decode($quiz->options_feedback) ?? [];
+        $feedback = $options[$selectedOption]->feedback;
+
+        return redirect()->back()->with([
+            'feedback' => $feedback,
+            'is_correct' => $isCorrect
+        ])->withInput();
     }
 
     public function exploreBrowseButton() {

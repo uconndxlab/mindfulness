@@ -30,7 +30,12 @@ class ContentController extends Controller
         $optionsFeedback = [];
         $index = 1;
         
+        // $answer = "none";
         while ($request->has("option_$index")) {
+            //assigning the correct answer
+            // if ($index == $request->quiz_correct_answer) {
+            //     $answer = $request->input("option_$index");
+            // }
             $optionsFeedback[] = [
                 'option' => $request->input("option_$index"),
                 'feedback' => $request->input("feedback_$index"),
