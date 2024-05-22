@@ -96,7 +96,7 @@ class PageNavController extends Controller
         //track explore page for browse button
         Session::put('last_explore_page', 'explore/'.$lessonId);
         //get the lesson info
-        $lesson = Lesson::select('id', 'title')->find($lessonId);
+        $lesson = Lesson::find($lessonId);
         return view('explore.lesson', compact('showBackBtn', 'lessonId', 'lesson'));
     }
 

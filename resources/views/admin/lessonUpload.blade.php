@@ -15,13 +15,6 @@
             $file_name = "Current file: ".$lesson->file_name;
             $end_behavior = old('end_behavior', $lesson->end_behavior);
             $method = "PUT";
-
-            $question = old('quiz_question', $quiz->question);
-            $quizOptions = old('quiz_options', []);
-            if (isset($quiz)) {
-                $quizOptions = json_decode($quiz->options_feedback) ?? [];
-            }
-            $answer = old('quiz_correct_answer', $quiz->correct_answer);
         }
         else {
             $header = "New Lesson:";
@@ -33,11 +26,20 @@
             $file_name = "Choose file:";
             $end_behavior = 'none';
             $method = "POST";
+        }
 
+        if (isset($quiz)) {
+            $question = old('quiz_question', $quiz->question);
+            $quizOptions = json_decode($quiz->options_feedback) ?? [];
+            $answer = old('quiz_correct_answer', $quiz->correct_answer);
+        }
+        else {
             $question = old('quiz_question');
             $quizOptions = old('quiz_options', []);
             $answer = old('quiz_correct_answer');
         }
+
+
     @endphp
 
     <div class="text-left">
