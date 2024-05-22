@@ -30,7 +30,7 @@ class MainSeeder extends Seeder
         Module::all()->each(function ($module) {
             for ($i = 1; $i <= $module->lesson_count; $i++) {
                 Lesson::create([
-                    'title' => 'Compass ' . $i,
+                    'title' => 'Empty ' . $i,
                     'module_id' => $module->id,
                     'lesson_number' => $i,
                 ]);

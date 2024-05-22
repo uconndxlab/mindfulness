@@ -99,7 +99,7 @@ class PageNavController extends Controller
         //track explore page for browse button
         Session::put('last_explore_page', 'explore/'.$lessonId);
         //get the lesson info
-        $lesson = Lesson::find($lessonId);
+        $lesson = Lesson::findOrFail($lessonId);
         //get quizid
         $quizId = null;
         if ($lesson->end_behavior == 'quiz') {
@@ -110,7 +110,7 @@ class PageNavController extends Controller
 
     public function exploreQuiz($quizId) {
         //quiz info
-        $quiz = Quiz::find($quizId);
+        $quiz = Quiz::findOrFail($quizId);
         $showBackBtn = true;
         //set routes for browse and back buttons
         Session::put("back_route", '/explore/'.$quiz->lesson_id);
