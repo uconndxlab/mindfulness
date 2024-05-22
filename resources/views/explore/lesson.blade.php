@@ -8,7 +8,7 @@
         @php
             if ($lesson->end_behavior == 'quiz') {
                 $redirectLabel = "TAKE QUIZ";
-                $redirectRoute = route('profile');
+                $redirectRoute = route('explore.quiz', ['quizId' => $quizId]);
             }
             else if ($lesson->end_behavior == "journal") {
                 $redirectLabel = "JOURNAL";
@@ -49,7 +49,7 @@
     const redirectButton = document.getElementById('redirectButton')
 
     //disabling the redirection button
-    redirectButton.classList.add('disabled');
+    // redirectButton.classList.add('disabled');
     audio.addEventListener('ended', () => {
         redirectButton.classList.remove('disabled');
     });

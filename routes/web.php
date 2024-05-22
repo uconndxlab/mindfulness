@@ -39,8 +39,10 @@ Route::middleware('auth')->group(function () {
 
     //explore pages
     Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
-    Route::get('/explore', [PageNavController::class, 'exploreHomePage'])->name('explore.home');
+    Route::get('/explore', [PageNavController::class, 'exploreHome'])->name('explore.home');
     Route::get('/explore/{lessonId}', [PageNavController::class, 'exploreLesson'])->name('explore.lesson');
+    Route::get('/explore/quiz/{quizId}', [PageNavController::class,'exploreQuiz'])->name('explore.quiz');
+    Route::post('/explore/quiz/{quizId}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
     
     //User updates
     Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
