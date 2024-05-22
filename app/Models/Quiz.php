@@ -12,12 +12,12 @@ class Quiz extends Model
     protected $fillable = [
         'lesson_id', 
         'question', 
-        'options_feeback', 
+        'options_feedback', 
         'correct_answer'
     ];
 
     protected $casts = [
-        'options' => 'array',
+        'options_feeback' => 'array',
     ];
 
     public function lesson()
