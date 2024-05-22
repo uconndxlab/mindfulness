@@ -255,7 +255,7 @@ class ContentController extends Controller
         $lesson = Lesson::find($lessonId);
         //delete content
         if ($lesson->file_path) {
-            if (file_exists(storage_path('app/'.$lesson->file_path))) {
+            if (file_exists(storage_path('app/puiblic/'.$lesson->file_path))) {
                 Storage::disk()->delete($lesson->file_path);
             }
         }
