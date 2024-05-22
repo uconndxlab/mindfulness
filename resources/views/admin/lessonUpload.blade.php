@@ -13,8 +13,15 @@
             $description = old('description', $lesson->description);
             $sub_header = old('sub_header', $lesson->sub_header);
             $file_name = "Current file: ".$lesson->file_name;
-            $end_behavior = $lesson->end_behavior;
+            $end_behavior = old('end_behavior', $lesson->end_behavior);
             $method = "PUT";
+
+            $question = old('quiz_question', $quiz->question);
+            $quizOptions = old('quiz_options', []);
+            if (isset($quiz)) {
+                $quizOptions = json_decode($quiz->options_feedback) ?? [];
+            }
+            $answer = old('quiz_correct_answer', $quiz->correct_answer);
         }
         else {
             $header = "New Lesson:";
@@ -26,6 +33,10 @@
             $file_name = "Choose file:";
             $end_behavior = 'none';
             $method = "POST";
+
+            $question = old('quiz_question');
+            $quizOptions = old('quiz_options', []);
+            $answer = old('quiz_correct_answer');
         }
     @endphp
 
@@ -116,36 +127,62 @@
             @enderror
         </div>
 
-        
-        <h3 class="font-weight-bold">Quiz Details: ***If applicable</h3>
-        <div class="form-group">
-            <label for="quiz_question" class="font-weight-bold">Question:</label>
-            <input type="text" class="form-control" id="quiz_question" name="quiz_question" value="{{ old('quiz_question') }}">
+        <div id="quiz_form" style="display: none;">
+            <h3 class="font-weight-bold">Quiz Details:</h3>
+            <div class="form-group">
+                <label for="quiz_question" class="font-weight-bold">Question:</label>
+                <input type="text" class="form-control" id="quiz_question" name="quiz_question" value="{{ $question }}" required>
+            </div>
+            
+            <div id="quiz-options">
+                @php
+                    $index = 1;
+                @endphp
+                @foreach ($quizOptions as $option)
+                    <div class="form-group quiz-option" id="quiz-option-{{ $index }}">
+                        <label for="option_{{ $index }}" class="font-weight-bold">Option {{ $index }}:</label>
+                        <input type="text" class="form-control" id="option_{{ $index }}" name="option_{{ $index }}" value="{{ old('option_'.$index, $option->option ?? '') }}" required>
+                        <label for="feedback_{{ $index }}" class="font-weight-bold">Feedback {{ $index }}:</label>
+                        <textarea class="form-control" id="feedback_{{ $index }}" name="feedback_{{ $index }}">{{ old('feedback_'.$index, $option->feedback ?? '') }}</textarea>
+                    </div>
+                    @php
+                        $index++;
+                    @endphp
+                @endforeach
+            </div>
+                
+            <button type="button" class="btn btn-primary" id="add-option">+</button>
+            <button type="button" class="btn btn-danger" id="remove-option">-</button>
+            
+            <div class="form-group">
+                <label for="quiz_correct_answer" class="font-weight-bold">Correct Answer (number):</label>
+                <input type="number" class="form-control" id="quiz_correct_answer" name="quiz_correct_answer" value="{{ $answer }}" required>
+            </div>
         </div>
 
-        @for ($i = 1; $i <= 5; $i++)
-            <div class="form-group">
-                <label for="option_{{ $i }}" class="font-weight-bold">Option {{ $i }}:</label>
-                <input type="text" class="form-control" id="option_{{ $i }}" name="option_{{ $i }}" value="{{ old('option_'.$i) }}">
-            </div>
-
-            <div class="form-group">
-                <label for="feedback_{{ $i }}" class="font-weight-bold">Feedback {{ $i }}:</label>
-                <textarea type="text" class="form-control" id="feedback_{{ $i }}" name="feedback_{{ $i }}">{{ old('feedback_'.$i) }}</textarea>
-            </div>
-        @endfor
-
-        <div class="form-group">
-            <label for="quiz_correct_answer" class="font-weight-bold">Correct Answer (number):</label>
-            <input type="number" class="form-control" id="quiz_correct_answer" name="quiz_correct_answer" value="{{ old('quiz_correct_answer') }}">
-        </div>
-
+            
         <div class="text-center">
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">SAVE</button>
+                <button type="submit" class="btn btn-success">SAVE</button>
             </div>
         </div>
     </form>
+
+    @if ($errors->any())
+        <div class="alert alert-danger mt-3">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger mt-3">
+            {{ session('error') }}
+        </div>
+    @endif
 
     @if (isset($lesson))
         <form method="POST" action="{{ route('admin.lesson.delete', ['lessonId' => $lesson->id])}}">
@@ -159,4 +196,64 @@
         </form>
     @endif
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var endBehaviorSelect = document.getElementById('end_behavior');
+        var quizForm = document.getElementById('quiz_form');
+        var quizQuestionInput = document.getElementById('quiz_question');
+        var quizAnswerInput = document.getElementById('quiz_correct_answer');
+
+        //hiding quiz form
+        function toggleQuizForm() {
+            if (endBehaviorSelect.value === 'quiz') {
+                quizForm.style.display = 'block';
+                quizQuestionInput.setAttribute('required', 'required');
+                quizAnswerInput.setAttribute('required', 'required');
+            } else {
+                quizForm.style.display = 'none';
+                quizQuestionInput.removeAttribute('required');
+                quizAnswerInput.removeAttribute('required');
+            }
+        }
+        //toggle on start
+        endBehaviorSelect.addEventListener('change', toggleQuizForm);
+        toggleQuizForm();
+
+
+        //set option count to number of quiz options when initiated
+        let optionCount = {{ count($quizOptions) }};
+        console.log(optionCount);
+
+        document.getElementById('add-option').addEventListener('click', function () {
+            optionCount++;
+            let quizOptionsDiv = document.getElementById('quiz-options');
+
+            //add option div to quizOptionsDiv - includes option and feedback
+            let optionDiv = document.createElement('div');
+            optionDiv.classList.add('form-group', 'quiz-option');
+            optionDiv.id = `quiz-option-${optionCount}`;
+            optionDiv.innerHTML = `
+                <label for="option_${optionCount}" class="font-weight-bold">Option ${optionCount}:</label>
+                <input type="text" class="form-control" id="option_${optionCount}" name="option_${optionCount}" value="{{ old('option_${optionCount}') }}" required>
+                <label for="feedback_${optionCount}" class="font-weight-bold">Feedback ${optionCount}:</label>
+                <textarea class="form-control" id="feedback_${optionCount}" name="feedback_${optionCount}">{{ old('feedback_${optionCount}') }}</textarea>
+            `;
+            quizOptionsDiv.appendChild(optionDiv);
+        });
+
+        //remove the added divs
+        document.getElementById('remove-option').addEventListener('click', function () {
+            if (optionCount > 1) {
+                let quizOptionsDiv = document.getElementById('quiz-options');
+
+                //remove  last option
+                let lastOptionDiv = document.getElementById(`quiz-option-${optionCount}`);
+                quizOptionsDiv.removeChild(lastOptionDiv);
+
+                optionCount--;
+            }
+        });
+    });
+</script>
 @endsection

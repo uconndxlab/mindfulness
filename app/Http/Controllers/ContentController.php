@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Module;
 use App\Models\Lesson;
+use App\Models\Quiz;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\PageNavController;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class ContentController extends Controller
 {
@@ -17,6 +19,34 @@ class ContentController extends Controller
     public function __construct(PageNavController $pageNavController)
     {
         $this->pageNavController = $pageNavController;
+    }
+
+    public function handleQuiz(Request $request, $lessonId) {
+        $request->validate([
+            'quiz_question' => ['required', 'string', 'max:255'],
+            'quiz_correct_answer' => ['required', 'integer'],
+        ]);
+
+        $optionsFeedback = [];
+        $index = 1;
+        
+        while ($request->has("option_$index")) {
+            $optionsFeedback[] = [
+                'option' => $request->input("option_$index"),
+                'feedback' => $request->input("feedback_$index"),
+            ];
+            $index++;
+        }
+        
+        //update the quiz or create one depending on if found
+        Quiz::updateOrCreate(
+            ['lesson_id' => $lessonId],
+            [
+                'question' => $request->quiz_question,
+                'options_feedback' => json_encode($optionsFeedback),
+                'correct_answer' => $request->quiz_correct_answer,
+            ]
+        );
     }
 
     public function adminPage() {
@@ -68,32 +98,44 @@ class ContentController extends Controller
             return redirect()->back()->withErrors($e->errors())->withInput();
         }
 
-        //upload file
-        $filePath = null;
-        $file_name = null;
-        if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('content');
-            $file_name = $request->file('file')->getClientOriginalName();
+        //transaction to ensure both the lesson and quiz go through
+        DB::beginTransaction();
+        try {
+            //upload file
+            $filePath = null;
+            $file_name = null;
+            if ($request->hasFile('file')) {
+                $filePath = $request->file('file')->store('content');
+                $file_name = $request->file('file')->getClientOriginalName();
+            }
+    
+            //update module lesson count
+            $module = Module::find($request->module);
+            $module->lesson_count = Lesson::where('module_id', $module->id)->count() + 1;
+            $module->save();
+    
+            //create lesson
+            $lesson = Lesson::create([
+                'title' => $request->title,
+                'sub_header' => $request->sub_header,
+                'module_id' => $request->module,
+                'lesson_number' => $module->lesson_count,
+                'description' => $request->description,
+                'file_path' => $filePath,
+                'file_name' => $file_name,
+                'end_behavior' => $request->end_behavior
+            ]);
+    
+            if ($request->end_behavior == 'quiz') {
+                $this->handleQuiz($request, $lesson->id);
+            }
+
+            DB::commit();
+            return redirect()->route('admin.browse')->with('success', 'Lesson created successfully!');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->withErrors(['error' => 'An error occurred while creating the lesson and quiz.'])->withInput();
         }
-
-        //update module lesson count
-        $module = Module::find($request->module);
-        $module->lesson_count = Lesson::where('module_id', $module->id)->count() + 1;
-        $module->save();
-
-        //create lesson
-        $lesson = Lesson::create([
-            'title' => $request->title,
-            'sub_header' => $request->sub_header,
-            'module_id' => $request->module,
-            'lesson_number' => $module->lesson_count,
-            'description' => $request->description,
-            'file_path' => $filePath,
-            'file_name' => $file_name,
-            'end_behavior' => $request->end_behavior
-        ]);
-
-        return redirect()->route('admin.browse')->with('success', 'Lesson created successfully!');
     }
 
     public function showLessonPage($lessonId) {
@@ -108,8 +150,11 @@ class ContentController extends Controller
 
         $modules = Module::orderBy('module_number', 'asc')->get();
         $lesson = Lesson::find($lessonId);
+        if ($lesson->end_behavior == 'quiz') {
+            $quiz = Quiz::where('lesson_id', $lesson->id)->first();
+        }
 
-        return view('admin.lessonUpload', compact('showBackBtn', 'hideBottomNav', 'hideProfileLink', 'modules', 'lesson'));
+        return view('admin.lessonUpload', compact('showBackBtn', 'hideBottomNav', 'hideProfileLink', 'modules', 'lesson', 'quiz'));
     }
 
     public function updateLesson(Request $request, $lessonId) {
@@ -126,67 +171,78 @@ class ContentController extends Controller
             return redirect()->back()->withErrors($e->errors())->withInput();
         }
 
-        $lesson = Lesson::find($lessonId);
-        $lesson->title = $request->title;
-        $lesson->sub_header = $request->sub_header;
-        $lesson->end_behavior = $request->end_behavior;
-        if ($lesson->module_id != $request->module) {
-            //lesson count on old module
-            $module = Module::find($lesson->module_id);
-            $module->lesson_count--;
-            $module->save();
-            
-            //adjusting lesson numbers
-            $lessonsAfter = Lesson::where('module_id', $lesson->module_id)
-                                    ->where('lesson_number', '>', $lesson->lesson_number)
-                                    ->get();
-            foreach ($lessonsAfter as $lessonAfter) {
-                $lessonAfter->lesson_number--;
-                $lessonAfter->save();
-            }
-            
-            //assign lesson to module
-            $lesson->module_id = $request->module;
-            $module = Module::find($lesson->module_id);
-            $module->lesson_count++;
-            $lesson->lesson_number = $module->lesson_count;
-            $module->save();
-        }
-        $lesson->description = $request->description;
 
-        //file check
-        $sameFile = false;
-        if ($request->hasFile('file')) {
-            $newFile = $request->file('file');
-            $newFileHash = hash_file('md5', $newFile->getRealPath());
-            //if path saved in db
-            if ($lesson->file_path) {
-                $currentFilePath = storage_path('app/'.$lesson->file_path);
-                //if file exists
-                if (file_exists($currentFilePath)) {
-                    $currentFileHash = hash_file('md5', $currentFilePath);
-                    //if file is not the same
-                    if ($newFileHash !== $currentFileHash) {
-                        //delete old
-                        Storage::disk()->delete($lesson->file_path);
-                    }
-                    else {
-                        $sameFile = true;
+        //transaction to ensure both the lesson and quiz go through
+        DB::beginTransaction();
+        try {
+            $lesson = Lesson::find($lessonId);
+            $lesson->title = $request->title;
+            $lesson->sub_header = $request->sub_header;
+            $lesson->end_behavior = $request->end_behavior;
+            if ($lesson->module_id != $request->module) {
+                //lesson count on old module
+                $module = Module::find($lesson->module_id);
+                $module->lesson_count--;
+                $module->save();
+                
+                //adjusting lesson numbers
+                $lessonsAfter = Lesson::where('module_id', $lesson->module_id)
+                                        ->where('lesson_number', '>', $lesson->lesson_number)
+                                        ->get();
+                foreach ($lessonsAfter as $lessonAfter) {
+                    $lessonAfter->lesson_number--;
+                    $lessonAfter->save();
+                }
+                
+                //assign lesson to module
+                $lesson->module_id = $request->module;
+                $module = Module::find($lesson->module_id);
+                $module->lesson_count++;
+                $lesson->lesson_number = $module->lesson_count;
+                $module->save();
+            }
+            $lesson->description = $request->description;
+
+            //file check
+            $sameFile = false;
+            if ($request->hasFile('file')) {
+                $newFile = $request->file('file');
+                $newFileHash = hash_file('md5', $newFile->getRealPath());
+                //if path saved in db
+                if ($lesson->file_path) {
+                    $currentFilePath = storage_path('app/'.$lesson->file_path);
+                    //if file exists
+                    if (file_exists($currentFilePath)) {
+                        $currentFileHash = hash_file('md5', $currentFilePath);
+                        //if file is not the same
+                        if ($newFileHash !== $currentFileHash) {
+                            //delete old
+                            Storage::disk()->delete($lesson->file_path);
+                        }
+                        else {
+                            $sameFile = true;
+                        }
                     }
                 }
+                if (!$sameFile) {
+                    //save new
+                    $newFilePath = $newFile->store('content');
+                    $lesson->file_path = $newFilePath;
+                    $lesson->file_name = $newFile->getClientOriginalName();
+                }
             }
-            if (!$sameFile) {
-                //save new
-                $newFilePath = $newFile->store('content');
-                $lesson->file_path = $newFilePath;
-                $lesson->file_name = $newFile->getClientOriginalName();
+
+            $lesson->save();
+            if ($request->end_behavior == 'quiz') {
+                $this->handleQuiz($request, $lesson->id);
             }
+
+            DB::commit();
+            return redirect()->route('admin.browse')->with('success', 'Lesson updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors(['error' => $e->getMessage()])->withInput();
         }
-
-        //DELETE FILE if not passed in?
-
-        $lesson->save();
-        return redirect()->route('admin.browse')->with('success', 'Lesson updated successfully.');
     }
 
     public function deleteLesson($lessonId) {
