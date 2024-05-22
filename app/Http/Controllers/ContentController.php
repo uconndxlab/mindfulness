@@ -105,7 +105,7 @@ class ContentController extends Controller
             $filePath = null;
             $file_name = null;
             if ($request->hasFile('file')) {
-                $filePath = $request->file('file')->store('content');
+                $filePath = $request->file('file')->store('content', 'public');
                 $file_name = $request->file('file')->getClientOriginalName();
             }
     
@@ -150,6 +150,7 @@ class ContentController extends Controller
 
         $modules = Module::orderBy('module_number', 'asc')->get();
         $lesson = Lesson::find($lessonId);
+        $quiz = null;
         if ($lesson->end_behavior == 'quiz') {
             $quiz = Quiz::where('lesson_id', $lesson->id)->first();
         }
@@ -225,8 +226,8 @@ class ContentController extends Controller
                     }
                 }
                 if (!$sameFile) {
-                    //save new
-                    $newFilePath = $newFile->store('content');
+                    //same file
+                    $newFilePath = $newFile->store('content', 'public');
                     $lesson->file_path = $newFilePath;
                     $lesson->file_name = $newFile->getClientOriginalName();
                 }
