@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Note;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,16 +15,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        //disable foreign keys
+        DB::statement('PRAGMA foreign_keys = OFF;');
 
-        //seeds the DB with test data - one user, 20 notes
-        User::factory()->create([
-            'id' => 1,
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => bcrypt('randompass')
+        //truncate the tables
+        DB::table('modules')->truncate();
+        DB::table('lessons')->truncate();
+        DB::table('content')->truncate();
+        DB::table('quizzes')->truncate();
+
+        //enable foreign key checks for SQLite
+        DB::statement('PRAGMA foreign_keys = ON;');
+
+        //call seeders
+        $this->call([
+            ModuleSeeder::class,
+            LessonSeeder::class,
+            ContentSeeder::class,
+            QuizSeeder::class,
         ]);
-
-        Note::factory(20)->create();
     }
 }

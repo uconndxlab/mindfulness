@@ -14,15 +14,29 @@ class LessonSeeder extends Seeder
      */
     public function run(): void
     {
-        //modules have lessons - run module seeder first
+
+        $lessons = json_decode(file_get_contents(database_path('data/lessons.json')), true);
+        
+        foreach ($lessons as $lesson) {
+            Lesson::create($lesson);
+            $module = Module::find($lesson['module_id']);
+            $module->lesson_count++;
+            $module->save();
+        }
+
+        //other empty lessons
         Module::all()->each(function ($module) {
-            for ($i = 1; $i <= $module->lesson_count; $i++) {
+            $limit = rand(5, 7);
+            $start = $module->lesson_count + 1;
+            for ($i = $start; $i <= $limit; $i++) {
                 Lesson::create([
-                    'title' => 'Compass ' . $i,
+                    'title' => 'Example ' . $i,
                     'module_id' => $module->id,
                     'lesson_number' => $i,
                 ]);
+                $module->lesson_count++;
             }
+            $module->save();
         });
     }
 }

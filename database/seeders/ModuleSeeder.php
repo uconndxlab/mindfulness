@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Module;
+use Illuminate\Support\Facades\DB;
 
 class ModuleSeeder extends Seeder
 {
@@ -13,12 +14,10 @@ class ModuleSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 1; $i <= 4; $i++) {
-            Module::create([
-                'name' => 'Module '.$i,
-                'module_number' => $i,
-                'lesson_count' => rand(5, 7),
-            ]);
+        $modules = json_decode(file_get_contents(database_path('data/modules.json')), true);
+        
+        foreach ($modules as $module) {
+            Module::create($module);
         }
     }
 }

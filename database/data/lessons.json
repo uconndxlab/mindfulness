@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "title": "Activity 1",
+        "module_id": 1,
+        "lesson_number": 1,
+        "description": "This is an example description for the first activity. The descriptions are stored with each lesson in a database which store other lesson related information such as which module they belong to and information regarding audio/video and quizzes.",
+        "sub_header": "What is Mindfulness?",
+        "end_behavior": "quiz"
+    },
+    {
+        "id": 2,
+        "title": "Activity 2",
+        "module_id": 1,
+        "lesson_number": 2,
+        "description": "This is another description to demonstration dynamic loading. You could put anything here.",
+        "sub_header": "Body Scan",
+        "end_behavior": "journal"
+    }
+]
