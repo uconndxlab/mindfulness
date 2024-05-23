@@ -5,20 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Quiz extends Model
+class Content extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'lesson_id', 
-        'question', 
-        'options_feedback', 
-        'correct_answer'
-    ];
-
-    protected $casts = [
-        'options_feedback' => 'json',
-    ];
+    protected $table = 'content';
 
     public function lesson()
     {
