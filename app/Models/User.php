@@ -20,6 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'voiceId'
     ];
 
     /**
@@ -43,5 +44,14 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function isAdmin(): bool {
+        return $this->role === 'admin';
+    }
+
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
     }
 }
