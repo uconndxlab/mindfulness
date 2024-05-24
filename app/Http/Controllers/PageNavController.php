@@ -6,6 +6,7 @@ use App\Models\Module;
 use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\Note;
+use App\Models\Content;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
@@ -105,7 +106,24 @@ class PageNavController extends Controller
         if ($lesson->end_behavior == 'quiz') {
             $quizId = Quiz::where('lesson_id', $lesson->id)->value('id');
         }
-        return view('explore.lesson', compact('showBackBtn', 'lessonId', 'lesson', 'quizId'));
+        //get content
+        $extra = Content::where('lesson_id', $lesson->id)->get();
+        $main = null;
+        //filtering main
+        foreach ($extra as $key => $item) {
+            if ($item->main) {
+                $main = $item;
+                //remove main
+                $extra->forget($key);
+                break;
+            }
+        }
+
+        if ($extra->count() == 0) {
+            $extra = null;
+        }
+
+        return view('explore.lesson', compact('showBackBtn', 'lessonId', 'lesson', 'quizId', 'main', 'extra'));
     }
 
     public function exploreQuiz($quizId) {
@@ -129,8 +147,8 @@ class PageNavController extends Controller
         $feedback = null;
         
         //convert options and get feedback
-        $options = json_decode($quiz->options_feedback) ?? [];
-        $feedback = $options[$selectedOption]->feedback;
+        $options = $quiz->options_feedback ?? [];
+        $feedback = $options[$selectedOption]['feedback'];
 
         return redirect()->back()->with([
             'feedback' => $feedback,
