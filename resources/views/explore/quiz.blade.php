@@ -6,7 +6,7 @@
 <div class="col-md-8">
     <div class="text-left">
         @php
-            $quizOptions = json_decode($quiz->options_feedback) ?? [];
+            $quizOptions = $quiz->options_feedback ?? [];
         @endphp
 
         <h1 class="display font-weight-bold">Quiz</h1>
@@ -18,7 +18,7 @@
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="answer" id="option_{{ $index }}" value="{{ $index }}" {{ old('answer') == $index ? 'checked' : '' }}>
                 <label class="form-check-label" for="option_{{ $index }}">
-                    {{ $optionFeedback->option }}
+                    {{ $optionFeedback['option'] }}
                 </label>
             </div>
         @endforeach

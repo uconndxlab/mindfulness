@@ -30,28 +30,45 @@
     </div>
 
     <div class="container manual-margin-top">
-        @if($lesson->file_path)
-            <audio id="audio" controls preload="none">
-                <source src="{{ asset('storage/'.$lesson->file_path) }}" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
+        @if($main != null)
+            <audio id="audio" controls preload="auto" src="{{ Storage::url('content/'.$main->file_name) }}"></audio>
         @endif
     </div>
 
     <div class="container manual-margin-top">
         <a id="redirectButton" class="btn btn-primary" href="{{ $redirectRoute }}">{{ $redirectLabel }}</a>
     </div>
+
+    <div id="extra" class="container manual-margin-top" style="display: none;">
+        @if($extra != null)
+        <h3>Additional items:</h3>
+            @foreach ($extra as $index => $item)
+                @if (isset($item->name))
+                    <h5>{{ $item->name }}</h5>
+                @endif
+                <audio id="audio_{{ $index }}" controls preload="auto">
+                    <source src="{{ Storage::url('content/'.$item->file_name) }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            @endforeach
+        @endif
+    </div>
+
+
 </div>
 <script>
     const audio = document.getElementById('audio')
     // var seekSlider = document.getElementById('seekSlider');
     // var playPauseBtn = document.getElementById('playPauseBtn');
     const redirectButton = document.getElementById('redirectButton')
+    const extraDiv = document.getElementById('extraDiv')
 
     //disabling the redirection button
-    // redirectButton.classList.add('disabled');
+    redirectButton.classList.add('disabled');
+
     audio.addEventListener('ended', () => {
         redirectButton.classList.remove('disabled');
+        extraDiv.style.display = 'block';
     });
 
     // //initializing the seek bar, waiting for audio to load
