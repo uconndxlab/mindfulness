@@ -31,7 +31,8 @@
 
     <div class="container manual-margin-top">
         @if($main != null)
-            <audio id="audio" controls preload="auto" src="{{ Storage::url('content/'.$main->file_name) }}"></audio>
+            <audio id="audio_main" controls preload="auto" src="{{ Storage::url('content/'.$main->file_name) }}">
+            </audio>
         @endif
     </div>
 
@@ -57,11 +58,11 @@
 
 </div>
 <script>
-    const audio = document.getElementById('audio')
+    const audio = document.getElementById('audio_main')
     // var seekSlider = document.getElementById('seekSlider');
     // var playPauseBtn = document.getElementById('playPauseBtn');
     const redirectButton = document.getElementById('redirectButton')
-    const extraDiv = document.getElementById('extraDiv')
+    const extraDiv = document.getElementById('extra')
 
     //disabling the redirection button
     redirectButton.classList.add('disabled');
