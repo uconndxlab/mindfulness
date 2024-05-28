@@ -53,7 +53,7 @@
     @if (auth::user()->isAdmin())
         <div class="text-center">
             <div class="form-group">
-                <a href="{{ route('admin.browse') }}" class="btn btn-primary">ADMIN: Content Upload</a>
+                <a href="{{ route('admin.browse') }}" class="btn btn-primary disabled">ADMIN: Content Upload</a>
             </div>
         </div>
     @endif
