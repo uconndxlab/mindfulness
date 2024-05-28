@@ -7,10 +7,14 @@ use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
+
     /**
      * Seed the application's database.
+     * 
+     * @param bool $examples
+     * @return void
      */
-    public function run(): void
+    public function run(bool $examples = false): void
     {
         //disable foreign keys
         DB::statement('PRAGMA foreign_keys = OFF;');
@@ -25,13 +29,11 @@ class DatabaseSeeder extends Seeder
         DB::statement('PRAGMA foreign_keys = ON;');
 
         //call seeders
-        $this->call([
-            ModuleSeeder::class,
-            LessonSeeder::class,
-            ContentSeeder::class,
-            QuizSeeder::class,
-            //right now just resetting progress, not resetting user table
-            ResetUserProgress::class,
-        ]);
+        $this->call(ModuleSeeder::class);
+        $this->call(LessonSeeder::class, false, compact('examples'));
+        $this->call(ContentSeeder::class, false, compact('examples'));
+        $this->call(QuizSeeder::class);
+        //right now just resetting progress, not resetting user table
+        $this->call(ResetUserProgress::class);
     }
 }
