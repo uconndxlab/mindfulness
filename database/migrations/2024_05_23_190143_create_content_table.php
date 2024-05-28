@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('lesson_id')->constrained()->onDelete('cascade');
             $table->string('name')->nullable();
             $table->boolean('main')->default(false);
-            $table->enum('type', ['audio', 'video', 'workbook']);
+            $table->enum('type', ['audio', 'video', 'pdf']);
             $table->string('file_name');
             $table->string('completion_message')->default('Congrats on completing the activity!');
             $table->timestamps();
