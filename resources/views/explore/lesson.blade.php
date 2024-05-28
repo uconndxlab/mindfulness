@@ -59,8 +59,6 @@
 </div>
 <script>
     const audio = document.getElementById('audio_main')
-    // var seekSlider = document.getElementById('seekSlider');
-    // var playPauseBtn = document.getElementById('playPauseBtn');
     const redirectButton = document.getElementById('redirectButton')
     const extraDiv = document.getElementById('extra')
 
@@ -71,45 +69,5 @@
         redirectButton.classList.remove('disabled');
         extraDiv.style.display = 'block';
     });
-
-    // //initializing the seek bar, waiting for audio to load
-    // function initSeekBar() {
-    //     var duration = Math.floor(audio.duration);
-    //     seekSlider.max = duration;
-    // }
-    // audio.addEventListener('loadedmetadata', initSeekBar);
-
-    // //play/pause functionality
-    // function togglePlayPause() {
-    //     if (audio.paused) {
-    //         audio.play();
-    //         playPauseBtn.textContent = 'Pause';
-    //     } else {
-    //         audio.pause();
-    //         playPauseBtn.textContent = 'Play';
-    //     }
-    // }
-    // playPauseBtn.addEventListener('click', togglePlayPause);
-
-    // //seek and audio time relationship
-    // function seek() {
-    //     var seekto = audio.duration * (seekSlider.value / 100);
-    //     audio.currentTime = seekto;
-    // }
-    // function updateSeekSlider() {
-    //     var currentTime = Math.floor(audio.currentTime);
-    //     seekSlider.value = currentTime;
-    // }
-    // audio.addEventListener('timeupdate', updateSeekSlider);
-    // seekSlider.addEventListener('input', seek);
 </script>
 @endsection
-
-
-
-<!-- style="display: none;" -->
-<!-- <div class="audio-controls">
-                <input type="range" id="seekSlider" value="0" min="0" step="1">
-                <button id="playPauseBtn">Play</button>
-                <div id="seekTime">0:00 / 0:00</div>
-            </div> -->
