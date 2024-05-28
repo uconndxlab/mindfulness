@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
     //User updates
     Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
     Route::put('/user/update/namePass', [UserController::class, 'updateNamePass'])->name('user.update.namePass');
+    Route::put('/user/update/progress', [UserController::class,'updateProgress'])->name('user.update.progress');
     
     //NOTES
     Route::resource('note', NoteController::class);

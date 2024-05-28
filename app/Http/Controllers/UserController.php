@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Lesson;
 
 class UserController extends Controller
 {
@@ -24,6 +25,19 @@ class UserController extends Controller
         }
 
         return redirect(route('explore.home'));
+    }
+
+    public function updateProgress(Request $request) {
+        $request->validate([
+            'lessonId' => ['required', 'exists:lessons,id'],
+        ]);
+
+        //right now this is very simple
+        $user = Auth::user();
+        $lesson = Lesson::find($request->input('lessonId'));
+        $user->progress = $lesson->order + 1;
+        $user->save();
+        return response()->json(['message' => 'Progress updated']);
     }
 
     public function updateNamePass(Request $request) {

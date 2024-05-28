@@ -77,7 +77,7 @@ class PageNavController extends Controller
         foreach ($modules as $module) {
             $lessons = Lesson::where('module_id', $module->id)
                                 ->orderBy('lesson_number', 'asc')
-                                ->select('id', 'title')
+                                ->select('id', 'title', 'order')
                                 ->get();
             $module->lessons = $lessons;
         }
@@ -94,13 +94,18 @@ class PageNavController extends Controller
     }
 
     public function exploreLesson($lessonId) {
+        //get the lesson info
+        $lesson = Lesson::findOrFail($lessonId);
+        //adding prevention of url access to stop skipping - send to explore home
+        if (Auth::user()->progress < $lesson->order) {
+            return redirect()->to(route('explore.home'));
+        }
+
         //set back_route
         $showBackBtn = true;
         Session::put("back_route", '/explore');
         //track explore page for browse button
-        Session::put('last_explore_page', 'explore/'.$lessonId);
-        //get the lesson info
-        $lesson = Lesson::findOrFail($lessonId);
+        Session::put('last_explore_page', 'explore/'.$lesson->id);
         //get quizid
         $quizId = null;
         if ($lesson->end_behavior == 'quiz') {

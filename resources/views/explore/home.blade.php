@@ -8,6 +8,7 @@
         $adminCheck = isset($fromAdmin) && $fromAdmin && Auth::user()->isAdmin();
         $route = $adminCheck ? 'admin.lesson.show' : 'explore.lesson';
         $header = $adminCheck ? '***EDIT MODULES:***' : 'Mindfulness Modules:';
+        $progress = Auth::user()->progress;
     @endphp
 
     <div class="text-left">
@@ -28,7 +29,7 @@
                     <p>{{ $module->name }}:</p>
                     @foreach ($module->lessons as $lesson)
                         <div class="p-1">
-                            <a class="btn btn-primary btn-block" href="{{ route($route, ['lessonId' => $lesson->id]) }}">{{ $lesson->title }}</a>
+                            <a class="btn btn-primary btn-block {{ $progress < $lesson->order ? 'disabled' : ''}}" href="{{ route($route, ['lessonId' => $lesson->id]) }}">{{ $lesson->title }}</a>
                         </div>
                     @endforeach
                     @if ($adminCheck)
