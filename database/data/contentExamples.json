@@ -1,0 +1,54 @@
+[
+    {
+        "lesson_id": 1,
+        "main": true,
+        "type": "audio",
+        "file_name": "Rocks on Rocks.m4a"
+    },
+    {
+        "lesson_id": 2,
+        "main": true,
+        "type": "audio",
+        "file_name": "Rocks on Rocks.m4a"
+    },
+    {
+        "lesson_id": 2,
+        "name": "Body Scan - Long Version",
+        "main": false,
+        "type": "audio",
+        "file_name": "Module 1 Activity 2 - Body Scan Long Version.MP3"
+    },
+    {
+        "lesson_id": 1,
+        "name": "Example extra video",
+        "main": false,
+        "type": "video",
+        "file_name": "videoExampleSnarky.MOV"
+    },
+    {
+        "lesson_id": 1,
+        "name": "Example extra pdf",
+        "main": false,
+        "type": "pdf",
+        "file_name": "pdfExample.pdf"
+    },
+    {
+        "lesson_id": 3,
+        "main": true,
+        "type": "pdf",
+        "file_name": "pdfExample.pdf"
+    },
+    {
+        "lesson_id": 4,
+        "main": true,
+        "type": "video",
+        "file_name": "videoExampleSnarky.MOV"
+    },
+    {
+        "lesson_id": 4,
+        "name": "Example extra pdf",
+        "main": false,
+        "type": "pdf",
+        "file_name": "pdfExample.pdf"
+    }
+]

@@ -15,7 +15,8 @@ class LessonSeeder extends Seeder
     public function run(): void
     {
 
-        $lessons = json_decode(file_get_contents(database_path('data/lessons.json')), true);
+        // $lessons = json_decode(file_get_contents(database_path('data/lessons.json')), true);
+        $lessons = json_decode(file_get_contents(database_path('data/lessonsExamples.json')), true);
         
         $order = 0;
         foreach ($lessons as $lesson) {
@@ -28,7 +29,7 @@ class LessonSeeder extends Seeder
 
         //other empty lessons
         Module::all()->each(function ($module) use (&$order) {
-            $limit = rand(5, 7);
+            $limit = rand(2, 4);
             //take into account the real lessons
             $start = $module->lesson_count + 1;
             for ($i = $start; $i <= $limit; $i++) {
