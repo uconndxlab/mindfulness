@@ -57,10 +57,12 @@
 
 
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
     const audio = document.getElementById('audio_main')
     const redirectButton = document.getElementById('redirectButton')
     const extraDiv = document.getElementById('extra')
+    const lessonId = {{ $lesson->id }}
 
     //disabling the redirection button
     redirectButton.classList.add('disabled');
@@ -68,6 +70,19 @@
     audio.addEventListener('ended', () => {
         redirectButton.classList.remove('disabled');
         extraDiv.style.display = 'block';
+
+        //update users progress
+        // axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        axios.put('{{ route('user.update.progress') }}', {
+            lessonId: lessonId
+        })
+        .then(response => {
+            console.log(response.data.message);
+        })
+        .catch(error => {
+            console.error('There was an error updating the progress:', error);
+        });
+
     });
 </script>
 @endsection
