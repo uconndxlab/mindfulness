@@ -2,9 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Note;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -33,6 +30,8 @@ class DatabaseSeeder extends Seeder
             LessonSeeder::class,
             ContentSeeder::class,
             QuizSeeder::class,
+            //right now just resetting progress, not resetting user table
+            ResetUserProgress::class,
         ]);
     }
 }
