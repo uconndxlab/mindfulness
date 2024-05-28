@@ -10,11 +10,15 @@ class ContentSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * 
+     * @param bool $examples
+     * @return void
      */
-    public function run(): void
+    public function run(bool $examples = false): void
     {
-        // $content = json_decode(file_get_contents(database_path('data/content.json')), true);
-        $content = json_decode(file_get_contents(database_path('data/contentExamples.json')), true);
+        //data to seed depends on the param
+        $ftype = $examples ? "Examples.json" : ".json";
+        $content = json_decode(file_get_contents(database_path('data/content'.$ftype)), true);
         
         foreach ($content as $item) {
             Content::create($item);

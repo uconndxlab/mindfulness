@@ -11,13 +11,17 @@ class LessonSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * 
+     * @param bool $examples
+     * @return void
      */
-    public function run(): void
+    public function run(bool $examples = false): void
     {
-
-        // $lessons = json_decode(file_get_contents(database_path('data/lessons.json')), true);
-        $lessons = json_decode(file_get_contents(database_path('data/lessonsExamples.json')), true);
+        //data to seed depends on the param
+        $ftype = $examples ? "Examples.json" : ".json";
+        $lessons = json_decode(file_get_contents(database_path('data/lessons'.$ftype)), true);
         
+        //lessons in the data
         $order = 0;
         foreach ($lessons as $lesson) {
             $lesson['order'] = $order++;
