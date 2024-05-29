@@ -5,7 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>@yield('title')</title>
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <style>
+            html {
+                overflow-y: scroll;
+            }
             .manual-margins {
                 margin-top: 4rem;
                 margin-bottom: 4rem;
@@ -13,8 +17,24 @@
             .manual-margin-top {
                 margin-top: 3rem;
             }
+
             .note-content {
                 word-wrap: break-word;
+            }
+
+            /* nav icons */
+            .nav-icon-text i {
+                font-size: 28px;
+            }
+            .nav-icon-text {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                font-size: 14px;
+            }
+            .nav-link.active {
+                color: #007bff;
             }
         </style>
     </head>
@@ -55,12 +75,15 @@
                     <li class="nav-item">
                         <!-- check the routename to set which is active -->
                         <a class="nav-link {{ Str::startsWith(Request::route()->getName(), 'explore.') ? 'active' : ''}}" href="{{ route('explore.browse') }}">
-                            <span>Browse</span>
+                            <span class="nav-icon-text">
+                                <i class="bi bi-ui-checks-grid"></i>Browse</span>
+                            </span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ Request::route()->getName() == 'journal' ? 'active' : '' }}" href="{{ route('journal') }}">
-                            <span>Journal</span>
+                            <span class="nav-icon-text">
+                                <i class="bi bi-journal-plus"></i>Journal</span>
                         </a>
                     </li>
                 </ul>
