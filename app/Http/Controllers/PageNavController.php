@@ -26,8 +26,17 @@ class PageNavController extends Controller
         return view("auth.voice-select");
     }
 
-    public function journalPage()
+    public function journalPage(Request $request)
     {
+        $showBackBtn = false;
+        $activity = null;
+        
+        //if we are redirected here from an activity
+        if ($request->activity) {
+            $showBackBtn = true;
+            Session::put("back_route", url()->previous());
+            $activity = Lesson::find($request->activity)->title;
+        }
         //get user
         $id = Auth::id();
         $notes = Note::where('user_id', $id)->orderBy('created_at', 'desc')->get();
@@ -37,7 +46,7 @@ class PageNavController extends Controller
             $date->setTimezone(new \DateTimeZone('EST'));
             $note->formatted_date = $date->diffForHumans().', '.$date->toFormattedDayDateString();
         }
-        return view("profile.journal", compact("notes"));
+        return view("profile.journal", compact('notes', 'showBackBtn', 'activity'));
     }
 
     public function backButton() {
