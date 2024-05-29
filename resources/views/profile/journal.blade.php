@@ -46,21 +46,3 @@
     @endforeach
 </div>
 @endsection
-
-
-<!-- <div class="accordion" id="accordionExample">
-        @foreach ($notes as $note)
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="{{ 'heading'.$note->id }}">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="{{ '#collapse'.$note->id }}" aria-expanded="true" aria-controls="{{ 'collapse'.$note->id }}">
-                    {{ $note->word_otd }} created at: {{ $note->created_at }}
-                </button>
-            </h2>
-            <div id="{{ 'collapse'.$note->id }}" class="accordion-collapse collapse" aria-labelledby="{{ 'heading'.$note->id }}" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                    {{ $note->note }}
-                </div>
-            </div>
-        </div>
-        @endforeach
-    </div> -->

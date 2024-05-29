@@ -12,7 +12,7 @@
             }
             else if ($lesson->end_behavior == "journal") {
                 $redirectLabel = "JOURNAL";
-                $redirectRoute = route('journal');
+                $redirectRoute = route('journal', ['activity' => $lesson->id]);
             }
             else {
                 $redirectLabel = "LEAVE ACTIVITY";

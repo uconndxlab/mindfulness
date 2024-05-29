@@ -44,7 +44,7 @@
             <ul class="navbar-nav mr-auto">
                 @if(isset($showBackBtn) && $showBackBtn)
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('button.back') }}">< Back</a>
+                        <a class="nav-link" href="{{ route('button.back') }}">< Back {{ isset($activity) ? 'to '.$activity : ''}}</a>
                     </li>
                 @endif
             </ul>
