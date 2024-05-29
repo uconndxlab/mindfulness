@@ -10,14 +10,16 @@
         "main": true,
         "type": "audio",
         "file_name": "Rocks on Rocks.m4a",
-        "completion_message": null
+        "completion_message": null,
+        "is_meditation": true
     },
     {
         "lesson_id": 2,
         "name": "Body Scan - Long Version",
         "main": false,
         "type": "audio",
-        "file_name": "Module 1 Activity 2 - Body Scan Long Version.MP3"
+        "file_name": "Module 1 Activity 2 - Body Scan Long Version.MP3",
+        "is_meditation": true
     },
     {
         "lesson_id": 1,
@@ -43,7 +45,8 @@
         "lesson_id": 4,
         "main": true,
         "type": "video",
-        "file_name": "videoExampleSnarky.MOV"
+        "file_name": "videoExampleSnarky.MOV",
+        "is_meditation": true
     },
     {
         "lesson_id": 4,

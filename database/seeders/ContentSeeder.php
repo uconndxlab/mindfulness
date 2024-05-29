@@ -21,6 +21,16 @@ class ContentSeeder extends Seeder
         $content = json_decode(file_get_contents(database_path('data/content'.$ftype)), true);
         
         foreach ($content as $item) {
+            //setting the completion message for meditation content
+            if (isset($item['is_meditation']) && $item['is_meditation']) {
+                if (!isset($item['completion_message'])) {
+                    $item['completion_message'] = "Congrats on completing the activity!";
+                }
+                else if ($item['completion_message'] == null) {
+                    $item['completion_message'] = "";
+                }
+                $item['completion_message'] = $item['completion_message']."\nMeditation exercises have been unlocked in the library.";
+            }
             Content::create($item);
         }
     }

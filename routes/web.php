@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
     Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
     Route::get('/profile', [PageNavController::class, 'profilePage'])->name('profile');
+    Route::get('/meditation-library', [PageNavController::class, 'meditationLibrary'])->name('meditationLib');
 
     //back button
     Route::get('/backBtn', [PageNavController::class, 'backButton'])->name('button.back');
@@ -51,7 +52,6 @@ Route::middleware('auth')->group(function () {
     
     //NOTES
     Route::resource('note', NoteController::class);
-
 
     //ADMIN ONLY
     Route::middleware('admin')->group(function () {

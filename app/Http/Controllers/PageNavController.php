@@ -26,6 +26,23 @@ class PageNavController extends Controller
         return view("auth.voice-select");
     }
 
+    public function meditationLibrary()
+    {
+        //get lessons
+        $progress = Auth::user()->progress;
+        $lessons = Lesson::where('order', '<', $progress)->orderBy('order', 'asc')->select('id', 'title', 'sub_header')->get();
+
+        //remove lessons with no meditation content
+        foreach ($lessons as $key => $lesson) {
+            $content = Content::where('lesson_id', $lesson->id)->where('is_meditation', 1)->get();
+            if ($content->isEmpty()) {
+                $lessons->forget($key);
+            }
+            $lesson->content = $content;
+        }
+        return view("meditation-library", compact('lessons'));
+    }
+
     public function journalPage(Request $request)
     {
         $showBackBtn = false;

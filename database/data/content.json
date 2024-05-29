@@ -9,13 +9,15 @@
         "lesson_id": 2,
         "main": true,
         "type": "audio",
-        "file_name": "Module 1 Activity 2 - Body Scan.m4a"
+        "file_name": "Module 1 Activity 2 - Body Scan.m4a",
+        "is_meditation": true
     },
     {
         "lesson_id": 2,
         "name": "Body Scan - Long Version",
         "main": false,
         "type": "audio",
-        "file_name": "Module 1 Activity 2 - Body Scan Long Version.MP3"
+        "file_name": "Module 1 Activity 2 - Body Scan Long Version.MP3",
+        "is_meditation": true
     }
 ]
