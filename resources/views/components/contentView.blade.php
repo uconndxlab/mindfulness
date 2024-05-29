@@ -7,6 +7,9 @@
     </video>
 @elseif ($type == 'pdf')
     <div>
-        <a id="{{ $id }}" class="btn btn-link" href="{{ Storage::url('content/'.$file) }}" target="_blank">Open workbook page</a>
+        <span>
+            <a id="{{ $id }}" class="btn btn-link" href="{{ Storage::url('content/'.$file) }}" target="_blank">Open workbook page</a>
+            <a href="{{ Storage::url('content/'.$file) }}" download class="btn btn-info"><i class="bi bi-download"></i></a>
+        </span>
     </div>
 @endif
