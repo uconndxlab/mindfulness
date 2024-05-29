@@ -9,7 +9,7 @@
     <div>
         <span>
             <a id="{{ $id }}" class="btn btn-link" href="{{ Storage::url('content/'.$file) }}" target="_blank">Open workbook page</a>
-            <a href="{{ Storage::url('content/'.$file) }}" download class="btn btn-info"><i class="bi bi-download"></i></a>
+            <a id="{{ $id2 }}" href="{{ Storage::url('content/'.$file) }}" download class="btn btn-info"><i class="bi bi-download"></i></a>
         </span>
     </div>
 @endif
