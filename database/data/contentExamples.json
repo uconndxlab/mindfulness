@@ -9,7 +9,8 @@
         "lesson_id": 2,
         "main": true,
         "type": "audio",
-        "file_name": "Rocks on Rocks.m4a"
+        "file_name": "Rocks on Rocks.m4a",
+        "completion_message": null
     },
     {
         "lesson_id": 2,

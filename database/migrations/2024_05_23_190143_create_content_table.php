@@ -18,7 +18,7 @@ return new class extends Migration
             $table->boolean('main')->default(false);
             $table->enum('type', ['audio', 'video', 'pdf']);
             $table->string('file_name');
-            $table->string('completion_message')->default('Congrats on completing the activity!');
+            $table->string('completion_message')->default('Congrats on completing the activity!')->nullable();
             $table->timestamps();
         });
     }

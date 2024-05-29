@@ -7,7 +7,7 @@
     <div class="text-left">
         @php
             if ($lesson->end_behavior == 'quiz') {
-                $redirectLabel = "TAKE QUIZ";
+                $redirectLabel = "QUIZ";
                 $redirectRoute = route('explore.quiz', ['quizId' => $quizId]);
             }
             else if ($lesson->end_behavior == "journal") {
@@ -15,7 +15,7 @@
                 $redirectRoute = route('journal');
             }
             else {
-                $redirectLabel = "FINISH ACTIVITY";
+                $redirectLabel = "LEAVE ACTIVITY";
                 $redirectRoute = route('explore.browse');
             }
             $progress = Auth::user()->progress;
@@ -33,11 +33,16 @@
     <div class="container manual-margin-top">
         @if($main != null)
             <x-contentView id="content_main" type="{{ $main->type }}" file="{{ $main->file_name }}"/>
+            @if($main->completion_message != null)
+                <div id="comp_message" class="mt-1 text-success" style="display: none;">
+                    {{ $main->completion_message }}
+                </div>
+            @endif
         @endif
     </div>
 
     <div class="container manual-margin-top">
-        <a id="redirectButton" class="btn btn-primary disabled" href="{{ $redirectRoute }}">{{ $redirectLabel }}</a>
+        <a id="redirect_button" class="btn btn-primary disabled" href="{{ $redirectRoute }}">{{ $redirectLabel }}</a>
     </div>
 
     <div id="extra" class="container manual-margin-top" style="display: none;">
@@ -58,13 +63,18 @@
 <script>
     const mainContent = document.getElementById('content_main')
     const mainType = '{{ $main ? $main->type : null }}'
-    const redirectButton = document.getElementById('redirectButton')
+    const redirectButton = document.getElementById('redirect_button')
     const extraDiv = document.getElementById('extra')
     const lessonId = {{ $lesson->id }}
+    const hasMessage = {{ $main && $main->completion_message ? 'true' : 'false' }} == true;
+    let completionMessageDiv = null;
+    if (hasMessage) {
+        completionMessageDiv = document.getElementById('comp_message');
+    }
 
     //checking if this has already been completed
-    const progress = {{ $progress }}
-    const order = {{ $lesson->order }}
+    const progress = {{ $progress }};
+    const order = {{ $lesson->order }};
     if (progress > order) {
         //if completed, show extra content and redirect
         extraDiv.style.display = 'block';
@@ -76,18 +86,24 @@
         //show content
         redirectButton.classList.remove('disabled');
         extraDiv.style.display = 'block';
+        //show this only when the activity is completed
+        if (hasMessage) {
+            completionMessageDiv.style.display = 'block';
+        }
 
         // axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         //update users progress with lessonId
-        axios.put('{{ route('user.update.progress') }}', {
-            lessonId: lessonId
-        })
-        .then(response => {
-            console.log(response.data.message);
-        })
-        .catch(error => {
-            console.error('There was an error updating the progress:', error);
-        });
+        if (progress <= order) {
+            axios.put('{{ route('user.update.progress') }}', {
+                lessonId: lessonId
+            })
+            .then(response => {
+                console.log(response.data.message);
+            })
+            .catch(error => {
+                console.error('There was an error updating the progress:', error);
+            });
+        }
     }
     
     //setting event listener based on type of content
