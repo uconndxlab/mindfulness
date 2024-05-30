@@ -7,8 +7,12 @@
     <form method="POST" action="{{ route('register.submit') }}">
         @csrf
 
-        <div class="form-group">
-            <label for="name">First Name</label>
+        <div class="text-left fs-5 fw-bold mb-3">
+            Create an Account
+        </div>
+
+        <div class="form-group mb-3">
+            <label class="fw-bold" for="name">First Name</label>
             <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" autocomplete="off">
             @error('name')
                 <span class="invalid-feedback" role="alert">
@@ -17,8 +21,8 @@
             @enderror
         </div>
 
-        <div class="form-group">
-            <label for="email">Email</label>
+        <div class="form-group mb-3">
+            <label class="fw-bold" for="email">Email</label>
             <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" autocomplete="off">
             @error('email')
                 <span class="invalid-feedback" role="alert">
@@ -27,8 +31,8 @@
             @enderror
         </div>
 
-        <div class="form-group">
-            <label for="password">Password</label>
+        <div class="form-group mb-3">
+            <label class="fw-bold" for="password">Password</label>
             <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" autocomplete="off">
             @error('password')
                 <span class="invalid-feedback" role="alert">
@@ -37,16 +41,11 @@
             @enderror
         </div>
 
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary">SIGN UP</button>
+        <div class="form-group text-center mb-3">
+            <button type="submit" class="btn btn-info">SIGN UP</button>
         </div>
     </form>
 
-    <div class="text-center mt-3">
-        <hr class="my-4">
-        <span class="text-muted">OR</span>
-    </div>
-
-    <a href="{{ route('login') }}" class="text-center mt-3">Return to Login</a>
+    <a href="{{ route('login') }}" class="text-center text- mt-3">Return to Login</a>
 </div>
 @endsection
