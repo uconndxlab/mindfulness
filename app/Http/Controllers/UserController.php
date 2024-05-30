@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Lesson;
+use App\Models\Favorite;
 
 class UserController extends Controller
 {
@@ -68,5 +69,36 @@ class UserController extends Controller
         } else {
             return back()->with('success', 'Nothing to change.');
         }
+    }
+
+    public function addFavorite(Request $request) {
+        $request->validate([
+            'lessonId' => ['required', 'exists:lessons,id']
+        ]);
+
+        $user = Auth::user();
+        //check if user is here yet
+        if ($user->progress < Lesson::findOrFail($request->lessonId)->order) {
+            return response()->json(['message' => 'Forbidden'], 203);
+        }
+
+        Favorite::create([
+            'user_id' => $user->id,
+            'lesson_id' => $request->lessonId
+        ]);
+
+        return response()->json(['message' => 'Favorite added'], 201);
+    }
+
+    public function deleteFavorite($lessonId) {
+        Lesson::findOrFail($lessonId);
+
+        $user = Auth::user();
+
+        Favorite::where('user_id', $user->id)
+            ->where('lesson_id', $lessonId)
+            ->delete();
+
+        return response()->json(['message' => 'Favorite removed'], 200);
     }
 }

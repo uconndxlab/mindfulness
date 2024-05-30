@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
     Route::get('/profile', [PageNavController::class, 'profilePage'])->name('profile');
     Route::get('/meditation-library', [PageNavController::class, 'meditationLibrary'])->name('meditationLib');
+    Route::get('/favorites', [PageNavController::class, 'favoritesPage'])->name('favorites');
 
     //back button
     Route::get('/backBtn', [PageNavController::class, 'backButton'])->name('button.back');
@@ -49,6 +50,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
     Route::put('/user/update/namePass', [UserController::class, 'updateNamePass'])->name('user.update.namePass');
     Route::put('/user/update/progress', [UserController::class,'updateProgress'])->name('user.update.progress');
+
+    //favorites
+    Route::post('/favorites', [UserController::class, 'addFavorite'])->name('favorites.create');
+    Route::delete('/favorites/{lessonId}', [UserController::class,'deleteFavorite'])->name('favorites.delete');
     
     //NOTES
     Route::resource('note', NoteController::class);
