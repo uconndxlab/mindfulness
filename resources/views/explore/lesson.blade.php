@@ -21,7 +21,12 @@
             $progress = Auth::user()->progress;
         @endphp
 
-        <h1 class="display fw-bold">{{ $lesson->title }}</h1>
+        <h1 class="display fw-bold">{{ $lesson->title }}
+            <button id="favorite_btn" class="btn btn-link">
+                <i id="favorite_icon" class="bi bi-star"></i>
+            </button>
+        </h1>
+
         @if($lesson->sub_header)
             <h2>{{ $lesson->sub_header }}</h2>
         @endif
@@ -59,31 +64,37 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
-    //get element for content, get type
-    const mainContent = document.getElementById('content_main')
-    const mainType = '{{ $main ? $main->type : null }}'
+    //get lessonId
+    const lessonId = {{ $lesson->id }};
 
-    //if it is a pdf, get the element to set listener later
-    let pdfDownload = null
+    //MAIN
+    //find the main content and its type
+    const mainContent = document.getElementById('content_main');
+    const mainType = '{{ $main ? $main->type : null }}';
+    //if pdf, get the download element
+    let pdfDownload = null;
     if (mainType && mainType == 'pdf') {
-        pdfDownload = document.getElementById('pdf_download')
+        pdfDownload = document.getElementById('pdf_download');
     }
-
-    //other elements
-    const redirectButton = document.getElementById('redirect_button')
-    const extraDiv = document.getElementById('extra')
-
-    //to track progress
-    const lessonId = {{ $lesson->id }}
-
+    
+    //FAVORITE
+    //get favorite button, icon, isFavorited value
+    const favButton = document.getElementById('favorite_btn');
+    let isFavorited = {{ $isFavorited ? 'true' : 'false' }};
+    const favIcon = document.getElementById('favorite_icon');
+    if (isFavorited) {
+        favIcon.className = 'bi bi-star-fill';
+    }
+    
+    //COMPLETION ITEMS
+    const redirectButton = document.getElementById('redirect_button');
     //completion message
-    const hasMessage = {{ $main && $main->completion_message ? 'true' : 'false' }} == true
-    let completionMessageDiv = null
-    if (hasMessage) {
-        completionMessageDiv = document.getElementById('comp_message');
-    }
+    const hasMessage = {{ $main && $main->completion_message ? 'true' : 'false' }};
+    let completionMessageDiv = hasMessage ? document.getElementById('comp_message') : null;
+    //extra content
+    const extraDiv = document.getElementById('extra');
 
-    //checking if this lesson has already been completed
+    //CHECK COMPLETION
     const progress = {{ $progress }};
     const order = {{ $lesson->order }};
     if (progress > order) {
@@ -92,21 +103,23 @@
         redirectButton.classList.remove('disabled');
     }
 
-    //call when activity finishes
+    //COMPLETION
     function activityComplete() {
-        //show content
+        //show content and redirect
         redirectButton.classList.remove('disabled');
         extraDiv.style.display = 'block';
-        //show message only when the activity is completed in that moment
+        //show message
         if (hasMessage) {
             completionMessageDiv.style.display = 'block';
         }
-
-        // axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         //update users progress with lessonId
         if (progress <= order) {
             axios.put('{{ route('user.update.progress') }}', {
                 lessonId: lessonId
+            }, {
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
             })
             .then(response => {
                 console.log(response.data.message);
@@ -117,7 +130,7 @@
         }
     }
     
-    //setting event listener based on type of content
+    //END LISTENER
     if (mainType) {
         if (mainType == 'pdf') {
             pdfDownload.addEventListener('click', () => {
@@ -133,5 +146,64 @@
             });
         }
     }
+
+    //FAVORITE HANDLING
+    function addFavorite() {
+        return new Promise((resolve, reject) => {
+            axios.post('{{ route('favorites.create') }}', {
+                lessonId: lessonId
+            }, {
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => {
+                console.log(response.data.message);
+                resolve(true);
+            })
+            .catch(error => {
+                console.error('There was an error adding favorite', error);
+                reject(false);
+            });
+        });
+    }
+
+    function removeFavorite() {
+        return new Promise((resolve, reject) => {
+            axios.delete('/favorites/' + lessonId, {
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => {
+                console.log(response.data.message);
+                resolve(true);
+            })
+            .catch(error => {
+                console.error('There was an error removing favorite', error);
+                reject(false);
+            });
+        });
+    }
+
+    //FAVORITE LISTENER
+    favButton.addEventListener('click', () => {
+        if (isFavorited) {
+            removeFavorite().then(success => {
+                if (success) {
+                    isFavorited = false;
+                    favIcon.className = "bi bi-star";
+                }
+            });
+        }
+        else {
+            addFavorite().then(success => {
+                if (success) {
+                    isFavorited = true;
+                    favIcon.className = "bi bi-star-fill";
+                }
+            });
+        }
+    });
 </script>
 @endsection
