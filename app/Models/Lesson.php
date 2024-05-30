@@ -19,6 +19,11 @@ class Lesson extends Model
         return $this->hasOne(Quiz::class);
     }
 
+    public function content()
+    {
+        return $this->hasMany(Content::class);
+    }
+
     protected $fillable = [
         'title',
         'module_id',
@@ -29,4 +34,9 @@ class Lesson extends Model
         'sub_header',
         'end_behavior'
     ];
+
+    public function favoritedBy()
+    {
+        return $this->hasMany(Favorite::class);
+    }
 }
