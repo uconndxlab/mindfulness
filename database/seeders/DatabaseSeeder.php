@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         DB::table('lessons')->truncate();
         DB::table('content')->truncate();
         DB::table('quizzes')->truncate();
+        DB::table('favorites')->truncate();
 
         //enable foreign key checks for SQLite
         DB::statement('PRAGMA foreign_keys = ON;');
