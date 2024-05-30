@@ -22,7 +22,7 @@
                     <div class="p-2 bg-secondary h-100">
                         @foreach ($favorites as $favorite)
                             <div class="p-1">
-                                <a class="btn btn-primary w-100" href="{{ route('explore.lesson', ['lessonId' => $favorite->lesson->id]) }}">
+                                <a class="btn btn-primary w-100" href="{{ route('explore.lesson', ['lessonId' => $favorite->lesson->id, 'from' => 'fav']) }}">
                                     {{ $favorite->lesson->module->name }} - {{ $favorite->lesson->title }}
                                 </a>
                             </div>

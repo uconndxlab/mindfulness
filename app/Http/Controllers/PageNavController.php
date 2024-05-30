@@ -74,7 +74,7 @@ class PageNavController extends Controller
         return view("profile.journal", compact('notes', 'showBackBtn', 'activity'));
     }
 
-    public function backButton() {
+    public function backButton(Request $request) {
         //back button functionality - get route, forget key, redirect
 
         //if from admin page, get separate session variable
@@ -85,6 +85,10 @@ class PageNavController extends Controller
         }
         else {
             $backRoute = Session::get("back_route");
+            //case where back is selected on explore page that was reached by favorites
+            if ($backRoute == "/favorites" && $request->from_back = 'explore.lesson') {
+                Session::put('last_explore_page', 'explore');
+            }
             Session::forget("back_route");
         }
         return redirect()->to($backRoute);
@@ -127,7 +131,7 @@ class PageNavController extends Controller
         return view("explore.home", compact('modules'));
     }
 
-    public function exploreLesson($lessonId) {
+    public function exploreLesson(Request $request, $lessonId) {
         //get the lesson info
         $lesson = Lesson::findOrFail($lessonId);
         //adding prevention of url access to stop skipping - send to explore home
@@ -137,7 +141,14 @@ class PageNavController extends Controller
 
         //set back_route
         $showBackBtn = true;
-        Session::put("back_route", '/explore');
+        //from refereces where the button was clicked
+        if (isset($request->from) && $request->from = 'fav') {
+            //if button was accessed on the favorites page, that is where back should lead
+            Session::put("back_route", '/favorites');
+        }
+        else {
+            Session::put("back_route", '/explore');
+        }
         //track explore page for browse button
         Session::put('last_explore_page', 'explore/'.$lesson->id);
         //get quizid
