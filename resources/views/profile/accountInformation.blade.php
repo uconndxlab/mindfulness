@@ -13,9 +13,13 @@
     <form method="POST" action="{{ route('user.update.namePass') }}">
         @csrf
         @Method('put')
+
+        <div class="text-center fs-5 fw-bold mt-5 mb-3">
+            My Account
+        </div>
         
-        <div class="form-group">
-            <label for="name">Name</label>
+        <div class="form-group mb-3">
+            <label class="fw-bold" for="name">Name</label>
             <input id="name" type="name" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name', Auth::user()->name) }}">
             @error('name')
             <span class="invalid-feedback" role="alert">
@@ -24,8 +28,8 @@
                 @enderror
         </div>
         
-        <div class="form-group">
-            <label for="password">New Password</label>
+        <div class="form-group mb-3">
+            <label class="fw-bold" for="password">New Password</label>
             <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password">
             @error('password')
             <span class="invalid-feedback" role="alert">
@@ -34,8 +38,8 @@
             @enderror
         </div>
 
-        <div class="form-group">
-            <label for="oldPass">Enter old password to confirm changes:</label>
+        <div class="form-group mb-3">
+            <label class="fw-bold" for="oldPass">Enter old password to confirm changes:</label>
             <input id="oldPass" type="password" class="form-control @error('oldPass') is-invalid @enderror" name="oldPass">
             @error('oldPass')
             <span class="invalid-feedback" role="alert">
@@ -51,7 +55,7 @@
     </form>
 
     @if (auth::user()->isAdmin())
-        <div class="text-center">
+        <div class="text-center mt-3">
             <div class="form-group">
                 <a href="{{ route('admin.browse') }}" class="btn btn-primary disabled">ADMIN: Content Upload</a>
             </div>
