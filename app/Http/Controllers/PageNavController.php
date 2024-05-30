@@ -40,7 +40,15 @@ class PageNavController extends Controller
             }
             $lesson->content = $content;
         }
-        return view("meditation-library", compact('lessons'));
+        return view("other.meditation-library", compact('lessons'));
+    }
+
+    public function favoritesPage()
+    {
+        //get users favorites and sort by lesson order
+        $favorites = Auth::user()->favorites()->with('lesson')->get();
+        $favorites = $favorites->sortBy('lesson.order');
+        return view("other.favorites", compact('favorites'));
     }
 
     public function journalPage(Request $request)
@@ -133,12 +141,9 @@ class PageNavController extends Controller
         //track explore page for browse button
         Session::put('last_explore_page', 'explore/'.$lesson->id);
         //get quizid
-        $quizId = null;
-        if ($lesson->end_behavior == 'quiz') {
-            $quizId = Quiz::where('lesson_id', $lesson->id)->value('id');
-        }
+        $quizId = $lesson->end_behavior == 'quiz' && $lesson->quiz ? $lesson->quiz : null;
         //get content
-        $extra = Content::where('lesson_id', $lesson->id)->get();
+        $extra = $lesson->content;
         $main = null;
         //filtering main
         foreach ($extra as $key => $item) {
@@ -154,7 +159,11 @@ class PageNavController extends Controller
             $extra = null;
         }
 
-        return view('explore.lesson', compact('showBackBtn', 'lessonId', 'lesson', 'quizId', 'main', 'extra'));
+        //favorited?
+        $user = Auth::user();
+        $isFavorited = $user->favorites()->where('lesson_id', $lessonId)->exists();
+
+        return view('explore.lesson', compact('showBackBtn', 'lessonId', 'lesson', 'quizId', 'main', 'extra', 'isFavorited'));
     }
 
     public function exploreQuiz($quizId) {
