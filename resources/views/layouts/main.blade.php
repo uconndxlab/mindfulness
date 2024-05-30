@@ -36,6 +36,9 @@
             .nav-link.active {
                 color: #007bff;
             }
+            .bi-star-fill {
+                color: #ffd700;
+            }
         </style>
     </head>
 
@@ -88,6 +91,11 @@
                     <li class="nav-item">
                         <a class="nav-link {{ Request::route()->getName() == 'meditationLib' ? 'active' : '' }}" href="{{ route('meditationLib') }}">
                             <span class="nav-icon-text"><i class="bi bi-collection"></i>Library</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::route()->getName() == 'favorites' ? 'active' : '' }}" href="{{ route('favorites') }}">
+                            <span class="nav-icon-text"><i class="bi bi-star"></i>Favorites</span>
                         </a>
                     </li>
                 </ul>
