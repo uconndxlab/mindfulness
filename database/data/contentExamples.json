@@ -4,6 +4,7 @@
         "main": true,
         "type": "audio",
         "voice": "Voice 1: What is mindfulness",
+        "is_meditation": true,
         "file_name": "Module 1 Activity 1 - What is mindfulness.m4a"
     },
     {
@@ -11,6 +12,7 @@
         "main": true,
         "type": "audio",
         "voice": "Voice 2: Rocks",
+        "is_meditation": true,
         "file_name": "Rocks on Rocks.m4a"
     },
     {

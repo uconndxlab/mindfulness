@@ -34,11 +34,11 @@ class PageNavController extends Controller
 
         //remove lessons with no meditation content
         foreach ($lessons as $key => $lesson) {
-            $content = Content::where('lesson_id', $lesson->id)->where('is_meditation', 1)->get();
-            if ($content->isEmpty()) {
+            $lesson->main = $lesson->content->where('is_meditation', 1)->where('main', true);
+            $lesson->extra = $lesson->content->where('is_meditation', 1)->where('main', false);
+            if ($lesson->main->isEmpty() && $lesson->extra->isEmpty()) {
                 $lessons->forget($key);
             }
-            $lesson->content = $content;
         }
         return view("other.meditation-library", compact('lessons'));
     }
