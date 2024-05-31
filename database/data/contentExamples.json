@@ -3,14 +3,30 @@
         "lesson_id": 1,
         "main": true,
         "type": "audio",
+        "voice": "Voice 1: What is mindfulness",
+        "file_name": "Module 1 Activity 1 - What is mindfulness.m4a"
+    },
+    {
+        "lesson_id": 1,
+        "main": true,
+        "type": "audio",
+        "voice": "Voice 2: Rocks",
         "file_name": "Rocks on Rocks.m4a"
     },
     {
         "lesson_id": 2,
         "main": true,
         "type": "audio",
+        "file_name": "Module 1 Activity 2 - Body Scan.m4a",
+        "voice": "Voice 1: Body Scan",
+        "is_meditation": true
+    },
+    {
+        "lesson_id": 2,
+        "main": true,
+        "type": "audio",
         "file_name": "Rocks on Rocks.m4a",
-        "completion_message": null,
+        "voice": "Voice 2: Rocks",
         "is_meditation": true
     },
     {
