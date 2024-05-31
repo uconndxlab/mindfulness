@@ -37,19 +37,22 @@
 
     <div class="container manual-margin-top">
         @if (!$main->isEmpty())
-            @if ($main->count() > 1)
-                <select id="voice_select" onchange="handleVoiceChange()">
-                    @foreach($main as $index => $content)
-                        <option value="{{ $index }}">{{ $content->voice ? $content->voice : "Other" }}</option>
-                    @endforeach
-                </select>
-            @endif
-                
+        
             @foreach($main as $index => $content)
                 <div id="content_main_{{ $index }}" class="content-main {{ $index == 0 ? 'initial-content' : '' }}" data-type="{{ $content->type }}" style="display: {{ $index == 0 ? 'block' : 'none' }};">
                     <x-contentView id="content_view_{{ $index }}" id2="pdf_download" type="{{ $content->type }}" file="{{ $content->file_name }}"/>
                 </div>
             @endforeach
+            @if ($main->count() > 1)
+                <div class="col-md-4 mt-1">
+                    <label class="fw-bold" for="word_otd">Select Voice:</label>
+                    <select class="form-control" id="voice_select" onchange="handleVoiceChange()">
+                        @foreach($main as $index => $content)
+                        <option value="{{ $index }}">{{ $content->voice ? $content->voice : "Other" }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
             @if($main->first()->completion_message != null)
                 <div id="comp_message" class="mt-1" style="display: none;">
                     <pre class="text-success">{{ $main->first()->completion_message }}</pre>
@@ -203,6 +206,7 @@
         //hide all options
         document.querySelectorAll('.content-main').forEach(function(element) {
             element.style.display = 'none';
+            element.querySelector('audio').pause();
         });
 
         //get select value
