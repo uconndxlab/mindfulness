@@ -154,21 +154,10 @@ class PageNavController extends Controller
         //get quizid
         $quizId = $lesson->end_behavior == 'quiz' && $lesson->quiz ? $lesson->quiz : null;
         //get content
-        $extra = $lesson->content;
-        $main = null;
-        //filtering main
-        foreach ($extra as $key => $item) {
-            if ($item->main) {
-                $main = $item;
-                //remove main
-                $extra->forget($key);
-                break;
-            }
-        }
-
-        if ($extra->count() == 0) {
-            $extra = null;
-        }
+        $content = $lesson->content;
+        $extra = $content->where('main', false);
+        $main = $content->where('main', true);
+        $main = $main->sortBy('id');
 
         //favorited?
         $user = Auth::user();
