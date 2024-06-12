@@ -1,0 +1,19 @@
+/*establish colors*/
+:root {
+    --dark-green: #48745D;
+    --light-green:#C9EDC1
+}
+
+/*styles*/
+
+.form-control {
+    border-radius:100px!important;
+}
+
+.btn-primary{
+    background-color:var(--dark-green)!important;
+    border-radius:100px!important;
+    border-color:var(--dark-green)!important;
+    padding:10px 50px!important;
+    width:100%;
+}
