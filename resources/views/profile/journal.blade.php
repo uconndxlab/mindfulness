@@ -3,7 +3,7 @@
 @section('title', 'Journal')
 
 @section('content')
-<div class="col-8">
+<div class="col-md-8">
     @if (session('success'))
     <div class="alert alert-success" role="alert">
         {{ session('success') }}
@@ -14,16 +14,28 @@
     </div>
     <form method="POST" action="{{ route('note.store') }}">
         @csrf
-        <div class="form-group">
-            <label class="fw-bold" for="word_otd">Word of the day:</label>
+        <div class="form-group dropdown">
+            <label class="fw-bold col-12" for="word_otd">Word of the day:</label>
+            <!-- Are we able to make it work with this code instead?
+            <button id="word-of-day" class="btn btn-xlight dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Select a word
+            </button>
+            <ul class="dropdown-menu" id="word_otd" name="word_otd">
+                <li><button class="dropdown-item" type="button" value="relax" onclick="showWord(this)">Relax</button></li>
+                <li><button class="dropdown-item" type="button" value="compassion" onclick="showWord(this)">Compassion</button></li>
+                <li><button class="dropdown-item" type="button" value="other" onclick="showWord(this)">More options...</button></li>
+                
+            </ul>
+            -->
             <select class="form-control" id="word_otd" name="word_otd">
-                <option value="relax">Relax</option>
-                <option value="compassion">Compassion</option>
-                <option value="other">More options...</option>
-            </select>
+            <option value="relax" onclick="showWord(this)">Relax</option>
+            <option value="compassion" onclick="showWord(this)">Compassion</option>
+            <option  value="other" onclick="showWord(this)">More</option>
+            </select> 
+            
         </div>
 
-        <div class="form-group mt-3">
+        <div class="form-group mt-3 ">
             <label class="fw-bold" for="note">New Note:</label>
             <textarea class="form-control @error('note') is-invalid @enderror" id="note" name="note" rows="5" value="{{ old('note') }}"></textarea>
             @error('note')
@@ -39,13 +51,25 @@
             </div>
         </div>
     </form>
-    <h3 class="fw-bold">Previous Notes:</h3>
+    <h3 class="fw-bold mt-3">Previous Notes:</h3>
     @foreach ($notes as $note)
-        <h5 class="fw-bold d-flex justify-content-between">
-            <span>{{ $note->word_otd }}</span>
-            <span>{{ $note->formatted_date }}</span>
-        </h5>
-        <p class="note-content">{{ $note->note }}</p>
+        <div class="prior-note">
+            <div class="top-note">
+                <h5 class="fw-bold d-flex justify-content-between">
+                    <span>{{ $note->word_otd }}</span>
+                </h5>
+                <small>{{ $note->formatted_date }}</small>
+            </div>
+
+            <p class="note-content">{{ $note->note }}</p>
+        </div>
     @endforeach
 </div>
+<!--part of ul design
+<script>
+    function showWord(item) {
+        document.getElementById("word-of-day").innerHTML = item.innerHTML;
+}
+</script>
+-->
 @endsection

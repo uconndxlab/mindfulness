@@ -3,7 +3,7 @@
 @section('title', 'Home')
 
 @section('content')
-<div class="col-8">
+<div class="col-md-8">
     @php
         $adminCheck = isset($fromAdmin) && $fromAdmin && Auth::user()->isAdmin();
         $route = $adminCheck ? 'admin.lesson.show' : 'explore.lesson';
@@ -21,15 +21,16 @@
     </div>
     @endif
 
-    <div class="container">
+    <div class="">
         @foreach ($modules as $module)
-        <div class="row mb-3 border justify-content-center">
-            <div class="col-5">
-                <div class="p-2 bg-secondary h-100">
+        <div class="row mb-3 justify-content-center">
+            <div class="col-12">
+                <div class="h-100">
                     <p>{{ $module->name }}:</p>
                     @foreach ($module->lessons as $lesson)
-                        <div class="p-1">
-                            <a class="btn btn-primary w-100 {{ $progress < $lesson->order ? 'disabled' : ''}}" href="{{ route($route, ['lessonId' => $lesson->id]) }}">{{ $lesson->title }}</a>
+                        <div class="card p-2 module mb-2">
+                            <a class="stretched-link w-100 {{ $progress < $lesson->order ? 'disabled' : ''}}" href="{{ route($route, ['lessonId' => $lesson->id]) }}">{{ $lesson->title }}</a>
+                            <i class="bi bi-arrow-right"></i>
                         </div>
                     @endforeach
                     @if ($adminCheck)
