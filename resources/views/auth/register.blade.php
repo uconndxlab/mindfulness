@@ -3,7 +3,7 @@
 @section('title', 'New User')
 
 @section('content')
-<div class="col-md-4">
+<div class="col-md-6">
     <form method="POST" action="{{ route('register.submit') }}">
         @csrf
 
@@ -42,7 +42,7 @@
         </div>
 
         <div class="form-group text-center mb-3">
-            <button type="submit" class="btn btn-info">SIGN UP</button>
+            <button type="submit" class="btn btn-primary">SIGN UP</button>
         </div>
     </form>
 

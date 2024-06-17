@@ -16,15 +16,16 @@
             <span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span> 
         </div>
     @else
-        <div class="container">
-            <div class="row mb-3 border justify-content-center">
-                <div class="col-5">
-                    <div class="p-2 bg-secondary h-100">
+        <div class="">
+            <div class="row mb-3 justify-content-center">
+                <div class="col-12">
+                    <div class=" h-100">
                         @foreach ($favorites as $favorite)
-                            <div class="p-1">
-                                <a class="btn btn-primary w-100" href="{{ route('explore.lesson', ['lessonId' => $favorite->lesson->id, 'from' => 'fav']) }}">
+                            <div class="card module p-2 mb-2">
+                                <a class=" stretched-link w-100" href="{{ route('explore.lesson', ['lessonId' => $favorite->lesson->id, 'from' => 'fav']) }}">
                                     {{ $favorite->lesson->module->name }} - {{ $favorite->lesson->title }}
                                 </a>
+                                <i class="bi bi-arrow-right"></i>
                             </div>
                         @endforeach
                     </div>

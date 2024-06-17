@@ -4,9 +4,9 @@
 
 @section('content')
 
-<div class="col-md-5 border">
+<div class="col-md-6 dark-background">
     <div class="text-left">
-        <h1 class="display font-weight-bold">Voice Selection</h1>
+        <h1 class="display fs-1 fw-bold mb-1">Voice Selection</h1>
         <p>Please select one of the following voices. This can be changed later on.</p>
     </div>
     <form action="{{ route('user.update.voice') }}" method="POST">

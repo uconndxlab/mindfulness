@@ -6,12 +6,12 @@
         <title>@yield('title')</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link href="{{ URL::asset('main.css') }}" rel="stylesheet">
         <style>
             html {
                 overflow-y: scroll;
             }
             .manual-margins {
-                margin-top: 4rem;
                 margin-bottom: 6rem;
             }
             .manual-margin-top {
@@ -43,8 +43,8 @@
     </head>
 
     <body>
-        <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
-            <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container-fluid container">
                 <ul class="navbar-nav">
                     @if(isset($showBackBtn) && $showBackBtn)
                         <li class="nav-item mr-auto">
@@ -75,30 +75,32 @@
         </div>
 
         @if (!(isset($hideBottomNav) && $hideBottomNav))
-            <nav class="navbar fixed-bottom navbar-expand-lg navbar-light bg-light">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item">
-                        <!-- check the routename to set which is active -->
-                        <a class="nav-link {{ Str::startsWith(Request::route()->getName(), 'explore.') ? 'active' : ''}}" href="{{ route('explore.browse') }}">
-                            <span class="nav-icon-text"><i class="bi bi-ui-checks-grid"></i>Browse</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ Request::route()->getName() == 'journal' ? 'active' : '' }}" href="{{ route('journal') }}">
-                            <span class="nav-icon-text"><i class="bi bi-journal-plus"></i>Journal</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ Request::route()->getName() == 'meditationLib' ? 'active' : '' }}" href="{{ route('meditationLib') }}">
-                            <span class="nav-icon-text"><i class="bi bi-collection"></i>Library</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ Request::route()->getName() == 'favorites' ? 'active' : '' }}" href="{{ route('favorites') }}">
-                            <span class="nav-icon-text"><i class="bi bi-star"></i>Favorites</span>
-                        </a>
-                    </li>
-                </ul>
+            <nav class="navbar fixed-bottom navbar-expand-lg navbar-light lower-nav-full">
+                <div class="container">
+                    <ul class="navbar-nav lower-nav mx-auto">
+                        <li class="nav-item">
+                            <!-- check the routename to set which is active -->
+                            <a class="nav-link {{ Str::startsWith(Request::route()->getName(), 'explore.') ? 'active' : ''}}" href="{{ route('explore.browse') }}">
+                                <span class="nav-icon-text"><i class="bi bi-ui-checks-grid"></i>Browse</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ Request::route()->getName() == 'journal' ? 'active' : '' }}" href="{{ route('journal') }}">
+                                <span class="nav-icon-text"><i class="bi bi-journal-plus"></i>Journal</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ Request::route()->getName() == 'meditationLib' ? 'active' : '' }}" href="{{ route('meditationLib') }}">
+                                <span class="nav-icon-text"><i class="bi bi-collection"></i>Library</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ Request::route()->getName() == 'favorites' ? 'active' : '' }}" href="{{ route('favorites') }}">
+                                <span class="nav-icon-text"><i class="bi bi-star"></i>Favorites</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </nav>
         @endif
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>

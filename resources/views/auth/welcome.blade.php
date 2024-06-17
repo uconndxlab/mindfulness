@@ -3,15 +3,15 @@
 @section('title', 'Welcome!')
 
 @section('content')
-<div class="col-md-5 border">
+<div class="col-md-6 dark-background">
     <div class="text-left">
-        <h1 class="display-3 font-weight-bold">Welcome!</h1>
-        <p class="lead">Welcome text goes here. It can wrap on to the following line like this. The following video is just a placeholder. It will be changed.</p>
+        <h1 class="display-3 fs-1 fw-bold mb-1">Welcome!</h1>
+        <p class="">Welcome text goes here. It can wrap on to the following line like this. The following video is just a placeholder. It will be changed.</p>
     </div>
     <div class="text-center">
         <x-contentView id="welcome_video" type="video" file="videoExampleSnarky.MOV"/>
         <br><br>
-        <a href="{{ route('voiceSelect') }}" class="btn btn-primary btn-lg">NEXT</a>
+        <a href="{{ route('voiceSelect') }}" class="btn btn-primary">NEXT</a>
     </div>
 </div>
 @endsection
