@@ -3,12 +3,14 @@
 @section('title', 'Log In')
 
 @section('content')
-<div class="col-md-4">
+<div class="col-md-6">
     <form method="POST" action="{{ route('login.submit') }}">
         @csrf
-
+        <div class="text-left fs-2 fw-bold mb-1">
+            Mindfulness.
+        </div>
         <div class="text-left fs-5 fw-bold mb-3">
-            Create an Account
+            Log in to your Account
         </div>
 
         <div class="form-group mb-3">
