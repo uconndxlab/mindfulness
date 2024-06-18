@@ -58,7 +58,8 @@ Check Laravel's documentation on [project set-up](https://laravel.com/docs/11.x/
 
 7. Run database migrations and seeding:
     ```bash
-    php artisan migrate --seed
+    php artisan migrate
+    php artisan db:seed --class=DatabaseSeeder
     ```
     - If prompted to make a new sqlite database, select yes.
 
