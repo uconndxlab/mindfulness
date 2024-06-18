@@ -15,17 +15,28 @@
                 $redirectRoute = route('journal', ['activity' => $lesson->id]);
             }
             else {
-                $redirectLabel = "FINISH ACTIVITY";
-                $redirectRoute = route('explore.browse');
+                $redirectLabel = "NEXT";
+                $redirectRoute = route('explore.lesson', ['lessonId' => $next]);
             }
             $progress = Auth::user()->progress;
         @endphp
 
-        <h1 class="display fw-bold">{{ $lesson->title }}
-            <button id="favorite_btn" class="btn btn-link">
-                <i id="favorite_icon" class="bi bi-star"></i>
-            </button>
-        </h1>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="display fw-bold">{{ $lesson->title }}
+                    <button id="favorite_btn" class="btn btn-link">
+                        <i id="favorite_icon" class="bi bi-star"></i>
+                    </button>
+                </h1>
+            </div>
+            <div>
+                <h1 class="display fw-bold">
+                    <a id="exit_btn" class="btn btn-link" href="{{ route('explore.home') }}">
+                        <i id="exit_icon" class="bi bi-x-lg"></i>
+                    </a>
+                </h1>
+            </div>
+        </div>
 
         @if($lesson->sub_header)
             <h2>{{ $lesson->sub_header }}</h2>

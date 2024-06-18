@@ -163,7 +163,10 @@ class PageNavController extends Controller
         $user = Auth::user();
         $isFavorited = $user->favorites()->where('lesson_id', $lessonId)->exists();
 
-        return view('explore.lesson', compact('showBackBtn', 'lessonId', 'lesson', 'quizId', 'main', 'extra', 'isFavorited'));
+        //get next lesson
+        $next = Lesson::where('order', $lesson->order + 1)->value('id');
+
+        return view('explore.lesson', compact('showBackBtn', 'lessonId', 'lesson', 'quizId', 'main', 'extra', 'isFavorited', 'next'));
     }
 
     public function exploreQuiz($quizId) {
@@ -174,8 +177,11 @@ class PageNavController extends Controller
         Session::put("back_route", '/explore/'.$quiz->lesson_id);
         Session::put('last_explore_page', 'explore/quiz/'.$quizId);
         //get activity title
-        $activityTitle = Lesson::find($quiz->lesson_id)->value('title');
-        return view('explore.quiz', compact('showBackBtn', 'quiz', 'activityTitle'));
+        $lesson = Lesson::find($quiz->lesson_id);
+        $activity = $lesson->title;
+        //getting id of next lesson
+        $next = Lesson::where('order', $lesson->order + 1)->value('id');
+        return view('explore.quiz', compact('showBackBtn', 'quiz', 'activity',  'next'));
     }
 
     public function submitQuiz(Request $request, $quizId)

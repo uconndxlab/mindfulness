@@ -167,6 +167,14 @@ body:has(div.dark-background){
     color:rgba(0,0,0,0.5)
 }
 
+#exit_btn{
+    width:auto!important;
+    padding:0px!important;
+    margin-top:-2px!important;
+    font-size:25px;
+    color:rgba(0,0,0,0.5)
+}
+
 /*module*/
 .module a{
     text-decoration:none;

@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', $activityTitle.': Quiz')
+@section('title', $activity.': Quiz')
 
 @section('content')
 <div class="col-md-8">
@@ -9,7 +9,18 @@
             $quizOptions = $quiz->options_feedback ?? [];
         @endphp
 
-        <h1 class="display font-weight-bold">Quiz</h1>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="display font-weight-bold">Quiz</h1>
+            </div>
+            <div>
+                <h1 class="display fw-bold">
+                    <a id="exit_btn" class="btn btn-link" href="{{ route('explore.home') }}">
+                        <i id="exit_icon" class="bi bi-x-lg"></i>
+                    </a>
+                </h1>
+            </div>
+        </div>
         <h2>{{ $quiz->question }}</h2>
     </div>
     <form action="{{ route('quiz.submit', $quiz->id) }}" method="POST" class="manual-margin-top">
@@ -29,15 +40,13 @@
             </div>
         @endif
 
-        <button type="submit" id="submitButton" class="btn btn-primary mt-3">Submit</button>
+        <button type="submit" id="submitButton" class="btn btn-primary mt-3">SUBMIT</button>
             
     </form>
     
     @if (session('is_correct'))
-        <div class="text-left">
-            <div class="container manual-margin-top">
-                <a id="redirectButton" class="btn btn-success" href="{{ route('explore.home') }}">EXIT QUIZ</a>
-            </div>
+        <div class="container manual-margin-top">
+            <a id="nextButton" class="btn btn-success" href="{{ route('explore.lesson', ['lessonId' => $next]) }}">NEXT</a>
         </div>
     @endif
 </div>
@@ -69,7 +78,4 @@
         checkRadioButtons();
     });
 </script>
-
-
-
 @endsection
