@@ -15,24 +15,21 @@
     <form method="POST" action="{{ route('note.store') }}">
         @csrf
         <div class="form-group dropdown">
-            <label class="fw-bold col-12" for="word_otd">Word of the day:</label>
-            <!-- Are we able to make it work with this code instead?
+            <label class="fw-bold col-12" for="word_dropdown">Word of the day:</label>
             <button id="word-of-day" class="btn btn-xlight dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Select a word
             </button>
-            <ul class="dropdown-menu" id="word_otd" name="word_otd">
+            <ul class="dropdown-menu @error('word_otd') is-invalid @enderror" id="word_dropdown" name="word_dropdown">
                 <li><button class="dropdown-item" type="button" value="relax" onclick="showWord(this)">Relax</button></li>
                 <li><button class="dropdown-item" type="button" value="compassion" onclick="showWord(this)">Compassion</button></li>
                 <li><button class="dropdown-item" type="button" value="other" onclick="showWord(this)">More options...</button></li>
-                
             </ul>
-            -->
-            <select class="form-control" id="word_otd" name="word_otd">
-            <option value="relax" onclick="showWord(this)">Relax</option>
-            <option value="compassion" onclick="showWord(this)">Compassion</option>
-            <option  value="other" onclick="showWord(this)">More</option>
-            </select> 
-            
+            <input type="hidden" name="word_otd" id="word_otd" value="">
+            @error('word_otd')
+            <span class="invalid-feedback" role="alert">
+                <strong>{{ $message }}</strong>
+            </span>
+            @enderror
         </div>
 
         <div class="form-group mt-3 ">
@@ -65,11 +62,10 @@
         </div>
     @endforeach
 </div>
-<!--part of ul design
 <script>
     function showWord(item) {
         document.getElementById("word-of-day").innerHTML = item.innerHTML;
-}
+        document.getElementById("word_otd").value = item.value;
+    }
 </script>
--->
 @endsection
