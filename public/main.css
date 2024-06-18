@@ -8,7 +8,6 @@
 }
 
 /*styles*/
-
 a {
     color:var(--dark-green)!important;
     font-weight:500!important;
@@ -39,10 +38,7 @@ textarea.form-control {
     border-radius:20px;
 }
 
-
-
 /*buttons*/
-
 .btn {
     border-radius:100px!important;
     padding:10px 50px!important;
@@ -85,9 +81,7 @@ textarea.form-control {
     color:#000!important
 }
 
-
 /*nav*/
-
 .lower-nav{
     display: flex!important;
     flex-direction: row!important;
