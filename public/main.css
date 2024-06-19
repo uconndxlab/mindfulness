@@ -75,6 +75,14 @@ textarea.form-control {
     align-items:center!important;
 }
 
+[id^="dropdown_button_"] {
+    max-width: 500px !important;
+    padding: 10px 20px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
 .dropdown-menu{
     max-width:500px!important;
     width:100%;

@@ -10,7 +10,6 @@
     <div class="text-left">
         <h1 class="display fw-bold">Meditation Library</h1>
     </div>
-
     @if ($lessons->isEmpty())
         <div class="text-left muted">
             Keep progressing to unlock meditation sessions...
@@ -35,11 +34,26 @@
                             @if ($lesson->main->count() > 1)
                                 <div class="col-md-4 mb-4">
                                     <label class="fw-bold" for="word_otd">Select Voice:</label>
-                                    <select class="form-control" id="voice_select_{{ $index }}" onchange="handleVoiceChange({{ $index }})">
-                                        @foreach($lesson->main as $content_index => $content)
-                                            <option value="{{ $content_index }}">{{ $content->voice ? $content->voice : "Other" }}</option>
-                                        @endforeach
-                                    </select>
+
+
+
+                                    <div class="form-group dropdown">
+                                        <button id="dropdown_button_{{ $index }}" class="btn btn-xlight dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            {{ $lesson->main[0]->voice ? $lesson->main[0]->voice : "Other"}}
+                                        </button>
+                                        <ul class="dropdown-menu" id="voice_dropdown" name="voice_dropdown">
+                                            @foreach ($lesson->main as $content_index => $content)
+                                                <li>
+                                                    <button class="dropdown-item" type="button" value="{{ $content_index }}" onclick="selectVoice({{ $index }}, {{ $content_index }}, '{{ $content->voice ? $content->voice : 'Other' }}')">
+                                                        {{ $content->voice ? $content->voice : "Other" }}
+                                                    </button>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                        <input type="hidden" id="voice_select_{{ $index }}" name="voice_select_{{ $index }}" value="0">
+                                    </div>
+
+
                                 </div>
                             @endif
 
@@ -57,6 +71,16 @@
     @endif
 </div>
 <script>
+
+
+    //function for dropdown
+    function selectVoice(lessonIndex, contentIndex, voice) {
+        //change the text, change the value stored in hidden input
+        document.getElementById(`dropdown_button_${lessonIndex}`).innerHTML = voice;
+        document.getElementById(`voice_select_${lessonIndex}`).value = contentIndex;
+        handleVoiceChange(lessonIndex);
+    }
+
     //change voice
     function handleVoiceChange(lessonIndex) {
         //hide all options
@@ -66,10 +90,10 @@
         });
 
         //get select value
-        var select = document.getElementById('voice_select_' + lessonIndex);
-        var selectedIndex = select.value;
+        var dd_input = document.getElementById('voice_select_' + lessonIndex);
+        var selectedIndex = dd_input.value;
 
-        //show the content selected and change main
+        //show the selected audio
         var selectedContent = document.getElementById('lesson_' + lessonIndex + '_content_main_' + selectedIndex);
         if (selectedContent) {
             selectedContent.style.display = 'block';
@@ -80,8 +104,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         //check count for all
         @foreach ($lessons as $index => $lesson)
-            const mainCount_{{ $index }} = {{ $lesson->main->count() }};
-            if (mainCount_{{ $index }} > 1) {
+            if ({{ $lesson->main->count() }} > 1) {
                 const select = document.getElementById('voice_select_{{ $index }}');
                 if (select) {
                     handleVoiceChange({{ $index }});
