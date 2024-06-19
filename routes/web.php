@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PageNavController;
 use App\Http\Controllers\NoteController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+
+use App\Mail\TestMail;
+use Illuminate\Support\Facades\Mail;
 
 //default
 Route::redirect("/","/explore");
@@ -21,9 +25,43 @@ Route::get('/account-creation', [AuthController::class, 'registrationPage'])->na
 //registration request
 Route::post('/account-creation', [AuthController::class,'register'])->name('register.submit');
 
+//EMAIL VERIFICATION
+Route::middleware('auth')->group(function () {
+    Route::get('/email/verify', function () {
+        if (Auth::user()->email_verified_at) {
+            return redirect()->back();
+        }
+        return view('auth.verify-email');
+    })->name('verification.notice');
+
+    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+        $request->fulfill();
+        return redirect()->intended('/welcome');
+    })->middleware('signed')->name('verification.verify');
+
+    Route::post('/email/verification-notification', function (Request $request) {
+        $user = Auth::user();
+        $user->sendEmailVerificationNotification();
+        // TODO DELETE THIS WHEN EMAIL IS SET UP
+        $user->email_verified_at = now();
+        $user->save();
+        if ($user->email_verified_at) {
+            return redirect()->intended('/explore');
+        }
+
+        return back()->with('message', 'Verification link sent!');
+    })->middleware('throttle:6,1')->name('verification.send');
+});
+
+
+Route::get('/test', function () {
+    Mail::to('test@example.com')->send(new TestMail());
+    return 'Test email sent!';
+});
+
 
 //AUTH protected routes
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     //logout
     Route::get('/logout', [AuthController::class,'logout'])->name('logout');
 
