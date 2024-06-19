@@ -43,8 +43,8 @@ class LessonSeeder extends Seeder
                     'lesson_number' => $i,
                     'order' => $order++,
                 ]);
+                $module->lesson_count += 1;
             }
-            $module->lesson_count = $limit;
             $module->save();
         });
     }

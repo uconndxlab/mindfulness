@@ -61,5 +61,19 @@
             </div>
         </div>
     @endif
+
+    <div class="text-center fs-5 fw-bold mt-5 mb-3">
+        Progress
+    </div>
+    @foreach ($modules as $module)
+        <div class="prior-note">
+            <div class="top-note">
+                <h5 class="fw-bold d-flex justify-content-between">
+                    <span>{{ $module->name }}</span>
+                </h5>
+                <small class="{{ $module->progress == $module->lesson_count ? 'fw-bold' : '' }}">{{ $module->progress }}/{{ $module->lesson_count }}</small>
+            </div>
+        </div>
+    @endforeach
 </div>
 @endsection

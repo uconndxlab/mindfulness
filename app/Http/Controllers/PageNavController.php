@@ -104,7 +104,24 @@ class PageNavController extends Controller
         if ($prev_path != "/profile" && !Str::startsWith($prev_path, '/admin')) {
             Session::put("back_route", url()->previous());
         }
-        return view("profile.accountInformation", compact("showBackBtn", "hideProfileLink"));
+
+        //calculating progress
+        $modules = Module::orderBy('module_number', 'asc')->get();
+        $progress = Auth::user()->progress;
+        foreach ($modules as $module) {
+            if ($progress >= $module->lesson_count) {
+                $module->progress = $module->lesson_count;
+                $progress -= $module->lesson_count;
+            }
+            else if ($progress > 0) {
+                $module->progress = $progress;
+                $progress = 0;
+            }
+            else {
+                $module->progress = 0;
+            }
+        }
+        return view("profile.accountInformation", compact("showBackBtn", "hideProfileLink", 'modules'));
     }
 
     public function getModulesList() {
