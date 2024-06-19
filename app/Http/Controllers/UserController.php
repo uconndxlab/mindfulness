@@ -49,25 +49,26 @@ class UserController extends Controller
         if ($request->name != $user->name || $request->password != null) {
             //validate
             $request->validate([
-                'name'=> ['string', 'max:255'],
-                'password'=> [Password::defaults(), 'nullable'],
+                'name'=> ['sometimes', 'string', 'max:255'],
+                'password'=> ['sometimes', Password::defaults(), 'nullable'],
                 'oldPass'=>['required'],
             ]);
-    
+
             //check password before making updates
-            if (Hash::check($request->oldPass, $user->password)) {
-                if ($request->name) {
-                    $user->name = $request->name;
-                }
-                if ($request->password) {
-                    $user->password = Hash::make($request->password);
-                }
-                $user->save();
-                return back()->with('success','Information updated.');
+            if (!Hash::check($request->oldPass, $user->password)) {
+                return back()->withErrors(['oldPass' => 'The password you entered is incorrect.'])->withInput();;
             }
-            return back()->withErrors(['oldPass' => 'Incorrect password.'])->withInput();;
-        } else {
-            return back()->with('success', 'Nothing to change.');
+            if ($request->name && $request->name != $user->name) {
+                $user->name = $request->name;
+            }
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
+            $user->save();
+            return back()->with('success','Your information has been updated successfully.');
+        }
+        else {
+            return back();
         }
     }
 
