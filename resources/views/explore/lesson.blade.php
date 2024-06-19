@@ -295,6 +295,18 @@
                 }
             }
         }
+
+        //pausing all audios when another is played
+        const playableMedia = document.querySelectorAll('.media-player');
+        playableMedia.forEach(playing => {
+            playing.addEventListener('play', () => {
+                playableMedia.forEach(other => {
+                    if (other !== playing) {
+                        other.pause();
+                    }
+                });
+            });
+        });
     });
 </script>
 @endsection

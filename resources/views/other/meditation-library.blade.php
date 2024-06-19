@@ -50,8 +50,6 @@
                                         </ul>
                                         <input type="hidden" id="voice_select_{{ $index }}" name="voice_select_{{ $index }}" value="0">
                                     </div>
-
-
                                 </div>
                             @endif
 
@@ -69,8 +67,6 @@
     @endif
 </div>
 <script>
-
-
     //function for dropdown
     function selectVoice(lessonIndex, contentIndex, voice) {
         //change the text, change the value stored in hidden input
@@ -118,6 +114,18 @@
                 const audioElements = collapseElement.querySelectorAll('audio');
                 audioElements.forEach(function(audioElement) {
                     audioElement.pause();
+                });
+            });
+        });
+
+        //pausing all audios when another is played
+        const playableMedia = document.querySelectorAll('.media-player');
+        playableMedia.forEach(playing => {
+            playing.addEventListener('play', () => {
+                playableMedia.forEach(other => {
+                    if (other !== playing) {
+                        other.pause();
+                    }
                 });
             });
         });
