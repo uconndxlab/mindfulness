@@ -141,10 +141,12 @@ class PageNavController extends Controller
 
         //set back_route
         $showBackBtn = true;
+        $from_fav = false;
         //from refereces where the button was clicked
         if (isset($request->from) && $request->from = 'fav') {
             //if button was accessed on the favorites page, that is where back should lead
             Session::put("back_route", '/favorites');
+            $from_fav = true;
         }
         else {
             Session::put("back_route", '/explore');
@@ -166,7 +168,7 @@ class PageNavController extends Controller
         //get next lesson
         $next = Lesson::where('order', $lesson->order + 1)->value('id');
 
-        return view('explore.lesson', compact('showBackBtn', 'lessonId', 'lesson', 'quizId', 'main', 'extra', 'isFavorited', 'next'));
+        return view('explore.lesson', compact('showBackBtn', 'lessonId', 'lesson', 'quizId', 'main', 'extra', 'isFavorited', 'next', 'from_fav'));
     }
 
     public function exploreQuiz($quizId) {

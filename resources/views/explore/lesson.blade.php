@@ -31,7 +31,7 @@
             </div>
             <div>
                 <h1 class="display fw-bold">
-                    <a id="exit_btn" class="btn btn-link" href="{{ route('explore.home') }}">
+                    <a id="exit_btn" class="btn btn-link" href="{{ $from_fav ? route('favorites'): route('explore.home') }}">
                         <i id="exit_icon" class="bi bi-x-lg"></i>
                     </a>
                 </h1>

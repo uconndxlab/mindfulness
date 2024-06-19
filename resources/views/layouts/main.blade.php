@@ -41,14 +41,29 @@
             }
         </style>
     </head>
-
+        @php
+            $route_name = Request::route()->getName();
+            $active_items = [false, false, false, false];
+            if ($route_name == 'journal') {
+                $active_items[1] = true;
+            }
+            else if ($route_name == 'meditationLib') {
+                $active_items[2] = true;
+            }
+            else if (Str::startsWith($route_name, 'explore.') && !(isset($from_fav) && $from_fav)) {
+                $active_items[0] = true;
+            }
+            else {
+                $active_items[3] = true;
+            }
+        @endphp
     <body>
         <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container-fluid container">
                 <ul class="navbar-nav">
                     @if(isset($showBackBtn) && $showBackBtn)
                         <li class="nav-item mr-auto">
-                            <a class="nav-link" href="{{ route('button.back', ['from_back' => Request::route()->getName()]) }}">< Back {{ isset($activity) ? 'to '.$activity : ''}}</a>
+                            <a class="nav-link" href="{{ route('button.back', ['from_back' => $route_name]) }}">< Back {{ isset($activity) ? 'to '.$activity : ''}}</a>
                         </li>
                     @endif
                 </ul>
@@ -60,7 +75,7 @@
                         </li>
                     @else
                         <!-- otherwise show a logout button - unless on admin pages -->
-                        <li class="nav-item ml-auto" @if(Str::startsWith(Request::route()->getName(), 'admin.')) hidden @endif>
+                        <li class="nav-item ml-auto" @if(Str::startsWith($route_name, 'admin.')) hidden @endif>
                             <a class="nav-link" href="{{ route('logout') }}">Logout</a>
                         </li>
                     @endif
@@ -74,28 +89,29 @@
             </div>
         </div>
 
+
         @if (!(isset($hideBottomNav) && $hideBottomNav))
             <nav class="navbar fixed-bottom navbar-expand-lg navbar-light lower-nav-full">
                 <div class="container">
                     <ul class="navbar-nav lower-nav mx-auto">
                         <li class="nav-item">
                             <!-- check the routename to set which is active -->
-                            <a class="nav-link {{ Str::startsWith(Request::route()->getName(), 'explore.') ? 'active' : ''}}" href="{{ route('explore.browse') }}">
+                            <a class="nav-link {{ $active_items[0] ? 'active' : '' }}" href="{{ route('explore.browse') }}">
                                 <span class="nav-icon-text"><i class="bi bi-ui-checks-grid"></i>Browse</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ Request::route()->getName() == 'journal' ? 'active' : '' }}" href="{{ route('journal') }}">
+                            <a class="nav-link {{ $active_items[1] ? 'active' : '' }}" href="{{ route('journal') }}">
                                 <span class="nav-icon-text"><i class="bi bi-journal-plus"></i>Journal</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ Request::route()->getName() == 'meditationLib' ? 'active' : '' }}" href="{{ route('meditationLib') }}">
+                            <a class="nav-link {{ $active_items[2] ? 'active' : '' }}" href="{{ route('meditationLib') }}">
                                 <span class="nav-icon-text"><i class="bi bi-collection"></i>Library</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ Request::route()->getName() == 'favorites' ? 'active' : '' }}" href="{{ route('favorites') }}">
+                            <a class="nav-link {{ $active_items[3] ? 'active' : '' }}" href="{{ route('favorites') }}">
                                 <span class="nav-icon-text"><i class="bi bi-star"></i>Favorites</span>
                             </a>
                         </li>
