@@ -34,9 +34,7 @@
                             @if ($lesson->main->count() > 1)
                                 <div class="col-md-4 mb-4">
                                     <label class="fw-bold" for="word_otd">Select Voice:</label>
-
-
-
+                                    <!-- drop down for voice select -->
                                     <div class="form-group dropdown">
                                         <button id="dropdown_button_{{ $index }}" class="btn btn-xlight dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                             {{ $lesson->main[0]->voice ? $lesson->main[0]->voice : "Other"}}

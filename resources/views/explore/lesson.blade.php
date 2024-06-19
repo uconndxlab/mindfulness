@@ -57,11 +57,22 @@
             @if ($main->count() > 1)
                 <div class="col-md-4 mt-1">
                     <label class="fw-bold" for="word_otd">Select Voice:</label>
-                    <select class="form-control" id="voice_select" onchange="handleVoiceChange()">
-                        @foreach($main as $index => $content)
-                        <option value="{{ $index }}">{{ $content->voice ? $content->voice : "Other" }}</option>
-                        @endforeach
-                    </select>
+                    <!-- dropdown for voice select -->
+                    <div class="form-group dropdown">
+                        <button id="dropdown_button_" class="btn btn-xlight dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ $main[0]->voice ? $main[0]->voice : "Other"}}
+                        </button>
+                        <ul class="dropdown-menu" id="voice_dropdown" name="voice_dropdown">
+                            @foreach ($main as $content_index => $content)
+                                <li>
+                                    <button class="dropdown-item" type="button" value="{{ $content_index }}" onclick="selectVoice({{ $content_index }}, '{{ $content->voice ? $content->voice : 'Other' }}')">
+                                        {{ $content->voice ? $content->voice : "Other" }}
+                                    </button>
+                                </li>
+                            @endforeach
+                        </ul>
+                        <input type="hidden" id="voice_select" name="voice_select" value="0">
+                    </div>
                 </div>
             @endif
             @if($main->first()->completion_message != null)
@@ -212,7 +223,16 @@
         }
     });
 
+
     //VOICE OPTIONS
+    //function for dropdown
+    function selectVoice(contentIndex, voice) {
+        //change the text, change the value stored in hidden input
+        document.getElementById(`dropdown_button_`).innerHTML = voice;
+        document.getElementById(`voice_select`).value = contentIndex;
+        handleVoiceChange();
+    }
+
     function handleVoiceChange() {
         //hide all options
         document.querySelectorAll('.content-main').forEach(function(element) {
@@ -221,8 +241,8 @@
         });
 
         //get select value
-        var select = document.getElementById('voice_select');
-        var selectedIndex = select.value;
+        var dd_input = document.getElementById('voice_select');
+        var selectedIndex = dd_input.value;
 
         //show the content selected
         var selectedContent = document.getElementById('content_main_' + selectedIndex);
@@ -248,9 +268,8 @@
     //ON LOAD
     document.addEventListener('DOMContentLoaded', function() {
         //check count
-        const mainCount = {{ $main->count() }};
         //CASE WITH SELECT - AUDIO ONLY
-        if (mainCount > 1) {
+        if ({{ $main->count() }} > 1) {
             const select = document.getElementById('voice_select');
             if (select) {
                 handleVoiceChange();
