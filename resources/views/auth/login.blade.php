@@ -33,6 +33,7 @@
             @enderror
         </div>
 
+        <a href="{{ route('password.request') }}" class="text-center text- mt-3">Forgot Password?</a>
 
         <div class="form-group text-center">
             <button type="submit" class="btn btn-primary">LOG IN</button>

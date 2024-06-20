@@ -3,7 +3,7 @@
 @section('title', 'Email Verification')
 
 @section('content')
-<div>
+<div class="col-md-6">
     @if (session('message'))
         <div class="alert alert-success" role="alert">
             {{ session('message') }}
@@ -15,6 +15,7 @@
     <p>Please check your email for a verification link.</p>
     <p>If you did not receive the email, click the button below to request another.</p>
 
+    <!-- verification.resend -->
     <form method="POST" action="{{ route('verification.send') }}">
         @csrf
         <button type="submit" class="btn btn-primary">Resend Verification Email</button>

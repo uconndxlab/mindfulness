@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PageNavController;
 use App\Http\Controllers\NoteController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 use App\Mail\TestMail;
@@ -27,11 +29,12 @@ Route::post('/account-creation', [AuthController::class,'register'])->name('regi
 
 //EMAIL VERIFICATION
 Route::middleware('auth')->group(function () {
+    //THERE ARE BUILT IN VERIFICATION FUNCTIONS
     Route::get('/email/verify', function () {
         if (Auth::user()->email_verified_at) {
             return redirect()->back();
         }
-        return view('auth.verify-email');
+        return view('auth.verify');
     })->name('verification.notice');
 
     Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
@@ -54,10 +57,18 @@ Route::middleware('auth')->group(function () {
 });
 
 
-Route::get('/test', function () {
-    Mail::to('test@example.com')->send(new TestMail());
-    return 'Test email sent!';
-});
+// Route::get('/test', function () {
+//     Mail::to('test@example.com')->send(new TestMail());
+//     return 'Test email sent!';
+// });
+
+//FORGOT PASSWORD
+// Auth::routes(['verify' => true]);
+// Auth::routes();
+Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
 
 
 //AUTH protected routes
