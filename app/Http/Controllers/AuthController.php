@@ -36,8 +36,8 @@ class AuthController extends Controller
         }
 
         //check auth and remember
-        // $remember = $request->has('remember');
-        if (Auth::attempt($credentials)) { //, $remember
+        $remember = $request->has('remember');
+        if (Auth::attempt($credentials, $remember)) {
             return redirect()->intended('explore');
         }
         
@@ -78,8 +78,8 @@ class AuthController extends Controller
 
         //login and redirect
         event(new Registered($user));
-        // $remember = $request->has('remember');
-        Auth::login($user); //, $remember
+        $remember = $request->has('remember');
+        Auth::attempt($request->only('email', 'password'), $remember);
         return redirect(route('welcome'));
     }
 }
