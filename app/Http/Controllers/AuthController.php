@@ -10,9 +10,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class AuthController extends Controller
 {
+    use AuthenticatesUsers;
+
     public function loginPage()
     {
         return view('auth.login');
@@ -20,6 +23,11 @@ class AuthController extends Controller
 
     public function authenticate(Request $request)
     {
+        $request->validate([
+            'email' => ['required', 'email'],
+            'password' => 'required',
+        ]);
+
         //check if user exists first
         $credentials = $request->only('email', 'password');
         $user = User::where('email', $credentials['email'])->first();
@@ -27,10 +35,12 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'Email not found.']);
         }
 
-        //check authentication
-        if (Auth::attempt($credentials)) {
+        //check auth and remember
+        // $remember = $request->has('remember');
+        if (Auth::attempt($credentials)) { //, $remember
             return redirect()->intended('explore');
         }
+        
         return back()->withErrors(['password' => 'Invalid credentials.'])->withInput();
     }
 
@@ -52,7 +62,7 @@ class AuthController extends Controller
         try {
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['required',  'string',  'lowercase',  'email',  'max:255',  'unique:'.User::class],
+                'email' => ['required',  'email',  'max:255',  'unique:'.User::class],
                 'password'=> ['required', Password::defaults()],
             ]);
         } catch (ValidationException $e) {
@@ -68,7 +78,8 @@ class AuthController extends Controller
 
         //login and redirect
         event(new Registered($user));
-        Auth::login($user);
+        // $remember = $request->has('remember');
+        Auth::login($user); //, $remember
         return redirect(route('welcome'));
     }
 }
