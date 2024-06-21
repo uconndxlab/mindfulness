@@ -70,7 +70,7 @@ class AuthController extends Controller
                 'password'=> ['required', Password::defaults()],
             ], [
                 'name.required' => 'Please enter a name.',
-                'name.max' => 'Name must not be more than 255 characters.',
+                'name.max' => 'Name must be no longer than 255 characters.',
                 'email.required' => 'Please enter an email address.',
                 'email.email' => 'Not a valid email.',
                 'email.max' => 'Email must be no longer than 255 characters.',

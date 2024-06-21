@@ -52,6 +52,9 @@ class UserController extends Controller
                 'name'=> ['sometimes', 'string', 'max:255'],
                 'password'=> ['sometimes', Password::defaults(), 'nullable'],
                 'oldPass'=>['required'],
+            ], [
+                'name.max' => 'Name must be no longer than 255 characters.',
+                'oldPass.required' => 'Please enter your password to save changes.'
             ]);
 
             //check password before making updates
