@@ -9,7 +9,7 @@
         <p class="">Welcome text goes here. It can wrap on to the following line like this. The following video is just a placeholder. It will be changed.</p>
     </div>
     <div class="text-center">
-        <x-contentView id="welcome_video" type="video" file="videoExampleSnarky.MOV"/>
+        <x-contentView id="welcome_video" type="audio" file="1.0 Welcome message (3 min).m4a"/>
         <br><br>
         <a href="{{ route('voiceSelect') }}" class="btn btn-primary">NEXT</a>
     </div>
