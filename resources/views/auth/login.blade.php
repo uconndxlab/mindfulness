@@ -15,7 +15,7 @@
 
         <div class="form-group mb-3">
             <label class="fw-bold" for="email">Email</label>
-            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror @error('password') is-invalid @enderror" name="email" value="{{ old('email') }}">
+            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror @error('credentials') is-invalid @enderror" name="email" value="{{ old('email') }}">
             @error('email')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
@@ -25,8 +25,13 @@
 
         <div class="form-group mb-3">
             <label class="fw-bold" for="password">Password</label>
-            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password">
+            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror @error('credentials') is-invalid @enderror" name="password">
             @error('password')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+            @error('credentials')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
                 </span>

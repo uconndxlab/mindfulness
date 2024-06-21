@@ -26,14 +26,18 @@ class AuthController extends Controller
         $request->validate([
             'email' => ['required', 'email'],
             'password' => 'required',
+        ], [
+            'email.required' => "Email address is required.",
+            'email.email' => "Not a valid email address.",
+            'password.required' => "Password is required."
         ]);
 
         //check if user exists first
         $credentials = $request->only('email', 'password');
-        $user = User::where('email', $credentials['email'])->first();
-        if (!$user) { 
-            return back()->withErrors(['email' => 'Email not found.']);
-        }
+        // $user = User::where('email', $credentials['email'])->first();
+        // if (!$user) { 
+        //     return back()->withErrors(['email' => 'We can\'t find a user with that email address.']);
+        // }
 
         //check auth and remember
         $remember = $request->has('remember');
@@ -41,7 +45,7 @@ class AuthController extends Controller
             return redirect()->intended('explore');
         }
         
-        return back()->withErrors(['password' => 'Invalid credentials.'])->withInput();
+        return back()->withErrors(['credentials' => 'Invalid credentials.'])->withInput();
     }
 
     public function logout() {
@@ -64,6 +68,14 @@ class AuthController extends Controller
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required',  'email',  'max:255',  'unique:'.User::class],
                 'password'=> ['required', Password::defaults()],
+            ], [
+                'name.required' => 'Please enter a name.',
+                'name.max' => 'Name must not be more than 255 characters.',
+                'email.required' => 'Please enter an email address.',
+                'email.email' => 'Not a valid email.',
+                'email.max' => 'Email must be no longer than 255 characters.',
+                'email.unique' => 'The provided email is already in use.',
+                'password.required' => 'Please enter a password.'
             ]);
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
