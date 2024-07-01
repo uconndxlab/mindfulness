@@ -46,7 +46,7 @@
         @endif
     </div>
 
-    <div class="container manual-margin-top">
+    <div class="manual-margin-top">
         @if (!$main->isEmpty())
         
             @foreach($main as $index => $content)
@@ -83,11 +83,11 @@
         @endif
     </div>
 
-    <div class="container manual-margin-top">
+    <div class=" manual-margin-top">
         <a id="redirect_button" class="btn btn-primary disabled" href="{{ $redirectRoute }}">{{ $redirectLabel }}</a>
     </div>
 
-    <div id="extra" class="container manual-margin-top mb-3" style="display: none;">
+    <div id="extra" class=" manual-margin-top mb-3" style="display: none;">
         @if(!$extra->isEmpty())
         <h3>Additional items:</h3>
             @foreach ($extra as $index => $item)

@@ -67,7 +67,7 @@
     </div>
     @foreach ($modules as $module)
         <div class="prior-note">
-            <div class="top-note">
+            <div class="top-note-all">
                 <h5 class="fw-bold d-flex justify-content-between">
                     <span>{{ $module->name }}</span>
                 </h5>

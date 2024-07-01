@@ -23,7 +23,7 @@
         </div>
         <h2>{{ $quiz->question }}</h2>
     </div>
-    <form action="{{ route('quiz.submit', $quiz->id) }}" method="POST" class="manual-margin-top">
+    <form action="{{ route('quiz.submit', $quiz->id) }}" method="POST" class="pt-3">
         @csrf
         @foreach ($quizOptions as $index => $optionFeedback)
             <div class="form-check">
@@ -40,14 +40,15 @@
             </div>
         @endif
 
-        <button type="submit" id="submitButton" class="btn btn-primary mt-3">SUBMIT</button>
+        <button type="submit" id="submitButton" class="btn btn-secondary mt-4">SUBMIT</button>
             
     </form>
     
     @if (session('is_correct'))
-        <div class="container manual-margin-top">
-            <a id="nextButton" class="btn btn-success" href="{{ route('explore.lesson', ['lessonId' => $next]) }}">NEXT</a>
+        <div class=" manual-margin-top">
+            <a id="nextButton" class="btn btn-success" href="{{ route('explore.lesson', ['lessonId' => $next]) }}">NEXT <i class="bi bi-arrow-right"></i></a>
         </div>
+        
     @endif
 </div>
 
