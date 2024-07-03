@@ -25,7 +25,7 @@ a {
     border-radius:100px!important;
 }
 
-.form-control:focus {
+.form-control:focus,.form-check-input:checked,.form-check-input:focus {
     border-color: var(--dark-green)!important;
     box-shadow: 0 0 0 .25rem rgba(117, 186, 150, .25)!important;
 }
@@ -37,6 +37,11 @@ textarea.form-control {
 .bg-secondary{
     background-color:#EEF2F5!important;
     border-radius:20px;
+}
+
+.form-check-input:checked{
+    background-color: #000;
+    border-color: #000;
 }
 
 
@@ -64,6 +69,11 @@ textarea.form-control {
 .btn-xlight{
     background-color:var(--xlight-green)!important;
     color:#000!important;
+}
+
+.btn-secondary{
+    background-color:#000!important;
+    border-color:#000!important;
 }
 
 /*dropdown menu*/
@@ -154,11 +164,15 @@ body:has(div.dark-background){
 
 }
 
-.top-note{
+.top-note,.top-note-all{
     background:var(--light-green);
     padding:20px 20px 20px 20px;
     border-radius:10px 10px 0px 0px;
     margin-bottom:0px;
+}
+
+.top-note-all{
+    border-radius:10px!important;
 }
 
 .prior-note p{
@@ -196,6 +210,7 @@ body:has(div.dark-background){
     display:flex;
     flex-direction:row;
     align-items:center;
+    border-radius:10px;
 }
 
 .module:has(.disabled) {
@@ -213,4 +228,30 @@ body:has(div.dark-background){
 .module i{
     color:#fff;
     font-size:25px;
+}
+
+/*accordion*/
+.accordion,.accoridon-item{
+    border-radius:10px!important;
+}
+
+.accordion-button{
+    border-radius: 10px 10px 0px 0px!important;
+}
+
+.accordion-button .collapsed{
+    border-radius:0px!important;
+}
+
+.accordion-flush .accordion-item .accordion-button, .accordion-flush .accordion-item .accordion-button.collapsed {
+    color: var(--dark-green)!important;
+    background-color: var(--xlight-green)!important;
+}
+.accordion-button:focus{
+    border-color: var(--dark-green)!important;
+    box-shadow: 0 0 0 .25rem rgba(117, 186, 150, .25)!important;
+}
+
+.accordion-button:not(.collapsed)::after {
+    background-image: var(--bs-accordion-btn-icon)!important;
 }
