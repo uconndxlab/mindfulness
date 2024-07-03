@@ -7,6 +7,7 @@ use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\Note;
 use App\Models\Content;
+use App\Models\Week;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
@@ -25,6 +26,30 @@ class PageNavController extends Controller
     {
         return view("auth.voice-select");
     }
+
+    public function exploreHome()
+    {
+        $weeks = Week::orderBy('order', 'asc')->get();
+        return view("explore.home", compact('weeks'));
+    }
+
+    public function exploreWeek($week_id)
+    {
+        $week = Week::findOrFail($week_id);
+        return view("explore.week", compact('week'));
+    }
+
+    public function exploreActivity($activity_id)
+    {
+        $activity = Week::findOrFail($activity_id);
+        return view("explore.activity", compact('activity'));
+    }
+
+
+
+
+
+    //TODO
 
     public function meditationLibrary()
     {
@@ -139,13 +164,13 @@ class PageNavController extends Controller
         return $modules;
     }
 
-    public function exploreHome()
+    public function exploreHomeOld()
     {
         //get list of modules
         $modules = $this->getModulesList();
         //track explore page
         Session::put('last_explore_page', 'explore');
-        return view("explore.home", compact('modules'));
+        return view("explore.homeOriginal", compact('modules'));
     }
 
     public function exploreLesson(Request $request, $lessonId) {
