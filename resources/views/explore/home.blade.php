@@ -26,7 +26,8 @@
         <div class="row mb-3 justify-content-center">
             <div class="col-12">
                 <div class="h-100">
-                    <p>{{ $module->name }}:</p>
+                    <h5 class="fw-bold">{{ $module->name }}:</h5>
+                    <p></p>
                     @foreach ($module->lessons as $lesson)
                         <div class="card p-2 module mb-2">
                             <a class="stretched-link w-100 {{ $progress < $lesson->order ? 'disabled' : ''}}" href="{{ route($route, ['lessonId' => $lesson->id]) }}">{{ $lesson->title }}</a>

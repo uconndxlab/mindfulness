@@ -33,6 +33,10 @@
                 text-align: center;
                 font-size: 14px;
             }
+            .prof-icon-text {
+                font-size: 24px;
+                margin-left: 10px;
+            }
             .nav-link.active {
                 color: #007bff;
             }
@@ -43,12 +47,15 @@
     </head>
         @php
             $route_name = Request::route()->getName();
-            $active_items = [false, false, false, false];
+            $active_items = [false, false, false, false, false];
             if ($route_name == 'journal') {
                 $active_items[1] = true;
             }
             else if ($route_name == 'meditationLib') {
                 $active_items[2] = true;
+            }
+            else if ($route_name == 'profile') {
+                $active_items[4] = true;
             }
             else if (Str::startsWith($route_name, 'explore.') && !(isset($from_fav) && $from_fav)) {
                 $active_items[0] = true;
@@ -71,7 +78,9 @@
                     <!-- if not set or not true, show it -->
                     @if (!(isset($hideProfileLink) && $hideProfileLink))
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('profile') }}">Hi, {{ Auth::user()->name }}</a>
+                            <a class="nav-link" href="{{ route('profile') }}">Hi, {{ Auth::user()->name }}
+                                <i class="prof-icon-text bi bi-person-circle"></i>
+                            </a>
                         </li>
                     @else
                         <!-- otherwise show a logout button - unless on admin pages -->
@@ -113,6 +122,11 @@
                         <li class="nav-item">
                             <a class="nav-link {{ $active_items[3] ? 'active' : '' }}" href="{{ route('favorites') }}">
                                 <span class="nav-icon-text"><i class="bi bi-star"></i>Favorites</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ $active_items[4] ? 'active' : '' }}" href="{{ route('profile') }}">
+                                <span class="nav-icon-text"><i class="bi bi-person-circle"></i>Profile</span>
                             </a>
                         </li>
                     </ul>
