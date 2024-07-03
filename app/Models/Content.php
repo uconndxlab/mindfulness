@@ -15,4 +15,9 @@ class Content extends Model
     {
         return $this->belongsTo(Lesson::class);
     }
+
+    public function activity()
+    {
+        return $this->belongsTo(Activity::class);
+    }
 }
