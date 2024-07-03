@@ -27,7 +27,7 @@
         @csrf
         @foreach ($quizOptions as $index => $optionFeedback)
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="answer" id="option_{{ $index }}" value="{{ $index }}" {{ old('answer') == $index ? 'checked' : '' }}>
+                <input class="form-check-input" type="radio" name="answer" id="option_{{ $index }}" value="{{ $index }}" {{ old('answer') == $index ? 'checked' : '' }} {{ session('is_correct') ? 'disabled' : ''}}>
                 <label class="form-check-label" for="option_{{ $index }}">
                     {{ $optionFeedback['option'] }}
                 </label>
@@ -39,7 +39,7 @@
                 {{ session('feedback') }}
             </div>
         @endif
-        
+
         @if (session('is_correct'))
             <div class=" manual-margin-top">
                 <a id="nextButton" class="btn btn-success" href="{{ route('explore.lesson', ['lessonId' => $next]) }}">NEXT <i class="bi bi-arrow-right"></i></a>
