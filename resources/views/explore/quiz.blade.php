@@ -39,17 +39,19 @@
                 {{ session('feedback') }}
             </div>
         @endif
-
-        <button type="submit" id="submitButton" class="btn btn-secondary mt-4">SUBMIT</button>
-            
+        
+        @if (session('is_correct'))
+            <div class=" manual-margin-top">
+                <a id="nextButton" class="btn btn-success" href="{{ route('explore.lesson', ['lessonId' => $next]) }}">NEXT <i class="bi bi-arrow-right"></i></a>
+            </div>
+        
+        @else
+            <div class=" manual-margin-top">
+                <button type="submit" id="submitButton" class="btn btn-secondary mt-4">SUBMIT</button>
+            </div>
+        @endif
     </form>
     
-    @if (session('is_correct'))
-        <div class=" manual-margin-top">
-            <a id="nextButton" class="btn btn-success" href="{{ route('explore.lesson', ['lessonId' => $next]) }}">NEXT <i class="bi bi-arrow-right"></i></a>
-        </div>
-        
-    @endif
 </div>
 
 <script>
