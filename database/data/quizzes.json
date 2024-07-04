@@ -1,6 +1,7 @@
 [
     {
         "lesson_id": 1,
+        "activity_id": 1,
         "question": "Mindfulness is...",
         "options_feedback": [
             {

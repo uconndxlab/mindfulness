@@ -9,13 +9,6 @@ class Quiz extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'lesson_id', 
-        'question', 
-        'options_feedback', 
-        'correct_answer'
-    ];
-
     protected $casts = [
         'options_feedback' => 'json',
     ];
@@ -23,5 +16,10 @@ class Quiz extends Model
     public function lesson()
     {
         return $this->belongsTo(Lesson::class);
+    }
+
+    public function activity()
+    {
+        return $this->belongsTo(Activity::class);
     }
 }

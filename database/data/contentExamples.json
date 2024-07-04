@@ -1,6 +1,7 @@
 [
     {
         "lesson_id": 1,
+        "activity_id": 11,
         "main": true,
         "type": "audio",
         "voice": "Voice 1: What is mindfulness",
@@ -9,6 +10,7 @@
     },
     {
         "lesson_id": 1,
+        "activity_id": 1,
         "main": true,
         "type": "audio",
         "voice": "Voice 2: Rocks",
@@ -17,6 +19,7 @@
     },
     {
         "lesson_id": 2,
+        "activity_id": 12,
         "main": true,
         "type": "audio",
         "file_name": "Module 1 Activity 2 - Body Scan.m4a",
@@ -25,6 +28,7 @@
     },
     {
         "lesson_id": 2,
+        "activity_id": 2,
         "main": true,
         "type": "audio",
         "file_name": "Rocks on Rocks.m4a",
@@ -33,6 +37,7 @@
     },
     {
         "lesson_id": 2,
+        "activity_id": 12,
         "name": "Body Scan - Long Version",
         "main": false,
         "type": "audio",
@@ -41,6 +46,7 @@
     },
     {
         "lesson_id": 1,
+        "activity_id": 11,
         "name": "Example extra video",
         "main": false,
         "type": "video",
@@ -48,6 +54,7 @@
     },
     {
         "lesson_id": 1,
+        "activity_id": 11,
         "name": "Example extra pdf",
         "main": false,
         "type": "pdf",
@@ -55,12 +62,14 @@
     },
     {
         "lesson_id": 3,
+        "activity_id": 3,
         "main": true,
         "type": "pdf",
         "file_name": "pdfExample.pdf"
     },
     {
         "lesson_id": 4,
+        "activity_id": 4,
         "main": true,
         "type": "video",
         "file_name": "videoExampleSnarky.MOV",
@@ -68,6 +77,7 @@
     },
     {
         "lesson_id": 4,
+        "activity_id": 14,
         "name": "Example extra pdf",
         "main": false,
         "type": "pdf",

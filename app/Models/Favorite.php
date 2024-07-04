@@ -11,7 +11,7 @@ class Favorite extends Model
 
     protected $fillable = [
         'user_id',
-        'lesson_id'
+        'activity_id'
     ];
 
     public function user()
@@ -19,8 +19,8 @@ class Favorite extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function lesson()
+    public function activity()
     {
-        return $this->belongsTo(Lesson::class);
+        return $this->belongsTo(Activity::class);
     }
 }

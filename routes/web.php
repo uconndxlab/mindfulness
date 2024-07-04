@@ -81,6 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/explore/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
     Route::get('/explore/week/{week_id}', [PageNavController::class, 'exploreWeek'])->name('explore.week');
     Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
+    Route::get('/explore/quiz/{quiz_id}', [PageNavController::class,'exploreQuiz'])->name('explore.quiz');
 
 
     //TODO
@@ -92,7 +93,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
     Route::get('/explore', [PageNavController::class, 'exploreHomeOld'])->name('explore.home.old');
     Route::get('/explore/{lessonId}', [PageNavController::class, 'exploreLesson'])->name('explore.lesson');
-    Route::get('/explore/quiz/{quizId}', [PageNavController::class,'exploreQuiz'])->name('explore.quiz');
     Route::post('/explore/quiz/{quizId}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
 
 
@@ -115,7 +115,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //favorites
     Route::post('/favorites', [UserController::class, 'addFavorite'])->name('favorites.create');
-    Route::delete('/favorites/{lessonId}', [UserController::class,'deleteFavorite'])->name('favorites.delete');
+    Route::delete('/favorites/{activity_id}', [UserController::class,'deleteFavorite'])->name('favorites.delete');
     
     //NOTES
     Route::resource('note', NoteController::class);

@@ -7,6 +7,7 @@ use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\Note;
 use App\Models\Content;
+use App\Models\Activity;
 use App\Models\Week;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
@@ -41,8 +42,11 @@ class PageNavController extends Controller
 
     public function exploreActivity($activity_id)
     {
-        $activity = Week::findOrFail($activity_id);
-        return view("explore.activity", compact('activity'));
+        $user = Auth::user();
+        $is_favorited = $user->favorites()->where('activity', $activity_id)->exists();
+
+        $activity = Activity::findOrFail($activity_id);
+        return view("explore.activity", compact('activity', 'is_favorited'));
     }
 
 
