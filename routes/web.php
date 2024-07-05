@@ -14,7 +14,7 @@ use App\Mail\TestMail;
 use Illuminate\Support\Facades\Mail;
 
 //default
-Route::redirect("/","/explore");
+Route::redirect("/","/explore/home");
 
 //AUTHENTICATION
 //login page

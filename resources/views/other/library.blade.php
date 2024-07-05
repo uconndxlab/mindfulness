@@ -13,7 +13,7 @@
 
     @if ($activities->isEmpty()) 
         <div class="text-left muted">
-            {{ $page_info['empty'] }}
+            {!! $page_info['empty'] !!}
         </div>
     @else
         <div class="">
