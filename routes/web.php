@@ -76,12 +76,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //logout
     Route::get('/logout', [AuthController::class,'logout'])->name('logout');
 
-
     //NEW EXPLORE
     Route::get('/explore/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
     Route::get('/explore/week/{week_id}', [PageNavController::class, 'exploreWeek'])->name('explore.week');
     Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
     Route::get('/explore/quiz/{quiz_id}', [PageNavController::class,'exploreQuiz'])->name('explore.quiz');
+    Route::post('/explore/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
 
 
     //TODO
@@ -91,11 +91,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //explore pages
     Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
-    Route::get('/explore', [PageNavController::class, 'exploreHomeOld'])->name('explore.home.old');
-    Route::get('/explore/{lessonId}', [PageNavController::class, 'exploreLesson'])->name('explore.lesson');
-    Route::post('/explore/quiz/{quizId}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
-
-
 
 
 

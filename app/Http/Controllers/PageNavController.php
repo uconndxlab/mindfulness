@@ -59,21 +59,53 @@ class PageNavController extends Controller
             $redirect_label = "JOURNAL";
             $redirect_route = route('journal', ['activity' => $activity->id]);
         }
-        else if (!isset($activity->next)) {
-            $redirect_label = "FINISH";
-            $redirect_route = route('explore.home');
-        }
-        else {
+        else if ($activity->next) {
             $redirect_label = "NEXT";
             $redirect_route = route('explore.activity', ['activity_id' => $activity->next]);
         }
+        else {
+            $redirect_label = "FINISH";
+            $redirect_route = route('explore.home');
+        }
         return view("explore.activity", compact('activity', 'content', 'is_favorited', 'redirect_label', 'redirect_route'));
+    }
+    
+    //QUIZ
+    public function exploreQuiz($quiz_id) {
+        $quiz = Quiz::findOrFail($quiz_id);
+        if ($quiz->activity->next) {
+            $redirect_label = "NEXT";
+            $redirect_route = route('explore.activity', ['activity_id' => $quiz->activity->next]);
+        }
+        else {
+            $redirect_label = "FINISH";
+            $redirect_route = route('explore.home');
+        }
+        return view('explore.quiz', compact('quiz', 'redirect_label', 'redirect_route'));
+    }
+
+    public function submitQuiz(Request $request, $quiz_id)
+    {
+        //get quiz and chceck answer
+        $quiz = Quiz::find($quiz_id);
+        $selected_option = intval($request->answer);
+        $is_correct = $quiz->correct_answer == $selected_option+1;
+        $feedback = null;
+        
+        //convert options and get feedback
+        $options = $quiz->options_feedback ?? [];
+        $feedback = $options[$selected_option]['feedback'];
+
+        return redirect()->back()->with([
+            'feedback' => $feedback,
+            'is_correct' => $is_correct
+        ])->withInput();
     }
 
     //LIBRARIES
     public function favoritesPage()
     {
-        //get users favorites and sort by lesson order
+        //get users favorites and sort by activity order
         $favorites = Auth::user()->favorites()->with('activity')->get();
         $activities = $favorites->pluck('activity')->sortBy('order');
         $page_info = [
@@ -84,7 +116,7 @@ class PageNavController extends Controller
     }
     public function meditationLibrary()
     {
-        //get lessons
+        //TODO
         // Activity::where('order', '<', $progress)->orderBy('order', 'asc')->select('id', 'title', 'sub_header')->get();
         $activities = Activity::where('type', 'meditation')->orderBy('order', 'asc')->get();
         $page_info = [
@@ -173,21 +205,6 @@ class PageNavController extends Controller
         return view("profile.accountInformation", compact("showBackBtn", "hideProfileLink", 'modules'));
     }
 
-    public function getModulesList() {
-        //get list of modules
-        $modules = Module::orderBy('module_number', 'asc')->get();
-
-        //get associated lessons for each module
-        foreach ($modules as $module) {
-            $lessons = Lesson::where('module_id', $module->id)
-                                ->orderBy('lesson_number', 'asc')
-                                ->select('id', 'title', 'order')
-                                ->get();
-            $module->lessons = $lessons;
-        }
-        return $modules;
-    }
-
     public function exploreHomeOld()
     {
         //get list of modules
@@ -235,39 +252,6 @@ class PageNavController extends Controller
         $next = Lesson::where('order', $lesson->order + 1)->value('id');
 
         return view('explore.lesson', compact('showBackBtn', 'lessonId', 'lesson', 'quizId', 'main', 'extra', 'isFavorited', 'next', 'from_fav'));
-    }
-
-    public function exploreQuiz($quizId) {
-        //quiz info
-        $quiz = Quiz::findOrFail($quizId);
-        $showBackBtn = true;
-        //set routes for browse and back buttons
-        Session::put("back_route", '/explore/'.$quiz->lesson_id);
-        Session::put('last_explore_page', 'explore/quiz/'.$quizId);
-        //get activity title
-        $lesson = Lesson::find($quiz->lesson_id);
-        $activity = $lesson->title;
-        //getting id of next lesson
-        $next = Lesson::where('order', $lesson->order + 1)->value('id');
-        return view('explore.quiz', compact('showBackBtn', 'quiz', 'activity',  'next'));
-    }
-
-    public function submitQuiz(Request $request, $quizId)
-    {
-        //get quiz and chceck answer
-        $quiz = Quiz::find($quizId);
-        $selectedOption = intval($request->answer);
-        $isCorrect = $quiz->correct_answer == $selectedOption+1;
-        $feedback = null;
-        
-        //convert options and get feedback
-        $options = $quiz->options_feedback ?? [];
-        $feedback = $options[$selectedOption]['feedback'];
-
-        return redirect()->back()->with([
-            'feedback' => $feedback,
-            'is_correct' => $isCorrect
-        ])->withInput();
     }
 
     public function exploreBrowseButton() {

@@ -13,11 +13,6 @@ class Quiz extends Model
         'options_feedback' => 'json',
     ];
 
-    public function lesson()
-    {
-        return $this->belongsTo(Lesson::class);
-    }
-
     public function activity()
     {
         return $this->belongsTo(Activity::class);

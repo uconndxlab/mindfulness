@@ -1,12 +1,12 @@
 @extends('layouts.main')
 
-@section('title', $activity.': Quiz')
+@section('title', $quiz->activity->title.': Quiz')
 
 @section('content')
 <div class="col-md-8">
     <div class="text-left">
         @php
-            $quizOptions = $quiz->options_feedback ?? [];
+            $quiz_options = $quiz->options_feedback ?? [];
         @endphp
 
         <div class="d-flex justify-content-between align-items-center">
@@ -25,11 +25,11 @@
     </div>
     <form action="{{ route('quiz.submit', $quiz->id) }}" method="POST" class="pt-3">
         @csrf
-        @foreach ($quizOptions as $index => $optionFeedback)
+        @foreach ($quiz_options as $index => $option_feedback)
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="answer" id="option_{{ $index }}" value="{{ $index }}" {{ old('answer') == $index ? 'checked' : '' }} {{ session('is_correct') ? 'disabled' : ''}}>
                 <label class="form-check-label" for="option_{{ $index }}">
-                    {{ $optionFeedback['option'] }}
+                    {{ $option_feedback['option'] }}
                 </label>
             </div>
         @endforeach
@@ -40,16 +40,15 @@
             </div>
         @endif
 
-        @if (session('is_correct'))
-            <div class=" manual-margin-top">
-                <a id="nextButton" class="btn btn-success" href="{{ route('explore.lesson', ['lessonId' => $next]) }}">NEXT <i class="bi bi-arrow-right"></i></a>
-            </div>
-        
-        @else
-            <div class=" manual-margin-top">
-                <button type="submit" id="submitButton" class="btn btn-secondary mt-4">SUBMIT</button>
-            </div>
-        @endif
+        <div class=" manual-margin-top">
+            <a id="nextButton" class="btn btn-success" href="{{ $redirect_route }}" style="display: {{ session('is_correct') ? 'block' : 'none'}};">
+                {{ $redirect_label }}
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        <div class=" manual-margin-top">
+            <button type="submit" id="submitButton" class="btn btn-secondary mt-4" style="display: {{ session('is_correct') ? 'none' : 'block'}};">SUBMIT</button>
+        </div>
     </form>
     
 </div>
