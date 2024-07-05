@@ -47,18 +47,15 @@
     </head>
         @php
             $route_name = Request::route()->getName();
-            $active_items = [false, false, false, false, false];
-            if ($route_name == 'journal') {
+            $active_items = [false, false, false, false];
+            if (Str::startsWith($route_name, 'explore.')) {
+                $active_items[0] = true;
+            }
+            else if ($route_name == 'journal') {
                 $active_items[1] = true;
             }
-            else if ($route_name == 'meditationLib') {
+            else if (Str::startsWith($route_name, 'library.')) {
                 $active_items[2] = true;
-            }
-            else if ($route_name == 'profile') {
-                $active_items[4] = true;
-            }
-            else if (Str::startsWith($route_name, 'explore.') && !(isset($from_fav) && $from_fav)) {
-                $active_items[0] = true;
             }
             else {
                 $active_items[3] = true;
@@ -115,17 +112,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ $active_items[2] ? 'active' : '' }}" href="{{ route('meditationLib') }}">
+                            <a class="nav-link {{ $active_items[2] ? 'active' : '' }}" href="{{ route('library') }}">
                                 <span class="nav-icon-text"><i class="bi bi-collection"></i>Library</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ $active_items[3] ? 'active' : '' }}" href="{{ route('favorites') }}">
-                                <span class="nav-icon-text"><i class="bi bi-star"></i>Favorites</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ $active_items[4] ? 'active' : '' }}" href="{{ route('profile') }}">
+                            <a class="nav-link {{ $active_items[3] ? 'active' : '' }}" href="{{ route('profile') }}">
                                 <span class="nav-icon-text"><i class="bi bi-person-circle"></i>Profile</span>
                             </a>
                         </li>

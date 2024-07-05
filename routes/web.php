@@ -100,8 +100,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
     Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
     Route::get('/profile', [PageNavController::class, 'profilePage'])->name('profile');
-    Route::get('/meditation-library', [PageNavController::class, 'meditationLibrary'])->name('meditationLib');
-    Route::get('/favorites', [PageNavController::class, 'favoritesPage'])->name('favorites');
+    Route::get('/library', [PageNavController::class, 'library'])->name('library');
+    Route::get('/meditation-library', [PageNavController::class, 'meditationLibrary'])->name('library.meditation');
+    Route::get('/favorites', [PageNavController::class, 'favoritesLibrary'])->name('library.favorites');
     
     //User updates
     Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');

@@ -103,7 +103,17 @@ class PageNavController extends Controller
     }
 
     //LIBRARIES
-    public function favoritesPage()
+    public function library()
+    {
+        if (Session::get('previous_library')) {
+            return redirect()->route(Session::get('previous_library'));
+        }
+        else {
+            return redirect()->route('library.meditation');
+        }
+    }
+
+    public function favoritesLibrary()
     {
         //get users favorites and sort by activity order
         $favorites = Auth::user()->favorites()->with('activity')->get();
@@ -112,6 +122,7 @@ class PageNavController extends Controller
             'title' => 'Favorites',
             'empty' => '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>',
         ];
+        Session::put('previous_library', 'library.favorites');
         return view('other.library', compact('page_info', 'activities'));
     }
     public function meditationLibrary()
@@ -123,15 +134,15 @@ class PageNavController extends Controller
             'title' => 'Meditation Library',
             'empty' => 'Keep progressing to unlock meditation sessions...',
         ];
+        Session::put('previous_library', 'library.meditation');
         return view("other.library", compact('page_info', 'activities'));
     }
+
+
+
     
 
-
     //TODO
-
-
-
     public function journalPage(Request $request)
     {
         $showBackBtn = false;
