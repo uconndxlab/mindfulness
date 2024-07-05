@@ -70,37 +70,34 @@ class PageNavController extends Controller
         return view("explore.activity", compact('activity', 'content', 'is_favorited', 'redirect_label', 'redirect_route'));
     }
 
-    //FAVORITES
+    //LIBRARIES
     public function favoritesPage()
     {
         //get users favorites and sort by lesson order
         $favorites = Auth::user()->favorites()->with('activity')->get();
-        $favorites = $favorites->sortBy('activity.order');
-        return view("other.favorites", compact('favorites'));
+        $activities = $favorites->pluck('activity')->sortBy('order');
+        $page_info = [
+            'title' => 'Favorites',
+            'empty' => '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>',
+        ];
+        return view('other.library', compact('page_info', 'activities'));
     }
-
-    
-    
-    
-    
-    //TODO
-
     public function meditationLibrary()
     {
         //get lessons
-        $progress = Auth::user()->progress;
-        $lessons = Lesson::where('order', '<', $progress)->orderBy('order', 'asc')->select('id', 'title', 'sub_header')->get();
-
-        //remove lessons with no meditation content
-        foreach ($lessons as $key => $lesson) {
-            $lesson->main = $lesson->content->where('is_meditation', 1)->where('main', true);
-            $lesson->extra = $lesson->content->where('is_meditation', 1)->where('main', false);
-            if ($lesson->main->isEmpty() && $lesson->extra->isEmpty()) {
-                $lessons->forget($key);
-            }
-        }
-        return view("other.meditation-library", compact('lessons'));
+        // Activity::where('order', '<', $progress)->orderBy('order', 'asc')->select('id', 'title', 'sub_header')->get();
+        $activities = Activity::where('type', 'meditation')->orderBy('order', 'asc')->get();
+        $page_info = [
+            'title' => 'Meditation Library',
+            'empty' => 'Keep progressing to unlock meditation sessions...',
+        ];
+        return view("other.library", compact('page_info', 'activities'));
     }
+    
+
+
+    //TODO
+
 
 
     public function journalPage(Request $request)
