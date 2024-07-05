@@ -22,8 +22,8 @@
                     <div class=" h-100">
                         @foreach ($favorites as $favorite)
                             <div class="card module p-2 mb-2">
-                                <a class=" stretched-link w-100" href="{{ route('explore.lesson', ['lessonId' => $favorite->lesson->id, 'from' => 'fav']) }}">
-                                    {{ $favorite->lesson->module->name }} - {{ $favorite->lesson->title }}
+                                <a class=" stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $favorite->activity->id]) }}">
+                                    {{ $favorite->activity->day->week->name }}, {{ $favorite->activity->day->name }} - {{ $favorite->activity->title }}
                                 </a>
                                 <i class="bi bi-arrow-right"></i>
                             </div>

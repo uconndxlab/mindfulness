@@ -28,6 +28,7 @@ class PageNavController extends Controller
         return view("auth.voice-select");
     }
 
+    //EXPLORE
     public function exploreHome()
     {
         $weeks = Week::orderBy('order', 'asc')->get();
@@ -42,17 +43,46 @@ class PageNavController extends Controller
 
     public function exploreActivity($activity_id)
     {
-        $user = Auth::user();
-        $is_favorited = $user->favorites()->where('activity', $activity_id)->exists();
-
         $activity = Activity::findOrFail($activity_id);
-        return view("explore.activity", compact('activity', 'is_favorited'));
+        $content = $activity->content;
+        
+        //favoriting
+        $user = Auth::user();
+        $is_favorited = $user->favorites()->where('activity_id', $activity_id)->exists();
+
+        //end behavior
+        if ($activity->end_behavior == 'quiz') {
+            $redirect_label = "QUIZ";
+            $redirect_route = route('explore.quiz', ['quiz_id' => $activity->quiz->id]);
+        }
+        else if ($activity->end_behavior == "journal") {
+            $redirect_label = "JOURNAL";
+            $redirect_route = route('journal', ['activity' => $activity->id]);
+        }
+        else if (!isset($activity->next)) {
+            $redirect_label = "FINISH";
+            $redirect_route = route('explore.home');
+        }
+        else {
+            $redirect_label = "NEXT";
+            $redirect_route = route('explore.activity', ['activity_id' => $activity->next]);
+        }
+        return view("explore.activity", compact('activity', 'content', 'is_favorited', 'redirect_label', 'redirect_route'));
     }
 
+    //FAVORITES
+    public function favoritesPage()
+    {
+        //get users favorites and sort by lesson order
+        $favorites = Auth::user()->favorites()->with('activity')->get();
+        $favorites = $favorites->sortBy('activity.order');
+        return view("other.favorites", compact('favorites'));
+    }
 
-
-
-
+    
+    
+    
+    
     //TODO
 
     public function meditationLibrary()
@@ -72,13 +102,6 @@ class PageNavController extends Controller
         return view("other.meditation-library", compact('lessons'));
     }
 
-    public function favoritesPage()
-    {
-        //get users favorites and sort by lesson order
-        $favorites = Auth::user()->favorites()->with('lesson')->get();
-        $favorites = $favorites->sortBy('lesson.order');
-        return view("other.favorites", compact('favorites'));
-    }
 
     public function journalPage(Request $request)
     {

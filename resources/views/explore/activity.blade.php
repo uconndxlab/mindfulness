@@ -5,25 +5,6 @@
 @section('content')
 <div class="col-md-8">
     <div class="text-left">
-        @php
-            if ($activity->end_behavior == 'quiz') {
-                $redirect_label = "QUIZ";
-                $redirect_route = route('explore.quiz', ['quiz_id' => $activity->quiz->id]);
-            }
-            else if ($activity->end_behavior == "journal") {
-                $redirect_label = "JOURNAL";
-                $redirect_route = route('journal', ['activity' => $activity->id]);
-            }
-            else if (!isset($activity->next)) {
-                $redirect_label = "FINISH";
-                $redirect_route = route('explore.home');
-            }
-            else {
-                $redirect_label = "NEXT";
-                $redirect_route = route('explore.activity', ['activity_id' => $activity->next]);
-            }
-        @endphp
-
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h1 class="display fw-bold">{{ $activity->title }}
@@ -46,16 +27,12 @@
 
     </div>
     <div class="manual-margin-top">
-        @php
-            $content = $activity->content ? $activity->content : false
-        @endphp
-
         @if ($content)
             <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: block;">
                 <x-contentView id="content_view" id2="pdf_download" type="{{ $content->type }}" file="{{ $content->file_name }}"/>
             </div>
 
-            @if($content->completion_message != null)
+            @if($content->completion_message)
                 <div id="comp_message" class="mt-1" style="display: none;">
                     <pre class="text-success">{{ $content->completion_message }}</pre>
                 </div>
@@ -69,6 +46,55 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
     const activity_id = {{ $activity->id }};
+
+    //COMPLETION ITEMS
+    const redirectButton = document.getElementById('redirect_button');
+    const hasContent = {{ $content ? 'true' : 'false' }};
+    if (hasContent) {
+        const content = document.getElementById('content_view');
+        const type = '{{ isset($content->type) ? $content->type : null }}';
+        if (type == 'pdf') {
+            const pdfDownload = document.getElementById('pdf_download');
+            pdfDownload.addEventListener('click', activityComplete);
+            content.addEventListener('click', activityComplete);
+        }
+        else {
+            content.addEventListener('ended', activityComplete);
+        }
+    }
+    else {
+        activityComplete();
+    }
+
+    //COMPLETION
+    function activityComplete() {
+        //show content and redirect
+        console.log("activity completed")
+        redirectButton.classList.remove('disabled');
+        //show message
+        const hasMessage = {{ isset($content->completion_message) ? 'true' : 'false' }};
+        if (hasMessage) {
+            const completionMessageDiv = document.getElementById('comp_message');
+            completionMessageDiv.style.display = 'block';
+        }
+        // TODO update users progress with lessonId
+        // if (progress <= order) {
+        //     axios.put('{{ route('user.update.progress') }}', {
+        //         lessonId: lessonId
+        //     }, {
+        //         headers: {
+        //             'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        //         }
+        //     })
+        //     .then(response => {
+        //         console.log(response.data.message);
+        //     })
+        //     .catch(error => {
+        //         console.error('There was an error updating the progress:', error);
+        //     });
+        // }
+    }
+
     //FAVORITES
     //get favorite button, icon, isFavorited value
     const favButton = document.getElementById('favorite_btn');
@@ -136,7 +162,6 @@
             });
         }
     });
-    
 </script>
 @endsection
 
