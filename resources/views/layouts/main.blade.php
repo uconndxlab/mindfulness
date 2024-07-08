@@ -49,7 +49,12 @@
             $route_name = Request::route()->getName();
             $active_items = [false, false, false, false];
             if (Str::startsWith($route_name, 'explore.')) {
-                $active_items[0] = true;
+                if (Session::get('current_nav') == 'explore.home') {
+                    $active_items[0] = true;
+                }
+                else {
+                    $active_items[2] = true;
+                }
             }
             else if ($route_name == 'journal') {
                 $active_items[1] = true;
@@ -65,12 +70,13 @@
         <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container-fluid container">
                 <ul class="navbar-nav">
-                    @if(isset($showBackBtn) && $showBackBtn)
+                    @if(isset($back_route) && $back_route)
                         <li class="nav-item mr-auto">
-                            <a class="nav-link" href="{{ route('button.back', ['from_back' => $route_name]) }}">< Back {{ isset($activity) ? 'to '.$activity : ''}}</a>
+                            <a class="nav-link" href="{{ $back_route }}">< Back {{ isset($back_label) ? $back_label : ''}}</a>
                         </li>
                     @endif
                 </ul>
+
                 <ul class="navbar-nav">
                     <!-- if not set or not true, show it -->
                     @if (!(isset($hideProfileLink) && $hideProfileLink))

@@ -82,15 +82,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
     Route::get('/explore/quiz/{quiz_id}', [PageNavController::class,'exploreQuiz'])->name('explore.quiz');
     Route::post('/explore/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
+    Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
 
 
     //TODO
-
-    //back button
-    Route::get('/backBtn', [PageNavController::class, 'backButton'])->name('button.back');
-
     //explore pages
-    Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
+    Route::put('/user/update/progress', [UserController::class,'updateProgress'])->name('user.update.progress');
+    Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
+    Route::get('/profile', [PageNavController::class, 'profilePage'])->name('profile');
+
 
 
 
@@ -98,8 +98,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //Page Navigation - the controller is not totally necessary
     Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
     Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
-    Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
-    Route::get('/profile', [PageNavController::class, 'profilePage'])->name('profile');
     Route::get('/library', [PageNavController::class, 'library'])->name('library');
     Route::get('/meditation-library', [PageNavController::class, 'meditationLibrary'])->name('library.meditation');
     Route::get('/favorites', [PageNavController::class, 'favoritesLibrary'])->name('library.favorites');
@@ -107,7 +105,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //User updates
     Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
     Route::put('/user/update/namePass', [UserController::class, 'updateNamePass'])->name('user.update.namePass');
-    Route::put('/user/update/progress', [UserController::class,'updateProgress'])->name('user.update.progress');
 
     //favorites
     Route::post('/favorites', [UserController::class, 'addFavorite'])->name('favorites.create');

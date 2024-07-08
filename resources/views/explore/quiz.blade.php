@@ -15,7 +15,7 @@
             </div>
             <div>
                 <h1 class="display fw-bold">
-                    <a id="exit_btn" class="btn btn-link" href="{{ route('explore.home') }}">
+                    <a id="exit_btn" class="btn btn-link" href="{{ $exit_route }}">
                         <i id="exit_icon" class="bi bi-x-lg"></i>
                     </a>
                 </h1>

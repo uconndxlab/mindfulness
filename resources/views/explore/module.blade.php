@@ -4,8 +4,9 @@
 
 @section('content')
 <div class="col-md-8">
-    <div class="text-left">
-        <h1 class="display fw-bold mb-2">{{ $module->name }}</h1>
+    <div class="text-left mb-3">
+        <h1 class="display fw-bold mb-1">{{ $module->name }}</h1>
+        <p>{{ $module->description }}</p>
     </div>
 
     <div class="">
@@ -26,6 +27,7 @@
                     <div id="collapse_{{ $index }}" class="accordion-collapse collapse" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
                         <div class="accordion-body">
                             @if (!$disabled)
+                                <p>{{ $day->description }}</p>
                                 @foreach ($day->activities as $activity)
                                     <div class="card p-2 module mb-2">
                                         <a id="moduleLink" class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">{{ $activity->title }}</a>
