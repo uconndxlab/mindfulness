@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\Week;
+use App\Models\Module;
 use App\Models\Day;
 use App\Models\Activity;
 
@@ -13,50 +13,40 @@ class RestructureSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * 
+     * @param bool $examples
+     * @return void
      */
 
-    public function run(): void
+    public function run(bool $examples = false): void
     {
-        //wipe tables
-
-
-        DB::table('activities')->truncate();
-        DB::table('days')->truncate();
-        DB::table('weeks')->truncate();
-
         //basic population
-        $oldWeek = null;
+        $oldModule = null;
+        $day_order = 1;
         for ($i = 1; $i <= 4; $i++) {
-            $week = Week::create([
-                'name' => 'Week '.$i,
+            $module = Module::create([
+                'name' => 'Module '.$i,
                 'order' => $i,
+                'description' => 'This is a sample description for Module '.$i
             ]);
             //logic for assigning next attribute
             if ($i == 1) {
-                $oldWeek = $week;
+                $oldModule = $module;
             }
-            if ($oldWeek) {
-                $oldWeek->next = $week->id;
-                $oldWeek->save();
-                $oldWeek = $week;
+            if ($oldModule) {
+                $oldModule->next = $module->id;
+                $oldModule->save();
+                $oldModule = $module;
             }
 
             $oldDay = null;
-            for ($j = 1; $j <= 6; $j++) {
-                if ($j == 6) {
-                    $day = Day::create([
-                        'week_id' => $week->id,
-                        'name' => 'Optional',
-                        'order' => 0,
-                    ]);
-                }
-                else {
-                    $day = Day::create([
-                        'week_id' => $week->id,
-                        'name' => 'Day '.$j,
-                        'order' => $j,
-                    ]);
-                }
+            for ($j = 1; $j <= 5; $j++) {
+                $day = Day::create([
+                    'module_id' => $module->id,
+                    'name' => 'Day '.$j,
+                    'order' => $day_order,
+                    'description' => 'This is a sample description for Day '.$j.', in Module '.$i
+                ]);
 
                 if ($j == 1) {
                     $oldDay = $day;
@@ -66,11 +56,13 @@ class RestructureSeeder extends Seeder
                     $oldDay->save();
                     $oldDay = $day;
                 }
+                $day_order++;
             }
         }
 
         //populating activities
-        $activities = json_decode(file_get_contents(database_path('data/activitiesExamples.json')), true);
+        $ftype = $examples ? "Examples.json" : ".json";
+        $activities = json_decode(file_get_contents(database_path('data/activities'.$ftype)), true);
 
         $order = 0;
         //skipping next to avoid constraint error

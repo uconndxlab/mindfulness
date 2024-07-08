@@ -13,10 +13,6 @@ class ResetUserProgress extends Seeder
      */
     public function run(): void
     {
-        User::query()->update(['progress' => 0]);
-
-        // $user = User::find('5');
-        // $user->progress = 9;
-        // $user->save();
+        //
     }
 }

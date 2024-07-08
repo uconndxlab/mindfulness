@@ -1,26 +1,17 @@
 [
     {
-        "lesson_id": 1,
         "activity_id": 1,
-        "main": true,
         "type": "audio",
-        "file_name": "Module 1 Activity 1 - What is mindfulness.m4a"
+        "file_path": "Module 1 Activity 1 - What is mindfulness.m4a"
     },
     {
-        "lesson_id": 2,
         "activity_id": 2,
-        "main": true,
         "type": "audio",
-        "file_name": "Module 1 Activity 2 - Body Scan.m4a",
-        "is_meditation": true
+        "file_path": "Module 1 Activity 2 - Body Scan.m4a"
     },
     {
-        "lesson_id": 2,
         "activity_id": 12,
-        "name": "Body Scan - Long Version",
-        "main": false,
         "type": "audio",
-        "file_name": "Module 1 Activity 2 - Body Scan Long Version.MP3",
-        "is_meditation": true
+        "file_path": "Module 1 Activity 2 - Body Scan Long Version.MP3"
     }
 ]

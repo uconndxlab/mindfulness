@@ -21,17 +21,17 @@ class DatabaseSeeder extends Seeder
 
         //truncate the tables
         DB::table('modules')->truncate();
-        DB::table('lessons')->truncate();
+        DB::table('days')->truncate();
+        DB::table('activities')->truncate();
         DB::table('content')->truncate();
-        DB::table('quizzes')->truncate();
         DB::table('favorites')->truncate();
+        DB::table('quizzes')->truncate();
 
         //enable foreign key checks for SQLite
         DB::statement('PRAGMA foreign_keys = ON;');
 
         //call seeders
-        $this->call(ModuleSeeder::class);
-        $this->call(LessonSeeder::class, false, compact('examples'));
+        $this->call(RestructureSeeder::class, false, compact('examples'));
         $this->call(ContentSeeder::class, false, compact('examples'));
         $this->call(QuizSeeder::class);
         //right now just resetting progress, not resetting user table
