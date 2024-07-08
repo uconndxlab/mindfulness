@@ -9,9 +9,9 @@ class Day extends Model
 {
     use HasFactory;
 
-    public function week()
+    public function module()
     {
-        return $this->belongsTo(Week::class);
+        return $this->belongsTo(Module::class);
     }
 
     public function activities()

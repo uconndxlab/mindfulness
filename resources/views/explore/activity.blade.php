@@ -15,7 +15,7 @@
             </div>
             <div>
                 <h1 class="display fw-bold">
-                    <a id="exit_btn" class="btn btn-link" href="{{ route('explore.week', ['week_id' => $activity->day->week->id]) }}">
+                    <a id="exit_btn" class="btn btn-link" href="{{ route('explore.module', ['module_id' => $activity->day->module->id]) }}">
                         <i id="exit_icon" class="bi bi-x-lg"></i>
                     </a>
                 </h1>
@@ -29,7 +29,7 @@
     <div class="manual-margin-top">
         @if ($content)
             <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: block;">
-                <x-contentView id="content_view" id2="pdf_download" type="{{ $content->type }}" file="{{ $content->file_name }}"/>
+                <x-contentView id="content_view" id2="pdf_download" type="{{ $content->type }}" file="{{ $content->file_path }}"/>
             </div>
 
             @if($content->completion_message)

@@ -9,12 +9,12 @@
     </div>
 
     <div class="">
-        @foreach ($weeks as $week)
+        @foreach ($modules as $module)
         <div class="row mb-3 justify-content-center">
             <div class="col-12">
                 <div class="h-100">
                     <div class="card p-2 module mb-2">
-                        <a id="weekLink" class="stretched-link w-100 {{ $week->order >= 4 ? 'disabled' : ''}}" href="{{ route('explore.week', ['week_id' => $week->id]) }}">{{ $week->name }}</a>
+                        <a id="moduleLink" class="stretched-link w-100 {{ $module->order >= 4 ? 'disabled' : ''}}" href="{{ route('explore.module', ['module_id' => $module->id]) }}">{{ $module->name }}</a>
                         <i class="bi bi-arrow-right"></i>
                     </div>
                 </div>

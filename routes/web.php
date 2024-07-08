@@ -78,7 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //NEW EXPLORE
     Route::get('/explore/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
-    Route::get('/explore/week/{week_id}', [PageNavController::class, 'exploreWeek'])->name('explore.week');
+    Route::get('/explore/module/{module_id}', [PageNavController::class, 'exploreModule'])->name('explore.module');
     Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
     Route::get('/explore/quiz/{quiz_id}', [PageNavController::class,'exploreQuiz'])->name('explore.quiz');
     Route::post('/explore/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');

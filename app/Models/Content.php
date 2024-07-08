@@ -11,11 +11,6 @@ class Content extends Model
 
     protected $table = 'content';
 
-    public function lesson()
-    {
-        return $this->belongsTo(Lesson::class);
-    }
-
     public function activity()
     {
         return $this->belongsTo(Activity::class);

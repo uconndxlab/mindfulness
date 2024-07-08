@@ -29,18 +29,19 @@ class UserController extends Controller
         return redirect(route('explore.home'));
     }
 
-    public function updateProgress(Request $request) {
-        $request->validate([
-            'lessonId' => ['required', 'exists:lessons,id'],
-        ]);
+    //TODO
+    // public function updateProgress(Request $request) {
+    //     $request->validate([
+    //         'lessonId' => ['required', 'exists:lessons,id'],
+    //     ]);
 
-        //right now this is very simple
-        $user = Auth::user();
-        $lesson = Lesson::find($request->input('lessonId'));
-        $user->progress = $lesson->order + 1;
-        $user->save();
-        return response()->json(['message' => 'Progress updated']);
-    }
+    //     //right now this is very simple
+    //     $user = Auth::user();
+    //     $lesson = Lesson::find($request->input('lessonId'));
+    //     $user->progress = $lesson->order + 1;
+    //     $user->save();
+    //     return response()->json(['message' => 'Progress updated']);
+    // }
 
     public function updateNamePass(Request $request) {
         //get user
@@ -83,6 +84,7 @@ class UserController extends Controller
         ]);
 
         $user = Auth::user();
+        //TODO
         //check if user is here yet
         // if ($user->progress < Activity::findOrFail($request->activity_id)->order) {
         //     return response()->json(['message' => 'Forbidden'], 203);
@@ -97,7 +99,7 @@ class UserController extends Controller
     }
 
     public function deleteFavorite($activity_id) {
-        Lesson::findOrFail($activity_id);
+        Activity::findOrFail($activity_id);
 
         $user = Auth::user();
 

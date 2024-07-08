@@ -1,16 +1,16 @@
 @extends('layouts.main')
 
-@section('title', $week->name)
+@section('title', $module->name)
 
 @section('content')
 <div class="col-md-8">
     <div class="text-left">
-        <h1 class="display fw-bold mb-2">{{ $week->name }}</h1>
+        <h1 class="display fw-bold mb-2">{{ $module->name }}</h1>
     </div>
 
     <div class="">
     <div class="accordion border accordion-flush mb-3" id="accordianDays">
-            @foreach ($week->days as $index => $day)
+            @foreach ($module->days as $index => $day)
                 @php
                     $disabled = $day->order >= 4 ? 'disabled' : ''
                 @endphp
@@ -28,7 +28,7 @@
                             @if (!$disabled)
                                 @foreach ($day->activities as $activity)
                                     <div class="card p-2 module mb-2">
-                                        <a id="weekLink" class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">{{ $activity->title }}</a>
+                                        <a id="moduleLink" class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">{{ $activity->title }}</a>
                                         <i class="bi bi-arrow-right"></i>
                                     </div>
                                 @endforeach
