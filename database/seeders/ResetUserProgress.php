@@ -13,6 +13,6 @@ class ResetUserProgress extends Seeder
      */
     public function run(): void
     {
-        //
+        User::query()->update(['progress_module' => 1, 'progress_day' => 1, 'progress_activity' => 1]);
     }
 }

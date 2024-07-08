@@ -84,11 +84,10 @@ class UserController extends Controller
         ]);
 
         $user = Auth::user();
-        //TODO
         //check if user is here yet
-        // if ($user->progress < Activity::findOrFail($request->activity_id)->order) {
-        //     return response()->json(['message' => 'Forbidden'], 203);
-        // }
+        if ($user->progress_activity < Activity::findOrFail($request->activity_id)->order) {
+            return response()->json(['message' => 'Forbidden'], 203);
+        }
 
         Favorite::create([
             'user_id' => $user->id,

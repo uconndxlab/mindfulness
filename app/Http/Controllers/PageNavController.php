@@ -49,27 +49,46 @@ class PageNavController extends Controller
         Session::put('current_nav', 'explore.home');
         Session::put('explore_nav', route('explore.home'));
 
+        //get progress
+        $module_progress = Auth::user()->progress_module;
+
         //get modules
         $modules = Module::orderBy('order', 'asc')->get();
-        return view("explore.home", compact('modules'));
+        return view("explore.home", compact('modules', 'module_progress'));
     }
 
     public function exploreModule($module_id)
     {
+        
         //find the module
         $module = Module::findOrFail($module_id);
+        //check progress
+        if (Auth::user()->progress_module < $module->order) {
+            return redirect()->back();
+        }
+
+        //get progress
+        $day_progress = Auth::user()->progress_day;
+        $activity_progress = Auth::user()->progress_activity;
+
         //MUST be on browse to reach this page
         Session::put('current_nav', 'explore.home');
         Session::put('explore_nav', route('explore.module', ['module_id' => $module_id]));
 
+        //set back route
         $back_route = route('explore.home');
-        return view("explore.module", compact('module', 'back_route'));
+        return view("explore.module", compact('module', 'day_progress', 'activity_progress', 'back_route'));
     }
 
     public function exploreActivity($activity_id)
     {
         //find activity
         $activity = Activity::findOrFail($activity_id);
+        //check progress
+        if (Auth::user()->progress_activity < $activity->order) {
+            return redirect()->back();
+        }
+
         //update the current nav item with the activity
         $this->updateNavButtons(route('explore.activity', ['activity_id' => $activity_id]));
 
@@ -119,6 +138,11 @@ class PageNavController extends Controller
     public function exploreQuiz($quiz_id) {
         //find quiz
         $quiz = Quiz::findOrFail($quiz_id);
+        //block if user has not finished the associated activity
+        if (Auth::user()->progress_activity <= $quiz->activity->order) {
+            return redirect()->back();
+        }
+
         //update current nav item with the route
         $this->updateNavButtons(route('explore.quiz', ['quiz_id' => $quiz_id]));
 
@@ -209,9 +233,8 @@ class PageNavController extends Controller
     }
     public function meditationLibrary()
     {
-        //TODO
-        // Activity::where('order', '<', $progress)->orderBy('order', 'asc')->select('id', 'title', 'sub_header')->get();
-        $activities = Activity::where('type', 'practice')->orderBy('order', 'asc')->get();
+        $progress = Auth::user()->progress_activity;
+        $activities = Activity::where('order', '<', $progress)->where('type', 'practice')->orderBy('order', 'asc')->get();
         $page_info = [
             'title' => 'Meditation Library',
             'empty' => 'Keep progressing to unlock meditation sessions...',
@@ -244,8 +267,20 @@ class PageNavController extends Controller
         //TODO
         //calculating progress
         $modules = Module::orderBy('module_number', 'asc')->withCount('days')->get();
+        $module_progress = Auth::user()->progress_module;
+        $day_progress = Auth::user()->progress_day - 1;
         foreach ($modules as $module) {
-            $module->progress = 0;
+            if ($module_progress > $module->order) {
+                $module->progress = $module->days()->count();
+                $day_progress -= $module->progress;
+            }
+            else if ($module_progress == $module->order) {
+                $module->progress = $day_progress;
+                $day_progress = 0;
+            }
+            else {
+                $module->progress = 0;
+            }
         }
         return view("other.profile", compact('hide_profile_link', 'modules'));
     }

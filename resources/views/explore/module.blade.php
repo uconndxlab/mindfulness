@@ -13,7 +13,7 @@
     <div class="accordion border accordion-flush mb-3" id="accordianDays">
             @foreach ($module->days as $index => $day)
                 @php
-                    $disabled = $day->order >= 4 ? 'disabled' : ''
+                    $disabled = $day_progress < $day->order ? 'disabled' : '';
                 @endphp
                 <div class="accordion-item {{ $disabled }}">
                     <h2 class="accordion-header" id="headingOne">
@@ -29,10 +29,20 @@
                             @if (!$disabled)
                                 <p>{{ $day->description }}</p>
                                 @foreach ($day->activities as $activity)
-                                    <div class="card p-2 module mb-2">
-                                        <a id="moduleLink" class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">{{ $activity->title }}</a>
-                                        <i class="bi bi-arrow-right"></i>
-                                    </div>
+                                    @php
+                                        $locked = $activity_progress < $activity->order ? 'disabled' : '';
+                                    @endphp
+                                    @if ($locked)
+                                        <div class="card p-2 module mb-2">
+                                            <a id="moduleLink" class="stretched-link w-100 disabled" disabled>{{ $activity->title }}</a>
+                                            <i class="bi bi-arrow-right"></i>
+                                        </div>
+                                    @else
+                                        <div class="card p-2 module mb-2">
+                                            <a id="moduleLink" class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">{{ $activity->title }}</a>
+                                            <i class="bi bi-arrow-right"></i>
+                                        </div>
+                                    @endif
                                 @endforeach
                             @endif
                         </div>
