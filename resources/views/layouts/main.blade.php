@@ -79,7 +79,7 @@
 
                 <ul class="navbar-nav">
                     <!-- if not set or not true, show it -->
-                    @if (!(isset($hideProfileLink) && $hideProfileLink))
+                    @if (!(isset($hide_profile_link) && $hide_profile_link))
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('profile') }}">Hi, {{ Auth::user()->name }}
                                 <i class="prof-icon-text bi bi-person-circle"></i>

@@ -223,61 +223,30 @@ class PageNavController extends Controller
         return view("other.library", compact('page_info', 'activities'));
     }
     
+    public function journalPage(Request $request)
+    {
+        //get user
+        $id = Auth::id();
+        $notes = Note::where('user_id', $id)->orderBy('created_at', 'desc')->get();
+        //formatting the date
+        foreach ($notes as $note) {
+            $date = Carbon::parse($note->created_at);
+            $date->setTimezone(new \DateTimeZone('EST'));
+            $note->formatted_date = $date->diffForHumans().', '.$date->toFormattedDayDateString();
+        }
+        return view("other.journal", compact('notes'));
+    }
     
+    public function profilePage()
+    {
+        $hide_profile_link = true;
 
-    //TODO
-    // public function journalPage(Request $request)
-    // {
-    //     $showBackBtn = false;
-    //     $activity = null;
-        
-    //     //if we are redirected here from an activity
-    //     if ($request->activity) {
-    //         $showBackBtn = true;
-    //         Session::put("back_route", url()->previous());
-    //         $activity = Lesson::find($request->activity)->title;
-    //     }
-    //     //get user
-    //     $id = Auth::id();
-    //     $notes = Note::where('user_id', $id)->orderBy('created_at', 'desc')->get();
-    //     //formatting the date
-    //     foreach ($notes as $note) {
-    //         $date = Carbon::parse($note->created_at);
-    //         $date->setTimezone(new \DateTimeZone('EST'));
-    //         $note->formatted_date = $date->diffForHumans().', '.$date->toFormattedDayDateString();
-    //     }
-    //     return view("profile.journal", compact('notes', 'showBackBtn', 'activity'));
-    // }
-
-
-    // public function profilePage()
-    // {
-    //     //set nav bar buttons
-    //     $showBackBtn = true;
-    //     $hideProfileLink = true;
-    //     //if returning from profile submission or admin page, do not reset back_route
-    //     $prev_path = parse_url(url()->previous(), PHP_URL_PATH);
-    //     if ($prev_path != "/profile" && !Str::startsWith($prev_path, '/admin')) {
-    //         Session::put("back_route", url()->previous());
-    //     }
-
-    //     //calculating progress
-    //     $modules = Module::orderBy('module_number', 'asc')->get();
-    //     $progress = Auth::user()->progress;
-    //     foreach ($modules as $module) {
-    //         if ($progress >= $module->lesson_count) {
-    //             $module->progress = $module->lesson_count;
-    //             $progress -= $module->lesson_count;
-    //         }
-    //         else if ($progress > 0) {
-    //             $module->progress = $progress;
-    //             $progress = 0;
-    //         }
-    //         else {
-    //             $module->progress = 0;
-    //         }
-    //     }
-    //     return view("profile.accountInformation", compact("showBackBtn", "hideProfileLink", 'modules'));
-    // }
-
+        //TODO
+        //calculating progress
+        $modules = Module::orderBy('module_number', 'asc')->get();
+        foreach ($modules as $module) {
+            $module->progress = 0;
+        }
+        return view("other.profile", compact('hide_profile_link', 'modules'));
+    }
 }
