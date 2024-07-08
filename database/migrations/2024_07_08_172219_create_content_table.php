@@ -13,11 +13,9 @@ return new class extends Migration
     {
         Schema::create('content', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('lesson_id')->constrained()->onDelete('cascade');
-            $table->string('name')->nullable();
-            $table->boolean('main')->default(false);
+            $table->foreignId('activity_id')->constrained('activities')->onDelete('cascade');
             $table->enum('type', ['audio', 'video', 'pdf']);
-            $table->string('file_name');
+            $table->string('file_path');
             $table->string('completion_message')->default('Congrats on completing the activity!')->nullable();
             $table->timestamps();
         });

@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('modules', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable(false);
-            $table->integer('module_number')->nullable(false);
-            $table->integer('lesson_count')->nullable(false);
+            $table->string('name');
+            $table->string('description');
+            $table->string('workbook_path')->nullable();
+            $table->integer('order');
+            $table->foreignId('next')->nullable()->constrained('modules');
             $table->timestamps();
         });
     }

@@ -16,8 +16,7 @@ return new class extends Migration
             $table->foreignId('day_id')->nullable()->constrained('days');
             $table->string('title');
             $table->string('sub_header')->nullable();
-            $table->string('description')->nullable();
-            $table->enum('type', ['lesson', 'meditation', 'workbook']);
+            $table->enum('type', ['lesson', 'practice']);
             $table->enum('end_behavior', ['quiz', 'journal', 'none'])->default('none');
             $table->integer('order');
             $table->foreignId('next')->nullable()->constrained('activities');
