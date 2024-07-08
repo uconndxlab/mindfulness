@@ -50,6 +50,7 @@
     //COMPLETION ITEMS
     const redirectButton = document.getElementById('redirect_button');
     const hasContent = {{ $content ? 'true' : 'false' }};
+    //set eventlisteners to call activityComplete
     if (hasContent) {
         const content = document.getElementById('content_view');
         const type = '{{ isset($content->type) ? $content->type : null }}';
@@ -63,7 +64,16 @@
         }
     }
     else {
-        activityComplete();
+        redirectButton.classList.remove('disabled');
+        redirectButton.addEventListener('click', activityComplete);
+    }
+
+    //CHECKING COMPLETION
+    const progress = {{ $progress }};
+    const order = {{ $activity->order }};
+    if (progress > order) {
+        //if completed unlock the redirect button
+        redirectButton.classList.remove('disabled');
     }
 
     //COMPLETION
@@ -77,22 +87,22 @@
             const completionMessageDiv = document.getElementById('comp_message');
             completionMessageDiv.style.display = 'block';
         }
-        // TODO update users progress with lessonId
-        // if (progress <= order) {
-        //     axios.put('{{ route('user.update.progress') }}', {
-        //         lessonId: lessonId
-        //     }, {
-        //         headers: {
-        //             'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        //         }
-        //     })
-        //     .then(response => {
-        //         console.log(response.data.message);
-        //     })
-        //     .catch(error => {
-        //         console.error('There was an error updating the progress:', error);
-        //     });
-        // }
+        //update users progress
+        if (progress <= order) {
+            axios.put('{{ route('user.update.progress') }}', {
+                activity_id: activity_id
+            }, {
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => {
+                console.log(response.data.message);
+            })
+            .catch(error => {
+                console.error('There was an error updating the progress:', error);
+            });
+        }
     }
 
     //FAVORITES

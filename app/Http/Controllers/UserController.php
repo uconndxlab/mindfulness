@@ -29,19 +29,23 @@ class UserController extends Controller
         return redirect(route('explore.home'));
     }
 
-    //TODO
-    // public function updateProgress(Request $request) {
-    //     $request->validate([
-    //         'lessonId' => ['required', 'exists:lessons,id'],
-    //     ]);
+    public function updateProgress(Request $request) {
+        $request->validate([
+            'activity_id' => ['required', 'exists:activities,id'],
+        ]);
 
-    //     //right now this is very simple
-    //     $user = Auth::user();
-    //     $lesson = Lesson::find($request->input('lessonId'));
-    //     $user->progress = $lesson->order + 1;
-    //     $user->save();
-    //     return response()->json(['message' => 'Progress updated']);
-    // }
+        //right now this is very simple
+        $user = Auth::user();
+        $activity = Activity::find($request->activity_id);
+        //get next
+        $next_activity = Activity::where('order', $activity->order + 1)->first();
+        //update the progress attributes
+        $user->progress_activity = $next_activity->order;
+        $user->progress_day = $next_activity->day->order;
+        $user->progress_module = $next_activity->day->module->order;
+        $user->save();
+        return response()->json(['message' => 'Progress updated']);
+    }
 
     public function updateNamePass(Request $request) {
         //get user

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\Note;
 use App\Models\Content;
@@ -85,7 +84,8 @@ class PageNavController extends Controller
         //find activity
         $activity = Activity::findOrFail($activity_id);
         //check progress
-        if (Auth::user()->progress_activity < $activity->order) {
+        $progress = Auth::user()->progress_activity;
+        if ($progress < $activity->order) {
             return redirect()->back();
         }
 
@@ -114,7 +114,7 @@ class PageNavController extends Controller
         }
         else {
             $redirect_label = "FINISH";
-            $redirect_route = route('explore.home');
+            $redirect_route = route('explore.module', ['module_id' => $activity->day->module_id]);
         }
 
         //setting the back route/label
@@ -131,7 +131,7 @@ class PageNavController extends Controller
         //setting exit button
         $exit = Session::get('current_nav');
         $exit_route = $exit ? route($exit) : route('explore.home');
-        return view("explore.activity", compact('activity', 'content', 'is_favorited', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route'));
+        return view("explore.activity", compact('activity', 'progress', 'content', 'is_favorited', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route'));
     }
     
     //QUIZ
@@ -264,7 +264,6 @@ class PageNavController extends Controller
     {
         $hide_profile_link = true;
 
-        //TODO
         //calculating progress
         $modules = Module::orderBy('module_number', 'asc')->withCount('days')->get();
         $module_progress = Auth::user()->progress_module;
