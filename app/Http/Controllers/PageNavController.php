@@ -243,7 +243,7 @@ class PageNavController extends Controller
 
         //TODO
         //calculating progress
-        $modules = Module::orderBy('module_number', 'asc')->get();
+        $modules = Module::orderBy('module_number', 'asc')->withCount('days')->get();
         foreach ($modules as $module) {
             $module->progress = 0;
         }
