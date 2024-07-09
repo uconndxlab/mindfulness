@@ -47,7 +47,7 @@
     </head>
         @php
             $route_name = Request::route()->getName();
-            $active_items = [false, false, false, false];
+            $active_items = [false, false, false, false, false];
             if (Str::startsWith($route_name, 'explore.')) {
                 if (Session::get('current_nav') == 'explore.home') {
                     $active_items[0] = true;
@@ -62,8 +62,11 @@
             else if (Str::startsWith($route_name, 'library.')) {
                 $active_items[2] = true;
             }
-            else {
+            else if ($route_name == 'account') {
                 $active_items[3] = true;
+            }
+            else if ($route_name == 'help') {
+                $active_items[4] = true;
             }
         @endphp
     <body>
@@ -127,6 +130,11 @@
                         <li class="nav-item">
                             <a class="nav-link {{ $active_items[3] ? 'active' : '' }}" href="{{ route('account') }}">
                                 <span class="nav-icon-text"><i class="bi bi-person-circle"></i>Account</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ $active_items[4] ? 'active' : '' }}" href="{{ route('help') }}">
+                                <span class="nav-icon-text"><i class="bi bi-question-lg"></i></i>Help</span>
                             </a>
                         </li>
                     </ul>

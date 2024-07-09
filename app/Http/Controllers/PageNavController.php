@@ -7,6 +7,7 @@ use App\Models\Note;
 use App\Models\Content;
 use App\Models\Activity;
 use App\Models\Module;
+use App\Models\Faq;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
@@ -292,5 +293,11 @@ class PageNavController extends Controller
             }
         }
         return view("other.account", compact('hide_account_link', 'modules'));
+    }
+
+    public function helpPage()
+    {
+        $faqs = Faq::all();
+        return view("other.help", compact('faqs'));
     }
 }

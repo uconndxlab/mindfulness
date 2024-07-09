@@ -8,8 +8,7 @@
         <h1 class="display fw-bold mb-1">{{ $module->name }}</h1>
         <p>{{ $module->description }}</p>
         @if ($module->workbook_path)
-            <a class="btn btn-link" href="{{ Storage::url('content/'.$module->workbook_path) }}" target="_blank">Open workbook in a new page</a>
-            <a class="btn btn-info" href="{{ Storage::url('content/'.$module->workbook_path) }}" download><i class="bi bi-download"></i></a>
+            <x-contentView type="pdf" file="{{ $module->workbook_path }}"/>
         @endif
     </div>
 
