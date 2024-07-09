@@ -7,6 +7,10 @@
     <div class="text-left mb-3">
         <h1 class="display fw-bold mb-1">{{ $module->name }}</h1>
         <p>{{ $module->description }}</p>
+        @if ($module->workbook_path)
+            <a class="btn btn-link" href="{{ Storage::url('content/'.$module->workbook_path) }}" target="_blank">Open workbook in a new page</a>
+            <a class="btn btn-info" href="{{ Storage::url('content/'.$module->workbook_path) }}" download><i class="bi bi-download"></i></a>
+        @endif
     </div>
 
     <div class="">
@@ -31,15 +35,16 @@
                                 @foreach ($day->activities as $activity)
                                     @php
                                         $locked = $activity_progress < $activity->order ? 'disabled' : '';
+                                        $title = $activity->optional ? 'OPTIONAL: '.$activity->title : $activity->title
                                     @endphp
                                     @if ($locked)
                                         <div class="card p-2 module mb-2">
-                                            <a id="moduleLink" class="stretched-link w-100 disabled" disabled>{{ $activity->title }}</a>
+                                            <a id="moduleLink" class="stretched-link w-100 disabled" disabled>{{ $title }}</a>
                                             <i class="bi bi-arrow-right"></i>
                                         </div>
                                     @else
                                         <div class="card p-2 module mb-2">
-                                            <a id="moduleLink" class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">{{ $activity->title }}</a>
+                                            <a id="moduleLink" class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">{{ $title }}</a>
                                             <i class="bi bi-arrow-right"></i>
                                         </div>
                                     @endif

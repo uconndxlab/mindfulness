@@ -32,6 +32,8 @@ class RestructureSeeder extends Seeder
             //logic for assigning next attribute
             if ($i == 1) {
                 $oldModule = $module;
+                $module->workbook_path = 'pdfExample.pdf';
+                $module->save();
             }
             if ($oldModule) {
                 $oldModule->next = $module->id;
