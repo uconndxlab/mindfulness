@@ -196,8 +196,9 @@ class PageNavController extends Controller
         Session::put('current_nav', 'explore.home');
 
         //check if there is a route saved AND that this is NOT a second click, otherwise return home
-        if (Session::get('explore_nav') && !$request->active) {
-            return redirect()->to(Session::get('explore_nav'));
+        $saved = Session::get('explore_nav');
+        if ($saved && !$request->active) {
+            return redirect()->to($saved);
         }
         else {
             return redirect()->route('explore.home');
@@ -212,8 +213,9 @@ class PageNavController extends Controller
         //set the current nav item
         Session::put('current_nav', $library);
         //check if there is a route saved AND that this is NOT a second click, otherwise return to library
-        if (Session::get('library_nav') && !$request->active) {
-            return redirect()->to(Session::get('library_nav'));
+        $saved = Session::get('library_nav');
+        if ($saved && !$request->active) {
+            return redirect()->to($saved);
         }
         //otherwise go to the previous library
         else if ($library) {
