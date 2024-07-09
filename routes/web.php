@@ -89,7 +89,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
     Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
     Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
-    Route::get('/profile', [PageNavController::class, 'profilePage'])->name('profile');
+    Route::get('/account', [PageNavController::class, 'accountPage'])->name('account');
     Route::get('/library', [PageNavController::class, 'library'])->name('library');
     Route::get('/meditation-library', [PageNavController::class, 'meditationLibrary'])->name('library.meditation');
     Route::get('/favorites', [PageNavController::class, 'favoritesLibrary'])->name('library.favorites');

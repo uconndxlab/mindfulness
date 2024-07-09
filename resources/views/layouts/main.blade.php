@@ -33,7 +33,7 @@
                 text-align: center;
                 font-size: 14px;
             }
-            .prof-icon-text {
+            .tr-icon-text {
                 font-size: 24px;
                 margin-left: 10px;
             }
@@ -79,16 +79,18 @@
 
                 <ul class="navbar-nav">
                     <!-- if not set or not true, show it -->
-                    @if (!(isset($hide_profile_link) && $hide_profile_link))
+                    @if (!(isset($hide_account_link) && $hide_account_link))
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('profile') }}">Hi, {{ Auth::user()->name }}
-                                <i class="prof-icon-text bi bi-person-circle"></i>
+                            <a class="nav-link" href="{{ route('account') }}">Hi, {{ Auth::user()->name }}
+                                <i class="tr-icon-text bi bi-person-circle"></i>
                             </a>
                         </li>
                     @else
                         <!-- otherwise show a logout button - unless on admin pages -->
                         <li class="nav-item ml-auto" @if(Str::startsWith($route_name, 'admin.')) hidden @endif>
-                            <a class="nav-link" href="{{ route('logout') }}">Logout</a>
+                            <a class="nav-link" href="{{ route('logout') }}">Logout
+                                <i class="tr-icon-text bi bi-box-arrow-right"></i>
+                            </a>
                         </li>
                     @endif
                 </ul>
@@ -123,8 +125,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ $active_items[3] ? 'active' : '' }}" href="{{ route('profile') }}">
-                                <span class="nav-icon-text"><i class="bi bi-person-circle"></i>Profile</span>
+                            <a class="nav-link {{ $active_items[3] ? 'active' : '' }}" href="{{ route('account') }}">
+                                <span class="nav-icon-text"><i class="bi bi-person-circle"></i>Account</span>
                             </a>
                         </li>
                     </ul>

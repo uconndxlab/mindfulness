@@ -267,9 +267,9 @@ class PageNavController extends Controller
         return view("other.journal", compact('notes'));
     }
     
-    public function profilePage()
+    public function accountPage()
     {
-        $hide_profile_link = true;
+        $hide_account_link = true;
 
         //calculating progress
         $modules = Module::orderBy('module_number', 'asc')->withCount('days')->get();
@@ -288,6 +288,6 @@ class PageNavController extends Controller
                 $module->progress = 0;
             }
         }
-        return view("other.profile", compact('hide_profile_link', 'modules'));
+        return view("other.account", compact('hide_account_link', 'modules'));
     }
 }
