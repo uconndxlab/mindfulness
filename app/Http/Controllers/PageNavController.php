@@ -191,11 +191,12 @@ class PageNavController extends Controller
             ])->withInput();
     }
         
-    public function exploreBrowseButton() {
+    public function exploreBrowseButton(Request $request) {
         //set the current nav item
         Session::put('current_nav', 'explore.home');
-        //check if there is a route saved, otherwise return home
-        if (Session::get('explore_nav')) {
+
+        //check if there is a route saved AND that this is NOT a second click, otherwise return home
+        if (Session::get('explore_nav') && !$request->active) {
             return redirect()->to(Session::get('explore_nav'));
         }
         else {
@@ -204,14 +205,14 @@ class PageNavController extends Controller
     }
 
     //LIBRARIES
-    public function library()
+    public function library(Request $request)
     {
         //find what the previous library was
         $library = Session::get('previous_library');
         //set the current nav item
         Session::put('current_nav', $library);
-        //if there is a route saved, go to it
-        if (Session::get('library_nav')) {
+        //check if there is a route saved AND that this is NOT a second click, otherwise return to library
+        if (Session::get('library_nav') && !$request->active) {
             return redirect()->to(Session::get('library_nav'));
         }
         //otherwise go to the previous library

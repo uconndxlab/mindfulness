@@ -110,7 +110,7 @@
                     <ul class="navbar-nav lower-nav mx-auto">
                         <li class="nav-item">
                             <!-- check the routename to set which is active -->
-                            <a class="nav-link {{ $active_items[0] ? 'active' : '' }}" href="{{ route('explore.browse') }}">
+                            <a class="nav-link {{ $active_items[0] ? 'active' : '' }}" href="{{ route('explore.browse', ['active' => $active_items[0]]) }}">
                                 <span class="nav-icon-text"><i class="bi bi-ui-checks-grid"></i>Browse</span>
                             </a>
                         </li>
@@ -120,7 +120,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ $active_items[2] ? 'active' : '' }}" href="{{ route('library') }}">
+                            <a class="nav-link {{ $active_items[2] ? 'active' : '' }}" href="{{ route('library', ['active' => $active_items[2]]) }}">
                                 <span class="nav-icon-text"><i class="bi bi-collection"></i>Library</span>
                             </a>
                         </li>
