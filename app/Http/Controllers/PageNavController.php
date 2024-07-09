@@ -60,7 +60,7 @@ class PageNavController extends Controller
     {
         
         //find the module
-        $module = Module::findOrFail($module_id);
+        $module = Module::with('days.activities')->findOrFail($module_id);
         //check progress
         if (Auth::user()->progress_module < $module->order) {
             return redirect()->back();
@@ -73,6 +73,13 @@ class PageNavController extends Controller
         //MUST be on browse to reach this page
         Session::put('current_nav', 'explore.home');
         Session::put('explore_nav', route('explore.module', ['module_id' => $module_id]));
+
+        //sorting the activities
+        foreach ($module->days as $day) {
+            $day->activities = $day->activities->sortBy(function ($activity) {
+                return [$activity->optional, $activity->order];
+            })->values();
+        }
 
         //set back route
         $back_route = route('explore.home');

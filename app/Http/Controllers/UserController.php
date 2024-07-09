@@ -37,8 +37,11 @@ class UserController extends Controller
         //right now this is very simple
         $user = Auth::user();
         $activity = Activity::find($request->activity_id);
+        if ($user->progress_activity != $activity->order) {
+            return response()->json(['message' => 'Forbidden'], 203);
+        }
         //get next
-        $next_activity = Activity::where('order', $activity->order + 1)->first();
+        $next_activity = Activity::where('order', $activity->order + 1)->where('optional', false)->first();
         //update the progress attributes
         $user->progress_activity = $next_activity->order;
         $user->progress_day = $next_activity->day->order;

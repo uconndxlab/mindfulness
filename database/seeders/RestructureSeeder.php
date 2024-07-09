@@ -66,7 +66,7 @@ class RestructureSeeder extends Seeder
         $ftype = $examples ? "Examples.json" : ".json";
         $activities = json_decode(file_get_contents(database_path('data/activities'.$ftype)), true);
 
-        $order = 0;
+        $order = 1;
         //skipping next to avoid constraint error
         foreach ($activities as $activity) {
             $exceptNext = collect($activity)->except(['next_fake'])->toArray();
@@ -84,12 +84,13 @@ class RestructureSeeder extends Seeder
         Day::all()->each(function ($day) use (&$order) {
             //make a bunch of fake activities
             $start = count($day->activities) + 1;
-            for ($i = $start; $i <= 5; $i++) {
+            for ($i = $start; $i <= 7; $i++) {
                 Activity::create([
                     'day_id' => $day->id,
                     'title' => 'Example ' . $i,
-                    'type' => 'lesson',
-                    'order' => $order++,
+                    'type' => $i > 5 ? 'practice' : 'lesson',
+                    'order' => $i > 5 ? $order : $order++,
+                    'optional' => $i > 5,
                 ]);
             }
 

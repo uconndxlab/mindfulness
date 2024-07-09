@@ -46,6 +46,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
     const activity_id = {{ $activity->id }};
+    const optional = {{ $activity->optional }};
 
     //COMPLETION ITEMS
     const redirectButton = document.getElementById('redirect_button');
@@ -88,7 +89,7 @@
             completionMessageDiv.style.display = 'block';
         }
         //update users progress
-        if (progress <= order) {
+        if (progress <= order && !optional) {
             axios.put('{{ route('user.update.progress') }}', {
                 activity_id: activity_id
             }, {
