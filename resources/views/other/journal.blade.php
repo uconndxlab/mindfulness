@@ -48,19 +48,20 @@
             </div>
         </div>
     </form>
-    <h3 class="fw-bold mt-3">Previous Notes:</h3>
-    @foreach ($notes as $note)
-        <div class="prior-note">
-            <div class="top-note">
-                <h5 class="fw-bold d-flex justify-content-between">
-                    <span>{{ $note->word_otd }}</span>
-                </h5>
-                <small>{{ $note->formatted_date }}</small>
+    @if (isset($notes))
+        <h3 class="fw-bold mt-3">Previous Notes:</h3>
+        @foreach ($notes as $note)
+            <div class="prior-note">
+                <div class="top-note">
+                    <h5 class="fw-bold d-flex justify-content-between">
+                        <span>{{ $note->word_otd }}</span>
+                    </h5>
+                    <small>{{ $note->formatted_date }}</small>
+                </div>
+                <p class="note-content">{{ $note->note }}</p>
             </div>
-
-            <p class="note-content">{{ $note->note }}</p>
-        </div>
-    @endforeach
+        @endforeach
+    @endif
 </div>
 <script>
     function showWord(item) {

@@ -33,10 +33,10 @@
                 text-align: center;
                 font-size: 14px;
             }
-            .tr-icon-text {
+            /* .tr-icon-text {
                 font-size: 24px;
                 margin-left: 10px;
-            }
+            } */
             .nav-link.active {
                 color: #007bff;
             }
@@ -48,55 +48,50 @@
         @php
             $route_name = Request::route()->getName();
             $active_items = [false, false, false, false, false];
-            if (Str::startsWith($route_name, 'explore.')) {
-                if (Session::get('current_nav') == 'explore.home') {
+            if (!(isset($hide_bottom_nav) && $hide_bottom_nav)) {
+                if (Str::startsWith($route_name, 'explore.')) {
                     $active_items[0] = true;
                 }
-                else {
+                else if ($route_name == 'journal') {
+                    $active_items[1] = true;
+                }
+                else if (Str::startsWith($route_name, 'library.')) {
                     $active_items[2] = true;
                 }
-            }
-            else if ($route_name == 'journal') {
-                $active_items[1] = true;
-            }
-            else if (Str::startsWith($route_name, 'library.')) {
-                $active_items[2] = true;
-            }
-            else if ($route_name == 'account') {
-                $active_items[3] = true;
-            }
-            else if ($route_name == 'help') {
-                $active_items[4] = true;
+                else if ($route_name == 'account') {
+                    $active_items[3] = true;
+                }
+                else if ($route_name == 'help') {
+                    $active_items[4] = true;
+                }
             }
         @endphp
     <body>
         <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container-fluid container">
                 <ul class="navbar-nav">
-                    @if(isset($back_route) && $back_route)
+                    @if(isset($back_route) && isset($back_label))
                         <li class="nav-item mr-auto">
-                            <a class="nav-link" href="{{ $back_route }}">< Back {{ isset($back_label) ? $back_label : ''}}</a>
+                            <a class="nav-link" href="{{ $back_route }}"><i class="bi bi-arrow-left"></i>{{ $back_label }}</a>
                         </li>
                     @endif
                 </ul>
 
-                <ul class="navbar-nav">
-                    <!-- if not set or not true, show it -->
-                    @if (!(isset($hide_account_link) && $hide_account_link))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('account') }}">Hi, {{ Auth::user()->name }}
-                                <i class="tr-icon-text bi bi-person-circle"></i>
-                            </a>
-                        </li>
-                    @else
-                        <!-- otherwise show a logout button - unless on admin pages -->
-                        <li class="nav-item ml-auto" @if(Str::startsWith($route_name, 'admin.')) hidden @endif>
-                            <a class="nav-link" href="{{ route('logout') }}">Logout
-                                <i class="tr-icon-text bi bi-box-arrow-right"></i>
-                            </a>
-                        </li>
-                    @endif
-                </ul>
+                @if (!(isset($hide_bottom_nav) && $hide_bottom_nav))
+                    <ul class="navbar-nav">
+                        @if (!(isset($hide_account_link) && $hide_account_link))
+                            <li class="nav-item">
+                                <i><a class="nav-link" href="{{ route('account') }}">Hi, {{ Auth::user()->name }}</a></i>
+                            </li>
+                        @else
+                            <li class="nav-item ml-auto">
+                                <a class="nav-link" href="{{ route('logout') }}">Logout
+                                    <i class="bi bi-box-arrow-right"></i>
+                                </a>
+                            </li>
+                        @endif
+                    </ul>
+                @endif
             </div>
         </nav>
 
@@ -106,13 +101,11 @@
             </div>
         </div>
 
-
-        @if (!(isset($hideBottomNav) && $hideBottomNav))
+        @if (!(isset($hide_bottom_nav) && $hide_bottom_nav))
             <nav class="navbar fixed-bottom navbar-expand-lg navbar-light lower-nav-full">
                 <div class="container">
                     <ul class="navbar-nav lower-nav mx-auto">
                         <li class="nav-item">
-                            <!-- check the routename to set which is active -->
                             <a class="nav-link {{ $active_items[0] ? 'active' : '' }}" href="{{ route('explore.browse', ['active' => $active_items[0]]) }}">
                                 <span class="nav-icon-text"><i class="bi bi-ui-checks-grid"></i>Browse</span>
                             </a>
@@ -123,7 +116,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ $active_items[2] ? 'active' : '' }}" href="{{ route('library', ['active' => $active_items[2]]) }}">
+                            <a class="nav-link {{ $active_items[2] ? 'active' : '' }}" href="{{ route('library') }}">
                                 <span class="nav-icon-text"><i class="bi bi-collection"></i>Library</span>
                             </a>
                         </li>

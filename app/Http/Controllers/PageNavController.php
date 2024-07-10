@@ -27,27 +27,12 @@ class PageNavController extends Controller
         return view("auth.voice-select");
     }
 
-    //function to update the routes saved in session for navbar items
-    public function updateNavButtons($route) {
-        //check which nav item we are coming from
-        $current_nav = Session::get('current_nav');
-        if ($current_nav) {
-            //update the route that nav bar goes to
-            if ($current_nav == 'explore.home') {
-                Session::put('explore_nav', $route);
-            }
-            else {
-                Session::put('library_nav', $route);
-            }
-        }
-    }
-
     //EXPLORE
     public function exploreHome()
     {
-        //MUST be on browse to reach this page
-        Session::put('current_nav', 'explore.home');
-        Session::put('explore_nav', route('explore.home'));
+        //handle navigation
+        Session::put('current_nav', route('explore.home'));
+        Session::put('previous_explore', route('explore.home'));
 
         //get progress
         $module_progress = Auth::user()->progress_module;
@@ -66,15 +51,11 @@ class PageNavController extends Controller
         if (Auth::user()->progress_module < $module->order) {
             return redirect()->back();
         }
-
+        
         //get progress
         $day_progress = Auth::user()->progress_day;
         $activity_progress = Auth::user()->progress_activity;
-
-        //MUST be on browse to reach this page
-        Session::put('current_nav', 'explore.home');
-        Session::put('explore_nav', route('explore.module', ['module_id' => $module_id]));
-
+        
         //sorting the activities
         foreach ($module->days as $day) {
             $day->activities = $day->activities->sortBy(function ($activity) {
@@ -86,8 +67,14 @@ class PageNavController extends Controller
         }
 
         //set back route
+        $back_label = " Back to Home";
         $back_route = route('explore.home');
-        return view("explore.module", compact('module', 'day_progress', 'activity_progress', 'back_route'));
+
+        //handle navigation
+        Session::put('current_nav', route('explore.module', ['module_id' => $module_id]));
+        Session::put('previous_explore', route('explore.module', ['module_id' => $module_id]));
+        
+        return view("explore.module", compact('module', 'day_progress', 'activity_progress', 'back_label', 'back_route'));
     }
 
     public function exploreActivity($activity_id, Request $request)
@@ -100,18 +87,19 @@ class PageNavController extends Controller
             return redirect()->back();
         }
 
-        //update the current nav item with the activity
-        $this->updateNavButtons(route('explore.activity', ['activity_id' => $activity_id]));
-
         //get content
         $content = $activity->content;
         
         //favoriting
         $user = Auth::user();
         $is_favorited = $user->favorites()->where('activity_id', $activity_id)->exists();
-
+        
+        //setting exit button
+        $exit = Session::get('current_nav');
+        $exit_route = $exit ? $exit : route('explore.home');
+        
         //end behavior
-        if ($activity->end_behavior == 'quiz') {
+        if ($activity->end_behavior == 'quiz' && $activity->quiz) {
             $redirect_label = "QUIZ";
             $redirect_route = route('explore.quiz', ['quiz_id' => $activity->quiz->id]);
         }
@@ -121,44 +109,35 @@ class PageNavController extends Controller
         }
         else {
             $redirect_label = "FINISH";
-            $redirect_route = route('explore.module', ['module_id' => $activity->day->module_id]);
+            $redirect_route = $exit_route;
         }
 
-        //setting the back route/label
-        if (Session::get('current_nav') == 'explore.home') {
-            $back_label = ' to '.$activity->day->module->name;
-            $back_route = route('explore.module', ['module_id' => $activity->day->module_id]);
-        }
-        else {
-            $back_label = ' to Library';
-            $prev_lib = Session::get('previous_library');
-            $back_route = $prev_lib ? route($prev_lib) : route('library.meditation');
-        }
+        //setting back route
+        $back_label = " Exit";
+        $back_route = $exit_route;
 
-        //setting exit button
-        $exit = Session::get('current_nav');
-        $exit_route = $exit ? route($exit) : route('explore.home');
+        $hide_bottom_nav = true;
 
         //journal case
         if ($activity->end_behavior == "journal") {
             $journal_label = "JOURNAL";
             $journal_route = route('journal', ['activity_id' => $activity->id]);
-            return view("explore.activity", compact('activity', 'progress', 'content', 'is_favorited', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route', 'journal_label', 'journal_route'));
+            return view("explore.activity", compact('activity', 'progress', 'content', 'is_favorited', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route', 'hide_bottom_nav', 'journal_label', 'journal_route'));
         }
-        return view("explore.activity", compact('activity', 'progress', 'content', 'is_favorited', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route'));
+        return view("explore.activity", compact('activity', 'progress', 'content', 'is_favorited', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route', 'hide_bottom_nav'));
     }
     
     //QUIZ
     public function exploreQuiz($quiz_id) {
         //find quiz
         $quiz = Quiz::findOrFail($quiz_id);
-        //block if user has not finished the associated activity
+        //check progress
         if (Auth::user()->progress_activity <= $quiz->activity->order) {
             return redirect()->back();
         }
-
-        //update current nav item with the route
-        $this->updateNavButtons(route('explore.quiz', ['quiz_id' => $quiz_id]));
+        //setting exit route
+        $exit = Session::get('current_nav');
+        $exit_route = $exit ? $exit : route('explore.home');
 
         //set the end behavior
         if ($quiz->activity->next) {
@@ -167,22 +146,20 @@ class PageNavController extends Controller
         }
         else {
             $redirect_label = "FINISH";
-            $redirect_route = route('explore.home');
+            $redirect_route = $exit;
         }
 
         //setting back route/label
-        $back_label = ' to '.$quiz->activity->title;
+        $back_label = ' Back to '.$quiz->activity->title;
         $back_route = route('explore.activity', ['activity_id' => $quiz->activity_id]);
 
-        //setting exit route
-        $exit = Session::get('current_nav');
-        $exit_route = $exit ? route($exit) : route('explore.home');
-        return view('explore.quiz', compact('quiz', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route'));
+        $hide_bottom_nav = true;
+        return view('explore.quiz', compact('quiz', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route', 'hide_bottom_nav'));
     }
 
     public function submitQuiz(Request $request, $quiz_id)
     {
-        //get quiz and chceck answer
+        //get quiz and check answer
         $quiz = Quiz::find($quiz_id);
         $selected_option = intval($request->answer);
         $is_correct = $quiz->correct_answer == $selected_option+1;
@@ -197,15 +174,13 @@ class PageNavController extends Controller
             'is_correct' => $is_correct
             ])->withInput();
     }
-        
-    public function exploreBrowseButton(Request $request) {
-        //set the current nav item
-        Session::put('current_nav', 'explore.home');
 
-        //check if there is a route saved AND that this is NOT a second click, otherwise return home
-        $saved = Session::get('explore_nav');
-        if ($saved && !$request->active) {
-            return redirect()->to($saved);
+    public function exploreBrowseButton(Request $request) {
+        //browse nav button - check for previous explore page
+        //active is for double click functionality
+        $previous = Session::get('previous_explore');
+        if ($previous && !$request->active) {
+            return redirect()->to($previous);
         }
         else {
             return redirect()->route('explore.home');
@@ -213,20 +188,11 @@ class PageNavController extends Controller
     }
 
     //LIBRARIES
-    public function library(Request $request)
-    {
-        //find what the previous library was
-        $library = Session::get('previous_library');
-        //set the current nav item
-        Session::put('current_nav', $library);
-        //check if there is a route saved AND that this is NOT a second click, otherwise return to library
-        $saved = Session::get('library_nav');
-        if ($saved && !$request->active) {
-            return redirect()->to($saved);
-        }
-        //otherwise go to the previous library
-        else if ($library) {
-            return redirect()->route($library);
+    public function library(Request $request) {
+        //library nav button - check for previous library
+        $previous = Session::get('previous_library');
+        if ($previous) {
+            return redirect()->to($previous);
         }
         else {
             return redirect()->route('library.meditation');
@@ -243,9 +209,9 @@ class PageNavController extends Controller
             'empty' => '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>',
         ];
 
-        //set as the previous library and save route
-        Session::put('previous_library', 'library.favorites');
-        Session::put('library_nav', route('library.favorites'));
+        //set as the previous library and save as exit
+        Session::put('previous_library', route('library.favorites'));
+        Session::put('current_nav', route('library.favorites'));
         return view('other.library', compact('page_info', 'activities'));
     }
     public function meditationLibrary()
@@ -257,14 +223,24 @@ class PageNavController extends Controller
             'empty' => 'Keep progressing to unlock meditation sessions...',
         ];
 
-        //set as the previous library and save route
-        Session::put('previous_library', 'library.meditation');
-        Session::put('library_nav', route('library.meditation'));
+        //set as the previous library and save as exit
+        Session::put('previous_library', route('library.meditation'));
+        Session::put('current_nav', route('library.meditation'));
         return view("other.library", compact('page_info', 'activities'));
     }
     
     public function journalPage(Request $request)
     {
+        //check if coming from an activity
+        $activity_id = $request->activity_id;
+        if ($activity_id) {
+            $back_label = ' Back to '.Activity::findOrFail($activity_id)->title;
+            $back_route = route('explore.activity', ['activity_id' => $activity_id]);
+            $hide_bottom_nav = true;
+            return view("other.journal", compact('activity_id', 'back_label', 'back_route', 'hide_bottom_nav'));
+        }
+
+        //otherwise normal notes page
         //get user
         $id = Auth::id();
         $notes = Note::where('user_id', $id)->orderBy('created_at', 'desc')->get();
@@ -273,13 +249,6 @@ class PageNavController extends Controller
             $date = Carbon::parse($note->created_at);
             $date->setTimezone(new \DateTimeZone('EST'));
             $note->formatted_date = $date->diffForHumans().', '.$date->toFormattedDayDateString();
-        }
-
-        $activity_id = $request->activity_id;
-        if ($activity_id) {
-            $back_label = ' to '.Activity::findOrFail($activity_id)->title;
-            $back_route = route('explore.activity', ['activity_id' => $activity_id]);
-            return view("other.journal", compact('notes', 'activity_id', 'back_label', 'back_route'));
         }
         return view("other.journal", compact('notes'));
     }
