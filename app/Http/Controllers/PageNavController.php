@@ -80,6 +80,9 @@ class PageNavController extends Controller
             $day->activities = $day->activities->sortBy(function ($activity) {
                 return [$activity->optional, $activity->order];
             })->values();
+            if ($day->order == $day_progress) {
+                $day->show = true;
+            }
         }
 
         //set back route

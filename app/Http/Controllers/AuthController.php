@@ -42,7 +42,7 @@ class AuthController extends Controller
         //check auth and remember
         $remember = $request->has('remember');
         if (Auth::attempt($credentials, $remember)) {
-            return redirect()->intended('explore');
+            return redirect()->intended('explore.home');
         }
         
         return back()->withErrors(['credentials' => 'Invalid credentials.'])->withInput();

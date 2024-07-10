@@ -13,21 +13,22 @@
     </div>
 
     <div class="">
-    <div class="accordion border accordion-flush mb-3" id="accordianDays">
+    <div class="accordion border accordion-flush mb-3" id="accordionDays">
             @foreach ($module->days as $index => $day)
                 @php
                     $disabled = $day_progress < $day->order ? 'disabled' : '';
                 @endphp
-                <div class="accordion-item {{ $disabled }}">
-                    <h2 class="accordion-header" id="headingOne">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="{{ $disabled ? '' : 'collapse' }}" data-bs-target="#collapse_{{ $index }}" aria-expanded="false" aria-controls="collapse_{{ $index }}" {{ $disabled }}>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading_{{ $index }}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="false" aria-controls="collapse_{{ $index }}" {{ $disabled }}>
                             {{ $day->name }}
                             @if ($disabled)
                                 <i class="bi bi-lock"></i>
                             @endif
                         </button>
                     </h2>
-                    <div id="collapse_{{ $index }}" class="accordion-collapse collapse" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
+                    <div id="collapse_{{ $index }}" class="accordion-collapse collapse {{ $day->show ? 'show' : ''}}" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
                         <div class="accordion-body">
                             @if (!$disabled)
                                 <p>{{ $day->description }}</p>
