@@ -4,6 +4,11 @@
 
 @section('content')
 <div class="col-md-8">
+    @if (session('success'))
+        <div class="alert alert-success" role="alert">
+            {{ session('success') }}
+        </div>
+    @endif
     <div class="text-left">
         <div class="d-flex justify-content-between align-items-center">
             <div>

@@ -47,6 +47,11 @@ class NoteController extends Controller
                 'word_otd' => $validatedData['word_otd'],
                 'user_id' => Auth::id(),
             ]);
+
+            //if submitted note after activity
+            if ($request->activity_id) {
+                return redirect()->route('explore.activity',  ['activity_id' => $request->activity_id, 'journal_submitted' => true])->with('success', 'Journal submitted!');
+            }
     
             return back()->with('success', 'Note saved.');
     

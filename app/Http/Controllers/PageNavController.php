@@ -90,7 +90,7 @@ class PageNavController extends Controller
         return view("explore.module", compact('module', 'day_progress', 'activity_progress', 'back_route'));
     }
 
-    public function exploreActivity($activity_id)
+    public function exploreActivity($activity_id, Request $request)
     {
         //find activity
         $activity = Activity::findOrFail($activity_id);
@@ -115,9 +115,9 @@ class PageNavController extends Controller
             $redirect_label = "QUIZ";
             $redirect_route = route('explore.quiz', ['quiz_id' => $activity->quiz->id]);
         }
-        else if ($activity->end_behavior == "journal") {
+        else if ($activity->end_behavior == "journal" && !$request->journal_submitted) {
             $redirect_label = "JOURNAL";
-            $redirect_route = route('journal', ['activity' => $activity->id]);
+            $redirect_route = route('journal', ['activity_id' => $activity->id]);
         }
         else if ($activity->next) {
             $redirect_label = "NEXT";
@@ -270,6 +270,13 @@ class PageNavController extends Controller
             $date = Carbon::parse($note->created_at);
             $date->setTimezone(new \DateTimeZone('EST'));
             $note->formatted_date = $date->diffForHumans().', '.$date->toFormattedDayDateString();
+        }
+
+        $activity_id = $request->activity_id;
+        if ($activity_id) {
+            $back_label = ' to '.Activity::findOrFail($activity_id)->title;
+            $back_route = route('explore.activity', ['activity_id' => $activity_id]);
+            return view("other.journal", compact('notes', 'activity_id', 'back_label', 'back_route'));
         }
         return view("other.journal", compact('notes'));
     }
