@@ -4,13 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Quiz;
 use App\Models\Note;
-use App\Models\Content;
 use App\Models\Activity;
 use App\Models\Module;
 use App\Models\Faq;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -31,7 +29,7 @@ class PageNavController extends Controller
     public function exploreHome()
     {
         //handle navigation
-        Session::put('current_nav', route('explore.home'));
+        Session::put('current_nav', ['route' => route('explore.home'), 'back' => 'Home']);
         Session::put('previous_explore', route('explore.home'));
 
         //get progress
@@ -71,7 +69,7 @@ class PageNavController extends Controller
         $back_route = route('explore.home');
 
         //handle navigation
-        Session::put('current_nav', route('explore.module', ['module_id' => $module_id]));
+        Session::put('current_nav', ['route' => route('explore.module', ['module_id' => $module_id]), 'back' => 'Module '.$module_id]);
         Session::put('previous_explore', route('explore.module', ['module_id' => $module_id]));
         
         return view("explore.module", compact('module', 'day_progress', 'activity_progress', 'back_label', 'back_route'));
@@ -96,7 +94,7 @@ class PageNavController extends Controller
         
         //setting exit button
         $exit = Session::get('current_nav');
-        $exit_route = $exit ? $exit : route('explore.home');
+        $exit_route = $exit ? $exit['route'] : route('explore.home');
         
         //end behavior
         if ($activity->end_behavior == 'quiz' && $activity->quiz) {
@@ -113,7 +111,7 @@ class PageNavController extends Controller
         }
 
         //setting back route
-        $back_label = " Exit";
+        $back_label = $exit ? ' Back to '.$exit['back'] : ' Back';
         $back_route = $exit_route;
 
         $hide_bottom_nav = true;
@@ -137,7 +135,7 @@ class PageNavController extends Controller
         }
         //setting exit route
         $exit = Session::get('current_nav');
-        $exit_route = $exit ? $exit : route('explore.home');
+        $exit_route = $exit ? $exit['route'] : route('explore.home');
 
         //set the end behavior
         if ($quiz->activity->next) {
@@ -211,7 +209,7 @@ class PageNavController extends Controller
 
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.favorites'));
-        Session::put('current_nav', route('library.favorites'));
+        Session::put('current_nav', ['route' => route('library.favorites'), 'back' => 'Favorites']);
         return view('other.library', compact('page_info', 'activities'));
     }
     public function meditationLibrary()
@@ -225,7 +223,7 @@ class PageNavController extends Controller
 
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.meditation'));
-        Session::put('current_nav', route('library.meditation'));
+        Session::put('current_nav', ['route' => route('library.meditation'), 'back' => 'Meditation Library']);
         return view("other.library", compact('page_info', 'activities'));
     }
     
