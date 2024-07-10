@@ -44,7 +44,10 @@
             @endif
         @endif
     </div>
-    <div class=" manual-margin-top">
+    <div class="manual-margin-top" id="redirect_div">
+        @if (isset($journal_route))
+            <a id="redirect_button_2" class="btn btn-primary disabled" href="{{ $journal_route }}">{{ $journal_label }}</a>
+        @endif
         <a id="redirect_button" class="btn btn-primary disabled" href="{{ $redirect_route }}">{{ $redirect_label }}</a>
     </div>
 </div>
@@ -54,7 +57,7 @@
     const optional = {{ $activity->optional }};
 
     //COMPLETION ITEMS
-    const redirectButton = document.getElementById('redirect_button');
+    const redirectDiv = document.getElementById('redirect_div');
     const hasContent = {{ $content ? 'true' : 'false' }};
     //set eventlisteners to call activityComplete
     if (hasContent) {
@@ -70,8 +73,8 @@
         }
     }
     else {
-        redirectButton.classList.remove('disabled');
-        redirectButton.addEventListener('click', activityComplete);
+        //unlock redirect and add an event listener to track progress
+        unlockRedirect(true);
     }
 
     //CHECKING COMPLETION
@@ -79,14 +82,14 @@
     const order = {{ $activity->order }};
     if (progress > order) {
         //if completed unlock the redirect button
-        redirectButton.classList.remove('disabled');
+        unlockRedirect();
     }
 
     //COMPLETION
     function activityComplete() {
         //show content and redirect
         console.log("activity completed")
-        redirectButton.classList.remove('disabled');
+        unlockRedirect();
         //show message
         const hasMessage = {{ isset($content->completion_message) ? 'true' : 'false' }};
         if (hasMessage) {
@@ -109,6 +112,16 @@
                 console.error('There was an error updating the progress:', error);
             });
         }
+    }
+
+    //function for unlocking the redirection buttons
+    function unlockRedirect(addEventListener = false) {
+        redirectDiv.querySelectorAll('.disabled').forEach(element => {
+            element.classList.remove('disabled');
+            if (addEventListener) {
+                element.addEventListener('click', activityComplete);
+            }
+        });
     }
 
     //FAVORITES

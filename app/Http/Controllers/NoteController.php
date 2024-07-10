@@ -50,7 +50,7 @@ class NoteController extends Controller
 
             //if submitted note after activity
             if ($request->activity_id) {
-                return redirect()->route('explore.activity',  ['activity_id' => $request->activity_id, 'journal_submitted' => true])->with('success', 'Journal submitted!');
+                return redirect()->route('explore.activity',  ['activity_id' => $request->activity_id])->with('success', 'Journal submitted!');
             }
     
             return back()->with('success', 'Note saved.');

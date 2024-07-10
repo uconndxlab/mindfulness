@@ -115,10 +115,6 @@ class PageNavController extends Controller
             $redirect_label = "QUIZ";
             $redirect_route = route('explore.quiz', ['quiz_id' => $activity->quiz->id]);
         }
-        else if ($activity->end_behavior == "journal" && !$request->journal_submitted) {
-            $redirect_label = "JOURNAL";
-            $redirect_route = route('journal', ['activity_id' => $activity->id]);
-        }
         else if ($activity->next) {
             $redirect_label = "NEXT";
             $redirect_route = route('explore.activity', ['activity_id' => $activity->next]);
@@ -142,6 +138,13 @@ class PageNavController extends Controller
         //setting exit button
         $exit = Session::get('current_nav');
         $exit_route = $exit ? route($exit) : route('explore.home');
+
+        //journal case
+        if ($activity->end_behavior == "journal") {
+            $journal_label = "JOURNAL";
+            $journal_route = route('journal', ['activity_id' => $activity->id]);
+            return view("explore.activity", compact('activity', 'progress', 'content', 'is_favorited', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route', 'journal_label', 'journal_route'));
+        }
         return view("explore.activity", compact('activity', 'progress', 'content', 'is_favorited', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route'));
     }
     
