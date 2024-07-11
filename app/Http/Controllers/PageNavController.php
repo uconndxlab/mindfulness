@@ -129,7 +129,7 @@ class PageNavController extends Controller
     public function exploreQuiz($quiz_id) {
         //find quiz
         $quiz = Quiz::findOrFail($quiz_id);
-
+        
         //check progress
         if (Auth::user()->progress_activity <= $quiz->activity->order) {
             return redirect()->back();
@@ -137,9 +137,17 @@ class PageNavController extends Controller
 
         //see if an answer is saved
         $saved_answer = Session::get('saved_answer');
-        if ($saved_answer && $saved_answer['quiz_id'] != $quiz_id) {
+        if ($saved_answer && $saved_answer['quiz_id'] == $quiz_id) {
+            //convert options and get feedback
+            $options = $quiz->options_feedback ?? [];
+            //passing information through quiz
+            $quiz->saved_answer = $saved_answer['answer'];
+            $quiz->feedback = $options[$saved_answer['answer']]['feedback'];
+            $quiz->is_correct = $saved_answer['correct'];
+        }
+        else {
             Session::forget('saved_answer');
-            $saved_answer = null;
+            $quiz->saved_answer = null;
         }
 
         //setting exit route
@@ -159,11 +167,11 @@ class PageNavController extends Controller
         //setting back route/label
         $back_label = ' Back to '.$quiz->activity->title;
         $back_route = route('explore.activity', ['activity_id' => $quiz->activity_id]);
-
+        
         $hide_bottom_nav = true;
-        return view('explore.quiz', compact('quiz', 'saved_answer', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route', 'hide_bottom_nav'));
+        return view('explore.quiz', compact('quiz', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route', 'hide_bottom_nav'));
     }
-
+    
     public function submitQuiz(Request $request)
     {
         //get quiz and check answer
@@ -175,19 +183,19 @@ class PageNavController extends Controller
         //convert options and get feedback
         $options = $quiz->options_feedback ?? [];
         $feedback = $options[$selected_option]['feedback'];
-
+        
         //save answer in case returned to this page soon
-        Session::put('saved_answer', ['quiz_id' => $request->quiz_id, 'answer' => $selected_option]);
-
+        Session::put('saved_answer', ['quiz_id' => $request->quiz_id, 'answer' => $selected_option, 'correct' => $is_correct]);
+        
         return redirect()->back()->with([
             'feedback' => $feedback,
             'is_correct' => $is_correct
             ])->withInput();
-    }
-
-    public function exploreBrowseButton(Request $request) {
-        //browse nav button - check for previous explore page
-        //active is for double click functionality
+        }
+        
+        public function exploreBrowseButton(Request $request) {
+            //browse nav button - check for previous explore page
+            //active is for double click functionality
         $previous = Session::get('previous_explore');
         if ($previous && !$request->active) {
             return redirect()->to($previous);
