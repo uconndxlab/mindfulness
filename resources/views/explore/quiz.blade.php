@@ -23,7 +23,7 @@
         </div>
         <h2>{{ $quiz->question }}</h2>
     </div>
-    <form action="{{ route('quiz.submit', $quiz->id) }}" method="POST" class="pt-3">
+    <form action="{{ route('quiz.submit', ['quiz_id' => $quiz->id]) }}" method="POST" class="pt-3" id="quizForm">
         @csrf
         @foreach ($quiz_options as $index => $option_feedback)
             <div class="form-check">
@@ -55,8 +55,10 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const savedAnswer = {{ $saved_answer ? $saved_answer['answer'] : null }};
         const submitButton = document.getElementById('submitButton');
         const radioButtons = document.querySelectorAll('input[name="answer"]');
+        // const submissionFlag = 'formSubmitted';
 
         //check if any radio buttons are checked
         function checkRadioButtons() {
@@ -75,6 +77,35 @@
         radioButtons.forEach(radio => {
             radio.addEventListener('change', checkRadioButtons);
         });
+
+        if (savedAnswer != null) {
+            var selectedOption = document.getElementById('option_' + savedAnswer);
+            if (selectedOption) {
+                selectedOption.checked = true;
+            }
+            // localStorage.setItem(submissionFlag, 'true');
+
+            //submitting led to infinite loop
+            //make request
+        //     return new Promise((resolve, reject) => {
+        //     axios.post('}} route('quiz.submit') }}', {
+        //         quiz_id: quiz_id,
+        //         resubmit : true
+        //     }, {
+        //         headers: {
+        //             'X-CSRF-TOKEN': '}} csrf_token() }}'
+        //         }
+        //     })
+        //     .then(response => {
+        //         console.log(response.data.message);
+        //         resolve(true);
+        //     })
+        //     .catch(error => {
+        //         console.error('There was an error submitting the quiz', error);
+        //         reject(false);
+        //     });
+        // });
+        }
 
         //check initial selection
         checkRadioButtons();

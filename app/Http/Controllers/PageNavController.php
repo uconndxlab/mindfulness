@@ -129,10 +129,19 @@ class PageNavController extends Controller
     public function exploreQuiz($quiz_id) {
         //find quiz
         $quiz = Quiz::findOrFail($quiz_id);
+
         //check progress
         if (Auth::user()->progress_activity <= $quiz->activity->order) {
             return redirect()->back();
         }
+
+        //see if an answer is saved
+        $saved_answer = Session::get('saved_answer');
+        if ($saved_answer && $saved_answer['quiz_id'] != $quiz_id) {
+            Session::forget('saved_answer');
+            $saved_answer = null;
+        }
+
         //setting exit route
         $exit = Session::get('current_nav');
         $exit_route = $exit ? $exit['route'] : route('explore.home');
@@ -152,13 +161,13 @@ class PageNavController extends Controller
         $back_route = route('explore.activity', ['activity_id' => $quiz->activity_id]);
 
         $hide_bottom_nav = true;
-        return view('explore.quiz', compact('quiz', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route', 'hide_bottom_nav'));
+        return view('explore.quiz', compact('quiz', 'saved_answer', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route', 'hide_bottom_nav'));
     }
 
-    public function submitQuiz(Request $request, $quiz_id)
+    public function submitQuiz(Request $request)
     {
         //get quiz and check answer
-        $quiz = Quiz::find($quiz_id);
+        $quiz = Quiz::find($request->quiz_id);
         $selected_option = intval($request->answer);
         $is_correct = $quiz->correct_answer == $selected_option+1;
         $feedback = null;
@@ -166,6 +175,9 @@ class PageNavController extends Controller
         //convert options and get feedback
         $options = $quiz->options_feedback ?? [];
         $feedback = $options[$selected_option]['feedback'];
+
+        //save answer in case returned to this page soon
+        Session::put('saved_answer', ['quiz_id' => $request->quiz_id, 'answer' => $selected_option]);
 
         return redirect()->back()->with([
             'feedback' => $feedback,
