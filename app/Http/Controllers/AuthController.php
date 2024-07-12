@@ -88,6 +88,9 @@ class AuthController extends Controller
             'password'=> Hash::make($request->password),
         ]);
 
+        //unlocking first module/day/activity
+        unlockFirst($user->id);
+
         //login and redirect
         event(new Registered($user));
         $remember = $request->has('remember');
