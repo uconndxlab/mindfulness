@@ -17,9 +17,8 @@ class AdminOnly
     {
         //check if user is admin
 
-        abort(404, "Page not found.");
-
         if ($request->user() && !$request->user()->isAdmin()) {
+            abort(404, "Page not found.");
             abort(403, 'Unauthorized action.');
         }
         return $next($request);

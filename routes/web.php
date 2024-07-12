@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PageNavController;
 use App\Http\Controllers\NoteController;
+use App\Http\Controllers\ContentManagementController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -110,7 +111,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //ADMIN ONLY
     Route::middleware('admin')->group(function () {
         //Content upload
-        Route::get('/admin', [ContentController::class,'adminPage'])->name('admin.browse');
+        Route::get('/admin/home', [ContentManagementController::class,'adminPage'])->name('admin.home');
+
+
         Route::get('/admin/lesson/create', [ContentController::class,'newLessonPage'])->name('admin.lesson.create');
         Route::post('/admin/lesson', [ContentController::class, 'storeLesson'])->name('admin.lesson.store');
         Route::get('/admin/lesson/{lessonId}', [ContentController::class,'showLessonPage'])->name('admin.lesson.show');

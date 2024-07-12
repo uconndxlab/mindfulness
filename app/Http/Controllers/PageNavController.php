@@ -37,6 +37,10 @@ class PageNavController extends Controller
 
         //get modules
         $modules = Module::orderBy('order', 'asc')->get();
+
+        foreach ($modules as $module) {
+            $module->disabled = $module_progress < $module->order ? 'disabled' : '';
+        }
         return view("explore.home", compact('modules', 'module_progress'));
     }
 
