@@ -60,4 +60,19 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Favorite::class);
     }
+
+    public function progress_activities()
+    {
+        return $this->hasMany(UserActivity::class);
+    }
+    
+    public function progress_days()
+    {
+        return $this->hasMany(UserDay::class);
+    }
+
+    public function progress_modules()
+    {
+        return $this->hasMany(UserModule::class);
+    }
 }
