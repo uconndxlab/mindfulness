@@ -6,6 +6,8 @@ use App\Models\Quiz;
 use App\Models\Note;
 use App\Models\Activity;
 use App\Models\Module;
+use App\Models\UserModule;
+use App\Models\UserActivity;
 use App\Models\Faq;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
@@ -32,40 +34,31 @@ class PageNavController extends Controller
         Session::put('current_nav', ['route' => route('explore.home'), 'back' => 'Home']);
         Session::put('previous_explore', route('explore.home'));
 
-        //get progress
-        $module_progress = Auth::user()->progress_module;
-
-        //get modules
+        //get modules and progress
         $modules = Module::orderBy('order', 'asc')->get();
-
         foreach ($modules as $module) {
-            $module->disabled = $module_progress < $module->order ? 'disabled' : '';
+           $module->progress = getModuleProgress(Auth::id(), $module->id);
         }
-        return view("explore.home", compact('modules', 'module_progress'));
+        return view("explore.home", compact('modules'));
     }
 
     public function exploreModule($module_id)
     {
-        
         //find the module
         $module = Module::with('days.activities')->findOrFail($module_id);
+
         //check progress
-        if (Auth::user()->progress_module < $module->order) {
+        if (getModuleProgress(Auth::id(), $module_id) == 'locked') {
             return redirect()->back();
         }
         
-        //get progress
-        $day_progress = Auth::user()->progress_day;
-        $activity_progress = Auth::user()->progress_activity;
-        
-        //sorting the activities
+        //sorting the activities, and getting progress information
         foreach ($module->days as $day) {
             $day->activities = $day->activities->sortBy(function ($activity) {
                 return [$activity->optional, $activity->order];
             })->values();
-            if ($day->order == $day_progress) {
-                $day->show = true;
-            }
+
+            $day->progress = getDayProgress(Auth::id(), $day->id);
         }
 
         //set back route
@@ -76,16 +69,16 @@ class PageNavController extends Controller
         Session::put('current_nav', ['route' => route('explore.module', ['module_id' => $module_id]), 'back' => 'Module '.$module_id]);
         Session::put('previous_explore', route('explore.module', ['module_id' => $module_id]));
         
-        return view("explore.module", compact('module', 'day_progress', 'activity_progress', 'back_label', 'back_route'));
+        return view("explore.module", compact('module', 'back_label', 'back_route'));
     }
 
     public function exploreActivity($activity_id, Request $request)
     {
         //find activity
         $activity = Activity::findOrFail($activity_id);
-        //check progress
-        $progress = Auth::user()->progress_activity;
-        if ($progress < $activity->order) {
+        //check progress and set status
+        $activity->status = UserActivity::where('user_id', Auth::user()->id)->where('activity_id', $activity_id)->first()->status;
+        if (!isset($activity->status) || $activity->status == 'locked') {
             return redirect()->back();
         }
 
@@ -105,7 +98,8 @@ class PageNavController extends Controller
             $redirect_label = "QUIZ";
             $redirect_route = route('explore.quiz', ['quiz_id' => $activity->quiz->id]);
         }
-        else if ($activity->next) {
+        //make sure that if doing next, the day is not changing
+        else if ($activity->next && Activity::find($activity->next)->day->id == $activity->day->id) {
             $redirect_label = "NEXT";
             $redirect_route = route('explore.activity', ['activity_id' => $activity->next]);
         }
@@ -124,9 +118,9 @@ class PageNavController extends Controller
         if ($activity->end_behavior == "journal") {
             $journal_label = "JOURNAL";
             $journal_route = route('journal', ['activity_id' => $activity->id]);
-            return view("explore.activity", compact('activity', 'progress', 'content', 'is_favorited', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route', 'hide_bottom_nav', 'journal_label', 'journal_route'));
+            return view("explore.activity", compact('activity', 'content', 'is_favorited', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route', 'hide_bottom_nav', 'journal_label', 'journal_route'));
         }
-        return view("explore.activity", compact('activity', 'progress', 'content', 'is_favorited', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route', 'hide_bottom_nav'));
+        return view("explore.activity", compact('activity', 'content', 'is_favorited', 'redirect_label', 'redirect_route', 'back_label', 'back_route', 'exit_route', 'hide_bottom_nav'));
     }
     
     //QUIZ
@@ -281,20 +275,8 @@ class PageNavController extends Controller
 
         //calculating progress
         $modules = Module::orderBy('module_number', 'asc')->withCount('days')->get();
-        $module_progress = Auth::user()->progress_module;
-        $day_progress = Auth::user()->progress_day - 1;
         foreach ($modules as $module) {
-            if ($module_progress > $module->order) {
-                $module->progress = $module->days()->count();
-                $day_progress -= $module->progress;
-            }
-            else if ($module_progress == $module->order) {
-                $module->progress = $day_progress;
-                $day_progress = 0;
-            }
-            else {
-                $module->progress = 0;
-            }
+            $module->progress = getModuleProgress(Auth::id(), $module->id);
         }
         return view("other.account", compact('hide_account_link', 'modules'));
     }

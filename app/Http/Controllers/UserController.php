@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Lesson;
+use App\Models\UserActivity;
+use App\Models\UserDay;
+use App\Models\UserModule;
 use App\Models\Activity;
 use App\Models\Favorite;
 
@@ -30,23 +32,49 @@ class UserController extends Controller
     }
 
     public function updateProgress(Request $request) {
+        //TODO
         $request->validate([
             'activity_id' => ['required', 'exists:activities,id'],
         ]);
 
-        //right now this is very simple
-        $user = Auth::user();
-        $activity = Activity::find($request->activity_id);
-        if ($user->progress_activity != $activity->order) {
-            return response()->json(['message' => 'Forbidden'], 203);
+        $activity = Activity::findOrFail($request->activity_id);
+        $activity_progress = Auth::user()->load('progress_activities')->progress_activities;
+        $day_progress = Auth::user()->load('progress_days')->progress_days;
+        $module_progress = Auth::user()->load('progress_modules')->progress_modules;
+
+        //get the current activity status
+        $user_activity = $activity_progress->where('activity_id', $activity->id)->first();
+
+        //make sure they have this unlocked
+        if ($user_activity->status == 'unlocked') {
+            //update
+            $user_activity->status = 'completed';
+
+            //check next
+            if ($activity->next != null) {
+                //find next
+                $next = Activity::findOrFail($activity->next);
+                if ($next->day != $activity->day) {
+                    //handle the current day
+                    $user_day = $day_progress->where('day_id', $activity->day->id)->first();
+                    if ($user_day == 'unlocked') {
+                        
+                    }
+
+
+                }
+            }
+            //if nothing comes after, program is done - mark everything as complete...
         }
-        //get next
-        $next_activity = Activity::where('order', $activity->order + 1)->where('optional', false)->first();
-        //update the progress attributes
-        $user->progress_activity = $next_activity->order;
-        $user->progress_day = $next_activity->day->order;
-        $user->progress_module = $next_activity->day->module->order;
-        $user->save();
+        else if ($user_activity->status == 'completed') {
+            return response()->json(['message' => 'Activity already completed']);
+        }
+
+        //should not reach here
+        return response()->json(['message' => 'Forbidden'], 203);
+
+
+
         return response()->json(['message' => 'Progress updated']);
     }
 

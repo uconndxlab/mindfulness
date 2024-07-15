@@ -71,7 +71,7 @@
                 <h5 class="fw-bold d-flex justify-content-between">
                     <span>{{ $module->name }}</span>
                 </h5>
-                <small class="{{ $module->progress == $module->days_count ? 'fw-bold' : '' }}">{{ $module->progress }}/{{ $module->days_count }} days completed</small>
+                <small class="{{ $module->progress['status'] == 'completed' ? 'fw-bold' : '' }}">{{ $module->progress['completed'] }}/{{ $module->progress['total'] }} days completed</small>
             </div>
         </div>
     @endforeach

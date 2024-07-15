@@ -73,14 +73,14 @@
         }
     }
     else {
+        //if no content
         //unlock redirect and add an event listener to track progress
         unlockRedirect(true);
     }
 
     //CHECKING COMPLETION
-    const progress = {{ $progress }};
-    const order = {{ $activity->order }};
-    if (progress > order) {
+    const status = '{{ $activity->status }}';
+    if (status == 'completed') {
         //if completed unlock the redirect button
         unlockRedirect();
     }
@@ -97,7 +97,7 @@
             completionMessageDiv.style.display = 'block';
         }
         //update users progress
-        if (progress <= order && !optional) {
+        if (status == 'unlocked') {
             axios.put('{{ route('user.update.progress') }}', {
                 activity_id: activity_id
             }, {
@@ -118,6 +118,8 @@
     function unlockRedirect(addEventListener = false) {
         redirectDiv.querySelectorAll('.disabled').forEach(element => {
             element.classList.remove('disabled');
+
+            //if no content
             if (addEventListener) {
                 element.addEventListener('click', activityComplete);
             }

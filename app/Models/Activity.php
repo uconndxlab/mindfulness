@@ -23,4 +23,9 @@ class Activity extends Model
     {
         return $this->hasOne(Content::class);
     }
+
+    public function user_progress()
+    {
+        return $this->hasMany(UserActivity::class);
+    }
 }
