@@ -41,7 +41,7 @@
                                     @endphp
                                     @if ($activity->status == 'completed')
                                         <div class="card p-2 module mb-2">
-                                            <a id="moduleLink" class="stretched-link w-100 disabled" disabled><i class="bi bi-check2-square"></i>{{ $title }}</a>
+                                            <a id="moduleLink" class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}"><i class="bi bi-check2-square"></i>{{ $title }}</a>
                                             <i class="bi bi-arrow-right"></i>
                                         </div>
                                     @elseif ($activity->status == 'unlocked')
@@ -51,7 +51,7 @@
                                         </div>
                                     @else
                                         <div class="card p-2 module mb-2">
-                                            <a id="moduleLink" class="stretched-link w-100 disabled" disabled>{{ $title }}</a>
+                                            <a id="moduleLink" class="stretched-link w-100 disabled">{{ $title }}</a>
                                             <i class="bi bi-arrow-right"></i>
                                         </div>
                                     @endif

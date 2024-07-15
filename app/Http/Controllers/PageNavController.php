@@ -48,7 +48,7 @@ class PageNavController extends Controller
         $module = Module::with('days.activities')->findOrFail($module_id);
 
         //check progress
-        if (getModuleProgress(Auth::id(), $module_id) == 'locked') {
+        if (getModuleProgress(Auth::id(), $module_id)['status'] == 'locked') {
             return redirect()->back();
         }
         
@@ -74,10 +74,12 @@ class PageNavController extends Controller
 
     public function exploreActivity($activity_id, Request $request)
     {
+        $user = Auth::user();
         //find activity
         $activity = Activity::findOrFail($activity_id);
         //check progress and set status
-        $activity->status = UserActivity::where('user_id', Auth::user()->id)->where('activity_id', $activity_id)->first()->status;
+        $user->load('progress_activities');
+        $activity->status = $user->progress_activities->where('activity_id', $activity_id)->first()->status;
         if (!isset($activity->status) || $activity->status == 'locked') {
             return redirect()->back();
         }
@@ -86,7 +88,6 @@ class PageNavController extends Controller
         $content = $activity->content;
         
         //favoriting
-        $user = Auth::user();
         $is_favorited = $user->favorites()->where('activity_id', $activity_id)->exists();
         
         //setting exit button

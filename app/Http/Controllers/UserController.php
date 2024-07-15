@@ -39,43 +39,39 @@ class UserController extends Controller
 
         $activity = Activity::findOrFail($request->activity_id);
         $activity_progress = Auth::user()->load('progress_activities')->progress_activities;
-        $day_progress = Auth::user()->load('progress_days')->progress_days;
-        $module_progress = Auth::user()->load('progress_modules')->progress_modules;
 
         //get the current activity status
-        $user_activity = $activity_progress->where('activity_id', $activity->id)->first();
+        $current_activity_progress = $activity_progress->where('activity_id', $activity->id)->first();
 
         //make sure they have this unlocked
-        if ($user_activity->status == 'unlocked') {
+        if ($current_activity_progress->status == 'unlocked') {
             //update
-            $user_activity->status = 'completed';
+            $current_activity_progress->status = 'completed';
+            $current_activity_progress->save();
 
             //check next
             if ($activity->next != null) {
                 //find next
                 $next = Activity::findOrFail($activity->next);
-                if ($next->day != $activity->day) {
-                    //handle the current day
-                    $user_day = $day_progress->where('day_id', $activity->day->id)->first();
-                    if ($user_day == 'unlocked') {
-                        
-                    }
-
-
+                $next_activity_progress = $activity_progress->where('activity_id', $next->id)->first();
+                if ($next_activity_progress == null || $next_activity_progress->status == 'locked') {
+                    //update entry for next
+                    UserActivity::updateOrCreate([
+                        "user_id" => Auth::id(),
+                        "activity_id" => $next->id,
+                    ],[
+                        "status" => 'unlocked'
+                    ]);
                 }
             }
-            //if nothing comes after, program is done - mark everything as complete...
+            return response()->json(['message' => 'Progress updated']);
         }
-        else if ($user_activity->status == 'completed') {
+        else if ($current_activity_progress->status == 'completed') {
             return response()->json(['message' => 'Activity already completed']);
         }
 
         //should not reach here
         return response()->json(['message' => 'Forbidden'], 203);
-
-
-
-        return response()->json(['message' => 'Progress updated']);
     }
 
     public function updateNamePass(Request $request) {

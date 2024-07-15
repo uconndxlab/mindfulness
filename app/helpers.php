@@ -49,7 +49,7 @@ if (!function_exists('getDayProgress')) {
         $day = Day::findOrFail($day_id);
         $day_status = 'locked';
         $completed_count = 0;
-        $total = $day->activities->count();
+        $total = $day->activities->where('optional', false)->count();
         $activity_status = [];
         foreach ($day->activities as $activity) {
             $status = $activity_progress->where('activity_id', $activity->id)->first()->status;
@@ -57,7 +57,7 @@ if (!function_exists('getDayProgress')) {
             if ($status == 'unlocked') {
                 $day_status = 'unlocked';
             }
-            else if ($status == 'completed') {
+            else if ($status == 'completed' && $activity->optional == false) {
                 $completed_count++;
             }
         }
