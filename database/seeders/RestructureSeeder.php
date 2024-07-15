@@ -75,23 +75,30 @@ class RestructureSeeder extends Seeder
         }
 
         //applying the next
+        $act = null;
         foreach ($activities as $activity) {
             $act = Activity::findOrFail($activity['id']);
             $act->next = $activity['next_fake'];
             $act->save();
         }
     
-        Day::all()->each(function ($day) use (&$order) {
+        Day::all()->each(function ($day) use (&$order, &$act) {
             //make a bunch of fake activities
             $start = count($day->activities) + 1;
             for ($i = $start; $i <= 7; $i++) {
-                Activity::create([
+                $new = Activity::create([
                     'day_id' => $day->id,
                     'title' => 'Example ' . $i,
                     'type' => $i > 5 ? 'practice' : 'lesson',
                     'order' => $i > 5 ? $order : $order++,
                     'optional' => $i > 5,
                 ]);
+
+                if ($i <= 5) {
+                    $act->next = $new->id;
+                    $act->save();
+                    $act = $new;
+                }
             }
 
         });

@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
         DB::table('content')->truncate();
         DB::table('favorites')->truncate();
         DB::table('quizzes')->truncate();
+        DB::table('faqs')->truncate();
 
         //enable foreign key checks for SQLite
         DB::statement('PRAGMA foreign_keys = ON;');
@@ -34,7 +35,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RestructureSeeder::class, false, compact('examples'));
         $this->call(ContentSeeder::class, false, compact('examples'));
         $this->call(QuizSeeder::class);
-        //right now just resetting progress, not resetting user table
         $this->call(ResetUserProgress::class);
+        $this->call(FaqSeeder::class);
     }
 }
