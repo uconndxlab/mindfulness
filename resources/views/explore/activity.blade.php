@@ -51,7 +51,6 @@
         @if (isset($page_info['redirect_route']))
             <a id="redirect_button" class="btn btn-primary disabled" href="{{ $page_info['redirect_route'] }}">{{ $page_info['redirect_label'] }}</a>
         @endif
-        <a id="skip" class="btn btn-primary">skip</a>
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
@@ -63,9 +62,8 @@
     const redirectDiv = document.getElementById('redirect_div');
     const hasContent = {{ $content ? 'true' : 'false' }};
 
-    //SKIP
-    const skip = document.getElementById('skip');
-    skip.addEventListener('click', activityComplete)
+    //CHECKING COMPLETION
+    const status = '{{ $activity->status }}';
 
     //set eventlisteners to call activityComplete
     if (hasContent) {
@@ -81,23 +79,15 @@
         }
     }
     else {
-        //if no content
-        //unlock redirect and add an event listener to track progress
-        unlockRedirect(true);
+        //if no content - complete activity
+        activityComplete();
     }
 
-    //CHECKING COMPLETION
-    const status = '{{ $activity->status }}';
-    if (status == 'completed') {
-        //if completed unlock the redirect button
-        unlockRedirect();
-    }
 
     //COMPLETION
     function activityComplete() {
-        //show content and redirect
+        //show content
         console.log("activity completed")
-        unlockRedirect();
         //show message
         const hasMessage = {{ isset($content->completion_message) ? 'true' : 'false' }};
         if (hasMessage) {
@@ -115,22 +105,23 @@
             })
             .then(response => {
                 console.log(response.data.message);
+                //unlock redirect only after progress is processed
+                unlockRedirect();
             })
             .catch(error => {
                 console.error('There was an error updating the progress:', error);
             });
         }
+        else if (status == 'completed') {
+            //unlock if activity has been compeleted
+            unlockRedirect();
+        }
     }
 
     //function for unlocking the redirection buttons
-    function unlockRedirect(addEventListener = false) {
+    function unlockRedirect() {
         redirectDiv.querySelectorAll('.disabled').forEach(element => {
             element.classList.remove('disabled');
-
-            //if no content
-            if (addEventListener) {
-                element.addEventListener('click', activityComplete);
-            }
         });
     }
 
