@@ -75,7 +75,7 @@
 
     //CHECKING COMPLETION
     const status = '{{ $activity->status }}';
-    if (status == "completed") {
+    if (status == 'completed') {
         activityComplete(false);
     }
 
@@ -127,6 +127,9 @@
             .catch(error => {
                 console.error('There was an error updating the progress:', error);
             });
+        }
+        else if (status == 'completed') {
+            unlockRedirect();
         }
     }
 

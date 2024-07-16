@@ -94,7 +94,7 @@ class PageNavController extends Controller
         //get content
         $content = $activity->content;
         //decode the audio options
-        if ($content->type == 'audio' && $content->audio_options) {
+        if ($content && $content->type == 'audio' && $content->audio_options) {
             $content->audio_options = json_decode($content->audio_options, true);
         }
         
