@@ -7,11 +7,16 @@
     {
         "activity_id": 2,
         "type": "audio",
-        "file_path": "Module 1 Activity 2 - Body Scan.m4a"
-    },
-    {
-        "activity_id": 12,
-        "type": "audio",
-        "file_path": "Module 1 Activity 2 - Body Scan Long Version.MP3"
+        "file_path": "Module 1 Activity 2 - Body Scan.m4a",
+        "audio_options": {
+            "default": {
+                "10 minutes": {
+                    "file_path": "Module 1 Activity 2 - Body Scan.m4a"
+                },
+                "20 minutes": {
+                    "file_path": "Module 1 Activity 2 - Body Scan Long Version.MP3"
+                }
+            }
+        }
     }
 ]

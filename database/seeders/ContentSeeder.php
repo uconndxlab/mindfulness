@@ -31,6 +31,11 @@ class ContentSeeder extends Seeder
                 }
                 $item['completion_message'] = $item['completion_message']."\nMeditation exercises have been unlocked in the library.";
             }
+
+            if (isset($item['audio_options'])) {
+                $item['audio_options'] = json_encode($item['audio_options']);
+            }
+
             Content::create($item);
         }
     }
