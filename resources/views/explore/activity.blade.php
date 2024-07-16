@@ -105,6 +105,8 @@
             completionMessageDiv.style.display = 'block';
         }
         //update users progress
+        console.log("Status:");
+        console.log(status);
         if (status == 'unlocked') {
             axios.put('{{ route('user.update.progress') }}', {
                 activity_id: activity_id

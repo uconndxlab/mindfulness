@@ -65,6 +65,7 @@ class UserController extends Controller
             }
 
             //updating the session saved progress - getting will update
+            return response()->json(['message' => 'Progress updated']);
             Session::forget('progress_modules');
             Session::forget('progress_days');
 
