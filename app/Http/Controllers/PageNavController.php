@@ -86,8 +86,8 @@ class PageNavController extends Controller
         $activity = Activity::findOrFail($activity_id);
         //check progress and set status
         $user->load('progress_activities');
-        $activity->status = $user->progress_activities->where('activity_id', $activity_id)->first()->status;
-        if (!isset($activity->status) || $activity->status == 'locked') {
+        $activity->status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
+        if ($activity->status == 'locked') {
             return redirect()->back();
         }
 
@@ -137,7 +137,11 @@ class PageNavController extends Controller
         $quiz = Quiz::findOrFail($quiz_id);
         
         //check progress
-        if (Auth::user()->progress_activity <= $quiz->activity->order) {
+        $user = Auth::user();
+        $user->load('progress_activities');
+        $activity = Activity::findOrFail($quiz->activity->id);
+        $status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
+        if ($status != 'completed') {
             return redirect()->back();
         }
 
@@ -240,9 +244,18 @@ class PageNavController extends Controller
     }
     public function meditationLibrary()
     {
-        $progress = Auth::user()->progress_activity;
-        $activities = Activity::where('order', '<', $progress)->where('type', 'practice')->orderBy('order', 'asc')->get();
-
+        $user_id = Auth::id();
+        $activities = Activity::where('type', 'optional')
+            ->whereIn('id', function ($query) use ($user_id) {
+                $query->select('activity_id')
+                    ->from('user_activity')
+                    ->where('user_id', $user_id)
+                    ->where(function ($query) {
+                        $query->where('status', 'unlocked')
+                            ->orWhere('status', 'completed');
+                    });
+            })
+            ->get();
 
         $page_info = [
             'title' => 'Meditation Library',
@@ -284,7 +297,7 @@ class PageNavController extends Controller
         $hide_account_link = true;
 
         //calculating progress
-        $modules = Module::orderBy('module_number', 'asc')->withCount('days')->get();
+        $modules = Module::orderBy('order', 'asc')->withCount('days')->get();
         $progress = getModuleProgress(Auth::id(), $modules->pluck('id')->toArray());
         foreach ($modules as $module) {
             $module->progress = $progress[$module->id];

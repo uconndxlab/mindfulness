@@ -32,7 +32,6 @@ class UserController extends Controller
     }
 
     public function updateProgress(Request $request) {
-        //TODO
         $request->validate([
             'activity_id' => ['required', 'exists:activities,id'],
         ]);
@@ -121,7 +120,10 @@ class UserController extends Controller
 
         $user = Auth::user();
         //check if user is here yet
-        if ($user->progress_activity < Activity::findOrFail($request->activity_id)->order) {
+        $activity = Activity::findOrFail($request->activity_id);
+        $user->load('progress_activities');
+        $status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
+        if ($status == 'locked') {
             return response()->json(['message' => 'Forbidden'], 203);
         }
 
