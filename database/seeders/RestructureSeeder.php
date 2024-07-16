@@ -21,27 +21,27 @@ class RestructureSeeder extends Seeder
     public function run(bool $examples = false): void
     {
         //basic population
-        $oldModule = null;
+        // $oldModule = null;
         $day_order = 1;
         for ($i = 1; $i <= 4; $i++) {
             $module = Module::create([
                 'name' => 'Module '.$i,
                 'order' => $i,
-                'description' => 'This is a sample description for Module '.$i
+                'description' => 'This is a sample description for Module '.$i,
+                'workbook_path' => 'pdfExample.pdf'
             ]);
             //logic for assigning next attribute
-            if ($i == 1) {
-                $oldModule = $module;
-                $module->workbook_path = 'pdfExample.pdf';
-                $module->save();
-            }
-            if ($oldModule) {
-                $oldModule->next = $module->id;
-                $oldModule->save();
-                $oldModule = $module;
-            }
+            // if ($i == 1) {
+            //     $oldModule = $module;
+            //     $module->save();
+            // }
+            // if ($oldModule) {
+            //     $oldModule->next = $module->id;
+            //     $oldModule->save();
+            //     $oldModule = $module;
+            // }
 
-            $oldDay = null;
+            // $oldDay = null;
             for ($j = 1; $j <= 5; $j++) {
                 $day = Day::create([
                     'module_id' => $module->id,
@@ -50,14 +50,14 @@ class RestructureSeeder extends Seeder
                     'description' => 'This is a sample description for Day '.$j.', in Module '.$i
                 ]);
 
-                if ($j == 1) {
-                    $oldDay = $day;
-                }
-                if ($oldDay) {
-                    $oldDay->next = $day->id;
-                    $oldDay->save();
-                    $oldDay = $day;
-                }
+                // if ($j == 1) {
+                //     $oldDay = $day;
+                // }
+                // if ($oldDay) {
+                //     $oldDay->next = $day->id;
+                //     $oldDay->save();
+                //     $oldDay = $day;
+                // }
                 $day_order++;
             }
         }

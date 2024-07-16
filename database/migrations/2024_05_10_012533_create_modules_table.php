@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('description');
             $table->string('workbook_path')->nullable();
             $table->integer('order');
-            $table->foreignId('next')->nullable()->constrained('modules');
             $table->timestamps();
         });
     }

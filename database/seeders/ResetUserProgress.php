@@ -17,6 +17,7 @@ class ResetUserProgress extends Seeder
     public function run(): void
     {
         DB::table('user_activity')->truncate();
+        DB::table('favorites')->truncate();
         DB::table('sessions')->truncate();
 
         foreach (User::all() as $user) {
