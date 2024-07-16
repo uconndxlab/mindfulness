@@ -76,6 +76,8 @@ if (!function_exists('getDayProgress')) {
             $activity_progress = User::findOrFail($user_id)->load('progress_activities')->progress_activities;
             $days = Day::whereIn('id', $missing_day_ids)->with('activities')->get();
 
+            //show determines which one will open in the accordion
+            $show = [];
             foreach ($days as $day) {
                 //set vars
                 $day_status = 'locked';
@@ -85,11 +87,13 @@ if (!function_exists('getDayProgress')) {
 
                 //iterate through activities for that day
                 foreach ($day->activities as $activity) {
-                    $status = $activity_progress->where('activity_id', $activity->id)->first()->status ?? 'locked';
+                    $activity_info = $activity_progress->where('activity_id', $activity->id)->first();
+                    $status = $activity_info->status ?? 'locked';
                     $activity_status[$activity->id] = $status;
 
                     if ($status == 'unlocked') {
                         $day_status = 'unlocked';
+                        $show[$day->module->id] = $day->id;
                     }
                     else if ($status == 'completed' && $activity->optional == false) {
                         $completed_count++;
@@ -99,10 +103,11 @@ if (!function_exists('getDayProgress')) {
                 if ($completed_count == $total) {
                     $day_status = 'completed';
                 }
-
-                $progress[$day->id] = ['status' => $day_status, 'completed' => $completed_count, 'total' => $total, 'activity_status' => $activity_status];
+                $progress[$day->id] = ['status' => $day_status, 'completed' => $completed_count, 'total' => $total, 'activity_status' => $activity_status, 'show' => false];
             }
-
+            foreach ($show as $_ => $day_id) {
+                $progress[$day_id]['show'] = true;
+            }
             //put new days in the session
             Session::put('progress_days', $progress);
         }

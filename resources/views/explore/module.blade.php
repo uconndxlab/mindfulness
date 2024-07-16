@@ -30,7 +30,7 @@
                             @endif
                         </button>
                     </h2>
-                    <div id="collapse_{{ $index }}" class="accordion-collapse collapse {{ $day->show ? 'show' : ''}}" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
+                    <div id="collapse_{{ $index }}" class="accordion-collapse collapse {{ $day->progress['show'] ? 'show' : ''}}" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
                         <div class="accordion-body">
                             @if (!$disabled)
                                 <p>{{ $day->description }}</p>
