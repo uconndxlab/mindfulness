@@ -6,9 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use App\Models\UserActivity;
-use App\Models\UserDay;
-use App\Models\UserModule;
+use App\Models\Module;
 use App\Models\Activity;
 use App\Models\Favorite;
 
@@ -64,6 +64,25 @@ class UserController extends Controller
                     ]);
                 }
             }
+
+            //updating the session module progress
+            $module_progress = Session::get('stored_progress');
+            $stored_progress = [];
+            if ($module_progress == null) {
+                //if not available, get the progress for all
+                foreach (Module::all() as $module) {
+                    $stored_progress[$module->id] = getModuleProgress(Auth::id(), $module->id);
+                }
+            }
+            else {
+                //otherwise just update the one
+                $stored_progress = $module_progress;
+                $stored_progress[$activity->day->module->id] = getModuleProgress(Auth::id(), $activity->day->module->id);
+            }
+            Session::put('stored_progress', $stored_progress);
+            
+
+
             return response()->json(['message' => 'Progress updated']);
         }
         else if ($current_activity_progress->status == 'completed') {

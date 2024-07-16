@@ -36,8 +36,17 @@ class PageNavController extends Controller
 
         //get modules and progress
         $modules = Module::orderBy('order', 'asc')->get();
+
+        $stored_progress = Session::get('stored_progress');
+        if (!$stored_progress) {
+            $stored_progress = [];
+            foreach ($modules as $module) {
+                $stored_progress[$module->id] = getModuleProgress(Auth::id(), $module->id);
+            }
+            Session::put('stored_progress', $stored_progress);
+        }
         foreach ($modules as $module) {
-           $module->progress = getModuleProgress(Auth::id(), $module->id);
+            $module->progress = $stored_progress[$module->id];
         }
         return view("explore.home", compact('modules'));
     }
@@ -235,6 +244,8 @@ class PageNavController extends Controller
     {
         $progress = Auth::user()->progress_activity;
         $activities = Activity::where('order', '<', $progress)->where('type', 'practice')->orderBy('order', 'asc')->get();
+
+
         $page_info = [
             'title' => 'Meditation Library',
             'empty' => 'Keep progressing to unlock meditation sessions...',
@@ -276,8 +287,17 @@ class PageNavController extends Controller
 
         //calculating progress
         $modules = Module::orderBy('module_number', 'asc')->withCount('days')->get();
+
+        $stored_progress = Session::get('stored_progress');
+        if (!$stored_progress) {
+            $stored_progress = [];
+            foreach ($modules as $module) {
+                $stored_progress[$module->id] = getModuleProgress(Auth::id(), $module->id);
+            }
+            Session::put('stored_progress', $stored_progress);
+        }
         foreach ($modules as $module) {
-            $module->progress = getModuleProgress(Auth::id(), $module->id);
+            $module->progress = $stored_progress[$module->id];
         }
         return view("other.account", compact('hide_account_link', 'modules'));
     }
