@@ -20,7 +20,7 @@
             </div>
             <div>
                 <h1 class="display fw-bold">
-                    <a id="exit_btn" class="btn btn-link" href="{{ $exit_route }}">
+                    <a id="exit_btn" class="btn btn-link" href="{{ $page_info['exit_route'] }}">
                         <i id="exit_icon" class="bi bi-x-lg"></i>
                     </a>
                 </h1>
@@ -45,10 +45,12 @@
         @endif
     </div>
     <div class="manual-margin-top" id="redirect_div">
-        @if (isset($journal_route))
-            <a id="redirect_button_2" class="btn btn-primary disabled" href="{{ $journal_route }}">{{ $journal_label }}</a>
+        @if (isset($page_info['end_route']))
+            <a id="redirect_button_2" class="btn btn-primary disabled" href="{{ $page_info['end_route'] }}">{{ $page_info['end_label'] }}</a>
         @endif
-        <a id="redirect_button" class="btn btn-primary disabled" href="{{ $redirect_route }}">{{ $redirect_label }}</a>
+        @if (isset($page_info['redirect_route']))
+            <a id="redirect_button" class="btn btn-primary disabled" href="{{ $page_info['redirect_route'] }}">{{ $page_info['redirect_label'] }}</a>
+        @endif
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>

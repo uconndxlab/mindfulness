@@ -48,7 +48,7 @@
         @php
             $route_name = Request::route()->getName();
             $active_items = [false, false, false, false, false];
-            if (!(isset($hide_bottom_nav) && $hide_bottom_nav)) {
+            if (!(isset($page_info['hide_bottom_nav']) && $page_info['hide_bottom_nav'])) {
                 if (Str::startsWith($route_name, 'explore.')) {
                     $active_items[0] = true;
                 }
@@ -70,16 +70,16 @@
         <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container-fluid container">
                 <ul class="navbar-nav">
-                    @if(isset($back_route) && isset($back_label))
+                    @if(isset($page_info['back_route']) && isset($page_info['back_label']))
                         <li class="nav-item mr-auto">
-                            <a class="nav-link" href="{{ $back_route }}"><i class="bi bi-arrow-left"></i>{{ $back_label }}</a>
+                            <a class="nav-link" href="{{ $page_info['back_route'] }}"><i class="bi bi-arrow-left"></i>{{ $page_info['back_label'] }}</a>
                         </li>
                     @endif
                 </ul>
 
-                @if (!(isset($hide_bottom_nav) && $hide_bottom_nav))
+                @if (!(isset($page_info['hide_bottom_nav']) && $page_info['hide_bottom_nav']))
                     <ul class="navbar-nav">
-                        @if (!(isset($hide_account_link) && $hide_account_link))
+                        @if (!(isset($page_info['hide_account_link']) && $page_info['hide_account_link']))
                             <li class="nav-item">
                                 <i><a class="nav-link" href="{{ route('account') }}">Hi, {{ Auth::user()->name }}</a></i>
                             </li>
@@ -101,7 +101,7 @@
             </div>
         </div>
 
-        @if (!(isset($hide_bottom_nav) && $hide_bottom_nav))
+        @if (!(isset($page_info['hide_bottom_nav']) && $page_info['hide_bottom_nav']))
             <nav class="navbar fixed-bottom navbar-expand-lg navbar-light lower-nav-full">
                 <div class="container">
                     <ul class="navbar-nav lower-nav mx-auto">

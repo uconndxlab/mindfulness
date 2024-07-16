@@ -16,7 +16,7 @@
             </div>
             <div>
                 <h1 class="display fw-bold">
-                    <a id="exit_btn" class="btn btn-link" href="{{ $exit_route }}">
+                    <a id="exit_btn" class="btn btn-link" href="{{ $page_info['exit_route'] }}">
                         <i id="exit_icon" class="bi bi-x-lg"></i>
                     </a>
                 </h1>
@@ -46,10 +46,12 @@
         @endif
 
         <div class=" manual-margin-top">
-            <a id="nextButton" class="btn btn-success" href="{{ $redirect_route }}" style="display: {{ $is_correct ? 'block' : 'none'}};">
-                {{ $redirect_label }}
-                <i class="bi bi-arrow-right"></i>
-            </a>
+            @if (isset($page_info['redirect_route']) && isset($page_info['redirect_label']))
+                <a id="nextButton" class="btn btn-success" href="{{ $page_info['redirect_route'] }}" style="display: {{ $is_correct ? 'block' : 'none'}};">
+                    {{ $page_info['redirect_label'] }}
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            @endif
         </div>
         <div class=" manual-margin-top">
             <button type="submit" id="submitButton" class="btn btn-secondary mt-4" style="display: {{ $is_correct ? 'none' : 'block'}};">SUBMIT</button>
