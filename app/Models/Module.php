@@ -11,6 +11,6 @@ class Module extends Model
 
     public function days()
     {
-        return $this->hasMany(Day::class);
+        return $this->hasMany(Day::class)->orderBy('order');;
     }
 }

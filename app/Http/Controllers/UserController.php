@@ -65,23 +65,9 @@ class UserController extends Controller
                 }
             }
 
-            //updating the session module progress
-            $module_progress = Session::get('stored_progress');
-            $stored_progress = [];
-            if ($module_progress == null) {
-                //if not available, get the progress for all
-                foreach (Module::all() as $module) {
-                    $stored_progress[$module->id] = getModuleProgress(Auth::id(), $module->id);
-                }
-            }
-            else {
-                //otherwise just update the one
-                $stored_progress = $module_progress;
-                $stored_progress[$activity->day->module->id] = getModuleProgress(Auth::id(), $activity->day->module->id);
-            }
-            Session::put('stored_progress', $stored_progress);
-            
-
+            //updating the session saved progress - getting will update
+            Session::forget('progress_modules');
+            Session::forget('progress_days');
 
             return response()->json(['message' => 'Progress updated']);
         }

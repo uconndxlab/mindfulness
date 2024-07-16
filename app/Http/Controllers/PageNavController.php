@@ -6,8 +6,7 @@ use App\Models\Quiz;
 use App\Models\Note;
 use App\Models\Activity;
 use App\Models\Module;
-use App\Models\UserModule;
-use App\Models\UserActivity;
+use App\Models\User;
 use App\Models\Faq;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
@@ -36,17 +35,11 @@ class PageNavController extends Controller
 
         //get modules and progress
         $modules = Module::orderBy('order', 'asc')->get();
-
-        $stored_progress = Session::get('stored_progress');
-        if (!$stored_progress) {
-            $stored_progress = [];
-            foreach ($modules as $module) {
-                $stored_progress[$module->id] = getModuleProgress(Auth::id(), $module->id);
-            }
-            Session::put('stored_progress', $stored_progress);
-        }
+        $module_ids = $modules->pluck('id')->toArray();
+        $progress = getModuleProgress(Auth::id(), $module_ids);
+        
         foreach ($modules as $module) {
-            $module->progress = $stored_progress[$module->id];
+            $module->progress = $progress[$module->id];
         }
         return view("explore.home", compact('modules'));
     }
@@ -57,17 +50,22 @@ class PageNavController extends Controller
         $module = Module::with('days.activities')->findOrFail($module_id);
 
         //check progress
-        if (getModuleProgress(Auth::id(), $module_id)['status'] == 'locked') {
+        if (getModuleProgress(Auth::id(), [$module_id])[$module_id]['status'] == 'locked') {
             return redirect()->back();
         }
         
-        //sorting the activities, and getting progress information
+        //get progress
+        $day_ids = $module->days()->pluck('id')->toArray();
+        $progress = getDayProgress(Auth::id(), $day_ids);
+
+        //sorting the activities within each day
         foreach ($module->days as $day) {
             $day->activities = $day->activities->sortBy(function ($activity) {
                 return [$activity->optional, $activity->order];
             })->values();
 
-            $day->progress = getDayProgress(Auth::id(), $day->id);
+            //assign the progress
+            $day->progress = $progress[$day->id];
         }
 
         //set back route
@@ -287,17 +285,9 @@ class PageNavController extends Controller
 
         //calculating progress
         $modules = Module::orderBy('module_number', 'asc')->withCount('days')->get();
-
-        $stored_progress = Session::get('stored_progress');
-        if (!$stored_progress) {
-            $stored_progress = [];
-            foreach ($modules as $module) {
-                $stored_progress[$module->id] = getModuleProgress(Auth::id(), $module->id);
-            }
-            Session::put('stored_progress', $stored_progress);
-        }
+        $progress = getModuleProgress(Auth::id(), $modules->pluck('id')->toArray());
         foreach ($modules as $module) {
-            $module->progress = $stored_progress[$module->id];
+            $module->progress = $progress[$module->id];
         }
         return view("other.account", compact('hide_account_link', 'modules'));
     }
