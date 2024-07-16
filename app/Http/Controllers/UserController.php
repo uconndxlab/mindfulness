@@ -8,7 +8,6 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use App\Models\UserActivity;
-use App\Models\Module;
 use App\Models\Activity;
 use App\Models\Favorite;
 
@@ -52,12 +51,27 @@ class UserController extends Controller
             if ($activity->next != null) {
                 //find next
                 $next = Activity::findOrFail($activity->next);
-                $next_activity_progress = $activity_progress->where('activity_id', $next->id)->first();
-                if ($next_activity_progress == null || $next_activity_progress->status == 'locked') {
+                $next_activity_status = $activity_progress->where('activity_id', $next->id)->first()->status ?? 'locked';
+                if ($next_activity_status == 'locked') {
                     //update entry for next
                     UserActivity::updateOrCreate([
                         "user_id" => Auth::id(),
                         "activity_id" => $next->id,
+                    ],[
+                        "status" => 'unlocked'
+                    ]);
+                }
+            }
+
+            //handling optional
+            $optional_activities = Activity::where('optional', true)->where('order', $activity->order)->get();
+            foreach ($optional_activities as $optional) {
+                $optional_status = $activity_progress->where('activity_id', $optional->id)->first()->status ?? 'locked';
+                if ($optional_status == 'locked') {
+                    //update entry for optional
+                    UserActivity::updateOrCreate([
+                        "user_id" => Auth::id(),
+                        "activity_id" => $optional->id,
                     ],[
                         "status" => 'unlocked'
                     ]);

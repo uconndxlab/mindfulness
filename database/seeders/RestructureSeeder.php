@@ -90,7 +90,7 @@ class RestructureSeeder extends Seeder
                     'day_id' => $day->id,
                     'title' => 'Example ' . $i,
                     'type' => $i > 5 ? 'practice' : 'lesson',
-                    'order' => $i > 5 ? $order : $order++,
+                    'order' => $i > 5 ? $order-1 : $order++,
                     'optional' => $i > 5,
                 ]);
 
