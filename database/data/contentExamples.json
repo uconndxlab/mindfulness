@@ -5,12 +5,8 @@
         "file_path": "Module 1 Activity 1 - What is mindfulness.m4a",
         "audio_options": {
             "only voice": {
-                "1 min": {
-                    "file_path": "Rocks on Rocks.m4a"
-                },
-                "10 min": {
-                    "file_path": "Module 1 Activity 2 - Body Scan.m4a"
-                }
+                "1 min":  "Rocks on Rocks.m4a",
+                "10 min":  "Module 1 Activity 2 - Body Scan.m4a"
             }
         }
     },
@@ -20,17 +16,11 @@
         "file_path": "Rocks on Rocks.m4a",
         "audio_options": {
             "voice1": {
-                "1 min": {
-                    "file_path": "Rocks on Rocks.m4a"
-                }
+                "1 min": "Rocks on Rocks.m4a"
             },
             "voice2": {
-                "10 min": {
-                    "file_path": "Module 1 Activity 2 - Body Scan.m4a"
-                },
-                "20 min": {
-                    "file_path": "Module 1 Activity 2 - Body Scan Long Version.MP3"
-                }
+                "10 min": "Module 1 Activity 2 - Body Scan.m4a",
+                "20 min": "Module 1 Activity 2 - Body Scan Long Version.MP3"
             }
         }
     },

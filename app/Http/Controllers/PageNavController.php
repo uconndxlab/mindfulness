@@ -93,6 +93,10 @@ class PageNavController extends Controller
         
         //get content
         $content = $activity->content;
+        //decode the audio options
+        if ($content->type == 'audio' && $content->audio_options) {
+            $content->audio_options = json_decode($content->audio_options, true);
+        }
         
         //favoriting
         $is_favorited = $user->favorites()->where('activity_id', $activity_id)->exists();

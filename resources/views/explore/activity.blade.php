@@ -33,9 +33,20 @@
     </div>
     <div class="manual-margin-top">
         @if ($content)
-            <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: block;">
-                <x-contentView id="content_view" id2="pdf_download" type="{{ $content->type }}" file="{{ $content->file_path }}"/>
-            </div>
+            @if ($content->audio_options)
+                @foreach ($content->audio_options as $voice => $time_options)
+                    @foreach ($time_options as $time => $file_path)
+                        <div id="content_main" class="content-main" voice="{{ $voice }}" time="{{ $time }}" data-type="audio" style="display: block;">
+                            <x-contentView id="content_view" type="audio" file="{{ $file_path }}"/>
+                        </div>
+                    @endforeach
+                @endforeach
+
+            @else
+                <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: block;">
+                    <x-contentView id="content_view" id2="pdf_download" type="{{ $content->type }}" file="{{ $content->file_path }}"/>
+                </div>
+            @endif
 
             @if($content->completion_message)
                 <div id="comp_message" class="mt-1" style="display: none;">
@@ -64,6 +75,9 @@
 
     //CHECKING COMPLETION
     const status = '{{ $activity->status }}';
+    if (status == "completed") {
+        activityComplete(false);
+    }
 
     //set eventlisteners to call activityComplete
     if (hasContent) {
@@ -85,14 +99,16 @@
 
 
     //COMPLETION
-    function activityComplete() {
+    function activityComplete(message=true) {
         //show content
         console.log("activity completed")
         //show message
-        const hasMessage = {{ isset($content->completion_message) ? 'true' : 'false' }};
-        if (hasMessage) {
-            const completionMessageDiv = document.getElementById('comp_message');
-            completionMessageDiv.style.display = 'block';
+        if (message) {
+            const hasMessage = {{ isset($content->completion_message) ? 'true' : 'false' }};
+            if (hasMessage) {
+                const completionMessageDiv = document.getElementById('comp_message');
+                completionMessageDiv.style.display = 'block';
+            }
         }
         //update users progress
         if (status == 'unlocked') {
@@ -111,10 +127,6 @@
             .catch(error => {
                 console.error('There was an error updating the progress:', error);
             });
-        }
-        else if (status == 'completed') {
-            //unlock if activity has been compeleted
-            unlockRedirect();
         }
     }
 

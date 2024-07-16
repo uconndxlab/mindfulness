@@ -10,12 +10,8 @@
         "file_path": "Module 1 Activity 2 - Body Scan.m4a",
         "audio_options": {
             "default": {
-                "10 minutes": {
-                    "file_path": "Module 1 Activity 2 - Body Scan.m4a"
-                },
-                "20 minutes": {
-                    "file_path": "Module 1 Activity 2 - Body Scan Long Version.MP3"
-                }
+                "10 minutes": "Module 1 Activity 2 - Body Scan.m4a",
+                "20 minutes": "Module 1 Activity 2 - Body Scan Long Version.MP3"
             }
         }
     }
