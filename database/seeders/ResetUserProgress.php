@@ -6,8 +6,6 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
-use App\Models\Module;
-use Illuminate\Support\Facades\Session;
 
 class ResetUserProgress extends Seeder
 {

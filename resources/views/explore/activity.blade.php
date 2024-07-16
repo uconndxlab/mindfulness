@@ -51,6 +51,7 @@
         @if (isset($page_info['redirect_route']))
             <a id="redirect_button" class="btn btn-primary disabled" href="{{ $page_info['redirect_route'] }}">{{ $page_info['redirect_label'] }}</a>
         @endif
+        <a id="skip" class="btn btn-primary">skip</a>
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
@@ -61,6 +62,11 @@
     //COMPLETION ITEMS
     const redirectDiv = document.getElementById('redirect_div');
     const hasContent = {{ $content ? 'true' : 'false' }};
+
+    //SKIP
+    const skip = document.getElementById('skip');
+    skip.addEventListener('click', activityComplete)
+
     //set eventlisteners to call activityComplete
     if (hasContent) {
         const content = document.getElementById('content_view');
