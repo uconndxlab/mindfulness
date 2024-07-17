@@ -113,6 +113,7 @@
         @if (isset($page_info['redirect_route']))
             <a id="redirect_button" class="btn btn-primary disabled" href="{{ $page_info['redirect_route'] }}">{{ $page_info['redirect_label'] }}</a>
         @endif
+        <a id="skip" class="btn btn-primary" onclick="activityComplete()">skip</a>
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
