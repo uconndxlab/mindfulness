@@ -34,9 +34,60 @@
     <div class="manual-margin-top">
         @if ($content)
             @if ($content->audio_options)
+                <div class="col-4 mt-1">
+                    <label class="fw-bold" for="word_otd">Options:</label>
+                    <div class="form-group dropdown">
+
+                    <!-- voice selection -->
+                        @if (count($content->audio_options) > 1)
+                            <button id="voice_dropdown_button" class="btn btn-xlight dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ key($content->audio_options) }}
+                            </button>
+                            <ul class="dropdown-menu" id="voice_dropdown" name="voice_dropdown">
+                                @foreach ($content->audio_options as $voice => $time_options)
+                                    <li>
+                                        <button class="dropdown-item" type="button" value="{{ $voice }}" onclick="selectVoice('{{ $voice }}')">
+                                            {{ $voice }}
+                                        </button>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <button id="voice_dropdown_button" class="btn btn-xlight dropdown disabled">
+                                {{ key($content->audio_options) }}
+                            </button>
+                        @endif
+                        <input type="hidden" id="voice_select" name="voice_select" value="{{ key($content->audio_options) }}">
+                    </div>
+                    <!-- time selections -->
+                    @foreach ($content->audio_options as $voice => $time_options)
+                        <div class="form-group dropdown time-dropdown" voice="{{ $voice }}" style="display: {{ $voice == key($content->audio_options) ? 'block' : 'none' }};">
+                            @if (count($time_options) > 1)
+                                <button id="time_dropdown_button_{{ $voice }}" class="btn btn-xlight dropdown-toggle time-toggle" time="{{ key($time_options) }}" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {{ key($time_options) }}
+                                </button>
+                                <ul class="dropdown-menu" id="time_dropdown_{{ $voice }}" name="time_dropdown_{{ $voice }}">
+                                    @foreach ($time_options as $time => $_)
+                                        <li>
+                                            <button class="dropdown-item" type="button" value="{{ $time }}" onclick="selectTime('{{ $time }}')">
+                                                {{ $time }}
+                                            </button>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <button id="time_dropdown_button_{{ $voice }}" class="btn btn-xlight dropdown disabled time-toggle" time="{{ key($time_options) }}">
+                                    {{ key($time_options) }}
+                                </button>
+                            @endif
+                            <input type="hidden" id="time_select" name="time_select" value="{{ key($time_options) }}">
+                        </div>
+                    @endforeach
+                </div>
+
                 @foreach ($content->audio_options as $voice => $time_options)
                     @foreach ($time_options as $time => $file_path)
-                        <div id="content_main" class="content-main" voice="{{ $voice }}" time="{{ $time }}" data-type="audio" style="display: block;">
+                        <div id="content_main" class="content-main" voice="{{ $voice }}" time="{{ $time }}" data-type="audio" style="display: none;">
                             <x-contentView id="content_view" type="audio" file="{{ $file_path }}"/>
                         </div>
                     @endforeach
@@ -81,6 +132,7 @@
 
     //set eventlisteners to call activityComplete
     if (hasContent) {
+        //applies to all content items
         const content = document.getElementById('content_view');
         const type = '{{ isset($content->type) ? $content->type : null }}';
         if (type == 'pdf') {
@@ -205,6 +257,73 @@
                     favIcon.className = "bi bi-star-fill";
                 }
             });
+        }
+    });
+
+
+    //VOICE SELECTION
+    function selectVoice(voice) {
+        //change drop down text and hidden value
+        document.getElementById('voice_dropdown_button').innerHTML = voice;
+        document.getElementById('voice_select').value = voice;
+
+        //make sure the correct dropdown shows
+        document.querySelectorAll('.time-dropdown').forEach(dropdown => {
+            if (dropdown.getAttribute('voice') === voice) {
+                //show
+                dropdown.style.display = 'block';
+                //get the time value
+                var time = dropdown.querySelector('.time-toggle').getAttribute('time');
+                //set the new time
+                selectTime(time);
+            } else {
+                dropdown.style.display = 'none';
+            }
+        });
+    }
+    //TIME SELECTION
+    function selectTime(time) {
+        //get the voice
+        var voice = document.getElementById('voice_select').value;
+        //change the correct drop down
+        document.getElementById('time_dropdown_button_'+voice).innerHTML = time;
+        //change hidden value
+        document.getElementById('time_select').value = time;
+        //change the content
+        handleVoiceTimeChange();
+    }
+
+    function handleVoiceTimeChange() {
+        //get the inputs
+        var voice_input = document.getElementById('voice_select').value;
+        var time_input = document.getElementById('time_select').value;
+
+        //update which content is displayed, pause others
+        document.querySelectorAll('.content-main').forEach(content => {
+            if (content.getAttribute('voice') === voice_input && content.getAttribute('time') === time_input) {
+                content.style.display = 'block';
+            } else {
+                content.style.display = 'none';
+                content.querySelector('audio').pause();
+            }
+        });
+    }
+
+    //ON CONTENT LOAD
+    document.addEventListener('DOMContentLoaded', function() {
+        if (hasContent) {
+            const audioOptions = @json($content ? $content->audio_options : null);
+            if (audioOptions) {
+                console.log('Audio options loaded:', audioOptions);
+                const voice_select = document.getElementById('voice_select');
+                const time_select = document.getElementById('time_select');
+                if (voice_select && time_select) {
+                    handleVoiceTimeChange();
+                }
+            } else {
+                //behave as normal - event listeners are on all audio items
+                console.log('No audio options available.');
+            }
         }
     });
 </script>
