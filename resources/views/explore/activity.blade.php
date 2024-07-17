@@ -298,13 +298,15 @@
         var voice_input = document.getElementById('voice_select').value;
         var time_input = document.getElementById('time_select').value;
 
-        //update which content is displayed, pause others
+        //update which content is displayed, pause others, change eventListener
         document.querySelectorAll('.content-main').forEach(content => {
             if (content.getAttribute('voice') === voice_input && content.getAttribute('time') === time_input) {
                 content.style.display = 'block';
+                content.querySelector('audio').addEventListener('ended', activityComplete);
             } else {
                 content.style.display = 'none';
                 content.querySelector('audio').pause();
+                content.querySelector('audio').removeEventListener('ended', activityComplete);
             }
         });
     }
