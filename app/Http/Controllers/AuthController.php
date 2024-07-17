@@ -39,6 +39,11 @@ class AuthController extends Controller
         //     return back()->withErrors(['email' => 'We can\'t find a user with that email address.']);
         // }
 
+        if (Auth::attempt($credentials)) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+        
         //check auth and remember
         $remember = $request->has('remember');
         if (Auth::attempt($credentials, $remember)) {
@@ -48,7 +53,9 @@ class AuthController extends Controller
         return back()->withErrors(['credentials' => 'Invalid credentials.'])->withInput();
     }
 
-    public function logout() {
+    public function logout(Request $request) {
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         Auth::logout();
         return redirect()->route('login');
     }
