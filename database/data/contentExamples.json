@@ -25,12 +25,12 @@
         }
     },
     {
-        "activity_id": 11,
+        "activity_id": 51,
         "type": "video",
         "file_path": "videoExampleSnarky.MOV"
     },
     {
-        "activity_id": 11,
+        "activity_id": 51,
         "type": "pdf",
         "file_path": "pdfExample.pdf"
     },
@@ -45,7 +45,7 @@
         "file_path": "videoExampleSnarky.MOV"
     },
     {
-        "activity_id": 14,
+        "activity_id": 54,
         "type": "pdf",
         "file_path": "pdfExample.pdf"
     }

@@ -15,9 +15,9 @@ class AdminSeeder extends Seeder
     {
         User::factory()->create([
             'id' => User::max('id') + 1,
-            'name' => 'Admin-1',
-            'email' => 'admin@example.com',
-            'password' => bcrypt('adminpass$'),
+            'name' => 'Zoro',
+            'email' => 'zoro@op.com',
+            'password' => bcrypt('randpass'),
             'role' => 'admin',
         ]);
     }

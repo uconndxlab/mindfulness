@@ -112,6 +112,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('admin')->group(function () {
         //Content upload
         Route::get('/admin/home', [ContentManagementController::class,'adminPage'])->name('admin.home');
+        //modules
+        Route::get('/module/{module_id}', [ContentManagementController::class,'showModule'])->name('module.show');
+        Route::post('/module/{module_id}/edit', [ContentManagementController::class,'editModule'])->name('module.edit');
+        Route::get('/module/create', [ContentManagementController::class,'createModule'])->name('module.create');
+        Route::post('/module', [ContentManagementController::class,'storeModule'])->name('module.store');
+        Route::delete('/module/{module_id}', [ContentManagementController::class,'deleteModule'])->name('module.delete');
+
 
 
         Route::get('/admin/lesson/create', [ContentController::class,'newLessonPage'])->name('admin.lesson.create');
