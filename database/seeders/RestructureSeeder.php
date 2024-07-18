@@ -47,7 +47,8 @@ class RestructureSeeder extends Seeder
                     'module_id' => $module->id,
                     'name' => 'Day '.$j,
                     'order' => $day_order,
-                    'description' => 'This is a sample description for Day '.$j.', in Module '.$i
+                    'description' => 'This is a sample description for Day '.$j.', in Module '.$i,
+                    'deleted' => false
                 ]);
 
                 // if ($j == 1) {
@@ -79,6 +80,7 @@ class RestructureSeeder extends Seeder
         foreach ($activities as $activity) {
             $act = Activity::findOrFail($activity['id']);
             $act->next = $activity['next_fake'];
+            $act->deleted = false;
             $act->save();
         }
     
@@ -92,6 +94,7 @@ class RestructureSeeder extends Seeder
                     'type' => $i > 5 ? 'practice' : 'lesson',
                     'order' => $i > 5 ? $order-1 : $order++,
                     'optional' => $i > 5,
+                    'deleted' => false
                 ]);
 
                 if ($i <= 5) {

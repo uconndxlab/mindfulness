@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('end_behavior', ['quiz', 'journal', 'none'])->default('none');
             $table->integer('order');
             $table->foreignId('next')->nullable()->constrained('activities')->onDelete('set null');
+            $table->boolean('deleted')->default('true');
             $table->timestamps();
         });
     }

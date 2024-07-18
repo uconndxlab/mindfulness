@@ -87,7 +87,7 @@ class PageNavController extends Controller
         //check progress and set status
         $user->load('progress_activities');
         $activity->status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
-        if ($activity->status == 'locked') {
+        if ($activity->status == 'locked' || $activity->deleted == true) {
             return redirect()->back();
         }
         
@@ -150,7 +150,7 @@ class PageNavController extends Controller
         $user->load('progress_activities');
         $activity = Activity::findOrFail($quiz->activity->id);
         $status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
-        if ($status != 'completed') {
+        if ($status != 'completed'  || $activity->deleted == true) {
             return redirect()->back();
         }
 
@@ -244,7 +244,7 @@ class PageNavController extends Controller
     {
         //get users favorites and sort by activity order
         $favorites = Auth::user()->favorites()->with('activity')->get();
-        $activities = $favorites->pluck('activity')->sortBy('order');
+        $activities = $favorites->pluck('activity')->sortBy('order')->where('deleted', false);
         $page_info = [
             'title' => 'Favorites',
             'empty' => '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>',
@@ -258,7 +258,7 @@ class PageNavController extends Controller
     public function meditationLibrary()
     {
         $user_id = Auth::id();
-        $activities = Activity::where('type', 'practice')
+        $activities = Activity::where('deleted', false)->where('type', 'practice')
             ->whereIn('id', function ($query) use ($user_id) {
                 $query->select('activity_id')
                     ->from('user_activity')

@@ -44,6 +44,7 @@ class ContentManagementController extends Controller
             $module = Module::findOrFail($module_id);
             $activity = Activity::findOrFail(getConfig('first_activity_id'));
             if ($activity->day && $module == $activity->day->module) {
+                //change the first activity
                 $next_module = Module::where('order', $module->order+1)->first();
                 $new_first_activity = Activity::whereHas('day', function($query) use ($next_module) {
                     $query->where('module_id', $next_module->id);
@@ -54,7 +55,16 @@ class ContentManagementController extends Controller
                 }
                 Session::flush();
             }
-            
+            //set all days and modules inside to "deleted"
+            foreach ($module->days as $day) {
+                foreach ($day->activities as $activity) {
+                    $activity->deleted = true;
+                    $activity->save();
+                }
+                $day->deleted = true;
+                $day->save();
+            }
+
             $module->delete();
             return redirect()->back()->with('success', 'Module deleted successfully');
         } catch (\Exception $e) {

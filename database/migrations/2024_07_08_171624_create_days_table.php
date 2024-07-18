@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->integer('order');
+            $table->boolean('deleted')->default('true');
             $table->timestamps();
         });
     }
