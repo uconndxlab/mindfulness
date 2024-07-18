@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Module;
 use App\Models\Day;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Http\Request;
 
 class ContentManagementController extends Controller
 {
@@ -18,17 +19,20 @@ class ContentManagementController extends Controller
     }
 
     //NAVIGATION
-    public function adminPage() {
-        $modules = Module::all();
-        $lost_days = Day::where('deleted', true)->get();
-        return view('admin.home', compact('modules', 'lost_days'));
+    public function indexModule() {
+        $title = "Admin Content Management";
+        $head = "Modules";
+        $back_route = route('account');
+        $big_list = Module::all();
+        $item_type = 'module';
+        $lost_list = Day::where('deleted', true)->get();
+        $lost_type = 'day';
+        return view('admin.index', compact('title', 'head', 'back_route', 'big_list', 'item_type', 'lost_list', 'lost_type'));
     }
 
     //MODULES
     public function showModule($module_id) {
-        $module = Module::findOrFail($module_id);
-        $lost_activities = Activity::where('deleted', true)->get();
-        return view('admin.module', compact('module', 'lost_activities'));
+        return 'showModule';
     }
 
     public function editModule($module_id) {
@@ -78,6 +82,19 @@ class ContentManagementController extends Controller
     }
 
     //DAYS
+    public function indexDay(Request $request) {
+        $module = Module::findOrFail($request->module_id);
+
+        $title = $module->name.": Days";
+        $head = $module->name.": Days";
+        $back_route = route('module.index');
+        $big_list = $module->days;
+        $item_type = 'day';
+        $lost_list = Activity::where('deleted', true)->get();
+        $lost_type = 'activity';
+        return view('admin.index', compact('title', 'head', 'back_route', 'big_list', 'item_type', 'lost_list', 'lost_type'));
+    }
+
     public function showDay($day_id) {
         return 'showDay';
     }
@@ -97,6 +114,17 @@ class ContentManagementController extends Controller
         return 'deleteDay';
     }
     //ACTIVITIES
+    public function indexActivity(Request $request) {
+        $day = Day::findOrFail($request->day_id);
+
+        $title = $day->name.": Activities";
+        $head = $day->name.": Activities";
+        $back_route = route('day.index', ['module_id' => $day->module_id]);
+        $big_list = $day->activities;
+        $item_type = 'activity';
+        return view('admin.index', compact('title', 'head', 'back_route', 'big_list', 'item_type'));
+    }
+
     public function showActivity($activity_id) {
         return 'showActivity';
     }

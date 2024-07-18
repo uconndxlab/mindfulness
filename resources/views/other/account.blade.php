@@ -57,7 +57,7 @@
     @if (auth::user()->isAdmin())
         <div class="text-center mt-3">
             <div class="form-group">
-                <a href="{{ route('admin.home') }}" class="btn btn-danger">ADMIN: Content Management</a>
+                <a href="{{ route('module.index') }}" class="btn btn-danger">ADMIN: Content Management</a>
             </div>
         </div>
     @endif

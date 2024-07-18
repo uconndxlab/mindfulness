@@ -111,20 +111,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //ADMIN ONLY
     Route::middleware('admin')->group(function () {
         //Content upload
-        Route::get('/admin/home', [ContentManagementController::class,'adminPage'])->name('admin.home');
         //modules
+        Route::get('/module', [ContentManagementController::class,'indexModule'])->name('module.index');
         Route::get('/module/{module_id}', [ContentManagementController::class,'showModule'])->name('module.show');
         Route::post('/module/{module_id}/edit', [ContentManagementController::class,'editModule'])->name('module.edit');
         Route::get('/module/create', [ContentManagementController::class,'createModule'])->name('module.create');
         Route::post('/module', [ContentManagementController::class,'storeModule'])->name('module.store');
         Route::delete('/module/{module_id}', [ContentManagementController::class,'deleteModule'])->name('module.delete');
         //days
+        Route::get('/day', [ContentManagementController::class,'indexDay'])->name('day.index');
         Route::get('/day/{day_id}', [ContentManagementController::class,'showDay'])->name('day.show');
         Route::post('/day/{day_id}/edit', [ContentManagementController::class,'editDay'])->name('day.edit');
         Route::get('/day/create', [ContentManagementController::class,'createDay'])->name('day.create');
         Route::post('/day', [ContentManagementController::class,'storeDay'])->name('day.store');
         Route::delete('/day/{day_id}', [ContentManagementController::class,'deleteDay'])->name('day.delete');
         //activities
+        Route::get('/activity', [ContentManagementController::class,'indexActivity'])->name('activity.index');
         Route::get('/activity/{activity_id}', [ContentManagementController::class,'showActivity'])->name('activity.show');
         Route::post('/activity/{activity_id}/edit', [ContentManagementController::class,'editActivity'])->name('activity.edit');
         Route::get('/activity/create', [ContentManagementController::class,'createActivity'])->name('activity.create');
