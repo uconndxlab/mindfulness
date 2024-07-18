@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Activity;
 use App\Models\User;
 use App\Models\Module;
+use App\Models\Day;
 use Illuminate\Support\Facades\Session;
 
 class ContentManagementController extends Controller
@@ -19,12 +20,15 @@ class ContentManagementController extends Controller
     //NAVIGATION
     public function adminPage() {
         $modules = Module::all();
-        return view('admin.home', compact('modules'));
+        $lost_days = Day::where('deleted', true)->get();
+        return view('admin.home', compact('modules', 'lost_days'));
     }
 
     //MODULES
     public function showModule($module_id) {
-        return 'showModule';
+        $module = Module::findOrFail($module_id);
+        $lost_activities = Activity::where('deleted', true)->get();
+        return view('admin.module', compact('module', 'lost_activities'));
     }
 
     public function editModule($module_id) {
@@ -53,6 +57,7 @@ class ContentManagementController extends Controller
                 foreach (User::all() as $user) {
                     unlockFirst($user->id);
                 }
+                //will flush everyones session
                 Session::flush();
             }
             //set all days and modules inside to "deleted"
@@ -73,5 +78,42 @@ class ContentManagementController extends Controller
     }
 
     //DAYS
+    public function showDay($day_id) {
+        return 'showDay';
+    }
+
+    public function editDay($day_id) {
+        return 'editDay';       
+    }
+
+    public function createDay() {
+        return 'createDay';
+    }
+
+    public function storeDay() {
+        return 'storeDay';
+    }
+    public function deleteDay($day_id) {
+        return 'deleteDay';
+    }
     //ACTIVITIES
+    public function showActivity($activity_id) {
+        return 'showActivity';
+    }
+
+    public function editActivity($activity_id) {
+        return 'editActivity';       
+    }
+
+    public function createActivity() {
+        return 'createActivity';
+    }
+
+    public function storeActivity() {
+        return 'storeActivity';
+    }
+
+    public function deleteActivity($activity_id) {
+        return 'deleteActivity';
+    }
 }
