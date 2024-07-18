@@ -118,7 +118,9 @@ if (!function_exists('getDayProgress')) {
                 $progress[$day->id] = ['status' => $day_status, 'completed' => $completed_count, 'total' => $total, 'activity_status' => $activity_status, 'show' => false];
             }
             foreach ($show as $_ => $day_id) {
-                $progress[$day_id]['show'] = true;
+                if ($progress[$day_id]['status'] == 'unlocked') {
+                    $progress[$day_id]['show'] = true;
+                }
             }
             //put new days in the session
             Session::put('progress_days', $progress);
@@ -131,12 +133,15 @@ if (!function_exists('getDayProgress')) {
 if (!function_exists('unlockFirst')) {
     function unlockFirst($user_id)
     {
-        UserActivity::updateOrCreate([
-            "user_id" => $user_id,
-            "activity_id" => getConfig('first_activity_id'),
-        ],[
-            "status" => 'unlocked'
-        ]);
+        $user_activity = UserActivity::where('user_id', $user_id)->where('activity_id', getConfig('first_activity_id'))->first();
+        if ($user_activity == null || $user_activity->status == 'locked') {
+            UserActivity::updateOrCreate([
+                "user_id" => $user_id,
+                "activity_id" => getConfig('first_activity_id'),
+            ],[
+                "status" => 'unlocked'
+            ]);
+        }
     }
 }
 
