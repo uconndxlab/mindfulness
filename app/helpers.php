@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Models\Config;
+use App\Models;
 use App\Models\UserActivity;
 use App\Models\Activity;
 use App\Models\Day;
@@ -11,10 +11,22 @@ use Illuminate\Support\Facades\Session;
 if (!function_exists('getConfig')) {
     function getConfig($key, $default = null)
     {
-        $config = Config::where('key', $key)->first();
+        $config = Models\Config::where('key', $key)->first();
         return $config ? $config->value : $default;
     }
 }
+
+if (!function_exists('updateConfig')) {
+    function updateConfig($key, $value = null)
+    {
+        Models\Config::updateOrCreate([
+            'key' => $key
+        ],[
+            'value' => $value
+        ]);
+    }
+}
+
 
 if (!function_exists('getModuleProgress')) {
     function getModuleProgress($user_id, $module_ids)

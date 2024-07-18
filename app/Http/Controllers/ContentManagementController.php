@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activity;
-use App\Models\Day;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\User;
 use App\Models\Module;
+use Illuminate\Support\Facades\Session;
 
 class ContentManagementController extends Controller
 {
@@ -42,18 +41,22 @@ class ContentManagementController extends Controller
 
     public function deleteModule($module_id) {
         try {
-            DB::statement('PRAGMA foreign_keys = ON;');
-            // Find the module to delete
             $module = Module::findOrFail($module_id);
-    
-            // Delete related records in related_table
-            Day::where('module_id', $module_id)->delete();
-    
-            // Now delete the module
+            $activity = Activity::findOrFail(getConfig('first_activity_id'));
+            if ($activity->day && $module == $activity->day->module) {
+                $next_module = Module::where('order', $module->order+1)->first();
+                $new_first_activity = Activity::whereHas('day', function($query) use ($next_module) {
+                    $query->where('module_id', $next_module->id);
+                })->orderBy('order', 'asc')->first();
+                updateConfig('first_activity_id', $new_first_activity->id);
+                foreach (User::all() as $user) {
+                    unlockFirst($user->id);
+                }
+                Session::flush();
+            }
+            
             $module->delete();
-            DB::statement('PRAGMA foreign_keys = OFF;');
-    
-            return redirect()->route('modules.index')->with('success', 'Module deleted successfully');
+            return redirect()->back()->with('success', 'Module deleted successfully');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Failed to delete module: ' . $e->getMessage()]);
         }

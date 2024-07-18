@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('day_id')->nullable()->constrained('days');
+            $table->foreignId('day_id')->nullable()->constrained('days')->onDelete('set null');
             $table->string('title');
             $table->string('sub_header')->nullable();
             $table->enum('type', ['lesson', 'practice']);
             $table->enum('end_behavior', ['quiz', 'journal', 'none'])->default('none');
             $table->integer('order');
-            $table->foreignId('next')->nullable()->constrained('activities');
+            $table->foreignId('next')->nullable()->constrained('activities')->onDelete('set null');
             $table->timestamps();
         });
     }
