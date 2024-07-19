@@ -8,8 +8,9 @@
 @elseif ($type == 'pdf')
     <div>
         <span>
-            <a id="{{ isset($id) ? $id : '' }}" class="btn btn-link" href="{{ Storage::url('content/'.$file) }}" target="_blank">Open workbook page</a>
-            <a id="{{ isset($id2) ? $id2 : '' }}" class="btn btn-info" href="{{ Storage::url('content/'.$file) }}" download>DOWNLOAD <i class="bi bi-download"></i></a>
+            <a id="{{ isset($id) ? $id : '' }}" class="link-workbook" href="{{ Storage::url('content/'.$file) }}" target="_blank">Open workbook page</a>
+            <br>
+            <a id="{{ isset($id2) ? $id2 : '' }}" class="btn btn-workbook" href="{{ Storage::url('content/'.$file) }}" download>DOWNLOAD WORKBOOK <i class="bi bi-download"></i></a>
         </span>
     </div>
 @endif
