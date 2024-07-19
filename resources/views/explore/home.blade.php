@@ -14,23 +14,15 @@
                 <div class="col-12">
                     <div class="h-100">
                         <div class="card p-2 module mb-2">
-                            @if ($module->progress['status'] == 'completed')
-                                <a id="moduleLink" class="stretched-link w-100" href="{{ route('explore.module', ['module_id' => $module->id]) }}">
-                                    <i class="bi bi-check2-square"></i>
-                                    {{ $module->name }} <br> {{$module->progress['completed']}}/{{$module->progress['total']}} sessions completed
-                                </a>
-                                <i class="bi bi-arrow-right"></i>
-                            @elseif ($module->progress['status'] == 'unlocked')
-                                <a id="moduleLink" class="stretched-link w-100" href="{{ route('explore.module', ['module_id' => $module->id]) }}">
-
+                            @php
+                                $status = $module->progress['status'];
+                                $disabled = $module->progress['status'] == 'locked' ? 'disabled' : '';
+                            @endphp
+                            <a id="moduleLink" class="stretched-link w-100 {{ $disabled }}" {!! !$disabled ? 'href='.route('explore.module', ['module_id' => $module->id]) : '' !!}>
+                                <img src="{{ Storage::url('content/Flower-'.$module->progress['completed'].'.svg') }}" alt="Icon" style="width:24px; height:24px;">
                                 {{ $module->name }} <br> {{$module->progress['completed']}}/{{$module->progress['total']}} sessions completed
-                                </a>
-                                <i class="bi bi-arrow-right"></i>
-                            @else
-                                <a id="moduleLink" class="stretched-link w-100 disabled" disabled>{{ $module->name }} <br> {{$module->progress['completed']}}/{{$module->progress['total']}} sessions completed
-                                </a>
-                                <i class="bi bi-arrow-right"></i>
-                            @endif
+                            </a>
+                            <i class="bi bi-arrow-right"></i>
                         </div>
                     </div>
                 </div>
