@@ -17,16 +17,18 @@
                             @if ($module->progress['status'] == 'completed')
                                 <a id="moduleLink" class="stretched-link w-100" href="{{ route('explore.module', ['module_id' => $module->id]) }}">
                                     <i class="bi bi-check2-square"></i>
-                                    {{ $module->name }} - Completed: {{$module->progress['completed']}}/{{$module->progress['total']}}
+                                    {{ $module->name }} <br> {{$module->progress['completed']}}/{{$module->progress['total']}} sessions completed
                                 </a>
                                 <i class="bi bi-arrow-right"></i>
                             @elseif ($module->progress['status'] == 'unlocked')
                                 <a id="moduleLink" class="stretched-link w-100" href="{{ route('explore.module', ['module_id' => $module->id]) }}">
-                                    {{ $module->name }} - Completed: {{$module->progress['completed']}}/{{$module->progress['total']}}
+
+                                {{ $module->name }} <br> {{$module->progress['completed']}}/{{$module->progress['total']}} sessions completed
                                 </a>
                                 <i class="bi bi-arrow-right"></i>
                             @else
-                                <a id="moduleLink" class="stretched-link w-100 disabled" disabled>{{ $module->name }}</a>
+                                <a id="moduleLink" class="stretched-link w-100 disabled" disabled>{{ $module->name }} <br> {{$module->progress['completed']}}/{{$module->progress['total']}} sessions completed
+                                </a>
                                 <i class="bi bi-arrow-right"></i>
                             @endif
                         </div>

@@ -16,12 +16,12 @@
     @endphp
 
     <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container-fluid container">
-            <ul class="navbar-nav">
-                <li class="nav-item">
+        <div class="tabs">
+            <ul class="navbar-nav" style="flex-direction:row">
+                <li class="nav-item" style="padding:0px 20px">
                     <a class="nav-link {{ $library[0] ? 'active disabled' : ''}}" href="{{ $library[0] ? '' : route('library.meditation') }}">Meditation</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" style="padding:0px 20px">
                     <a class="nav-link {{ $library[1] ? 'active disabled' : ''}}" href="{{ $library[1] ? '' : route('library.favorites') }}">Favorites</a>
                 </li>
             </ul>

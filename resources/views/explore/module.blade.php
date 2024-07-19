@@ -13,13 +13,14 @@
     </div>
 
     <div class="">
-    <div class="accordion border accordion-flush mb-3" id="accordionDays">
+        <h4 class="mb-2">Sessions</h4>
+    <div class="accordion accordion-flush mb-3" id="accordionDays">
             @foreach ($module->days as $index => $day)
                 @php
                     $disabled = $day->progress['status'] == 'locked' ? 'disabled' : '';
                 @endphp
 
-                <div class="accordion-item">
+                <div class="accordion-item border mb-2">
                     <h2 class="accordion-header" id="heading_{{ $index }}">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="false" aria-controls="collapse_{{ $index }}" {{ $disabled }}>
                             {{ $day->name }}
@@ -33,7 +34,7 @@
                     <div id="collapse_{{ $index }}" class="accordion-collapse collapse {{ $day->progress['show'] ? 'show' : ''}}" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
                         <div class="accordion-body">
                             @if (!$disabled)
-                                <p>{{ $day->description }}</p>
+                                <!--<p>{{ $day->description }}</p>-->
                                 @foreach ($day->activities as $activity)
                                     @php
                                         $title = $activity->optional ? 'OPTIONAL: '.$activity->title : $activity->title;

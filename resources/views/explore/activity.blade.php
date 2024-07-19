@@ -34,7 +34,7 @@
     <div class="manual-margin-top">
         @if ($content)
             @if ($content->audio_options)
-                <div class="col-4 mt-1">
+                <div class="col-6 mt-1">
                     <label class="fw-bold" for="word_otd">Options:</label>
                     <div class="form-group dropdown">
 
@@ -111,7 +111,7 @@
             <a id="redirect_button_2" class="btn btn-primary disabled" href="{{ $page_info['end_route'] }}">{{ $page_info['end_label'] }}</a>
         @endif
         @if (isset($page_info['redirect_route']))
-            <a id="redirect_button" class="btn btn-primary disabled" href="{{ $page_info['redirect_route'] }}">{{ $page_info['redirect_label'] }}</a>
+            <a id="redirect_button" class="btn btn-tertiary disabled" href="{{ $page_info['redirect_route'] }}">{{ $page_info['redirect_label'] }}</a>
         @endif
         <a id="skip" class="btn btn-primary" onclick="activityComplete()">skip</a>
     </div>
