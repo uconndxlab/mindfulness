@@ -2,6 +2,11 @@
     {
         "activity_id": 1,
         "type": "audio",
+        "file_path": "Module 1 Activity 1 - Welcome message (3 min).m4a"
+    },
+    {
+        "activity_id": 2,
+        "type": "audio",
         "file_path": "Module 1 Activity 1 - What is mindfulness.m4a",
         "audio_options": {
             "only voice": {
@@ -11,7 +16,7 @@
         }
     },
     {
-        "activity_id": 2,
+        "activity_id": 3,
         "type": "audio",
         "file_path": "Rocks on Rocks.m4a",
         "audio_options": {
@@ -35,12 +40,12 @@
         "file_path": "pdfExample.pdf"
     },
     {
-        "activity_id": 3,
+        "activity_id": 4,
         "type": "pdf",
         "file_path": "pdfExample.pdf"
     },
     {
-        "activity_id": 4,
+        "activity_id": 5,
         "type": "video",
         "file_path": "videoExampleSnarky.MOV"
     },

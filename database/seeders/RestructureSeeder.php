@@ -84,10 +84,11 @@ class RestructureSeeder extends Seeder
             $act->save();
         }
     
-        Day::all()->each(function ($day) use (&$order, &$act) {
+        $end = $examples ? 7 : 5;
+        Day::all()->each(function ($day) use (&$order, &$act, &$end) {
             //make a bunch of fake activities
             $start = count($day->activities) + 1;
-            for ($i = $start; $i <= 7; $i++) {
+            for ($i = $start; $i <= $end; $i++) {
                 $new = Activity::create([
                     'day_id' => $day->id,
                     'title' => 'Example ' . $i,
@@ -105,5 +106,5 @@ class RestructureSeeder extends Seeder
             }
 
         });
-    }
+}
 }

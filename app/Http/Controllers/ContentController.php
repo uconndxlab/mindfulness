@@ -21,54 +21,54 @@ class ContentController extends Controller
         $this->pageNavController = $pageNavController;
     }
 
-    public function handleQuiz(Request $request, $lessonId) {
-        $request->validate([
-            'quiz_question' => ['required', 'string', 'max:255'],
-            'quiz_correct_answer' => ['required', 'integer'],
-        ]);
+    // public function handleQuiz(Request $request, $lessonId) {
+    //     $request->validate([
+    //         'quiz_question' => ['required', 'string', 'max:255'],
+    //         'quiz_correct_answer' => ['required', 'integer'],
+    //     ]);
 
-        $optionsFeedback = [];
-        $index = 1;
+    //     $optionsFeedback = [];
+    //     $index = 1;
         
-        // $answer = "none";
-        while ($request->has("option_$index")) {
-            //assigning the correct answer
-            // if ($index == $request->quiz_correct_answer) {
-            //     $answer = $request->input("option_$index");
-            // }
-            $optionsFeedback[] = [
-                'option' => $request->input("option_$index"),
-                'feedback' => $request->input("feedback_$index"),
-            ];
-            $index++;
-        }
+    //     // $answer = "none";
+    //     while ($request->has("option_$index")) {
+    //         //assigning the correct answer
+    //         // if ($index == $request->quiz_correct_answer) {
+    //         //     $answer = $request->input("option_$index");
+    //         // }
+    //         $optionsFeedback[] = [
+    //             'option' => $request->input("option_$index"),
+    //             'feedback' => $request->input("feedback_$index"),
+    //         ];
+    //         $index++;
+    //     }
         
-        //update the quiz or create one depending on if found
-        Quiz::updateOrCreate(
-            ['lesson_id' => $lessonId],
-            [
-                'question' => $request->quiz_question,
-                'options_feedback' => json_encode($optionsFeedback),
-                'correct_answer' => $request->quiz_correct_answer,
-            ]
-        );
-    }
+    //     //update the quiz or create one depending on if found
+    //     Quiz::updateOrCreate(
+    //         ['lesson_id' => $lessonId],
+    //         [
+    //             'question' => $request->quiz_question,
+    //             'options_feedback' => json_encode($optionsFeedback),
+    //             'correct_answer' => $request->quiz_correct_answer,
+    //         ]
+    //     );
+    // }
 
-    public function adminPage() {
-        //page for adding and editing lessons
+    // public function adminPage() {
+    //     //page for adding and editing lessons
 
-        $fromAdmin = true;
-        $showBackBtn = true;
-        $hideBottomNav = true;
-        $hideProfileLink = true;
+    //     $fromAdmin = true;
+    //     $showBackBtn = true;
+    //     $hideBottomNav = true;
+    //     $hideProfileLink = true;
 
-        //get list of modules
-        $modules = $this->pageNavController->getModulesList();
-        //set back_route - hardcode???
-        Session::put("admin_back_route", '/profile');
-        //using modified explore page
-        return view("explore.home", compact('modules', 'fromAdmin', 'showBackBtn', 'hideBottomNav', 'hideProfileLink'));
-    }
+    //     //get list of modules
+    //     $modules = $this->pageNavController->getModulesList();
+    //     //set back_route - hardcode???
+    //     Session::put("admin_back_route", '/profile');
+    //     //using modified explore page
+    //     return view("explore.home", compact('modules', 'fromAdmin', 'showBackBtn', 'hideBottomNav', 'hideProfileLink'));
+    // }
 
 //     public function newLessonPage(Request $request) {
 //         //show page for creating a new lesson
