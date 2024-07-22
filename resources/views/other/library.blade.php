@@ -28,10 +28,15 @@
         </div>
     </nav>
 
-
     <div class="text-left">
-        <h1 class="display fw-bold">{{ $page_info['title'] }}</h1>
+        <h1 class="display fw-bold mb-4">{{ $page_info['title'] }}</h1>
     </div>
+
+    <form method="GET" action="{{ $page_info['search_route'] }}" style="display: {{ $page_info['first_empty'] ? 'none' : 'block'}};">
+        <div class="form-group mb-3 col-5">
+            <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder='{{ $page_info['search_text'] }}'>
+        </div>
+    </form>
 
     @if ($activities->isEmpty()) 
         <div class="text-left muted">

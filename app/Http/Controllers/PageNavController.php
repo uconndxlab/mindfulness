@@ -6,7 +6,7 @@ use App\Models\Quiz;
 use App\Models\Note;
 use App\Models\Activity;
 use App\Models\Module;
-use App\Models\User;
+use App\Models\UserActivity;
 use App\Models\Faq;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
@@ -240,39 +240,79 @@ class PageNavController extends Controller
         }
     }
 
-    public function favoritesLibrary()
+    public function favoritesLibrary(Request $request)
     {
         //get users favorites and sort by activity order
-        $favorites = Auth::user()->favorites()->with('activity')->get();
-        $activities = $favorites->pluck('activity')->sortBy('order')->where('deleted', false);
+        $favorite_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
+        $query = Activity::whereIn('id', $favorite_ids)
+            ->where('deleted', false);
+        
+        if ($request->has('search') && $request->search != '') {
+            $searchTerm = $request->search;
+            $query->where(function ($query) use ($searchTerm) {
+                $query->where('title', 'like', '%'.$searchTerm.'%')
+                    ->orWhere('subheader', 'like', '%'.$searchTerm.'%');
+            });
+        }
+
+        //check if first query has rows
+        $first_empty = !$query->exists();
+
+        //check if from search
+        $is_search = $request->has('search') && $request->search != '';
+
+        //handle search
+        if ($is_search && !$first_empty) {
+            $query->where('title', 'like', '%'.$request->search.'%')
+                    ->orWhere('sub_header', 'like', '%'.$request->search.'%');
+        }
+
+        $activities = $query->orderBy('order')->get();
+
         $page_info = [
             'title' => 'Favorites',
-            'empty' => '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>',
+            'first_empty' => $first_empty,
+            'empty' => !$is_search ? '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>' : 'No activities found.',
+            'search_route' => route('library.favorites'),
+            'search_text' => 'Search for your favorite activity...'
         ];
 
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.favorites'));
-        Session::put('current_nav', ['route' => route('library.favorites'), 'back' => 'Favorites']);
+        Session::put('current_nav', ['route' => route('library.favorites')]);
         return view('other.library', compact('page_info', 'activities'));
     }
-    public function meditationLibrary()
+    public function meditationLibrary(Request $request)
     {
         $user_id = Auth::id();
-        $activities = Activity::where('deleted', false)->where('type', 'practice')
-            ->whereIn('id', function ($query) use ($user_id) {
-                $query->select('activity_id')
-                    ->from('user_activity')
-                    ->where('user_id', $user_id)
-                    ->where(function ($query) {
-                        $query->where('status', 'unlocked')
-                            ->orWhere('status', 'completed');
-                    });
-            })
-            ->get();
+        //query for activities - keep as query
+        $activity_ids = UserActivity::where('user_id', $user_id)
+            ->where('status', '!=', 'locked')
+            ->pluck('activity_id');
+        $query = Activity::where('deleted', false)
+            ->where('type', 'practice')
+            ->whereIn('id', $activity_ids);
 
+        //check if first query has rows
+        $first_empty = !$query->exists();
+
+        //check if from search
+        $is_search = $request->has('search') && $request->search != '';
+
+        //handle search
+        if ($is_search && !$first_empty) {
+            $query->where('title', 'like', '%'.$request->search.'%')
+                    ->orWhere('sub_header', 'like', '%'.$request->search.'%');
+        }
+
+        $activities = $query->orderBy('order')->get();
+        
         $page_info = [
             'title' => 'Meditation Library',
-            'empty' => 'Keep progressing to unlock meditation sessions...',
+            'first_empty' => $first_empty,
+            'empty' => !$is_search ? 'Keep progressing to unlock more meditation sessions...' : 'No activities found.',
+            'search_route' => route('library.meditation'),
+            'search_text' => 'Search for a meditation exercise...'
         ];
 
         //set as the previous library and save as exit

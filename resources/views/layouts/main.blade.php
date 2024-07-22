@@ -107,7 +107,7 @@
                     <ul class="navbar-nav lower-nav mx-auto">
                         <li class="nav-item">
                             <a class="nav-link {{ $active_items[0] ? 'active' : '' }}" href="{{ route('explore.browse', ['active' => $active_items[0]]) }}">
-                                <span class="nav-icon-text"><i class="bi bi-ui-checks-grid"></i>Browse</span>
+                                <span class="nav-icon-text"><i class="bi bi-ui-checks-grid"></i>Guides</span>
                             </a>
                         </li>
                         <li class="nav-item">
