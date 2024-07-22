@@ -22,7 +22,7 @@
 
                 <div class="accordion-item border mb-2">
                     <h2 class="accordion-header" id="heading_{{ $index }}">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="false" aria-controls="collapse_{{ $index }}" {{ $disabled }}>
+                        <button class="accordion-button {{ $day->progress['show'] ? '' : 'collapsed'}}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="false" aria-controls="collapse_{{ $index }}" {{ $disabled }}>
                             {{ $day->name }}
                             @if ($day->progress['status'] == 'completed')
                                 <i class="bi bi-check2-square"></i>
