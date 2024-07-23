@@ -281,6 +281,18 @@ class PageNavController extends Controller
                 }
             }
         }
+
+        //handle modules
+        $module_ids = $request->input('module', []);
+        if (!empty($module_ids)) {
+            $is_search = true;
+            //filter based on the module ids
+            $query->whereHas('day.module', function ($in_query) use ($module_ids) {
+                $in_query->whereIn('id', $module_ids);
+            });
+        }
+
+
         $activities = $query->orderBy('order')->get();
         
         //handle time
