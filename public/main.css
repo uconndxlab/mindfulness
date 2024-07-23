@@ -314,3 +314,12 @@ body:has(div.dark-background){
     font-size:16px;
     font-weight:600;
 }
+
+
+.activity-font {
+    font-size:16px;
+}
+.sub-activity-font {
+    font-size:14px;
+    font-weight:450;
+}

@@ -34,25 +34,23 @@
     <h1 class="display fw-bold mb-4">{{ $page_info['title'] }}</h1>
 </div>
 <div class="container">
-    <div class="row">
-        <div class="col-5">
-            <form id="search_form" method="GET" action="{{ $page_info['search_route'] }}" style="display: {{ $page_info['first_empty'] ? 'none' : 'block'}};">
+    <form id="search_filter_form" method="GET" action="{{ $page_info['search_route'] }}" style="display: {{ $page_info['first_empty'] ? 'none' : 'block'}};">
+        <div class="row">
+            <div class="col-5">
                 <div class="input-group">
                     <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder='{{ $page_info['search_text'] }}'>
                 </div>
-            </form>
+            </div>
         </div>
-    </div>
     
-    <div class="row">
-        <div class="col-12">
-            <hr class="separator-line">
+        <div class="row">
+            <div class="col-12">
+                <hr class="separator-line">
+            </div>
         </div>
-    </div>
     
-    <div class="row">
-        <div class="col-md-5">
-            <form id="filter_form" method="GET" action="{{ $page_info['search_route'] }}" style="display: {{ $page_info['first_empty'] ? 'none' : 'block'}};">
+        <div class="row">
+            <div class="col-md-5">
                 <div class="accordion accordion-flush mb-3" id="filter_accordion">
                     
                     @php
@@ -118,34 +116,34 @@
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Apply Filter</button>
-            </form>
-        </div>
-        <div class="col-md-7">
-            @if ($activities->isEmpty()) 
-            <div class="text-left muted">
-                {!! $page_info['empty'] !!}
             </div>
-            @else
-            <div class="">
-                <div class="row mb-3 justify-content-center">
-                    <div class="col-12">
-                        <div class=" h-100">
-                            @foreach ($activities as $activity)
-                            <div class="card module p-2 mb-2">
-                                <a class=" stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id, 'library' => true]) }}">
-                                    {{ $activity->day->module->name }}, {{ $activity->day->name }} - {{ $activity->optional ? 'OPTIONAL: ' : '' }} {{ $activity->title }}
-                                </a>
-                                <i class="bi bi-arrow-right"></i>
+            <div class="col-md-7">
+                @if ($activities->isEmpty()) 
+                    <div class="text-left muted">
+                        {!! $page_info['empty'] !!}
+                    </div>
+                @else
+                    <div class="">
+                        <div class="row mb-3 justify-content-center">
+                            <div class="col-12">
+                                <div class=" h-100">
+                                    @foreach ($activities as $activity)
+                                        <div class="card module p-2 mb-2">
+                                            <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id, 'library' => true]) }}">
+                                                <span class="activity-font">{{ $activity->title }}</span> <br>
+                                                <span class="sub-activity-font">{{ $activity->day->module->name }}, {{ $activity->day->name }}{{ $activity->optional ? ' - Optional' : '' }}</span>
+                                            </a>
+                                            <i class="bi bi-arrow-right"></i>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
-                            @endforeach
                         </div>
                     </div>
-                </div>
+                @endif
             </div>
-            @endif
         </div>
-    </div>
-</div>
+    </form>
 </div>
 @endsection
 <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.8.0/nouislider.min.js"></script>
@@ -154,7 +152,7 @@
         var slider = document.getElementById('time_range_slider');
         var startTimeInput = document.getElementById('start_time_input');
         var endTimeInput = document.getElementById('end_time_input');
-        var filterForm = document.getElementById('filter_form');
+        var filterForm = document.getElementById('search_filter_form');
 
         //gets vals from previous request
         var startVal = startTimeInput.value || 0;
