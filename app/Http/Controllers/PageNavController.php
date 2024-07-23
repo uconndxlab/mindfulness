@@ -284,7 +284,7 @@ class PageNavController extends Controller
         $activities = $query->orderBy('order')->get();
         
         //handle time
-        if ($request->has(['start_time', 'end_time']) && $request->start_time != 0 || $request->end_time != 30) {
+        if ($request->has(['start_time', 'end_time']) && ($request->start_time != 0 || $request->end_time != 30)) {
             $is_search = true;
             $start = $request->start_time;
             $end = $request->end_time;

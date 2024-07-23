@@ -36,7 +36,7 @@
 <div class="container">
     <div class="row">
         <div class="col-5">
-            <form method="GET" action="{{ $page_info['search_route'] }}" style="display: {{ $page_info['first_empty'] ? 'none' : 'block'}};">
+            <form id="search_form" method="GET" action="{{ $page_info['search_route'] }}" style="display: {{ $page_info['first_empty'] ? 'none' : 'block'}};">
                 <div class="input-group">
                     <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder='{{ $page_info['search_text'] }}'>
                 </div>
@@ -51,36 +51,76 @@
     </div>
     
     <div class="row">
-        <div class="col-md-4">
-            <form method="GET" action="{{ $page_info['search_route'] }}" style="display: {{ $page_info['first_empty'] ? 'none' : 'block'}};">
-
-                <div class="form-group mb-3">
-                    <h5 for="time_range">Time</h5>
-                    <div id="time_range_slider" style="margin-top: 20px;"></div>
-                    <div class="d-flex justify-content-between">
-                        <span id="start_time_label">0 min</span>
-                        <span id="end_time_label">30 min</span>
-                    </div>
-                </div>
-                <input type="hidden" name="start_time" id="start_time_input" value="{{ request('start_time') }}">
-                <input type="hidden" name="end_time" id="end_time_input" value="{{ request('end_time') }}">
-                
-                <div class="form-group mb-3">
-                    <h5>Category</h5>
-                    @foreach ($categories as $category)
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="category[]" id="category_{{ strtolower($category) }}" value="{{ $category }}" {{ in_array($category, request('category', [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="category_{{ strtolower($category) }}">
-                            {{ $category }}
-                        </label>
-                    </div>
-                    @endforeach
-                </div>
+        <div class="col-md-5">
+            <form id="filter_form" method="GET" action="{{ $page_info['search_route'] }}" style="display: {{ $page_info['first_empty'] ? 'none' : 'block'}};">
+                <div class="accordion accordion-flush mb-3" id="filter_accordion">
                     
+                    @php
+                        $show_time = (request('start_time') && request('start_time') != 0) || (request('end_time') && request('end_time') != 30);
+                    @endphp
+                    <div class="form-group accordion-item border mb-2">
+                        <h2 class="accordion-header" id="headingTime">
+                            <button class="accordion-button {{ request('start_time') || request('end_time') ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTime" aria-expanded="true" aria-controls="collapseTime">
+                                Time
+                            </button>
+                        </h2>
+                        <div id="collapseTime" class="accordion-collapse collapse {{ request('start_time') || request('end_time') ? 'show' : '' }}" aria-labelledby="headingTime">
+                            <div class="accordion-body">
+                                <div id="time_range_slider"></div>
+                                <div class="d-flex justify-content-between">
+                                    <span id="start_time_label">0 min</span>
+                                    <span id="end_time_label">30 min</span>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="start_time" id="start_time_input" value="{{ request('start_time') }}">
+                        <input type="hidden" name="end_time" id="end_time_input" value="{{ request('end_time') }}">
+                    </div>
+
+                    <div class="form-group accordion-item border mb-2">
+                        <h2 class="accordion-header" id="headingCategory">
+                            <button class="accordion-button {{ request('category') ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory" aria-expanded="true" aria-controls="collapseCategory">
+                                Category
+                            </button>
+                        </h2>
+                        <div id="collapseCategory" class="accordion-collapse collapse {{ request('category') ? 'show' : '' }}" aria-labelledby="headingCategory">
+                            <div class="accordion-body">
+                                @foreach ($categories as $category)
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="category[]" id="category_{{ strtolower($category) }}" value="{{ $category }}" {{ in_array($category, request('category', [])) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="category_{{ strtolower($category) }}">
+                                            {{ $category }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group accordion-item border mb-2">
+                        <h2 class="accordion-header" id="headingModule">
+                            <button class="accordion-button {{ request('module') ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseModule" aria-expanded="true" aria-controls="collapseModule">
+                                Module
+                            </button>
+                        </h2>
+                        <div id="collapseModule" class="accordion-collapse collapse {{ request('module') ? 'show' : '' }}" aria-labelledby="headingModule">
+                            <div class="accordion-body">
+                                @for ($i = 1; $i < 5; $i++)
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="module[]" id="module_{{ $i }}" value="{{ $i }}" {{ in_array($i, request('module', [])) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="module_{{ $i }}">
+                                            Module {{ $i }}
+                                        </label>
+                                    </div>
+                                @endfor
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <button type="submit" class="btn btn-primary">Apply Filter</button>
             </form>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-7">
             @if ($activities->isEmpty()) 
             <div class="text-left muted">
                 {!! $page_info['empty'] !!}
@@ -114,6 +154,7 @@
         var slider = document.getElementById('time_range_slider');
         var startTimeInput = document.getElementById('start_time_input');
         var endTimeInput = document.getElementById('end_time_input');
+        var filterForm = document.getElementById('filter_form');
 
         //gets vals from previous request
         var startVal = startTimeInput.value || 0;
@@ -158,8 +199,23 @@
             };
             
             //update hidden input
-            startTimeInput.value = timeToMinutes(values[0]);
-            endTimeInput.value = timeToMinutes(values[1]);
+            startConverted = timeToMinutes(values[0]);
+            endConverted = timeToMinutes(values[1]);
+            startTimeInput.value = startConverted;
+            endTimeInput.value = endConverted;
+            //remove the inputs if default values
+            if (startConverted === 0 && endConverted === 30) {
+                startTimeInput.remove();
+                endTimeInput.remove();
+            } else {
+                //add inputs back on change
+                if (!filterForm.contains(startTimeInput)) {
+                    filterForm.appendChild(startTimeInput);
+                }
+                if (!filterForm.contains(endTimeInput)) {
+                    filterForm.appendChild(endTimeInput);
+                }
+            }
         });
 
         //init labels
