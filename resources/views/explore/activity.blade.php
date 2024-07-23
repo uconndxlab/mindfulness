@@ -64,13 +64,13 @@
                         <div class="form-group dropdown time-dropdown" voice="{{ $voice }}" style="display: {{ $voice == key($content->audio_options) ? 'block' : 'none' }};">
                             @if (count($time_options) > 1)
                                 <button id="time_dropdown_button_{{ $voice }}" class="btn btn-xlight dropdown-toggle time-toggle" time="{{ key($time_options) }}" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {{ key($time_options) }}
+                                    {{ key($time_options) }} min
                                 </button>
                                 <ul class="dropdown-menu" id="time_dropdown_{{ $voice }}" name="time_dropdown_{{ $voice }}">
                                     @foreach ($time_options as $time => $_)
                                         <li>
                                             <button class="dropdown-item" type="button" value="{{ $time }}" onclick="selectTime('{{ $time }}')">
-                                                {{ $time }}
+                                                {{ $time }} min
                                             </button>
                                         </li>
                                     @endforeach

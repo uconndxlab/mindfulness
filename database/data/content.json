@@ -15,9 +15,9 @@
         "file_path": "Module 1 Activity 3 - Body Scan (7 min).m4a",
         "audio_options": {
             "Voice select...": {
-                "7 minutes": "Module 1 Activity 3 - Body Scan (7 min).m4a",
-                "13 minutes": "Module 1 Optional 1 Body Scan (13 min).m4a",
-                "21 minutes": "Module 1 Optional 2 Body Scan (21 min).MP3"
+                "7": "Module 1 Activity 3 - Body Scan (7 min).m4a",
+                "13": "Module 1 Optional 1 Body Scan (13 min).m4a",
+                "21": "Module 1 Optional 2 Body Scan (21 min).MP3"
             }
         }
     }

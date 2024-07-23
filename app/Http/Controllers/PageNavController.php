@@ -240,34 +240,89 @@ class PageNavController extends Controller
         }
     }
 
+    public function libraryFilter($query, Request $request) {
+        //check if first query has rows
+        $first_empty = !$query->exists();
+
+        //search/filter flag
+        $is_search = false;
+
+        //handle search
+        if ($request->has('search') && $request->search != '' && !$first_empty) {
+            $is_search = true;
+            $query->where('title', 'like', '%'.$request->search.'%')
+                    ->orWhere('sub_header', 'like', '%'.$request->search.'%');
+        }
+        
+        //handle categories
+        $categories = $request->input('category', []);
+        if (!empty($categories)) {
+            $is_search = true;
+            //filter based on the categories
+            foreach($categories as $category) {
+                $lower = strtolower($category);
+                if ($lower == 'audio' || $lower == 'video') {
+                    $query->whereHas('content', function ($in_query) use ($lower) {
+                        $in_query->where('type', $lower);
+                    });
+                }
+                else if ($lower == 'favorited') {
+                    $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
+                    $query->whereIn('id', $fav_ids);
+                }
+                else if ($lower == 'meditation') {
+                    $query->where('type', 'practice');
+                }
+                else if ($lower == 'optional') {
+                    $query->where('optional', true);
+                }
+                else if ($lower == 'quiz') {
+                    $query->where('end_behavior', 'quiz');
+                }
+            }
+        }
+        $activities = $query->orderBy('order')->get();
+        
+        //handle time
+        if ($request->has(['start_time', 'end_time']) && $request->start_time != 0 || $request->end_time != 30) {
+            $is_search = true;
+            $start = $request->start_time;
+            $end = $request->end_time;
+            $activities = $activities->filter(function ($activity) use ($start, $end) {
+                //first check for content
+                if (!$activity->content) {
+                    return false;
+                }
+                //then check audio options for times
+                $audio_options = json_decode($activity->content->audio_options, true) ?? null;
+                if (is_array($audio_options)) {
+                    foreach ($audio_options as $voice) {
+                        foreach ($voice as $time => $file) {
+                            if ($time >= $start && $time <= $end) {
+                                return true; //activity has audio in range
+                            }
+                        }
+                    }
+                }
+                return false;
+            });
+        }
+
+        return [$first_empty, $is_search, $activities];
+    }
+
     public function favoritesLibrary(Request $request)
     {
         //get users favorites and sort by activity order
         $favorite_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
         $query = Activity::whereIn('id', $favorite_ids)
             ->where('deleted', false);
-        
-        if ($request->has('search') && $request->search != '') {
-            $searchTerm = $request->search;
-            $query->where(function ($query) use ($searchTerm) {
-                $query->where('title', 'like', '%'.$searchTerm.'%')
-                    ->orWhere('subheader', 'like', '%'.$searchTerm.'%');
-            });
-        }
 
-        //check if first query has rows
-        $first_empty = !$query->exists();
-
-        //check if from search
-        $is_search = $request->has('search') && $request->search != '';
-
-        //handle search
-        if ($is_search && !$first_empty) {
-            $query->where('title', 'like', '%'.$request->search.'%')
-                    ->orWhere('sub_header', 'like', '%'.$request->search.'%');
-        }
-
-        $activities = $query->orderBy('order')->get();
+        //call search/filter function
+        $results = $this->libraryFilter($query, $request);
+        $first_empty = $results[0];
+        $is_search = $results[1];
+        $activities = $results[2];
 
         $page_info = [
             'title' => 'Favorites',
@@ -277,10 +332,12 @@ class PageNavController extends Controller
             'search_text' => 'Search for your favorite activity...'
         ];
 
+        $categories = ['Meditation', 'Audio', 'Video', 'Quiz', 'Optional'];
+
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.favorites'));
-        Session::put('current_nav', ['route' => route('library.favorites')]);
-        return view('other.library', compact('page_info', 'activities'));
+        Session::put('current_nav', ['route' => route('library.favorites'), 'back' => 'Favorites']);
+        return view('other.library', compact('page_info', 'activities', 'categories'));
     }
     public function meditationLibrary(Request $request)
     {
@@ -293,19 +350,11 @@ class PageNavController extends Controller
             ->where('type', 'practice')
             ->whereIn('id', $activity_ids);
 
-        //check if first query has rows
-        $first_empty = !$query->exists();
-
-        //check if from search
-        $is_search = $request->has('search') && $request->search != '';
-
-        //handle search
-        if ($is_search && !$first_empty) {
-            $query->where('title', 'like', '%'.$request->search.'%')
-                    ->orWhere('sub_header', 'like', '%'.$request->search.'%');
-        }
-
-        $activities = $query->orderBy('order')->get();
+        //call search/filter function
+        $results = $this->libraryFilter($query, $request);
+        $first_empty = $results[0];
+        $is_search = $results[1];
+        $activities = $results[2];
         
         $page_info = [
             'title' => 'Meditation Library',
@@ -315,10 +364,12 @@ class PageNavController extends Controller
             'search_text' => 'Search for a meditation exercise...'
         ];
 
+        $categories = ['Favorited', 'Audio', 'Video', 'Quiz', 'Optional'];
+
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.meditation'));
         Session::put('current_nav', ['route' => route('library.meditation'), 'back' => 'Meditation Library']);
-        return view("other.library", compact('page_info', 'activities'));
+        return view("other.library", compact('page_info', 'activities', 'categories'));
     }
     
     public function journalPage(Request $request)
