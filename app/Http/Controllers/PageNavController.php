@@ -293,7 +293,7 @@ class PageNavController extends Controller
         }
 
 
-        $activities = $query->orderBy('order')->get();
+        $activities = $query->orderBy('order')->paginate(6);
         
         //handle time
         if ($request->has(['start_time', 'end_time']) && ($request->start_time != 0 || $request->end_time != 30)) {
