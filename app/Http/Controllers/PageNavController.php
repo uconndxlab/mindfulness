@@ -353,7 +353,7 @@ class PageNavController extends Controller
         $page_info['hide_account_link'] = true;
 
         //calculating progress
-        $modules = Module::orderBy('order', 'asc')->withCount('days')->get();
+        $modules = Module::orderBy('order', 'asc')->get();
         $progress = getModuleProgress(Auth::id(), $modules->pluck('id')->toArray());
         foreach ($modules as $module) {
             $module->progress = $progress[$module->id];

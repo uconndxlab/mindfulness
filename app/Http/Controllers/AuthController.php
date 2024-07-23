@@ -96,6 +96,7 @@ class AuthController extends Controller
         ]);
 
         //unlocking first module/day/activity
+        lockAll($user->id);
         unlockFirst($user->id);
 
         //login and redirect
