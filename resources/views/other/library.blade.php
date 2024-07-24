@@ -129,7 +129,7 @@
                                     @foreach ($activities as $activity)
                                         <div class="card module p-2 mb-2">
                                             <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id, 'library' => true]) }}">
-                                                <span class="activity-font">{{ $activity->title }}</span> <br>
+                                                <span class="activity-font">{{ $activity->title }} - {{ $activity->sub_header }}</span> <br>
                                                 <span class="sub-activity-font">{{ $activity->day->module->name }}, {{ $activity->day->name }}{{ $activity->optional ? ' - Optional' : '' }}</span>
                                             </a>
                                             <i class="bi bi-arrow-right"></i>

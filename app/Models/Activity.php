@@ -9,6 +9,12 @@ class Activity extends Model
 {
     use HasFactory;
 
+    protected $table = 'activities';
+
+    protected $casts = [
+        'time' => 'array',
+    ];
+
     public function day()
     {
         return $this->belongsTo(Day::class);

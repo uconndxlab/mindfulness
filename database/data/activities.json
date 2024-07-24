@@ -27,6 +27,11 @@
         "type": "practice",
         "end_behavior": "journal",
         "order": 3,
-        "next_fake": null
+        "next_fake": null,
+        "time": [
+            7,
+            13,
+            21
+        ]
     }
 ]

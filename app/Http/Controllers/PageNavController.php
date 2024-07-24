@@ -250,8 +250,10 @@ class PageNavController extends Controller
         //handle search
         if ($request->has('search') && $request->search != '' && !$first_empty) {
             $is_search = true;
-            $query->where('title', 'like', '%'.$request->search.'%')
-                    ->orWhere('sub_header', 'like', '%'.$request->search.'%');
+            $query->where(function ($in_query) use ($request) {
+                $in_query->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('sub_header', 'like', '%' . $request->search . '%');
+            });
         }
         
         //handle categories
@@ -291,34 +293,22 @@ class PageNavController extends Controller
                 $in_query->whereIn('id', $module_ids);
             });
         }
-
-
-        $activities = $query->orderBy('order')->paginate(6);
         
         //handle time
         if ($request->has(['start_time', 'end_time']) && ($request->start_time != 0 || $request->end_time != 30)) {
             $is_search = true;
             $start = $request->start_time;
             $end = $request->end_time;
-            $activities = $activities->filter(function ($activity) use ($start, $end) {
-                //first check for content
-                if (!$activity->content) {
-                    return false;
-                }
-                //then check audio options for times
-                $audio_options = json_decode($activity->content->audio_options, true) ?? null;
-                if (is_array($audio_options)) {
-                    foreach ($audio_options as $voice) {
-                        foreach ($voice as $time => $file) {
-                            if ($time >= $start && $time <= $end) {
-                                return true; //activity has audio in range
-                            }
-                        }
-                    }
-                }
-                return false;
-            });
+            $query->where('time', '!=', null)->whereRaw("
+                EXISTS (
+                    SELECT 1
+                    FROM json_each(activities.time)
+                    WHERE CAST(json_each.value AS INTEGER) BETWEEN ? AND ?
+                )
+            ", [$start, $end]);
         }
+
+        $activities = $query->orderBy('order')->paginate(6);
 
         return [$first_empty, $is_search, $activities];
     }
