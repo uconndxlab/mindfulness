@@ -36,9 +36,12 @@
     <div class="container">
         <form id="search_filter_form" method="GET" action="{{ $page_info['search_route'] }}" style="display: {{ $page_info['first_empty'] ? 'none' : 'block'}};">
             <div class="row">
-                <div class="col-5">
-                    <div class="input-group">
-                        <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder='{{ $page_info['search_text'] }}'>
+                <div class="col-6">
+                    <div class="input-group mb-3">
+                        <input id="search_bar" type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder='{{ $page_info['search_text'] }}'>
+                        <span class="input-group-text">
+                            <i type="button" id="clear_search_button" class="bi bi-x-lg"></i>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -83,14 +86,16 @@
                             </h2>
                             <div id="collapseCategory" class="accordion-collapse collapse {{ request('category') ? 'show' : '' }}" aria-labelledby="headingCategory">
                                 <div class="accordion-body">
-                                    @foreach ($categories as $category)
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="category[]" id="category_{{ strtolower($category) }}" value="{{ $category }}" {{ in_array($category, request('category', [])) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="category_{{ strtolower($category) }}">
-                                                {{ $category }}
-                                            </label>
-                                        </div>
-                                    @endforeach
+                                    <div id="category_check">
+                                        @foreach ($categories as $category)
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="category[]" id="category_{{ strtolower($category) }}" value="{{ $category }}" {{ in_array($category, request('category', [])) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="category_{{ strtolower($category) }}">
+                                                    {{ $category }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -103,19 +108,22 @@
                             </h2>
                             <div id="collapseModule" class="accordion-collapse collapse {{ request('module') ? 'show' : '' }}" aria-labelledby="headingModule">
                                 <div class="accordion-body">
-                                    @for ($i = 1; $i < 5; $i++)
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="module[]" id="module_{{ $i }}" value="{{ $i }}" {{ in_array($i, request('module', [])) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="module_{{ $i }}">
-                                                Module {{ $i }}
-                                            </label>
-                                        </div>
-                                    @endfor
+                                    <div id="module_check">
+                                        @for ($i = 1; $i < 5; $i++)
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="module[]" id="module_{{ $i }}" value="{{ $i }}" {{ in_array($i, request('module', [])) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="module_{{ $i }}">
+                                                    Module {{ $i }}
+                                                </label>
+                                            </div>
+                                        @endfor
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Apply Filter</button>
+                    <button id="clear_filter_button" type="button" class="btn btn-link text-center mt-1 mb-2">Clear Filters</button>
                 </div>
                 <div class="col-md-8">
                     @if ($activities->isEmpty()) 
@@ -154,7 +162,12 @@
         var slider = document.getElementById('time_range_slider');
         var startTimeInput = document.getElementById('start_time_input');
         var endTimeInput = document.getElementById('end_time_input');
-        var filterForm = document.getElementById('search_filter_form');
+        var sfForm = document.getElementById('search_filter_form');
+
+        //for removing search query param from url
+        const url = new URL(window.location.href);
+        url.searchParams.delete('search'); // Remove 'search' parameter
+        window.history.replaceState({}, '', url);
 
         //gets vals from previous request
         var startVal = startTimeInput.value || 0;
@@ -186,7 +199,7 @@
         var startLabel = document.getElementById('start_time_label');
         var endLabel = document.getElementById('end_time_label');
 
-        //on change
+        //SLIDER CHANGE
         slider.noUiSlider.on('update', function (values) {
             //update labels
             startLabel.textContent = values[0];
@@ -209,16 +222,79 @@
                 endTimeInput.remove();
             } else {
                 //add inputs back on change
-                if (!filterForm.contains(startTimeInput)) {
-                    filterForm.appendChild(startTimeInput);
+                if (!sfForm.contains(startTimeInput)) {
+                    sfForm.appendChild(startTimeInput);
                 }
-                if (!filterForm.contains(endTimeInput)) {
-                    filterForm.appendChild(endTimeInput);
+                if (!sfForm.contains(endTimeInput)) {
+                    sfForm.appendChild(endTimeInput);
                 }
             }
         });
 
         //init labels
         slider.noUiSlider.set([parseInt(startVal), parseInt(endVal)]);
+
+        //CLEAR FILTERS
+        const moduleDiv = document.getElementById('module_check');
+        const categoryDiv = document.getElementById('category_check');
+        document.getElementById('clear_filter_button').addEventListener('click', clearFilters);
+        function clearFilters() {
+            //clear the checkbox fields
+            moduleDiv.querySelectorAll('.form-check-input').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            categoryDiv.querySelectorAll('.form-check-input').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            //resetting the time filter
+            startTimeInput.remove();
+            endTimeInput.remove();
+            //submit
+            sfForm.submit();
+        }
+
+        //CLEAR SEARCH
+        document.getElementById('clear_search_button').addEventListener('click', clearSearch);
+        function clearSearch() {
+            var searchBar = document.getElementById('search_bar');
+            searchBar.value = '';
+            searchBar.focus();
+            // sfForm.submit();
+        }
+
+        // //on submission
+        // sfForm.addEventListener('submit', function (event) {
+        //     event.preventDefault();
+        //     // var searchBar = document.getElementById('search_bar');
+        //     // //removing search from query vars if it is empty
+        //     // if (searchBar.value == '') {
+        //     //     //check for changes - if none, do not submit
+        //     //     searchBar.remove();
+        //     //     searchBar.removeAttribute('value');
+        //     // }
+        //     this.submit();
+        // });
+
+        // //helper function to check filter for changes
+        // function checkFilterChange() {
+        //     let change = false;
+        //     moduleDiv.querySelectorAll('.form-check-input').forEach(checkbox => {
+        //         if (checkbox.checked) {
+        //             change = true;
+        //         }
+        //     });
+        //     categoryDiv.querySelectorAll('.form-check-input').forEach(checkbox => {
+        //         if (checkbox.checked) {
+        //             change = true;
+        //         }
+        //     });
+        //     if (sfForm.contains(startTimeInput) || sfForm.contains(endTimeInput)) {
+        //         change = true;
+        //     }
+        //     return change;
+        // }
+
     });
+    
+
 </script>
