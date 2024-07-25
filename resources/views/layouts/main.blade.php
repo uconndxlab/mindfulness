@@ -43,6 +43,12 @@
             .bi-star-fill {
                 color: #ffd700;
             }
+            .sticky-top {
+                position: -webkit-sticky;
+                position: sticky;
+                top: 0;
+                z-index: 1020;
+            }
         </style>
     </head>
         @php
