@@ -328,8 +328,7 @@ class PageNavController extends Controller
 
         $page_info = [
             'title' => 'Favorites',
-            'first_empty' => $first_empty,
-            'empty' => !$is_search ? '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>' : 'No activities found.',
+            'first_empty' => $first_empty ? '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>' : null,
             'search_route' => route('library.favorites'),
             'search_text' => 'Search for your favorite activity...'
         ];
@@ -360,8 +359,7 @@ class PageNavController extends Controller
         
         $page_info = [
             'title' => 'Meditation Library',
-            'first_empty' => $first_empty,
-            'empty' => !$is_search ? 'Keep progressing to unlock more meditation sessions...' : 'No activities found.',
+            'first_empty' => $first_empty ? 'Keep progressing to unlock more meditation sessions...' : null,
             'search_route' => route('library.meditation'),
             'search_text' => 'Search for a meditation exercise...'
         ];
