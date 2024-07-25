@@ -51,7 +51,7 @@ Route::middleware('auth')->group(function () {
         $user->email_verified_at = now();
         $user->save();
         if ($user->email_verified_at) {
-            return redirect()->intended('/explore');
+            return redirect()->intended('/');
         }
 
         return back()->with('message', 'Verification link sent!');
