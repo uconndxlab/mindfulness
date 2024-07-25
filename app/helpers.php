@@ -157,3 +157,17 @@ if (!function_exists('lockAll')) {
         }
     }
 }
+
+if (!function_exists('unlockAll')) {
+    function unlockAll($user_id)
+    {
+        foreach (Activity::all() as $activity) {
+            UserActivity::updateOrCreate([
+                "user_id" => $user_id,
+                "activity_id" => $activity->id,
+            ],[
+                "status" => 'unlocked'
+            ]);
+        }
+    }
+}
