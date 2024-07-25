@@ -35,10 +35,13 @@ class ContactFormController extends Controller
             //email
             Mail::to('admin@example.com')->send(new InquiryReceived($inquiry));
     
-            return back()->with('success', 'Your inquiry has been submitted!');
+            return back()->with([
+                'success' => 'Your inquiry has been submitted!',
+                'submit' => 'true',
+            ]);
         }
         catch (ValidationException $e) {
-            return redirect()->back()->withErrors($e->errors())->withInput();
+            return redirect()->back()->withErrors($e->errors())->withInput()->with('submit', 'true');
         }
     }
 }

@@ -17,22 +17,22 @@
         <div class="tabs">
             <ul class="navbar-nav" style="flex-direction:row">
                 <li class="nav-item" style="padding:0px 20px">
-                    <a class="nav-link" href="#scrollspyTutorial">Tutorial</a>
+                    <a class="nav-link" href="#tutorial">Tutorial</a>
                 </li>
                 <li class="nav-item" style="padding:0px 20px">
-                    <a class="nav-link" href="#scrollspyFAQ">FAQ</a>
+                    <a class="nav-link" href="#FAQ">FAQ</a>
                 </li>
                 <li class="nav-item" style="padding:0px 20px">
-                    <a class="nav-link" href="#scrollspyContact">Contact Us</a>
+                    <a class="nav-link {{ session('success') ? 'active' : '' }}" href="#contactUs">Contact Us</a>
                 </li>
             </ul>
         </div>
     </nav>
     <div data-bs-spy="scroll" data-bs-target="#navbar-help" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true" class="scrollspy-example p-3 rounded-2" tabindex="0">
-        <h5 id="scrollspyTutorial" class="text-center fw-bold mt-4">Tutorial:</h5>
+        <h5 id="tutorial" class="text-center fw-bold mt-4">Tutorial:</h5>
         <x-contentView type="video" file="videoExampleSnarky.MOV"/>
         
-        <h5 id="scrollspyFAQ" class="text-center fw-bold mt-4">FAQ</h5>
+        <h5 id="FAQ" class="text-center fw-bold mt-4">FAQ</h5>
         <div class="col md-5">
             <div id="faqCarousel" class="carousel carousel-dark slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
@@ -62,7 +62,7 @@
             </div>
         </div>
 
-        <h5 id="scrollspyContact" class="text-center fw-bold mt-4">Contact us here:</h5>
+        <h5 id="contactUs" class="text-center fw-bold mt-4">Contact us here:</h5>
         <p class="text-center">You can reach us via email or phone:</p>
         <p class="text-center">
             <a href="mailto:example@example.com" class="text-decoration-none">example@example.com</a>
