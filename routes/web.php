@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactFormController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -57,12 +58,6 @@ Route::middleware('auth')->group(function () {
     })->middleware('throttle:6,1')->name('verification.send');
 });
 
-
-// Route::get('/test', function () {
-//     Mail::to('test@example.com')->send(new TestMail());
-//     return 'Test email sent!';
-// });
-
 //FORGOT PASSWORD
 // Auth::routes(['verify' => true]);
 // Auth::routes();
@@ -104,6 +99,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //favorites
     Route::post('/favorites', [UserController::class, 'addFavorite'])->name('favorites.create');
     Route::delete('/favorites/{activity_id}', [UserController::class,'deleteFavorite'])->name('favorites.delete');
+
+    //contact form
+    Route::post('/contact', [ContactFormController::class, 'submitForm'])->name('contact.submit');
     
     //NOTES
     Route::resource('note', NoteController::class);
