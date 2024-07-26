@@ -33,13 +33,13 @@
         <x-contentView type="video" file="videoExampleSnarky.MOV"/>
         
         <h5 id="FAQ" class="text-center fw-bold mt-4">FAQ</h5>
-        <div class="col md-5">
+        <div class="col-12">
             <div id="faqCarousel" class="carousel carousel-dark slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     @foreach ($faqs as $index => $faq)
                         <div class="carousel-item {{ $index == 0 ? 'active' : '' }}" data-bs-interval="60000">
                             <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
-                                <div class="prior-note">
+                                <div class="prior-note col-8">
                                     <div class="top-note">
                                         <h5 class="fw-bold d-flex justify-content-between">
                                             <span>{{ $faq->question }}</span>

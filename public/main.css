@@ -151,6 +151,58 @@ textarea.form-control {
     border-bottom:2px solid var(--dark-green);
 }
 
+/*search filter*/
+#search-icon{
+    margin-top:10px;
+    margin-right:-34px;
+    z-index:100;
+}
+
+#search_bar{
+    padding-left:34px;
+}
+
+#search_filter_form .input-group-text{
+    background:none;
+    border:none;
+}
+#search_filter_form .input-group-text a{
+    font-size:12px;
+}
+
+.noUi-connect {
+    background: var(--purple)!important;
+}
+
+.noUi-horizontal .noUi-handle {
+    width: 28px!important;
+    height: 28px!important;
+    right: -14px!important;
+    top: -6px;
+    border-radius: 100%!important;
+}
+
+.noUi-handle:before {
+    left:8px!important;
+}
+
+.noUi-handle:after {
+    left: 12px;
+}
+
+.noUi-target{
+    margin-bottom:15px!important;
+}
+
+.search-filters .accordion-body{
+    padding:20px!important;
+}
+
+.active>.page-link, .page-link.active {
+    background-color: var(--dark-green)!important;
+    border-color: var(--dark-green)!important;
+}
+
 /*change background color */
 body:has(div.dark-background){
     background-color:var(--dark-green);

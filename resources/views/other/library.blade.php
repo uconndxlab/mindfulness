@@ -38,14 +38,15 @@
             {!! $page_info['first_empty'] !!}
         </div>
     @else
-        <div class="container">
+        <div class="">
             <form id="search_filter_form" method="GET" action="{{ $page_info['search_route'] }}" style="display: {{ $page_info['first_empty'] ? 'none' : 'block'}};">
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-md-6">
                         <div class="input-group mb-3">
+                            <i style="padding:0px 10px" id="search-icon" class="bi bi-search"></i>
                             <input id="search_bar" type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder='{{ $page_info['search_text'] }}'>
                             <span class="input-group-text">
-                                <i type="button" id="clear_search_button" class="bi bi-x-lg"></i>
+                                <a style="color:#000!important" id="clear_search_button" type="button">CANCEL</a>
                             </span>
                         </div>
                     </div>
@@ -57,7 +58,7 @@
                     </div>
                 </div>
             
-                <div class="row">
+                <div class="row search-filters">
                     <div class="col-md-4">
                         <div class="accordion accordion-flush mb-3" id="filter_accordion">
                             
@@ -128,7 +129,7 @@
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Apply Filter</button>
-                        <button id="clear_filter_button" type="button" class="btn btn-link text-center mt-1 mb-2">Clear Filters</button>
+                        <button id="clear_filter_button" type="button" style="color:#000!important" class="btn btn-link text-center mt-1 mb-2">Clear Filters</button>
                     </div>
                     <div class="col-md-8">
                         @if ($activities->isEmpty()) 
