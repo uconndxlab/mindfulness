@@ -23,7 +23,7 @@
                     <a class="nav-link" href="#FAQ">FAQ</a>
                 </li>
                 <li class="nav-item" style="padding:0px 20px">
-                    <a class="nav-link {{ session('success') ? 'active' : '' }}" href="#contactUs">Contact Us</a>
+                    <a class="nav-link" href="#contactUs">Contact Us</a>
                 </li>
             </ul>
         </div>
@@ -96,3 +96,27 @@
     </div>
 </div>
 @endsection
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        //url hash
+        const hash = window.location.hash;
+        if (hash) {
+            //get corresponding hash
+            const navLink = document.querySelector(`.nav-link[href="${hash}"]`);
+            const section = document.querySelector(hash);
+
+            //remove active from all
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            
+            //add active to actual hash
+            if (navLink) {
+                navLink.classList.add('active');
+            }
+            
+            //scroll
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    });
+</script>

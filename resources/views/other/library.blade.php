@@ -133,7 +133,7 @@
                     <div class="col-md-8">
                         @if ($activities->isEmpty()) 
                             <div class="text-left muted">
-                                No activities found.
+                                No matches found.
                             </div>
                         @else
                             <div class="row mb-3 justify-content-center">
