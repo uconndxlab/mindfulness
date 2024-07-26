@@ -161,7 +161,6 @@
         </div>
     @endif
 </div>
-@endsection
 <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.8.0/nouislider.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -304,3 +303,4 @@
     
 
 </script>
+@endsection
