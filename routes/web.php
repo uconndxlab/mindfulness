@@ -90,6 +90,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/library', [PageNavController::class, 'library'])->name('library');
     Route::get('/meditation-library', [PageNavController::class, 'meditationLibrary'])->name('library.meditation');
     Route::get('/favorites', [PageNavController::class, 'favoritesLibrary'])->name('library.favorites');
+    Route::get('/search', [PageNavController::class, 'librarySearch'])->name('library.search');
     
     //User updates
     Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');

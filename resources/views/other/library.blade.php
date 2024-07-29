@@ -39,7 +39,7 @@
         </div>
     @else
         <div class="">
-            <form id="search_filter_form" method="GET" action="{{ $page_info['search_route'] }}" style="display: {{ $page_info['first_empty'] ? 'none' : 'block'}};">
+            <form id="search_filter_form" method="GET" style="display: {{ $page_info['first_empty'] ? 'none' : 'block'}};">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="input-group mb-3">
@@ -131,31 +131,8 @@
                         <button type="submit" class="btn btn-primary">Apply Filter</button>
                         <button id="clear_filter_button" type="button" style="color:#000!important" class="btn btn-link text-center mt-1 mb-2">Clear Filters</button>
                     </div>
-                    <div class="col-md-8">
-                        @if ($activities->isEmpty()) 
-                            <div class="text-left muted">
-                                No matches found.
-                            </div>
-                        @else
-                            <div class="row mb-3 justify-content-center">
-                                <div class="col-12">
-                                    <div class=" h-100">
-                                        @foreach ($activities as $activity)
-                                            <div class="card module p-2 mb-2">
-                                                <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id, 'library' => true]) }}">
-                                                    <span class="activity-font">{{ $activity->title }} - {{ $activity->sub_header }}</span> <br>
-                                                    <span class="sub-activity-font">{{ $activity->day->module->name }}, {{ $activity->day->name }}{{ $activity->optional ? ' - Optional' : '' }}</span>
-                                                </a>
-                                                <i class="bi bi-arrow-right"></i>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                {{ $activities->appends(request()->query())->links('pagination::bootstrap-5') }}
-                            </div>
-                        @endif
+                    <div id="activitiesContainer" class="col-md-8">
+                        <x-search-results :activities="collect()"/>
                     </div>
                 </div>
             </form>
@@ -168,22 +145,21 @@
         var slider = document.getElementById('time_range_slider');
         var startTimeInput = document.getElementById('start_time_input');
         var endTimeInput = document.getElementById('end_time_input');
+
         var sfForm = document.getElementById('search_filter_form');
 
-        //for removing search query param from url
-        const url = new URL(window.location.href);
-        url.searchParams.delete('search'); // Remove 'search' parameter
-        window.history.replaceState({}, '', url);
-
+        var searchBar = document.getElementById('search_bar');
+        
+        //SLIDER INIT
         //gets vals from previous request
         var startVal = startTimeInput.value || 0;
         var endVal = endTimeInput.value || 30;
-
+        
         //format mins
         function minutesToTime(minutes) {
             return `${String(minutes)} mins`;
         }
-
+        
         noUiSlider.create(slider, {
             start: [0, 30],
             connect: true,
@@ -201,16 +177,16 @@
                 }
             }
         });
-
+        
         var startLabel = document.getElementById('start_time_label');
         var endLabel = document.getElementById('end_time_label');
-
+        
         //SLIDER CHANGE
         slider.noUiSlider.on('update', function (values) {
             //update labels
             startLabel.textContent = values[0];
             endLabel.textContent = values[1];
-
+            
             //convert the # mins to #
             const timeToMinutes = (time) => {
                 const [mins, _] = time.split(' ').map(Number);
@@ -236,9 +212,76 @@
                 }
             }
         });
-
+        
         //init labels
         slider.noUiSlider.set([parseInt(startVal), parseInt(endVal)]);
+        
+
+        //get params
+        function getChecked(catOrMod) {
+            //get all checked
+            var checkboxes = null;
+            if (catOrMod == 'modules') {
+                checkboxes = document.querySelectorAll('input[name="module[]"]:checked');
+            }
+            else {
+                checkboxes = document.querySelectorAll('input[name="category[]"]:checked');
+            }
+            const list = Array.from(checkboxes).map(checkbox => checkbox.value);
+            return list;
+        }
+
+        console.log('about to search...');
+        //LOAD SEARCH
+        function search() {
+            //build query params
+            const query = searchBar.value;
+            const searchUrl = new URL('{{ route('library.search') }}');
+            searchUrl.searchParams.append('search', query);
+
+            const categories = getChecked('categories');
+            const modules = getChecked('modules');
+            categories.forEach(category => searchUrl.searchParams.append('category[]', category));
+            searchUrl.searchParams.append('category[]', '{{ $base_param }}')
+            modules.forEach(module_ => searchUrl.searchParams.append('module[]', module_));
+
+            //perform search
+            fetch(searchUrl, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('AJAX success');
+                //render component into container
+                document.getElementById('activitiesContainer').innerHTML = data.html;
+            })
+            .catch(error => {
+                console.error('Error performing search', error);
+            });
+        }
+        //search on page load
+        search();
+        
+        //SUBMISSION
+        sfForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            search();
+        });
+        
+        // keyboard submit on input
+        // timeout to limit request rate
+        let timeout = null;
+        searchBar.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                search();
+            }, 300);
+        });
 
         //CLEAR FILTERS
         const moduleDiv = document.getElementById('module_check');
@@ -256,52 +299,16 @@
             startTimeInput.remove();
             endTimeInput.remove();
             //submit
-            sfForm.submit();
+            search();
         }
 
         //CLEAR SEARCH
         document.getElementById('clear_search_button').addEventListener('click', clearSearch);
         function clearSearch() {
-            var searchBar = document.getElementById('search_bar');
             searchBar.value = '';
             searchBar.focus();
-            // sfForm.submit();
+            search();
         }
-
-        // //on submission
-        // sfForm.addEventListener('submit', function (event) {
-        //     event.preventDefault();
-        //     // var searchBar = document.getElementById('search_bar');
-        //     // //removing search from query vars if it is empty
-        //     // if (searchBar.value == '') {
-        //     //     //check for changes - if none, do not submit
-        //     //     searchBar.remove();
-        //     //     searchBar.removeAttribute('value');
-        //     // }
-        //     this.submit();
-        // });
-
-        // //helper function to check filter for changes
-        // function checkFilterChange() {
-        //     let change = false;
-        //     moduleDiv.querySelectorAll('.form-check-input').forEach(checkbox => {
-        //         if (checkbox.checked) {
-        //             change = true;
-        //         }
-        //     });
-        //     categoryDiv.querySelectorAll('.form-check-input').forEach(checkbox => {
-        //         if (checkbox.checked) {
-        //             change = true;
-        //         }
-        //     });
-        //     if (sfForm.contains(startTimeInput) || sfForm.contains(endTimeInput)) {
-        //         change = true;
-        //     }
-        //     return change;
-        // }
-
     });
-    
-
 </script>
 @endsection

@@ -240,26 +240,29 @@ class PageNavController extends Controller
         }
     }
 
-    public function libraryFilter($query, Request $request) {
-        //check if first query has rows
-        $first_empty = !$query->exists();
+    public function librarySearch(Request $request) {
 
-        //search/filter flag
-        $is_search = false;
-
+        //get query of unlocked activities
+        $user_id = Auth::id();
+        //query for activities - keep as query
+        $activity_ids = UserActivity::where('user_id', $user_id)
+        ->where('status', '!=', 'locked')
+        ->pluck('activity_id');
+        $query = Activity::where('deleted', false)
+        ->whereIn('id', $activity_ids);
+        
+        
         //handle search
-        if ($request->has('search') && $request->search != '' && !$first_empty) {
-            $is_search = true;
+        if ($request->has('search') && $request->search != '') {
             $query->where(function ($in_query) use ($request) {
                 $in_query->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('sub_header', 'like', '%' . $request->search . '%');
+                ->orWhere('sub_header', 'like', '%' . $request->search . '%');
             });
         }
         
         //handle categories
         $categories = $request->input('category', []);
         if (!empty($categories)) {
-            $is_search = true;
             //filter based on the categories
             foreach($categories as $category) {
                 $lower = strtolower($category);
@@ -283,11 +286,10 @@ class PageNavController extends Controller
                 }
             }
         }
-
+        
         //handle modules
         $module_ids = $request->input('module', []);
         if (!empty($module_ids)) {
-            $is_search = true;
             //filter based on the module ids
             $query->whereHas('day.module', function ($in_query) use ($module_ids) {
                 $in_query->whereIn('id', $module_ids);
@@ -296,39 +298,38 @@ class PageNavController extends Controller
         
         //handle time
         if ($request->has(['start_time', 'end_time']) && ($request->start_time != 0 || $request->end_time != 30)) {
-            $is_search = true;
             $start = $request->start_time;
             $end = $request->end_time;
             $query->where('time', '!=', null)->whereRaw("
-                EXISTS (
-                    SELECT 1
-                    FROM json_each(activities.time)
-                    WHERE CAST(json_each.value AS INTEGER) BETWEEN ? AND ?
+            EXISTS (
+                SELECT 1
+                FROM json_each(activities.time)
+                WHERE CAST(json_each.value AS INTEGER) BETWEEN ? AND ?
                 )
-            ", [$start, $end]);
+                ", [$start, $end]);
         }
+            
+        $activities = $query->with('day.module')->orderBy('order')->paginate(6);
+        $view = view('components.search-results', ['activities' => $activities])->render();
 
-        $activities = $query->orderBy('order')->paginate(6);
-
-        return [$first_empty, $is_search, $activities];
+        return response()->json(['html' => $view]);
     }
 
     public function favoritesLibrary(Request $request)
     {
-        //get users favorites and sort by activity order
+        //get users favorites
         $favorite_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
         $query = Activity::whereIn('id', $favorite_ids)
             ->where('deleted', false);
 
-        //call search/filter function
-        $results = $this->libraryFilter($query, $request);
-        $first_empty = $results[0];
-        $is_search = $results[1];
-        $activities = $results[2];
+        //and check if empty
+        $empty = !$query->exists();
+
+        $base_param = 'favorited';
 
         $page_info = [
             'title' => 'Favorites',
-            'first_empty' => $first_empty ? '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>' : null,
+            'first_empty' => $empty ? '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>' : null,
             'search_route' => route('library.favorites'),
             'search_text' => 'Search for your favorite activity...'
         ];
@@ -338,7 +339,7 @@ class PageNavController extends Controller
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.favorites'));
         Session::put('current_nav', ['route' => route('library.favorites'), 'back' => 'Favorites']);
-        return view('other.library', compact('page_info', 'activities', 'categories'));
+        return view('other.library', compact('base_param', 'page_info', 'categories'));
     }
     public function meditationLibrary(Request $request)
     {
@@ -352,11 +353,10 @@ class PageNavController extends Controller
             ->whereIn('id', $activity_ids);
 
         //call search/filter function
-        $results = $this->libraryFilter($query, $request);
-        $first_empty = $results[0];
-        $is_search = $results[1];
-        $activities = $results[2];
+        $first_empty = !$query->exists();
         
+        $base_param = 'meditation';
+
         $page_info = [
             'title' => 'Meditation Library',
             'first_empty' => $first_empty ? 'Keep progressing to unlock more meditation sessions...' : null,
@@ -369,7 +369,7 @@ class PageNavController extends Controller
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.meditation'));
         Session::put('current_nav', ['route' => route('library.meditation'), 'back' => 'Meditation Library']);
-        return view("other.library", compact('page_info', 'activities', 'categories'));
+        return view("other.library", compact('base_param', 'page_info', 'categories'));
     }
     
     public function journalPage(Request $request)
