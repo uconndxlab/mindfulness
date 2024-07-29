@@ -237,10 +237,18 @@
             //build query params
             const query = searchBar.value;
             const searchUrl = new URL('{{ route('library.search') }}');
+            //search
             searchUrl.searchParams.append('search', query);
-
-            const categories = getChecked('categories');
-            const modules = getChecked('modules');
+            //time
+            var start = startTimeInput.value;
+            var end = endTimeInput.value;
+            if (end != 30 || start != 0) {
+                searchUrl.searchParams.append('start_time', startTimeInput.value);
+                searchUrl.searchParams.append('end_time', endTimeInput.value);
+            }
+            //categories and modules
+            var categories = getChecked('categories');
+            var modules = getChecked('modules');
             categories.forEach(category => searchUrl.searchParams.append('category[]', category));
             searchUrl.searchParams.append('category[]', '{{ $base_param }}')
             modules.forEach(module_ => searchUrl.searchParams.append('module[]', module_));
