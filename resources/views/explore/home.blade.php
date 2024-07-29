@@ -18,8 +18,8 @@
                                 $status = $module->progress['status'];
                                 $disabled = $module->progress['status'] == 'locked' ? 'disabled' : '';
                             @endphp
-                            <a id="moduleLink" class="stretched-link w-100 {{ $disabled }}" {!! !$disabled ? 'href='.route('explore.module', ['module_id' => $module->id]) : '' !!}>
-                                <img src="{{ Storage::url('content/Flower-'.$module->progress['completed'].'.svg') }}" alt="Icon" style="width:24px; height:24px;">
+                            <a style="display:flex" id="moduleLink" class="stretched-link w-100 {{ $disabled }}" {!! !$disabled ? 'href='.route('explore.module', ['module_id' => $module->id]) : '' !!}>
+                                <img src="{{ Storage::url('content/Flower-'.$module->progress['completed'].'.svg') }}" alt="Icon" style="width:50px; height:50px; margin-right:10px;">
                                 {{ $module->name }} <br> {{$module->progress['completed']}}/{{$module->progress['total']}} sessions completed
                             </a>
                             <i class="bi bi-arrow-right"></i>
