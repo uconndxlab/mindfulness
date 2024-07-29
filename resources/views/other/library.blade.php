@@ -134,7 +134,7 @@
                     <div class="col-md-8">
                         @if ($activities->isEmpty()) 
                             <div class="text-left muted">
-                                No activities found.
+                                No matches found.
                             </div>
                         @else
                             <div class="row mb-3 justify-content-center">
@@ -162,7 +162,6 @@
         </div>
     @endif
 </div>
-@endsection
 <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.8.0/nouislider.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -305,3 +304,4 @@
     
 
 </script>
+@endsection

@@ -388,7 +388,7 @@ class PageNavController extends Controller
         //otherwise normal notes page
         //get user
         $id = Auth::id();
-        $notes = Note::where('user_id', $id)->orderBy('created_at', 'desc')->get();
+        $notes = Note::where('user_id', $id)->orderBy('created_at', 'desc')->paginate(5);
         //formatting the date
         foreach ($notes as $note) {
             $date = Carbon::parse($note->created_at);

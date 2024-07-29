@@ -8,12 +8,16 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Mail;
+use URL;
 
 class ContactFormController extends Controller
 {
     public function submitForm(Request $request)
     {
         try {
+            $previous_url = URL::previous();
+            $redirect = $previous_url.'#contactUs';
+
             //validate
             $request->validate([
                 'message' => ['required', 'string'],
@@ -34,14 +38,13 @@ class ContactFormController extends Controller
     
             //email
             Mail::to('admin@example.com')->send(new InquiryReceived($inquiry));
-    
-            return back()->with([
-                'success' => 'Your inquiry has been submitted!',
-                'submit' => 'true',
+
+            return redirect($redirect)->with([
+                'success' => 'Your inquiry has been submitted!'
             ]);
         }
         catch (ValidationException $e) {
-            return redirect()->back()->withErrors($e->errors())->withInput()->with('submit', 'true');
+            return redirect($redirect)->withErrors($e->errors())->withInput();
         }
     }
 }
