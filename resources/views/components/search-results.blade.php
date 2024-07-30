@@ -1,17 +1,18 @@
-@php
-    $rand_act = isset($random) ? $random : null;
-@endphp
 @if (!isset($activities) || $activities->isEmpty())
-    <div class="text-left muted">
-        No matches found. {{ $rand_act ? 'Here is a random activity you might like to practice: ' : ''}}
-    </div>
-    @if ($rand_act)
+    @if (isset($random))
+        <div class="text-left muted">
+            No matches found. Here is a random activity you might like to practice:
+        </div>
         <div class="card module p-2 mb-2">
-            <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $rand_act->id, 'library' => true]) }}">
-                <span class="activity-font">{{ $rand_act->title }} - {{ $rand_act->sub_header }}</span> <br>
-                <span class="sub-activity-font">{{ $rand_act->day->module->name }}, {{ $rand_act->day->name }}{{ $rand_act->optional ? ' - Optional' : '' }}</span>
+            <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $random->id, 'library' => true]) }}">
+                <span class="activity-font">{{ $random->title }} - {{ $random->sub_header }}</span> <br>
+                <span class="sub-activity-font">{{ $random->day->module->name }}, {{ $random->day->name }}{{ $random->optional ? ' - Optional' : '' }}</span>
             </a>
             <i class="bi bi-arrow-right"></i>
+        </div>
+    @elseif (isset($empty_text))
+        <div class="text-left muted">
+            {!! $empty_text !!}
         </div>
     @endif
 @else

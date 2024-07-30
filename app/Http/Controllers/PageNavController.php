@@ -252,14 +252,24 @@ class PageNavController extends Controller
         ->whereIn('id', $activity_ids);
         
         //base param
+        $empty_text = null;
         if ($request->base_param) {
-            if ($request->base_param = 'meditation') {
+            if ($request->base_param == 'meditation') {
                 $query->where('type', 'practice');
+                $empty_text = 'Keep progressing to unlock more meditation sessions...';
             }
             else if ($request->base_param = 'favorited') {
                 $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
                 $query->whereIn('id', $fav_ids);
+                $empty_text = '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>';
             }
+        }
+
+        //check if empty
+        $empty = !$query->exists();
+        if ($empty) {
+            $view = view('components.search-results', ['empty_text' => $empty_text])->render();
+            return response()->json(['html' => $view]);
         }
 
         //pulling random item
@@ -331,19 +341,10 @@ class PageNavController extends Controller
 
     public function favoritesLibrary(Request $request)
     {
-        //get users favorites
-        $favorite_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
-        $query = Activity::whereIn('id', $favorite_ids)
-            ->where('deleted', false);
-
-        //and check if empty
-        $empty = !$query->exists();
-
         $base_param = 'favorited';
 
         $page_info = [
             'title' => 'Favorites',
-            'first_empty' => $empty ? '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>' : null,
             'search_route' => route('library.favorites'),
             'search_text' => 'Search for your favorite activity...'
         ];
@@ -357,23 +358,10 @@ class PageNavController extends Controller
     }
     public function meditationLibrary(Request $request)
     {
-        $user_id = Auth::id();
-        //query for activities - keep as query
-        $activity_ids = UserActivity::where('user_id', $user_id)
-            ->where('status', '!=', 'locked')
-            ->pluck('activity_id');
-        $query = Activity::where('deleted', false)
-            ->where('type', 'practice')
-            ->whereIn('id', $activity_ids);
-
-        //call search/filter function
-        $first_empty = !$query->exists();
-        
         $base_param = 'meditation';
 
         $page_info = [
             'title' => 'Meditation Library',
-            'first_empty' => $first_empty ? 'Keep progressing to unlock more meditation sessions...' : null,
             'search_route' => route('library.meditation'),
             'search_text' => 'Search for a meditation exercise...'
         ];
