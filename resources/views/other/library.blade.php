@@ -276,7 +276,7 @@
             }
             //categories and modules
             _categories.forEach(category => params.append('category[]', category));
-            params.append('category[]', '{{ $base_param }}')
+            params.append('base_param', '{{ $base_param }}')
             _modules.forEach(module_ => params.append('module[]', module_));
 
             //saving recent search to session

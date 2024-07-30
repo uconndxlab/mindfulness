@@ -251,6 +251,20 @@ class PageNavController extends Controller
         $query = Activity::where('deleted', false)
         ->whereIn('id', $activity_ids);
         
+        //base param
+        if ($request->base_param) {
+            if ($request->base_param = 'meditation') {
+                $query->where('type', 'practice');
+            }
+            else if ($request->base_param = 'favorited') {
+                $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
+                $query->whereIn('id', $fav_ids);
+            }
+        }
+
+        //pulling random item
+        $query_clone = clone $query;
+        $random_act = $query_clone->inRandomOrder()->first();
         
         //handle search
         if ($request->has('search') && $request->search != '') {
@@ -310,7 +324,7 @@ class PageNavController extends Controller
         }
             
         $activities = $query->with('day.module')->orderBy('order')->paginate(6);
-        $view = view('components.search-results', ['activities' => $activities])->render();
+        $view = view('components.search-results', ['activities' => $activities, 'random' => $random_act])->render();
 
         return response()->json(['html' => $view]);
     }
