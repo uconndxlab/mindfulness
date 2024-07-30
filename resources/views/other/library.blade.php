@@ -128,7 +128,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button id="apply_filter_button" type="submit" class="btn btn-primary">Apply Filter</button>
+                        <button id="apply_filter_button" type="button" class="btn btn-primary">Apply Filter</button>
                         <button id="clear_filter_button" type="button" style="color:#000!important" class="btn btn-link text-center mt-1 mb-2">Clear Filters</button>
                     </div>
                     <div id="activitiesContainer" class="col-md-8">
@@ -221,6 +221,10 @@
         var _modules = null;
         var _start = null;
         var _end = null;
+        //when apply search with filters
+        document.getElementById('apply_filter_button').addEventListener('click', function() {
+            search(true);
+        });
         function saveFilters() {
             //save the filters
             _categories = getChecked('categories');
