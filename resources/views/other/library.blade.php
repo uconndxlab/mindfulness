@@ -149,6 +149,36 @@
         var sfForm = document.getElementById('search_filter_form');
 
         var searchBar = document.getElementById('search_bar');
+
+        var baseParam = '{{ $base_param }}';
+
+        //load in old filter values
+        function loadFilters() {
+            console.log('loading values');
+            var filters = null;
+            if (baseParam == 'meditation') {
+                filters = JSON.parse(sessionStorage.getItem('meditation_filters'));
+            }
+            else {
+                filters = JSON.parse(sessionStorage.getItem('favorite_filters'));
+            }
+            if (filters) {
+                //search
+                searchBar.value = filters.search || '';
+                //time
+                startTimeInput.value = filters.start || 0;
+                endTimeInput.value = filters.end || 30;
+                //categories
+                document.querySelectorAll('input[name="category[]"]').forEach(checkbox => {
+                    checkbox.checked = filters.categories.includes(checkbox.value);
+                });
+                //modules
+                document.querySelectorAll('input[name="module[]"]').forEach(checkbox => {
+                    checkbox.checked = filters.modules.includes(checkbox.value);
+                });
+            }
+        }
+        loadFilters();
         
         //SLIDER INIT
         //gets vals from previous request
@@ -258,7 +288,7 @@
                 end: _end
             };
 
-            if ('{{ $base_param == 'meditation'}}') {
+            if (baseParam == 'meditation') {
                 sessionStorage.setItem('meditation_filters', JSON.stringify(filters));
             }
             else {
@@ -344,8 +374,7 @@
                 checkbox.checked = false;
             });
             //resetting the time filter
-            startTimeInput.remove();
-            endTimeInput.remove();
+            slider.noUiSlider.set([0, 30]);
             //submit
             search(true);
         }
