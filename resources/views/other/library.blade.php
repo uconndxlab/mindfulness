@@ -128,7 +128,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Apply Filter</button>
+                        <button id="apply_filter_button" type="submit" class="btn btn-primary">Apply Filter</button>
                         <button id="clear_filter_button" type="button" style="color:#000!important" class="btn btn-link text-center mt-1 mb-2">Clear Filters</button>
                     </div>
                     <div id="activitiesContainer" class="col-md-8">
@@ -216,8 +216,54 @@
         //init labels
         slider.noUiSlider.set([parseInt(startVal), parseInt(endVal)]);
         
+        //APPLY/SAVE FILTERS
+        var _categories = null;
+        var _modules = null;
+        var _start = null;
+        var _end = null;
+        function saveFilters() {
+            //save the filters
+            _categories = getChecked('categories');
+            _modules = getChecked('modules');
+            _start = startTimeInput.value;
+            _end = endTimeInput.value;
+        }
 
-        //get params
+        //build query params
+        function getQueryParams() {
+            const params = new URLSearchParams();
+            //search
+            params.append('search', searchBar.value);
+            
+            //time
+            if (_end != 30 || _start != 0) {
+                params.append('start_time', _start);
+                params.append('end_time', _end);
+            }
+            //categories and modules
+            _categories.forEach(category => params.append('category[]', category));
+            params.append('category[]', '{{ $base_param }}')
+            _modules.forEach(module_ => params.append('module[]', module_));
+
+            //saving recent search to session
+            const filters = {
+                search: searchBar.value,
+                categories: _categories,
+                modules: _modules,
+                start: _start,
+                end: _end
+            };
+
+            if ('{{ $base_param == 'meditation'}}') {
+                sessionStorage.setItem('meditation_filters', JSON.stringify(filters));
+            }
+            else {
+                sessionStorage.setItem('favorite_filters', JSON.stringify(filters));
+            }
+            
+            return params.toString();
+        }
+
         function getChecked(catOrMod) {
             //get all checked
             var checkboxes = null;
@@ -231,28 +277,18 @@
             return list;
         }
 
+
         console.log('about to search...');
         //LOAD SEARCH
-        function search() {
-            //build query params
-            const query = searchBar.value;
+        function search(filters = false) {
+            //build url
             const searchUrl = new URL('{{ route('library.search') }}');
-            //search
-            searchUrl.searchParams.append('search', query);
-            //time
-            var start = startTimeInput.value;
-            var end = endTimeInput.value;
-            if (end != 30 || start != 0) {
-                searchUrl.searchParams.append('start_time', startTimeInput.value);
-                searchUrl.searchParams.append('end_time', endTimeInput.value);
+            if (filters) {
+                saveFilters();
             }
-            //categories and modules
-            var categories = getChecked('categories');
-            var modules = getChecked('modules');
-            categories.forEach(category => searchUrl.searchParams.append('category[]', category));
-            searchUrl.searchParams.append('category[]', '{{ $base_param }}')
-            modules.forEach(module_ => searchUrl.searchParams.append('module[]', module_));
-
+            const params = getQueryParams();
+            searchUrl.search = params;
+            console.log(params);
             //perform search
             fetch(searchUrl, {
                 method: 'GET',
@@ -272,16 +308,16 @@
                 console.error('Error performing search', error);
             });
         }
-        //search on page load
-        search();
+        //search on page load with filters
+        search(true);
         
-        //SUBMISSION
+        //SUBMISSION - filters (apply button)
         sfForm.addEventListener('submit', function(event) {
             event.preventDefault();
-            search();
+            search(true);
         });
         
-        // keyboard submit on input
+        // keyboard submit on input - ignores filters
         // timeout to limit request rate
         let timeout = null;
         searchBar.addEventListener('input', function() {
@@ -291,7 +327,7 @@
             }, 300);
         });
 
-        //CLEAR FILTERS
+        //CLEAR FILTERS - resubmit/search
         const moduleDiv = document.getElementById('module_check');
         const categoryDiv = document.getElementById('category_check');
         document.getElementById('clear_filter_button').addEventListener('click', clearFilters);
@@ -307,10 +343,10 @@
             startTimeInput.remove();
             endTimeInput.remove();
             //submit
-            search();
+            search(true);
         }
 
-        //CLEAR SEARCH
+        //CLEAR SEARCH - ignores filters
         document.getElementById('clear_search_button').addEventListener('click', clearSearch);
         function clearSearch() {
             searchBar.value = '';
