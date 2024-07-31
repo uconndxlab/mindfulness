@@ -1,0 +1,16 @@
+[
+    {
+        "id": 1,
+        "module_id": 1,
+        "name": "Monday",
+        "description": "Today, you reflect on your intentions and set yourself up for success in this Healing Hearts journey! A good beginning is half the battle!",
+        "order": 1
+    },
+    {
+        "id": 2,
+        "module_id": 1,
+        "name": "Tuesday",
+        "description": "Today you will learn how to be curious and practice a new way to connect with your body!",
+        "order": 2
+    }
+]

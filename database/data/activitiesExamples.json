@@ -2,23 +2,17 @@
     {
         "id": 1,
         "day_id": 1,
-        "title": "Activity 1",
-        "sub_header": "Welcome",
+        "title": "Welcome",
         "type": "lesson",
-        "end_behavior": "none",
+        "time": 3,
         "order": 1,
-        "next_fake": 2,
-        "time": [
-            3
-        ]
+        "next_fake": 2
     },
     {
         "id": 2,
         "day_id": 1,
-        "title": "Activity 1",
-        "sub_header": "What is Mindfulness?",
+        "title": "What is Mindfulness?",
         "type": "lesson",
-        "end_behavior": "quiz",
         "order": 2,
         "next_fake": 3,
         "time": [

@@ -2,36 +2,102 @@
     {
         "id": 1,
         "day_id": 1,
-        "title": "Activity 1",
-        "sub_header": "Welcome",
-        "type": "lesson",
-        "end_behavior": "none",
+        "title": "Welcome",
+        "time": 2,
         "order": 1,
         "next_fake": 2
     },
     {
         "id": 2,
         "day_id": 1,
-        "title": "Activity 2",
-        "sub_header": "What is Mindfulness?",
-        "type": "lesson",
-        "end_behavior": "quiz",
+        "title": "Your Child's 30th Birthday",
+        "type": "practice",
+        "time": 7,
         "order": 2,
         "next_fake": 3
     },
     {
         "id": 3,
         "day_id": 1,
-        "title": "Activity 3",
-        "sub_header": "Body Scan",
-        "type": "practice",
-        "end_behavior": "journal",
+        "title": "Goals",
+        "type": "quiz",
+        "time": null,
         "order": 3,
-        "next_fake": null,
-        "time": [
-            7,
-            13,
-            21
-        ]
+        "next_fake": 4
+    },
+    {
+        "id": 4,
+        "day_id": 1,
+        "title": "Morning Glory Time",
+        "type": "lesson",
+        "time": 4,
+        "order": 4,
+        "next_fake": 5
+    },
+    {
+        "id": 5,
+        "day_id": 1,
+        "title": "Journal",
+        "type": "journal",
+        "time": null,
+        "completion_message": "Check out the workbook on how to create reminders, remove barriers, and other tools to help you succeed!",
+        "order": 5,
+        "next_fake": 6
+    },
+    {
+        "id": 6,
+        "day_id": 2,
+        "title": "Introduce COMPASS",
+        "type": "lesson",
+        "time": 1,
+        "order": 6,
+        "next_fake": 7
+    },
+    {
+        "id": 7,
+        "day_id": 2,
+        "title": "Curiosity",
+        "type": "lesson",
+        "time": 3,
+        "order": 7,
+        "next_fake": 8
+    },
+    {
+        "id": 8,
+        "day_id": 2,
+        "title": "Body Scan",
+        "type": "practice",
+        "time": 7,
+        "order": 8,
+        "next_fake": 9
+    },
+    {
+        "id": 9,
+        "day_id": 2,
+        "title": "Journaling",
+        "type": "journal",
+        "time": null,
+        "order": 9,
+        "next_fake": null
+    },
+    {
+        "id": 10,
+        "day_id": 2,
+        "title": "Body Scan",
+        "type": "practice",
+        "time": null,
+        "order": 10,
+        "optional": true,
+        "next_fake": null
+    },
+    {
+        "id": 11,
+        "day_id": 2,
+        "title": "Body Scan",
+        "type": "practice",
+        "time": null,
+        "order": 10,
+        "optional": true,
+        "next_fake": null
     }
 ]

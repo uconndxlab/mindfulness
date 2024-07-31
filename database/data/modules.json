@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "name": "Part 1 - Foundational Skills",
+        "description": "This week is about learning skills to transform how you feel every day and boost your health and mental sharpness! Learning new skills can be hard and takes courage and commitment!",
+        "workbook_path": null,
+        "order": 1
+    },
+    {
+        "id": 2,
+        "name": "Part 2",
+        "description": "",
+        "workbook_path": null,
+        "order": 2
+    },
+    {
+        "id": 3,
+        "name": "Part 3",
+        "description": "",
+        "workbook_path": null,
+        "order": 3
+    },
+    {
+        "id": 4,
+        "name": "Part 4",
+        "description": "",
+        "workbook_path": null,
+        "order": 4
+    }
+]

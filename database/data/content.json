@@ -2,22 +2,80 @@
     {
         "activity_id": 1,
         "type": "audio",
-        "file_path": "Module 1 Activity 1 - Welcome message (3 min).m4a"
+        "file_path": "1.1 Welcome Message (AI)(2 min).mp3",
+        "audio_options": {
+            "AI": {
+                "2": "1.1 Welcome Message (AI)(2 min).mp3"
+            }
+        }
     },
     {
         "activity_id": 2,
         "type": "audio",
-        "file_path": "Module 1 Activity 1 - What is mindfulness.m4a"
+        "file_path": "1.1 Your Childs 30th Birthday (Na)(7 min).m4a",
+        "audio_options": {
+            "Na": {
+                "7": "1.1 Your Childs 30th Birthday (Na)(7 min).m4a"
+            }
+        }
     },
     {
-        "activity_id": 3,
+        "activity_id": 4,
         "type": "audio",
-        "file_path": "Module 1 Activity 3 - Body Scan (7 min).m4a",
+        "file_path": "1.1 Morning Glory Time (Na)(4 min).m4a",
         "audio_options": {
-            "Voice select...": {
-                "7": "Module 1 Activity 3 - Body Scan (7 min).m4a",
-                "13": "Module 1 Optional 1 Body Scan (13 min).m4a",
-                "21": "Module 1 Optional 2 Body Scan (21 min).MP3"
+            "Na": {
+                "4": "1.1 Morning Glory Time (Na)(4 min).m4a"
+            }
+        }
+    },
+    {
+        "activity_id": 6,
+        "type": "audio",
+        "file_path": "1.2 Introducing COMPASS (AI)(1 min).mp3",
+        "audio_options": {
+            "AI": {
+                "4": "1.2 Introducing COMPASS (AI)(1 min).mp3"
+            }
+        }
+    },
+    {
+        "activity_id": 7,
+        "type": "audio",
+        "file_path": "1.2 Curiosity (AI)(3 min).mp3",
+        "audio_options": {
+            "AI": {
+                "3": "1.2 Curiosity (AI)(3 min).mp3"
+            }
+        }
+    },
+    {
+        "activity_id": 8,
+        "type": "audio",
+        "file_path": "1.2 Body Scan (Na)(7 min).m4a",
+        "audio_options": {
+            "Na": {
+                "7": "1.2 Body Scan (Na)(7 min).m4a"
+            }
+        }
+    },
+    {
+        "activity_id": 10,
+        "type": "audio",
+        "file_path": "1.2 Body Scan (Na)(13 min)(Optional).m4a",
+        "audio_options": {
+            "Na": {
+                "13": "1.2 Body Scan (Na)(13 min)(Optional).m4a"
+            }
+        }
+    },
+    {
+        "activity_id": 11,
+        "type": "audio",
+        "file_path": "1.2 Body Scan (Na)(21 min)(Optional).MP3",
+        "audio_options": {
+            "Na": {
+                "21": "1.2 Body Scan (Na)(21 min)(Optional).MP3"
             }
         }
     }

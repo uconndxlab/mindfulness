@@ -20,51 +20,38 @@ class RestructureSeeder extends Seeder
 
     public function run(bool $examples = false): void
     {
-        //basic population
-        // $oldModule = null;
-        $day_order = 1;
-        for ($i = 1; $i <= 4; $i++) {
-            $module = Module::create([
-                'name' => 'Module '.$i,
-                'order' => $i,
-                'description' => 'This is a sample description for Module '.$i,
-                'workbook_path' => 'pdfExample.pdf'
-            ]);
-            //logic for assigning next attribute
-            // if ($i == 1) {
-            //     $oldModule = $module;
-            //     $module->save();
-            // }
-            // if ($oldModule) {
-            //     $oldModule->next = $module->id;
-            //     $oldModule->save();
-            //     $oldModule = $module;
-            // }
+        $ftype = $examples ? "Examples.json" : ".json";
 
-            // $oldDay = null;
-            for ($j = 1; $j <= 5; $j++) {
+        //populate modules and days with data
+        $modules = json_decode(file_get_contents(database_path('data/modules.json')), true);
+        $days = json_decode(file_get_contents(database_path('data/days.json')), true);
+
+        foreach ($modules as $module) {
+            $extract = collect($module)->toArray();
+            Module::create($extract);
+        }
+
+        $day_order = 1;
+        foreach ($days as $day) {
+            $extract = collect($day)->toArray();
+            Day::create($extract);
+            $day_order++;
+        }
+
+        //populating extra example days
+        foreach (Module::all() as $module) {
+            for ($j = $module->id == 1 ? 3 : 1; $j <= 5; $j++) {
                 $day = Day::create([
                     'module_id' => $module->id,
                     'name' => 'Day '.$j,
-                    'order' => $day_order,
-                    'description' => 'This is a sample description for Day '.$j.', in Module '.$i,
-                    'deleted' => false
+                    'order' => $day_order++,
+                    'description' => 'This is a sample description for Day '.$j.', in '.$module->name
                 ]);
-
-                // if ($j == 1) {
-                //     $oldDay = $day;
-                // }
-                // if ($oldDay) {
-                //     $oldDay->next = $day->id;
-                //     $oldDay->save();
-                //     $oldDay = $day;
-                // }
-                $day_order++;
             }
         }
+        
 
         //populating activities
-        $ftype = $examples ? "Examples.json" : ".json";
         $activities = json_decode(file_get_contents(database_path('data/activities'.$ftype)), true);
 
         $order = 1;
@@ -78,10 +65,13 @@ class RestructureSeeder extends Seeder
         //applying the next
         $act = null;
         foreach ($activities as $activity) {
-            $act = Activity::findOrFail($activity['id']);
-            $act->next = $activity['next_fake'];
-            $act->deleted = false;
-            $act->save();
+            $new = Activity::findOrFail($activity['id']);
+            $new->next = $activity['next_fake'];
+            $new->deleted = false;
+            $new->save();
+            if (!$new->optional) {
+                $act = $new;
+            }
         }
     
         $end = $examples ? 7 : 5;
@@ -92,10 +82,9 @@ class RestructureSeeder extends Seeder
                 $new = Activity::create([
                     'day_id' => $day->id,
                     'title' => 'Example ' . $i,
-                    'type' => $i > 5 ? 'practice' : 'lesson',
+                    'type' => null,
                     'order' => $i > 5 ? $order-1 : $order++,
-                    'optional' => $i > 5,
-                    'deleted' => false
+                    'optional' => $i > 5
                 ]);
 
                 if ($i <= 5) {
