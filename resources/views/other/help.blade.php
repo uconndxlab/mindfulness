@@ -27,34 +27,6 @@
         
         <div id="FAQ">
             <h5 class="text-center fw-bold mt-4">FAQ</h5>
-            <div class="col md-5">
-                <div id="faqCarousel" class="carousel carousel-dark slide" data-bs-ride="carousel">
-                    <div class="carousel-inner">
-                        @foreach ($faqs as $index => $faq)
-                            <div class="carousel-item {{ $index == 0 ? 'active' : '' }}" data-bs-interval="60000">
-                                <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
-                                    <div class="prior-note">
-                                        <div class="top-note">
-                                            <h5 class="fw-bold d-flex justify-content-between">
-                                                <span>{{ $faq->question }}</span>
-                                            </h5>
-                                        </div>
-                                        <p class="note-content">{{ $faq->answer }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#faqCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#faqCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
-                </div>
-            </div>
             <div class="accordion accordion-flush mb-3" id="filter_accordion">
                 @foreach ($faqs as $index => $faq)
                     <div class="form-group accordion-item border mb-2">
