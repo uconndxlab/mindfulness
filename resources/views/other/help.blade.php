@@ -92,7 +92,7 @@
                 @csrf
                 <div class="mb-3">
                     <label for="subject" class="form-label">Subject</label>
-                    <input type="text" class="form-control" id="subject" name="subject" value="{{ old('subject') }}">
+                    <input type="text" class="form-control" id="subject" name="subject" value="{{ old('subject') }}" placeholder="Examples: bug, library help,...">
                     @error('subject')
                         <div class="text-danger">{{ $message }}</div>
                     @enderror

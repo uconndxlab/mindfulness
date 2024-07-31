@@ -59,15 +59,15 @@
                         </h5>
                         <small>{{ $note->formatted_date }}</small>
                     </div>
-                    @if (strlen($note->note) > 175)
+                    @if (strlen($note->note) > 100)
                         <div id="note_content_{{ $index }}" class="note-content-extra">
                             <p class="note-content">
-                                {{ substr($note->note, 0, 150) }}
+                                {{ substr($note->note, 0, 75) }}
                                 <span class="dots">
                                     ...
                                 </span>
                                 <span class="more-text" style="display: none">
-                                    {{ substr($note->note, 150) }}
+                                    {{ substr($note->note, 75) }}
                                 </span>
                             </p>
                             <button id="read_more_{{ $index }}"class="btn btn-link read-more-btn">Read More...</button>
