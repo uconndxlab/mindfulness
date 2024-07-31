@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "day_id": 1,
+        "title": "Activity 1",
+        "sub_header": "Welcome",
+        "type": "lesson",
+        "end_behavior": "none",
+        "order": 1,
+        "next_fake": 2
+    },
+    {
+        "id": 2,
+        "day_id": 1,
+        "title": "Activity 2",
+        "sub_header": "What is Mindfulness?",
+        "type": "lesson",
+        "end_behavior": "quiz",
+        "order": 2,
+        "next_fake": 3
+    },
+    {
+        "id": 3,
+        "day_id": 1,
+        "title": "Activity 3",
+        "sub_header": "Body Scan",
+        "type": "practice",
+        "end_behavior": "journal",
+        "order": 3,
+        "next_fake": null,
+        "time": [
+            7,
+            13,
+            21
+        ]
+    }
+]

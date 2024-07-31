@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Module;
-use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\Note;
+use App\Models\Activity;
+use App\Models\Module;
+use App\Models\UserActivity;
+use App\Models\Faq;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -25,133 +26,397 @@ class PageNavController extends Controller
         return view("auth.voice-select");
     }
 
-    public function journalPage()
+    //EXPLORE
+    public function exploreHome()
     {
+        //handle navigation
+        Session::put('current_nav', ['route' => route('explore.home'), 'back' => 'Home']);
+        Session::put('previous_explore', route('explore.home'));
+
+        //get modules and progress
+        $modules = Module::orderBy('order', 'asc')->get();
+        $module_ids = $modules->pluck('id')->toArray();
+        $progress = getModuleProgress(Auth::id(), $module_ids);
+        
+        foreach ($modules as $module) {
+            $module->progress = $progress[$module->id];
+        }
+        return view("explore.home", compact('modules'));
+    }
+
+    public function exploreModule($module_id)
+    {
+        //find the module
+        $module = Module::with('days.activities')->findOrFail($module_id);
+
+        //check progress
+        if (getModuleProgress(Auth::id(), [$module_id])[$module_id]['status'] == 'locked') {
+            return redirect()->back();
+        }
+        
+        //get progress
+        $day_ids = $module->days()->pluck('id')->toArray();
+        $progress = getDayProgress(Auth::id(), $day_ids);
+
+        //sorting the activities within each day
+        foreach ($module->days as $day) {
+            $day->activities = $day->activities->sortBy(function ($activity) {
+                return [$activity->optional, $activity->order];
+            })->values();
+
+            //assign the progress
+            $day->progress = $progress[$day->id];
+        }
+
+        //set back route
+        $page_info['back_label'] = " Back to Home";
+        $page_info['back_route'] = route('explore.home');
+
+        //handle navigation
+        Session::put('current_nav', ['route' => route('explore.module', ['module_id' => $module_id]), 'back' => 'Module '.$module_id]);
+        Session::put('previous_explore', route('explore.module', ['module_id' => $module_id]));
+        
+        return view("explore.module", compact('module', 'page_info'));
+    }
+
+    public function exploreActivity($activity_id, Request $request)
+    {
+        $user = Auth::user();
+        //find activity
+        $activity = Activity::findOrFail($activity_id);
+        //check progress and set status
+        $user->load('progress_activities');
+        $activity->status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
+        if ($activity->status == 'locked' || $activity->deleted == true) {
+            return redirect()->back();
+        }
+        
+        //get content
+        $content = $activity->content;
+        //decode the audio options
+        if ($content && $content->type == 'audio' && $content->audio_options) {
+            $content->audio_options = json_decode($content->audio_options, true);
+        }
+        
+        //favoriting
+        $is_favorited = $user->favorites()->where('activity_id', $activity_id)->exists();
+
+        $page_info = [];
+        
+        //setting exit button
+        $exit = Session::get('current_nav');
+        $page_info['exit_route'] = $exit ? $exit['route'] : route('explore.home');
+        
+        //NEXT/FINISH redirect
+        //make sure that if doing next, the day is not changing
+        if (!$request->library) {
+            if ($activity->next && Activity::find($activity->next)->day->id == $activity->day->id) {
+                $page_info['redirect_label'] = "NEXT";
+                $page_info['redirect_route'] = route('explore.activity', ['activity_id' => $activity->next]);
+            }
+            else {
+                $page_info['redirect_label'] = "FINISH";
+                $page_info['redirect_route'] = $page_info['exit_route'];
+            }
+        }
+
+        //setting back route
+        $page_info['back_label'] = $exit ? ' Back to '.$exit['back'] : ' Back';
+        $page_info['back_route'] = $page_info['exit_route'];
+
+        $page_info['hide_bottom_nav'] = true;
+
+        //end behavior - for activities
+        if ($activity->end_behavior != 'none') {
+            if ($activity->end_behavior == "journal") {
+                $page_info['end_label'] = "JOURNAL";
+                $page_info['end_route'] = route('journal', ['activity_id' => $activity->id, 'library' => $request->library]);
+            }
+            else if ($activity->end_behavior == "quiz" && $activity->quiz) {
+                $page_info['end_label'] = "QUIZ";
+                $page_info['end_route'] = route('explore.quiz', ['quiz_id' => $activity->quiz->id, 'library' => $request->library]);
+            }
+        }
+        return view("explore.activity", compact('activity', 'content', 'is_favorited', 'page_info'));
+    }
+    
+    //QUIZ
+    public function exploreQuiz($quiz_id, Request $request) {
+        //find quiz
+        $quiz = Quiz::findOrFail($quiz_id);
+        
+        //check progress
+        $user = Auth::user();
+        $user->load('progress_activities');
+        $activity = Activity::findOrFail($quiz->activity->id);
+        $status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
+        if ($status != 'completed'  || $activity->deleted == true) {
+            return redirect()->back();
+        }
+
+        //see if an answer is saved
+        $saved_answer = Session::get('saved_answer');
+        if ($saved_answer && $saved_answer['quiz_id'] == $quiz_id) {
+            //convert options and get feedback
+            $options = $quiz->options_feedback ?? [];
+            //passing information through quiz
+            $quiz->saved_answer = $saved_answer['answer'];
+            $quiz->feedback = $options[$saved_answer['answer']]['feedback'];
+            $quiz->is_correct = $saved_answer['correct'];
+        }
+        else {
+            Session::forget('saved_answer');
+            $quiz->saved_answer = null;
+        }
+
+        $page_info = [];
+
+        //setting exit route
+        $exit = Session::get('current_nav');
+        $page_info['exit_route'] = $exit ? $exit['route'] : route('explore.home');
+
+        //set the end behavior - next only on same day
+        if (!$request->library) {
+            if ($quiz->activity->next && Activity::find($quiz->activity->next)->day->id == $quiz->activity->day->id) {
+                $page_info['redirect_label'] = "NEXT";
+                $page_info['redirect_route'] = route('explore.activity', ['activity_id' => $quiz->activity->next]);
+            }
+            else {
+                $page_info['redirect_label'] = "FINISH";
+                $page_info['redirect_route'] = $exit;
+            }
+        }
+
+        //setting back route/label
+        $page_info['back_label'] = ' Back to '.$quiz->activity->title;
+        $page_info['back_route'] = route('explore.activity', ['activity_id' => $quiz->activity_id, 'library' => $request->library]);
+        
+        $page_info['hide_bottom_nav'] = true;
+        return view('explore.quiz', compact('quiz', 'page_info'));
+    }
+    
+    public function submitQuiz(Request $request)
+    {
+        //get quiz and check answer
+        $quiz = Quiz::find($request->quiz_id);
+        $selected_option = intval($request->answer);
+        $is_correct = $quiz->correct_answer == $selected_option+1;
+        $feedback = null;
+        
+        //convert options and get feedback
+        $options = $quiz->options_feedback ?? [];
+        $feedback = $options[$selected_option]['feedback'];
+        
+        //save answer in case returned to this page soon
+        Session::put('saved_answer', ['quiz_id' => $request->quiz_id, 'answer' => $selected_option, 'correct' => $is_correct]);
+        
+        return redirect()->back()->with([
+            'feedback' => $feedback,
+            'is_correct' => $is_correct
+            ])->withInput();
+        }
+        
+        public function exploreBrowseButton(Request $request) {
+            //browse nav button - check for previous explore page
+            //active is for double click functionality
+        $previous = Session::get('previous_explore');
+        if ($previous && !$request->active) {
+            return redirect()->to($previous);
+        }
+        else {
+            return redirect()->route('explore.home');
+        }
+    }
+
+    //LIBRARIES
+    public function library(Request $request) {
+        //library nav button - check for previous library
+        $previous = Session::get('previous_library');
+        if ($previous) {
+            return redirect()->to($previous);
+        }
+        else {
+            return redirect()->route('library.meditation');
+        }
+    }
+
+    public function librarySearch(Request $request) {
+
+        //get query of unlocked activities
+        $user_id = Auth::id();
+        //query for activities - keep as query
+        $activity_ids = UserActivity::where('user_id', $user_id)
+        ->where('status', '!=', 'locked')
+        ->pluck('activity_id');
+        $query = Activity::where('deleted', false)
+        ->whereIn('id', $activity_ids);
+        
+        //base param
+        $empty_text = null;
+        if ($request->base_param) {
+            if ($request->base_param == 'meditation') {
+                $query->where('type', 'practice');
+                $empty_text = 'Keep progressing to unlock more meditation sessions...';
+            }
+            else if ($request->base_param = 'favorited') {
+                $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
+                $query->whereIn('id', $fav_ids);
+                $empty_text = '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>';
+            }
+        }
+
+        //check if empty
+        $empty = !$query->exists();
+        if ($empty) {
+            $view = view('components.search-results', ['empty_text' => $empty_text])->render();
+            return response()->json(['html' => $view]);
+        }
+
+        //pulling random item
+        $query_clone = clone $query;
+        $random_act = $query_clone->inRandomOrder()->first();
+        
+        //handle search
+        if ($request->has('search') && $request->search != '') {
+            $query->where(function ($in_query) use ($request) {
+                $in_query->where('title', 'like', '%' . $request->search . '%')
+                ->orWhere('sub_header', 'like', '%' . $request->search . '%');
+            });
+        }
+        
+        //handle categories
+        $categories = $request->input('category', []);
+        if (!empty($categories)) {
+            //filter based on the categories
+            foreach($categories as $category) {
+                $lower = strtolower($category);
+                if ($lower == 'audio' || $lower == 'video') {
+                    $query->whereHas('content', function ($in_query) use ($lower) {
+                        $in_query->where('type', $lower);
+                    });
+                }
+                else if ($lower == 'favorited') {
+                    $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
+                    $query->whereIn('id', $fav_ids);
+                }
+                else if ($lower == 'meditation') {
+                    $query->where('type', 'practice');
+                }
+                else if ($lower == 'optional') {
+                    $query->where('optional', true);
+                }
+                else if ($lower == 'quiz') {
+                    $query->where('end_behavior', 'quiz');
+                }
+            }
+        }
+        
+        //handle modules
+        $module_ids = $request->input('module', []);
+        if (!empty($module_ids)) {
+            //filter based on the module ids
+            $query->whereHas('day.module', function ($in_query) use ($module_ids) {
+                $in_query->whereIn('id', $module_ids);
+            });
+        }
+        
+        //handle time
+        if ($request->has(['start_time', 'end_time']) && ($request->start_time != 0 || $request->end_time != 30)) {
+            $start = $request->start_time;
+            $end = $request->end_time;
+            $query->where('time', '!=', null)->whereRaw("
+            EXISTS (
+                SELECT 1
+                FROM json_each(activities.time)
+                WHERE CAST(json_each.value AS INTEGER) BETWEEN ? AND ?
+                )
+                ", [$start, $end]);
+        }
+            
+        $activities = $query->with('day.module')->orderBy('order')->paginate(6);
+        $view = view('components.search-results', ['activities' => $activities, 'random' => $random_act])->render();
+
+        return response()->json(['html' => $view]);
+    }
+
+    public function favoritesLibrary(Request $request)
+    {
+        $base_param = 'favorited';
+
+        $page_info = [
+            'title' => 'Favorites',
+            'search_route' => route('library.favorites'),
+            'search_text' => 'Search for your favorite activity...'
+        ];
+
+        $categories = ['Meditation', 'Audio', 'Video', 'Quiz', 'Optional'];
+
+        //set as the previous library and save as exit
+        Session::put('previous_library', route('library.favorites'));
+        Session::put('current_nav', ['route' => route('library.favorites'), 'back' => 'Favorites']);
+        return view('other.library', compact('base_param', 'page_info', 'categories'));
+    }
+    public function meditationLibrary(Request $request)
+    {
+        $base_param = 'meditation';
+
+        $page_info = [
+            'title' => 'Meditation Library',
+            'search_route' => route('library.meditation'),
+            'search_text' => 'Search for a meditation exercise...'
+        ];
+
+        $categories = ['Favorited', 'Audio', 'Video', 'Quiz', 'Optional'];
+
+        //set as the previous library and save as exit
+        Session::put('previous_library', route('library.meditation'));
+        Session::put('current_nav', ['route' => route('library.meditation'), 'back' => 'Meditation Library']);
+        return view("other.library", compact('base_param', 'page_info', 'categories'));
+    }
+    
+    public function journalPage(Request $request)
+    {
+        $page_info = [];
+
+        //check if coming from an activity
+        $activity_id = $request->activity_id;
+        if ($activity_id) {
+            $page_info['back_label'] = ' Back to '.Activity::findOrFail($activity_id)->title;
+            $page_info['back_route'] = route('explore.activity', ['activity_id' => $activity_id, 'library' => $request->library]);
+            $page_info['hide_bottom_nav'] = true;
+            return view("other.journal", compact('activity_id', 'page_info'));
+        }
+
+        //otherwise normal notes page
         //get user
         $id = Auth::id();
-        $notes = Note::where('user_id', $id)->orderBy('created_at', 'desc')->get();
+        $notes = Note::where('user_id', $id)->orderBy('created_at', 'desc')->paginate(5);
         //formatting the date
         foreach ($notes as $note) {
             $date = Carbon::parse($note->created_at);
             $date->setTimezone(new \DateTimeZone('EST'));
             $note->formatted_date = $date->diffForHumans().', '.$date->toFormattedDayDateString();
         }
-        return view("profile.journal", compact("notes"));
+        return view("other.journal", compact('notes', 'page_info'));
     }
-
-    public function backButton() {
-        //back button functionality - get route, forget key, redirect
-
-        //if from admin page, get separate session variable
-        $prev_path = parse_url(url()->previous(), PHP_URL_PATH);
-        if (Str::startsWith($prev_path, '/admin')) {
-            $backRoute = Session::get("admin_back_route");
-            Session::forget("admin_back_route");
-        }
-        else {
-            $backRoute = Session::get("back_route");
-            Session::forget("back_route");
-        }
-        return redirect()->to($backRoute);
-    }
-
-    public function profilePage()
+    
+    public function accountPage()
     {
-        //set nav bar buttons
-        $showBackBtn = true;
-        $hideProfileLink = true;
-        //if returning from profile submission or admin page, do not reset back_route
-        $prev_path = parse_url(url()->previous(), PHP_URL_PATH);
-        if ($prev_path != "/profile" && !Str::startsWith($prev_path, '/admin')) {
-            Session::put("back_route", url()->previous());
-        }
-        return view("profile.accountInformation", compact("showBackBtn", "hideProfileLink"));
-    }
+        $page_info = [];
+        $page_info['hide_account_link'] = true;
 
-    public function getModulesList() {
-        //get list of modules
-        $modules = Module::orderBy('module_number', 'asc')->get();
-
-        //get associated lessons for each module
+        //calculating progress
+        $modules = Module::orderBy('order', 'asc')->get();
+        $progress = getModuleProgress(Auth::id(), $modules->pluck('id')->toArray());
         foreach ($modules as $module) {
-            $lessons = Lesson::where('module_id', $module->id)
-                                ->orderBy('lesson_number', 'asc')
-                                ->select('id', 'title')
-                                ->get();
-            $module->lessons = $lessons;
+            $module->progress = $progress[$module->id];
         }
-        return $modules;
+        return view("other.account", compact('page_info', 'modules'));
     }
 
-    public function exploreHome()
+    public function helpPage()
     {
-        //get list of modules
-        $modules = $this->getModulesList();
-        //track explore page
-        Session::put('last_explore_page', 'explore');
-        return view("explore.home", compact('modules'));
+        $faqs = Faq::all();
+        return view("other.help", compact('faqs'));
     }
-
-    public function exploreLesson($lessonId) {
-        //set back_route
-        $showBackBtn = true;
-        Session::put("back_route", '/explore');
-        //track explore page for browse button
-        Session::put('last_explore_page', 'explore/'.$lessonId);
-        //get the lesson info
-        $lesson = Lesson::findOrFail($lessonId);
-        //get quizid
-        $quizId = null;
-        if ($lesson->end_behavior == 'quiz') {
-            $quizId = Quiz::where('lesson_id', $lesson->id)->value('id');
-        }
-        return view('explore.lesson', compact('showBackBtn', 'lessonId', 'lesson', 'quizId'));
-    }
-
-    public function exploreQuiz($quizId) {
-        //quiz info
-        $quiz = Quiz::findOrFail($quizId);
-        $showBackBtn = true;
-        //set routes for browse and back buttons
-        Session::put("back_route", '/explore/'.$quiz->lesson_id);
-        Session::put('last_explore_page', 'explore/quiz/'.$quizId);
-        //get activity title
-        $activityTitle = Lesson::find($quiz->lesson_id)->value('title');
-        return view('explore.quiz', compact('showBackBtn', 'quiz', 'activityTitle'));
-    }
-
-    public function submitQuiz(Request $request, $quizId)
-    {
-        //get quiz and chceck answer
-        $quiz = Quiz::find($quizId);
-        $selectedOption = intval($request->answer);
-        $isCorrect = $quiz->correct_answer == $selectedOption+1;
-        $feedback = null;
-        
-        //convert options and get feedback
-        $options = json_decode($quiz->options_feedback) ?? [];
-        $feedback = $options[$selectedOption]->feedback;
-
-        return redirect()->back()->with([
-            'feedback' => $feedback,
-            'is_correct' => $isCorrect
-        ])->withInput();
-    }
-
-    public function exploreBrowseButton() {
-        //double click functionality - if clicking browse while on an explore page
-        if (Str::startsWith(parse_url(url()->previous(), PHP_URL_PATH), '/explore')) {
-            return redirect()->route('explore.home');
-        }
-
-        //check session for last used explore page - resume on this page
-        $lastExplorePage = Session::get('last_explore_page');
-
-        if ($lastExplorePage && Str::startsWith($lastExplorePage, 'explore/')) {
-            return redirect()->to($lastExplorePage);
-        } else {
-            return redirect()->route('explore.home');
-        }
-    }
-
 }

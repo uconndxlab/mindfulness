@@ -10,9 +10,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class AuthController extends Controller
 {
+    use AuthenticatesUsers;
+
     public function loginPage()
     {
         return view('auth.login');
@@ -20,21 +23,39 @@ class AuthController extends Controller
 
     public function authenticate(Request $request)
     {
+        $request->validate([
+            'email' => ['required', 'email'],
+            'password' => 'required',
+        ], [
+            'email.required' => "Email address is required.",
+            'email.email' => "Not a valid email address.",
+            'password.required' => "Password is required."
+        ]);
+
         //check if user exists first
         $credentials = $request->only('email', 'password');
-        $user = User::where('email', $credentials['email'])->first();
-        if (!$user) { 
-            return back()->withErrors(['email' => 'Email not found.']);
-        }
+        // $user = User::where('email', $credentials['email'])->first();
+        // if (!$user) { 
+        //     return back()->withErrors(['email' => 'We can\'t find a user with that email address.']);
+        // }
 
-        //check authentication
         if (Auth::attempt($credentials)) {
-            return redirect()->intended('explore');
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
         }
-        return back()->withErrors(['password' => 'Invalid credentials.'])->withInput();
+        
+        //check auth and remember
+        $remember = $request->has('remember');
+        if (Auth::attempt($credentials, $remember)) {
+            return redirect()->intended('/explore/home');
+        }
+        
+        return back()->withErrors(['credentials' => 'Invalid credentials.'])->withInput();
     }
 
-    public function logout() {
+    public function logout(Request $request) {
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         Auth::logout();
         return redirect()->route('login');
     }
@@ -52,8 +73,16 @@ class AuthController extends Controller
         try {
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['required',  'string',  'lowercase',  'email',  'max:255',  'unique:'.User::class],
+                'email' => ['required',  'email',  'max:255',  'unique:'.User::class],
                 'password'=> ['required', Password::defaults()],
+            ], [
+                'name.required' => 'Please enter a name.',
+                'name.max' => 'Name must be no longer than 255 characters.',
+                'email.required' => 'Please enter an email address.',
+                'email.email' => 'Not a valid email.',
+                'email.max' => 'Email must be no longer than 255 characters.',
+                'email.unique' => 'The provided email is already in use.',
+                'password.required' => 'Please enter a password.'
             ]);
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
@@ -66,9 +95,14 @@ class AuthController extends Controller
             'password'=> Hash::make($request->password),
         ]);
 
+        //unlocking first module/day/activity
+        lockAll($user->id);
+        unlockFirst($user->id);
+
         //login and redirect
         event(new Registered($user));
-        Auth::login($user);
+        $remember = $request->has('remember');
+        Auth::attempt($request->only('email', 'password'), $remember);
         return redirect(route('welcome'));
     }
 }

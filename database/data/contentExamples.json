@@ -1,0 +1,57 @@
+[
+    {
+        "activity_id": 1,
+        "type": "audio",
+        "file_path": "Module 1 Activity 1 - Welcome message (3 min).m4a"
+    },
+    {
+        "activity_id": 2,
+        "type": "audio",
+        "file_path": "Module 1 Activity 1 - What is mindfulness.m4a",
+        "audio_options": {
+            "only voice": {
+                "1":  "Rocks on Rocks.m4a",
+                "10":  "Module 1 Activity 2 - Body Scan.m4a"
+            }
+        }
+    },
+    {
+        "activity_id": 3,
+        "type": "audio",
+        "file_path": "Rocks on Rocks.m4a",
+        "audio_options": {
+            "voice1": {
+                "1": "Rocks on Rocks.m4a"
+            },
+            "voice2": {
+                "10": "Module 1 Activity 2 - Body Scan.m4a",
+                "20": "Module 1 Activity 2 - Body Scan Long Version.MP3"
+            }
+        }
+    },
+    {
+        "activity_id": 51,
+        "type": "video",
+        "file_path": "videoExampleSnarky.MOV"
+    },
+    {
+        "activity_id": 51,
+        "type": "pdf",
+        "file_path": "pdfExample.pdf"
+    },
+    {
+        "activity_id": 4,
+        "type": "pdf",
+        "file_path": "pdfExample.pdf"
+    },
+    {
+        "activity_id": 5,
+        "type": "video",
+        "file_path": "videoExampleSnarky.MOV"
+    },
+    {
+        "activity_id": 54,
+        "type": "pdf",
+        "file_path": "pdfExample.pdf"
+    }
+]

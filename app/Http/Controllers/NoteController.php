@@ -31,21 +31,33 @@ class NoteController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate([
-                'note'=> ['required', 'string', 'max:1027'],
-                'word_otd'=> ['required', 'in:relax,compassion,other'],
+            $validatedData = $request->validate([
+                'note' => ['required', 'string', 'max:1027'],
+                'word_otd' => ['required', 'in:relax,compassion,other'],
+            ], [
+                'note.required' => 'Please enter a note.',
+                'note.string' => 'The note must be a string.',
+                'note.max' => 'The note may not be greater than 1027 characters.',
+                'word_otd.required' => 'Please select a word of the day.',
+                'word_otd.in' => 'Please select a word of the day.',
             ]);
+    
+            $note = Note::create([
+                'note' => $validatedData['note'],
+                'word_otd' => $validatedData['word_otd'],
+                'user_id' => Auth::id(),
+            ]);
+
+            //if submitted note after activity
+            if ($request->activity_id) {
+                return redirect()->route('explore.activity',  ['activity_id' => $request->activity_id])->with('success', 'Journal submitted!');
+            }
+    
+            return back()->with('success', 'Note saved.');
+    
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
         }
-        
-        $note = Note::create([
-            'note' => $request->note,
-            'word_otd'=> $request->word_otd,
-            'user_id'=> Auth::id(),
-        ]);
-
-        return back()->with('success', 'Note saved.');
     }
 
     /**

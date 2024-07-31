@@ -1,0 +1,64 @@
+[
+    {
+        "id": 1,
+        "day_id": 1,
+        "title": "Activity 1",
+        "sub_header": "Welcome",
+        "type": "lesson",
+        "end_behavior": "none",
+        "order": 1,
+        "next_fake": 2,
+        "time": [
+            3
+        ]
+    },
+    {
+        "id": 2,
+        "day_id": 1,
+        "title": "Activity 1",
+        "sub_header": "What is Mindfulness?",
+        "type": "lesson",
+        "end_behavior": "quiz",
+        "order": 2,
+        "next_fake": 3,
+        "time": [
+            1,
+            10
+        ]
+    },
+    {
+        "id": 3,
+        "day_id": 1,
+        "title": "Activity 2",
+        "sub_header": "Body Scan",
+        "type": "practice",
+        "end_behavior": "journal",
+        "order": 3,
+        "next_fake": 4,
+        "time": [
+            1,
+            10,
+            20
+        ]
+    },
+    {
+        "id": 4,
+        "day_id": 1,
+        "title": "PDF Example",
+        "sub_header": "Workbook example",
+        "type": "lesson",
+        "end_behavior": "journal",
+        "order": 4,
+        "next_fake": 5
+    },
+    {
+        "id": 5,
+        "day_id": 1,
+        "title": "Video Example",
+        "sub_header": "Snarky Puppy",
+        "type": "lesson",
+        "end_behavior": "none",
+        "order": 5,
+        "next_fake": null
+    }
+]

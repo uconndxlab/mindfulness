@@ -1,0 +1,17 @@
+[
+    {
+        "activity_id": 2,
+        "question": "Mindfulness is...",
+        "options_feedback": [
+            {
+                "option":"Stopping my thinking and Clearing my mind",
+                "feedback":"The correct answer here is Awareness and Heartfulness! Like you, many people think that mindfulness meditation is about stopping the thinking mind or clearing all thoughts and emotions\u2026 well, that is a wrong idea about mindfulness! The mind is always thinking and it is almost impossible to clear its thoughts and emotions. By practicing mindfulness, we are bringing awareness and heartfulness to all experiences, here and now, welcoming our thoughts and emotions, without pushing them away or taking them too personal or too seriously. We hope that you will learn more about mindfulness in this program!"
+            },
+            {
+                "option":"Awareness and Heartfulness",
+                "feedback":"Yes, that is the correct answer! By practicing mindfulness, we are bringing awareness and heartfulness to all experiences, here and now, welcoming our thoughts and emotions, without pushing them away or taking them too personal or too seriously. We hope that you will learn more about mindfulness in this program!"
+            }
+        ],
+        "correct_answer": 2
+    }
+]
