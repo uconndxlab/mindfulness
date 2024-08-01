@@ -12,6 +12,23 @@
         @endif
     </div>
 
+    <div class="modal fade" id="lockedActivityModal" tabindex="-1" aria-labelledby="lockedActivityModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="lockedActivityModalLabel">Activity Locked</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    This activity is currently locked. Continue progressing to unlock this activity.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="">
         <h4 class="mb-2">Sessions</h4>
     <div class="accordion accordion-flush mb-3" id="accordionDays">
@@ -39,23 +56,16 @@
                                     @php
                                         $title = $activity->optional ? 'OPTIONAL: '.$activity->title : $activity->title;
                                         $activity->status = $day->progress['activity_status'][$activity->id];
+                                        $disabled = $activity->status == 'locked' ? 'disabled' : '';
                                     @endphp
-                                    @if ($activity->status == 'completed')
-                                        <div class="card p-2 module mb-2">
-                                            <a id="moduleLink" class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}"><i class="bi bi-check2-square"></i>{{ $title }}</a>
-                                            <i class="bi bi-arrow-right"></i>
-                                        </div>
-                                    @elseif ($activity->status == 'unlocked')
-                                        <div class="card p-2 module mb-2">
-                                            <a id="moduleLink" class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">{{ $title }}</a>
-                                            <i class="bi bi-arrow-right"></i>
-                                        </div>
-                                    @else
-                                        <div class="card p-2 module mb-2">
-                                            <a id="moduleLink" class="stretched-link w-100 disabled">{{ $title }}</a>
-                                            <i class="bi bi-arrow-right"></i>
-                                        </div>
-                                    @endif
+                                    <div class="card p-2 module mb-2">
+                                        <a id="moduleLink" class="stretched-link w-100 activity-link {{ $disabled }}" data-id="{{ $activity->id }}" data-title="{{ $activity->title }}" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">
+                                            {!! $activity->status == 'completed' ? '<i class="bi bi-check2-square"></i>' : '' !!}
+                                            <span class="activity-font">{{ $title }}</span> <br>
+                                            <span class="sub-activity-font">{{ ucfirst($activity->type) }}{{ $activity->time ? ', '.$activity->time.'min' : '' }}</span>
+                                        </a>
+                                        <i class="bi bi-arrow-right"></i>
+                                    </div>
                                 @endforeach
                             @endif
                         </div>
@@ -65,4 +75,28 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.activity-link').forEach(function (activity) {
+            activity.addEventListener('click', function (event) {
+                event.preventDefault();
+                var activityId = this.getAttribute('data-id');
+                var activityName = this.getAttribute('data-title');
+
+                fetch(`/checkActivity/${activityId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.locked) {
+                            var myModal = new bootstrap.Modal(document.getElementById('lockedActivityModal'));
+                            document.getElementById('lockedActivityModalLabel').innerHTML = 'Locked: ' + activityName;
+                            myModal.show();
+                        } else {
+                            window.location.href = `/explore/activity/${activityId}`;
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+</script>
 @endsection

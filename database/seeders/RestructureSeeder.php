@@ -58,8 +58,10 @@ class RestructureSeeder extends Seeder
         //skipping next to avoid constraint error
         foreach ($activities as $activity) {
             $exceptNext = collect($activity)->except(['next_fake'])->toArray();
-            Activity::create($exceptNext);
-            $order++;
+            $_ = Activity::create($exceptNext);
+            if (!$_->optional) {
+                $order++;
+            }
         }
 
         //applying the next

@@ -3,6 +3,7 @@
         "id": 1,
         "day_id": 1,
         "title": "Welcome",
+        "type": "lesson",
         "time": 2,
         "order": 1,
         "next_fake": 2
@@ -83,20 +84,20 @@
     {
         "id": 10,
         "day_id": 2,
-        "title": "Body Scan",
+        "title": "Body Scan - 13 min",
         "type": "practice",
-        "time": null,
-        "order": 10,
+        "time": 13,
+        "order": 9,
         "optional": true,
         "next_fake": null
     },
     {
         "id": 11,
         "day_id": 2,
-        "title": "Body Scan",
+        "title": "Body Scan - 21 min",
         "type": "practice",
-        "time": null,
-        "order": 10,
+        "time": 21,
+        "order": 9,
         "optional": true,
         "next_fake": null
     }

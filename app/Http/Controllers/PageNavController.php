@@ -79,17 +79,26 @@ class PageNavController extends Controller
         return view("explore.module", compact('module', 'page_info'));
     }
 
+    public function checkActivity($activity_id) {
+        //checking the activity status - used before nav
+
+        //find activity
+        $activity = Activity::findOrFail($activity_id);
+        //check progress and set status
+        $status = Auth::user()->load('progress_activities')->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
+        if ($activity->deleted == true) {
+            abort(404, "Page not found.");
+        }
+        $locked = $status === 'locked';
+        return response()->json(['locked' => $locked]);
+    }
+
     public function exploreActivity($activity_id, Request $request)
     {
         $user = Auth::user();
         //find activity
         $activity = Activity::findOrFail($activity_id);
-        //check progress and set status
-        $user->load('progress_activities');
-        $activity->status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
-        if ($activity->status == 'locked' || $activity->deleted == true) {
-            return redirect()->back();
-        }
+        $activity->status = Auth::user()->load('progress_activities')->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
         
         //get content
         $content = $activity->content;
