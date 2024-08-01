@@ -99,7 +99,10 @@ class PageNavController extends Controller
         //find activity
         $activity = Activity::findOrFail($activity_id);
         $activity->status = Auth::user()->load('progress_activities')->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
-        
+        if ($activity->status == 'locked') {
+            abort(404, "Page not found.");
+        }
+
         //get content
         $content = $activity->content;
         //decode the audio options
@@ -287,10 +290,7 @@ class PageNavController extends Controller
         
         //handle search
         if ($request->has('search') && $request->search != '') {
-            $query->where(function ($in_query) use ($request) {
-                $in_query->where('title', 'like', '%' . $request->search . '%')
-                ->orWhere('sub_header', 'like', '%' . $request->search . '%');
-            });
+            $query->where('title', 'like', '%' . $request->search . '%');
         }
         
         //handle categories
@@ -311,11 +311,14 @@ class PageNavController extends Controller
                 else if ($lower == 'meditation') {
                     $query->where('type', 'practice');
                 }
+                else if ($lower == 'journal') {
+                    $query->where('type', 'journal');
+                }
                 else if ($lower == 'optional') {
                     $query->where('optional', true);
                 }
                 else if ($lower == 'quiz') {
-                    $query->where('end_behavior', 'quiz');
+                    $query->where('type', 'quiz');
                 }
             }
         }
@@ -333,13 +336,14 @@ class PageNavController extends Controller
         if ($request->has(['start_time', 'end_time']) && ($request->start_time != 0 || $request->end_time != 30)) {
             $start = $request->start_time;
             $end = $request->end_time;
-            $query->where('time', '!=', null)->whereRaw("
-            EXISTS (
-                SELECT 1
-                FROM json_each(activities.time)
-                WHERE CAST(json_each.value AS INTEGER) BETWEEN ? AND ?
-                )
-                ", [$start, $end]);
+            // $query->where('time', '!=', null)->whereRaw("
+            // EXISTS (
+            //     SELECT 1
+            //     FROM json_each(activities.time)
+            //     WHERE CAST(json_each.value AS INTEGER) BETWEEN ? AND ?
+            //     )
+            //     ", [$start, $end]);
+            $query->where('time', '<=', $end)->where('time', '>=', $start);
         }
             
         $activities = $query->with('day.module')->orderBy('order')->paginate(6);
@@ -358,7 +362,7 @@ class PageNavController extends Controller
             'search_text' => 'Search for your favorite activity...'
         ];
 
-        $categories = ['Meditation', 'Audio', 'Video', 'Quiz', 'Optional'];
+        $categories = ['Meditation', 'Audio', 'Video', 'Quiz', 'Journal', 'Optional'];
 
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.favorites'));
@@ -375,7 +379,7 @@ class PageNavController extends Controller
             'search_text' => 'Search for a meditation exercise...'
         ];
 
-        $categories = ['Favorited', 'Audio', 'Video', 'Quiz', 'Optional'];
+        $categories = ['Favorited', 'Audio', 'Video', 'Quiz', 'Journal', 'Optional'];
 
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.meditation'));

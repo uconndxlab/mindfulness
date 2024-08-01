@@ -5,8 +5,8 @@
         </div>
         <div class="card module p-2 mb-2">
             <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $random->id, 'library' => true]) }}">
-                <span class="activity-font">{{ $random->title }} - {{ $random->sub_header }}</span> <br>
-                <span class="sub-activity-font">{{ $random->day->module->name }}, {{ $random->day->name }}{{ $random->optional ? ' - Optional' : '' }}</span>
+                <span class="activity-font">{{ $random->title }}</span> <br>
+                <span class="sub-activity-font">{{ ucfirst($random->type) }}{{ $random->time ? ', '.$random->time.'min' : '' }}{{ $random->optional ? ', Optional' : '' }}</span>
             </a>
             <i class="bi bi-arrow-right"></i>
         </div>
