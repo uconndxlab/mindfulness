@@ -1,9 +1,8 @@
 [
     {
         "activity_id": 3,
-        "question_options": [
-            {
-                "question_no": 1,
+        "question_options": {
+            "question_1": {
                 "question": "What goals do you have in mind?",
                 "type": "multi-select",
                 "options_feedback": [
@@ -39,8 +38,7 @@
                     }
                 ]
             },
-            {
-                "question_no": 2,
+            "question_2": {
                 "question": "That’s great! This program includes scientifically proven activities to help you achieve your goal. How long do you want to spend practicing every day?",
                 "type": "single-select",
                 "options_feedback": [
@@ -70,6 +68,6 @@
                     }
                 ]
             }
-        ]
+        }
     }
 ]

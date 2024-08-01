@@ -11,28 +11,17 @@
     @endif
     <div class="text-left">
         <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h1 class="display fw-bold">{{ $activity->title }}
-                    <button id="favorite_btn" class="btn btn-link">
-                        <i id="favorite_icon" class="bi bi-star"></i>
-                    </button>
-                </h1>
-            </div>
-            <div>
-                <h1 class="display fw-bold">
-                    <a id="exit_btn" class="btn btn-link" href="{{ $page_info['exit_route'] }}">
-                        <i id="exit_icon" class="bi bi-x-lg"></i>
-                    </a>
-                </h1>
-            </div>
+            <h1 class="display fw-bold">{{ $activity->title }}
+                <button id="favorite_btn" class="btn btn-link">
+                    <i id="favorite_icon" class="bi bi-star"></i>
+                </button>
+            </h1>
         </div>
-
-        <h2>{{ $activity->sub_header }}</h2>
-        <p>{{ $activity->description }}</p>
+        <h5>{{ ucfirst($activity->type) }}</h5>
 
     </div>
     <div class="manual-margin-top">
-        @if ($content)
+        @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
             @if ($content->audio_options)
                 <div class="col-6 mt-1">
                     <label class="fw-bold" for="word_otd">Options:</label>
@@ -99,17 +88,18 @@
                 </div>
             @endif
 
-            @if($content->completion_message)
-                <div id="comp_message" class="mt-1" style="display: none;">
-                    <pre class="text-success">{{ $content->completion_message }}</pre>
-                </div>
-            @endif
+        @elseif ($activity->type == 'quiz' && $quiz)
+            <div id="questionContainer" class="col-md-8">
+                <x-quiz :question="collect()" :type="collect()"/>
+            </div>
+        @endif
+        @if($activity->completion_message)
+            <div id="comp_message" class="mt-1" style="display: none;">
+                <pre class="text-success">{{ $activity->completion_message }}</pre>
+            </div>
         @endif
     </div>
     <div class="manual-margin-top" id="redirect_div">
-        @if (isset($page_info['end_route']))
-            <a id="redirect_button_2" class="btn btn-primary disabled" href="{{ $page_info['end_route'] }}">{{ $page_info['end_label'] }}</a>
-        @endif
         @if (isset($page_info['redirect_route']))
             <a id="redirect_button" class="btn btn-tertiary disabled" href="{{ $page_info['redirect_route'] }}">{{ $page_info['redirect_label'] }}</a>
         @endif
@@ -124,6 +114,7 @@
     //COMPLETION ITEMS
     const redirectDiv = document.getElementById('redirect_div');
     const hasContent = {{ $content ? 'true' : 'false' }};
+    const hasQuiz = {{ $quiz ? 'true' : 'false' }};
 
     //CHECKING COMPLETION
     const status = '{{ $activity->status }}';
@@ -133,6 +124,7 @@
 
     //set eventlisteners to call activityComplete
     if (hasContent) {
+        console.log('Type: content');
         //applies to all content items
         const content = document.getElementById('content_view');
         const type = '{{ isset($content->type) ? $content->type : null }}';
@@ -144,6 +136,11 @@
         else {
             content.addEventListener('ended', activityComplete);
         }
+    }
+    else if (hasQuiz) {
+        //do nothing - call activity complete in AJAX request
+        console.log('Type: quiz');
+        getQuiz();
     }
     else {
         //if no content - complete activity
@@ -157,7 +154,7 @@
         console.log("activity completed")
         //show message
         if (message) {
-            const hasMessage = {{ isset($content->completion_message) ? 'true' : 'false' }};
+            const hasMessage = {{ isset($activity->completion_message) ? 'true' : 'false' }};
             if (hasMessage) {
                 const completionMessageDiv = document.getElementById('comp_message');
                 completionMessageDiv.style.display = 'block';
@@ -190,6 +187,38 @@
     function unlockRedirect() {
         redirectDiv.querySelectorAll('.disabled').forEach(element => {
             element.classList.remove('disabled');
+        });
+    }
+
+    //QUIZZES
+    function getQuiz() {
+        const quizUrl = new URL('{{ route('quiz.show', ['quiz_id' => $quiz ? $quiz->id : 0]) }}');
+        //reques
+        fetch (quizUrl, {
+            method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+        })
+        .then(response => {
+            if (response.status === 403) {
+                alert('You do not have permission to access this activity.');
+            }
+            else if (!response.ok === 200) {
+                alert('An error occurred.');
+            }
+            else {
+                return response.json();
+            }
+        })
+        .then(data => {
+            //render component into container
+            document.getElementById('questionContainer').innerHTML = data.html;
+        })
+        .catch(error => {
+            console.error('Error performing search', error);
         });
     }
 

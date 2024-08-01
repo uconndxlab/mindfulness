@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -81,6 +82,7 @@ class UserController extends Controller
             //updating the session saved progress - getting will update
             Session::forget('progress_modules');
             Session::forget('progress_days');
+            Cache::forget('user_'.Auth::id().'_progress_activities');
 
             return response()->json(['message' => 'Progress updated']);
         }

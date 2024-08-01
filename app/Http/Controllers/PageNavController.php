@@ -9,6 +9,7 @@ use App\Models\Module;
 use App\Models\UserActivity;
 use App\Models\Faq;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -79,35 +80,36 @@ class PageNavController extends Controller
         return view("explore.module", compact('module', 'page_info'));
     }
 
-    public function checkActivity($activity_id) {
-        //checking the activity status - used before nav
-
-        //find activity
+    public function checkActivityLocked($activity_id, $from_controller = false) {
+        //checking cache for progress
+        $cacheKey = 'user_' . Auth::id() . '_progress_activities';
+        $progress = Cache::get($cacheKey);
+        if (!$progress) {
+            $progress = Cache::remember($cacheKey, 30, function () {
+                return Auth::user()->load('progress_activities')->progress_activities;
+            });
+        }
         $activity = Activity::findOrFail($activity_id);
-        //check progress and set status
-        $status = Auth::user()->load('progress_activities')->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
+        $status = $progress->where('activity_id', $activity_id)->first()->status ?? 'locked';
+        //check if deleted
         if ($activity->deleted == true) {
             abort(404, "Page not found.");
         }
+        //check status
         $locked = $status === 'locked';
+        if ($from_controller) {
+            return $locked;
+        }
         return response()->json(['locked' => $locked]);
     }
 
     public function exploreActivity($activity_id, Request $request)
     {
         $user = Auth::user();
-        //find activity
+        //find activity and check progress again
         $activity = Activity::findOrFail($activity_id);
-        $activity->status = Auth::user()->load('progress_activities')->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
-        if ($activity->status == 'locked') {
+        if ($this->checkActivityLocked($activity_id, true)) {
             abort(404, "Page not found.");
-        }
-
-        //get content
-        $content = $activity->content;
-        //decode the audio options
-        if ($content && $content->type == 'audio' && $content->audio_options) {
-            $content->audio_options = json_decode($content->audio_options, true);
         }
         
         //favoriting
@@ -137,22 +139,32 @@ class PageNavController extends Controller
         $page_info['back_route'] = $page_info['exit_route'];
 
         $page_info['hide_bottom_nav'] = true;
-
-        //end behavior - for activities
-        if ($activity->end_behavior != 'none') {
-            if ($activity->end_behavior == "journal") {
-                $page_info['end_label'] = "JOURNAL";
-                $page_info['end_route'] = route('journal', ['activity_id' => $activity->id, 'library' => $request->library]);
-            }
-            else if ($activity->end_behavior == "quiz" && $activity->quiz) {
-                $page_info['end_label'] = "QUIZ";
-                $page_info['end_route'] = route('explore.quiz', ['quiz_id' => $activity->quiz->id, 'library' => $request->library]);
-            }
+    
+        //get content
+        $content = $activity->content;
+        $quiz = $activity->quiz;
+        //decode the audio options
+        if ($content && $content->type == 'audio' && $content->audio_options) {
+            $content->audio_options = json_decode($content->audio_options, true);
         }
-        return view("explore.activity", compact('activity', 'content', 'is_favorited', 'page_info'));
+        
+        return view("explore.activity", compact('activity', 'is_favorited', 'page_info', 'content', 'quiz'));
     }
     
     //QUIZ
+    public function getQuiz($quiz_id, Request $request) {
+        $quiz = Quiz::findOrFail($quiz_id)->with('activity')->first();
+        if ($this->checkActivityLocked($quiz->activity->id, true)) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+        //get question
+        $q_number = $request->q_number ?? 1;
+        $question = json_decode($quiz->question_options, true)['question_'.$q_number];
+
+        $view = view('components.quiz', ['question' => $question])->render();
+        return response()->json(['html' => $view], 200);
+    }
+
     public function exploreQuiz($quiz_id, Request $request) {
         //find quiz
         $quiz = Quiz::findOrFail($quiz_id);

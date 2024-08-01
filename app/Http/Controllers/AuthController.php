@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
@@ -56,6 +57,7 @@ class AuthController extends Controller
     public function logout(Request $request) {
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+        Cache::forget('user_'.Auth::id().'_progress_activities');
         Auth::logout();
         return redirect()->route('login');
     }
