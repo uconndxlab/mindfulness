@@ -83,7 +83,6 @@ class UserController extends Controller
             Session::forget('progress_modules');
             Session::forget('progress_days');
             Cache::forget('user_'.Auth::id().'_progress_activities');
-
             return response()->json(['message' => 'Progress updated']);
         }
         else if ($current_activity_progress->status == 'completed') {

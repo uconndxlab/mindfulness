@@ -98,9 +98,9 @@ class PageNavController extends Controller
         //check status
         $locked = $status === 'locked';
         if ($from_controller) {
-            return $locked;
+            return [$locked, $status];
         }
-        return response()->json(['locked' => $locked]);
+        return response()->json(['locked' => $locked, 'status' => $status]);
     }
 
     public function exploreActivity($activity_id, Request $request)
@@ -108,7 +108,9 @@ class PageNavController extends Controller
         $user = Auth::user();
         //find activity and check progress again
         $activity = Activity::findOrFail($activity_id);
-        if ($this->checkActivityLocked($activity_id, true)) {
+        $check_activity = $this->checkActivityLocked($activity_id, true);
+        $activity->status = $check_activity[1];
+        if ($check_activity[0]) {
             abort(404, "Page not found.");
         }
         
@@ -154,7 +156,7 @@ class PageNavController extends Controller
     //QUIZ
     public function getQuiz($quiz_id, Request $request) {
         $quiz = Quiz::findOrFail($quiz_id)->with('activity')->first();
-        if ($this->checkActivityLocked($quiz->activity->id, true)) {
+        if ($this->checkActivityLocked($quiz->activity->id, true)[0]) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
         //get question

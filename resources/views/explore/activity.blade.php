@@ -151,7 +151,7 @@
     //COMPLETION
     function activityComplete(message=true) {
         //show content
-        console.log("activity completed")
+        console.log('activity completed');
         //show message
         if (message) {
             const hasMessage = {{ isset($activity->completion_message) ? 'true' : 'false' }};
@@ -205,6 +205,7 @@
         .then(response => {
             if (response.status === 403) {
                 alert('You do not have permission to access this activity.');
+                window.location.href = '/explore/home';
             }
             else if (!response.ok === 200) {
                 alert('An error occurred.');
