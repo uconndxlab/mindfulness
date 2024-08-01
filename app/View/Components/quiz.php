@@ -11,9 +11,9 @@ class quiz extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct($question)
+    public function __construct($quiz)
     {
-        $this->question = $question;
+        $this->quiz = $quiz;
     }
 
     /**

@@ -89,8 +89,8 @@
             @endif
 
         @elseif ($activity->type == 'quiz' && $quiz)
-            <div id="questionContainer" class="col-md-8">
-                <x-quiz :question="collect()" :type="collect()"/>
+            <div id="quizContainer" class="col-md-8">
+                <x-quiz :quiz="collect()"/>
             </div>
         @endif
         @if($activity->completion_message)
@@ -216,7 +216,9 @@
         })
         .then(data => {
             //render component into container
-            document.getElementById('questionContainer').innerHTML = data.html;
+            document.getElementById('quizContainer').innerHTML = data.html;
+            //initialize quiz in the quiz component
+            initializeQuiz();
         })
         .catch(error => {
             console.error('Error performing search', error);
