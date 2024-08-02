@@ -145,7 +145,9 @@ class PageNavController extends Controller
         //get content
         $content = $activity->content;
         $quiz = $activity->quiz;
-        $quiz->question_options = json_decode($quiz->question_options, true);
+        if ($quiz) {
+            $quiz->question_options = json_decode($quiz->question_options, true);
+        }
         //decode the audio options
         if ($content && $content->type == 'audio' && $content->audio_options) {
             $content->audio_options = json_decode($content->audio_options, true);
