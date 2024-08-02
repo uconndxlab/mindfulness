@@ -9,10 +9,15 @@
                 <!-- options -->
                 @foreach ($question['options_feedback'] as $index => $option)
                     <div id="options_{{ $question['number'] }}" class="form-check type-{{ $question['type'] }}">
-                        <input class="form-check-input" name="answer_{{ $question['number'] }}" above-behavior="{{ $option['above'] }}" type="{{ $question['type'] }}" id="option_{{ $question['number'] }}_{{ $index }}">
+                        <input class="form-check-input" name="answer_{{ $question['number'] }}" above-behavior="{{ $option['above'] }}" type="{{ $question['type'] }}" data-other="{{ $option['other'] }}" id="option_{{ $question['number'] }}_{{ $index }}">
                         <label class="form-check-label" for="option_{{ $question['number'] }}_{{ $index }}">
                             {{ $option['option'] }}
                         </label>
+                        @if ($option['other'])
+                            <div class="other-div">
+                                <input type="text" id="other_{{ $question['number'] }}_{{ $index }}" class="form-control" name="other_answer_{{ $question['number'] }}" placeholder="Please specify" disabled>
+                            </div>
+                        @endif
                     </div>
                 @endforeach
 
@@ -67,6 +72,10 @@
                 questionNumber = q_no;
                 const quizDivs = quizForm.querySelectorAll('.quiz-div');
                 quizDivs.forEach(qDiv => {
+                    //pause any audio
+                    qDiv.querySelectorAll('audio').forEach(audio => {
+                        audio.pause();
+                    });
                     const currentNumber = parseInt(qDiv.getAttribute('data-number'));
                     const isLast = qDiv.getAttribute('data-last') === 'true';
                     const isFirst = currentNumber === 1;
@@ -113,6 +122,9 @@
                     });
                     //show/hide feedback
                     feedbackDiv.style.display = event.target.checked ? 'block' : 'none';
+
+                    checkBox(option, event.target.checked);
+
                 });
             });
 
@@ -125,33 +137,38 @@
                     var allBoxes = quizDiv.querySelectorAll('.form-check-input');
                     allBoxes.forEach(option => {
                         const behavior = option.getAttribute('above-behavior');
+
                         option.addEventListener('click', function(event) {
-                            if (event.target.checked) {
-                                if (behavior === 'none') {
-                                    //uncheck all but this
+                            const targetCheck = event.target.checked;
+                            //checked
+                            if (targetCheck) {
+                                //none above
+                                if (behavior == 'none') {
                                     allBoxes.forEach(box => {
                                         if (box != option) {
-                                            box.checked = false;
+                                            checkBox(box, false);;
                                         }
                                     });
                                 }
                                 else {
                                     allBoxes.forEach(box => {
-                                        //check all
+                                        //all above
                                         if (behavior === 'all') {
-                                            box.checked = true;
+                                            checkBox(box, true);
                                         }
                                         //uncheck none above on all other checks
                                         if (box.getAttribute('above-behavior') === 'none') {
-                                            box.checked = false;
+                                            checkBox(box, false);
                                         }
                                     });
                                 }
                             }
+                            //unchecked - any but none of the above
                             else if (behavior != 'none') {
                                 allBoxes.forEach(box => {
+                                    //uncheck all of above
                                     if (box.getAttribute('above-behavior') === 'all') {
-                                        box.checked = false;
+                                        checkBox(box, false);
                                     }
                                 });
                             }
@@ -159,6 +176,18 @@
                     });
                 }
             });
+
+            //OTHER
+            function checkBox(box, checked) {
+                box.checked = checked;
+                if (box.getAttribute('data-other')) {
+                    const splitId = box.id.split('_');
+                    const questionId = splitId[1];
+                    const optionId = splitId[2];
+                    const other = document.getElementById('other_'+questionId+'_'+optionId);
+                    box.checked ? other.removeAttribute('disabled') : other.setAttribute('disabled', '');
+                }
+            }
         });
     </script>
 @endif
