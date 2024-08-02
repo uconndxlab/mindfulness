@@ -124,7 +124,6 @@
                     feedbackDiv.style.display = event.target.checked ? 'block' : 'none';
 
                     checkBox(option, event.target.checked);
-
                 });
             });
 
@@ -172,6 +171,17 @@
                                     }
                                 });
                             }
+                        });
+                    });
+                }
+                //added in for other functionality on radio 
+                else {
+                    var allBoxes = quizDiv.querySelectorAll('.form-check-input');
+                    allBoxes.forEach(option => {
+                        option.addEventListener('click', function() {
+                            allBoxes.forEach(box => {
+                                checkBox(box, box.checked);
+                            });
                         });
                     });
                 }
