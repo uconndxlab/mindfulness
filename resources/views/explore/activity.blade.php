@@ -89,7 +89,7 @@
             @endif
 
         @elseif ($activity->type == 'quiz' && $quiz)
-            <div id="quizContainer" class="col-md-8">
+            <div id="quizContainer">
                 <x-quiz :quiz="$quiz"/>
             </div>
         @endif

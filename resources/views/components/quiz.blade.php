@@ -4,18 +4,39 @@
         @foreach ($quiz->question_options as $key => $question)
             <div id="{{ $key }}" class="quiz-div" data-number="{{ $question['number'] }}" data-last="{{ $question['last'] ? 'true' : 'false' }}" data-type="{{ $question['type'] }}"style="display: {{ $question['number'] == 1 ? 'block' : 'none'}};">
                 <div class="text-left quiz-question mb-3">
-                    <h2>{{ $question['question'] }}</h2>
+                    <h4>{{ $question['question'] }}</h4>
                 </div>
+                <!-- options -->
                 @foreach ($question['options_feedback'] as $index => $option)
-                    <div id="question_{{ $question['number'] }}_options" class="form-check type-{{ $question['type'] }}">
-                        <input class="form-check-input" name="question_{{ $question['number'] }}answer" above-behavior="{{ $option['above'] }}" type="{{ $question['type'] }}" id="question_{{ $question['number'] }}_option_{{ $index }}">
-                        <label class="form-check-label" for="question_{{ $question['number'] }}_option_{{ $index }}">
+                    <div id="options_{{ $question['number'] }}" class="form-check type-{{ $question['type'] }}">
+                        <input class="form-check-input" name="answer_{{ $question['number'] }}" above-behavior="{{ $option['above'] }}" type="{{ $question['type'] }}" id="option_{{ $question['number'] }}_{{ $index }}">
+                        <label class="form-check-label" for="option_{{ $question['number'] }}_{{ $index }}">
                             {{ $option['option'] }}
                         </label>
                     </div>
                 @endforeach
+
+                <!-- feedback -->
+                @foreach ($question['options_feedback'] as $index => $option)
+                    @php
+                        if ($option['correct']) {
+                            $text_color = $option['correct'] == 1 ? 'text-success' : 'text-info';
+                        }
+                        else {
+                            $text_color = 'text-danger';
+                        }
+                    @endphp
+                    <div id="feedback_{{ $question['number'] }}_{{ $index }}" class="feedback-div" style="display: none;">
+                        <div class="mt-3 {{ $text_color }}">
+                            {{ $option['feedback'] }}
+                        </div>
+                        @if ($option['audio_path'])
+                            <x-contentView id="fbAudio_{{ $question['number'] }}_{{ $index }}" id2="pdf_download" type="audio" file="{{ $option['audio_path'] }}"/>
+                        @endif
+                    </div>
+                @endforeach
             </div>
-            @endforeach
+        @endforeach
         <div class="d-flex justify-content-between">
             <button id="prev_q_button" type="button" class="btn btn-primary disabled">
                 <i class="bi bi-arrow-left"></i>
@@ -74,9 +95,30 @@
             }
             changeQuestion(questionNumber);
 
+            //SHOWING FEEDBACK
+            quizForm.querySelectorAll('.form-check-input').forEach(option => {
+                option.addEventListener('change', function(event) {
+                    //build id and get div
+                    const splitId = event.target.id.split('_');
+                    const questionId = splitId[1];
+                    const optionId = splitId[2];
+                    const feedbackDiv = document.getElementById('feedback_' + questionId + '_' + optionId);
+                    quizForm.querySelectorAll('.feedback-div').forEach(fbDiv => {
+                        //hide all other feedback
+                        fbDiv.style.display = 'none';
+                        //pause any audio
+                        fbDiv.querySelectorAll('audio').forEach(audio => {
+                            audio.pause();
+                        });
+                    });
+                    //show/hide feedback
+                    feedbackDiv.style.display = event.target.checked ? 'block' : 'none';
+                });
+            });
+
             //ALL/NONE ABOVE
             //get all question divs
-            document.querySelectorAll('.quiz-div').forEach(quizDiv => {
+            quizForm.querySelectorAll('.quiz-div').forEach(quizDiv => {
                 //select the ones with the checkbox answers
                 if (quizDiv.getAttribute('data-type') === 'checkbox') {
                     //find all options within the question
@@ -105,6 +147,13 @@
                                         }
                                     });
                                 }
+                            }
+                            else if (behavior != 'none') {
+                                allBoxes.forEach(box => {
+                                    if (box.getAttribute('above-behavior') === 'all') {
+                                        box.checked = false;
+                                    }
+                                });
                             }
                         });
                     });
