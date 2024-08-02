@@ -145,6 +145,7 @@ class PageNavController extends Controller
         //get content
         $content = $activity->content;
         $quiz = $activity->quiz;
+        $quiz->question_options = json_decode($quiz->question_options, true);
         //decode the audio options
         if ($content && $content->type == 'audio' && $content->audio_options) {
             $content->audio_options = json_decode($content->audio_options, true);
@@ -154,17 +155,17 @@ class PageNavController extends Controller
     }
     
     //QUIZ
-    public function getQuiz($quiz_id) {
-        $quiz = Quiz::findOrFail($quiz_id)->with('activity')->first();
-        if ($this->checkActivityLocked($quiz->activity->id, true)[0]) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
-        //get question
-        $quiz = json_decode($quiz->question_options, true);
+    // public function getQuiz($quiz_id) {
+    //     $quiz = Quiz::findOrFail($quiz_id)->with('activity')->first();
+    //     if ($this->checkActivityLocked($quiz->activity->id, true)[0]) {
+    //         return response()->json(['message' => 'Forbidden'], 403);
+    //     }
+    //     //get question
+    //     $quiz = json_decode($quiz->question_options, true);
 
-        $view = view('components.quiz', ['quiz' => $quiz, 'quiz_id' => $quiz_id])->render();
-        return response()->json(['html' => $view], 200);
-    }
+    //     $view = view('components.quiz', ['quiz' => $quiz, 'quiz_id' => $quiz_id])->render();
+    //     return response()->json(['html' => $view], 200);
+    // }
 
     public function exploreQuiz($quiz_id, Request $request) {
         //find quiz

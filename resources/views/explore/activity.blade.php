@@ -90,7 +90,7 @@
 
         @elseif ($activity->type == 'quiz' && $quiz)
             <div id="quizContainer" class="col-md-8">
-                <x-quiz :quiz="collect()"/>
+                <x-quiz :quiz="$quiz"/>
             </div>
         @endif
         @if($activity->completion_message)
@@ -140,7 +140,7 @@
     else if (hasQuiz) {
         //do nothing - call activity complete in AJAX request
         console.log('Type: quiz');
-        getQuiz();
+        // getQuiz();
     }
     else {
         //if no content - complete activity
@@ -190,40 +190,41 @@
         });
     }
 
+    //url route -  route('quiz.show', ['quiz_id' => $quiz ? $quiz->id : 0]) }}
     //QUIZZES
-    function getQuiz() {
-        const quizUrl = new URL('{{ route('quiz.show', ['quiz_id' => $quiz ? $quiz->id : 0]) }}');
-        //reques
-        fetch (quizUrl, {
-            method: 'GET',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                credentials: 'same-origin'
-        })
-        .then(response => {
-            if (response.status === 403) {
-                alert('You do not have permission to access this activity.');
-                window.location.href = '/explore/home';
-            }
-            else if (!response.ok === 200) {
-                alert('An error occurred.');
-            }
-            else {
-                return response.json();
-            }
-        })
-        .then(data => {
-            //render component into container
-            document.getElementById('quizContainer').innerHTML = data.html;
-            //initialize quiz in the quiz component
-            initializeQuiz();
-        })
-        .catch(error => {
-            console.error('Error performing search', error);
-        });
-    }
+    // function getQuiz() {
+    //     const quizUrl = new URL('');
+    //     //reques
+    //     fetch (quizUrl, {
+    //         method: 'GET',
+    //             headers: {
+    //                 'X-CSRF-TOKEN': '',
+    //                 'Accept': 'application/json'
+    //             },
+    //             credentials: 'same-origin'
+    //     })
+    //     .then(response => {
+    //         if (response.status === 403) {
+    //             alert('You do not have permission to access this activity.');
+    //             window.location.href = '/explore/home';
+    //         }
+    //         else if (!response.ok === 200) {
+    //             alert('An error occurred.');
+    //         }
+    //         else {
+    //             return response.json();
+    //         }
+    //     })
+    //     .then(data => {
+    //         //render component into container
+    //         document.getElementById('quizContainer').innerHTML = data.html;
+    //         //initialize quiz in the quiz component
+    //         initializeQuiz();
+    //     })
+    //     .catch(error => {
+    //         console.error('Error performing search', error);
+    //     });
+    // }
 
     //FAVORITES
     //get favorite button, icon, isFavorited value

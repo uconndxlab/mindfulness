@@ -1,73 +1,74 @@
 @if (isset($quiz))
-    <form id="quizForm" action="{{ route('quiz.submit', ['quiz_id' => $quiz_id]) }}" method="POST" class="pt-3">
+    <form id="quizForm" action="{{ route('quiz.submit', ['quiz_id' => $quiz->id]) }}" method="POST" class="pt-3">
         @csrf
-        @foreach ($quiz as $key => $question_options)
-            <div id="{{ $key }}" class="quiz-div" data-number="{{ $question_options['number'] }}" data-last="{{ $question_options['last'] ? 'true' : 'false' }}">
+        @foreach ($quiz->question_options as $key => $question)
+            <div id="{{ $key }}" class="quiz-div" data-number="{{ $question['number'] }}" data-last="{{ $question['last'] ? 'true' : 'false' }}" style="display: {{ $question['number'] == 1 ? 'block' : 'none'}};">
                 <div class="text-left quiz-question mb-3">
-                    <h2>{{ $question_options['question'] }}</h2>
+                    <h2>{{ $question['question'] }}</h2>
                 </div>
 
-                
+
 
 
             </div>
             @endforeach
         <div class="d-flex justify-content-between">
-            <button id="prev_q_button" type="button" class="btn btn-primary">
+            <button id="prev_q_button" type="button" class="btn btn-primary disabled">
                 <i class="bi bi-arrow-left"></i>
             </button>
-            <button id="next_q_button" type="button" class="btn btn-primary">
+            <button id="next_q_button" type="button" class="btn btn-primary disabled">
                 <i class="bi bi-arrow-right"></i>
             </button>
         </div>
     </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing quiz...');
+            var questionNumber = 1;
+    
+            const quizForm = document.getElementById('quizForm');
+            const prevQBtn = document.getElementById('prev_q_button');
+            const nextQBtn = document.getElementById('next_q_button');
+    
+            prevQBtn.addEventListener('click', function () {
+                changeQuestion(questionNumber - 1);
+            });
+            nextQBtn.addEventListener('click', function () {
+                changeQuestion(questionNumber + 1);
+            });
+    
+            function changeQuestion(q_no) {
+                console.log('Question No.: ' + q_no);
+                questionNumber = q_no;
+                const quizDivs = quizForm.querySelectorAll('.quiz-div');
+                quizDivs.forEach(qDiv => {
+                    const currentNumber = parseInt(qDiv.getAttribute('data-number'));
+                    const isLast = qDiv.getAttribute('data-last') === 'true';
+                    const isFirst = currentNumber === 1;
+    
+                    //handle hiding questions
+                    if (currentNumber === questionNumber) {
+                        qDiv.style.display = 'block';
+                        //handle prev/next
+                        if (isFirst) {
+                            prevQBtn.classList.add('disabled');
+                        }
+                        else {
+                            prevQBtn.classList.remove('disabled');
+                        }
+                        if (isLast) {
+                            nextQBtn.classList.add('disabled');
+                        }
+                        else {
+                            nextQBtn.classList.remove('disabled');
+                        }
+                    }
+                    else {
+                        qDiv.style.display = 'none';
+                    }
+                });
+            }
+            changeQuestion(questionNumber);
+        });
+    </script>
 @endif
-<script>
-    var prevQBtn;
-    var nextQBtn;
-    var quizForm;
-    var questionNumber;
-
-    function initializeQuiz() {
-        questionNumber = 1;
-
-        quizForm = document.getElementById('quizForm');
-        prevQBtn = document.getElementById('prev_q_button');
-        nextQBtn = document.getElementById('next_q_button');
-
-        prevQBtn.addEventListener('click', function () {
-            changeQuestion(questionNumber - 1);
-        });
-        nextQBtn.addEventListener('click', function () {
-            changeQuestion(questionNumber + 1);
-        });
-        changeQuestion(questionNumber);
-    }
-
-    function changeQuestion(q_no = 1) {
-        questionNumber = q_no;
-        quizForm.querySelectorAll('.quiz-div').forEach(qDiv => {
-            const currentNumber = parseInt(qDiv.getAttribute('data-number'));
-            //handle hiding qs
-            if (currentNumber === questionNumber) {
-                qDiv.style.display = 'block';
-                //handle the next/prev buttons
-                if (qDiv.getAttribute('data-last') === 'true') {
-                    nextQBtn.classList.add('disabled');
-                }
-                else {
-                    nextQBtn.classList.remove('disabled');
-                }
-                if (questionNumber === 1) {
-                    prevQBtn.classList.add('disabled');
-                }
-                else {
-                    prevQBtn.classList.remove('disabled');
-                }
-            }
-            else {
-                qDiv.style.display = 'none';
-            }
-        });
-    }
-</script>

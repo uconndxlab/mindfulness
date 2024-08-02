@@ -78,7 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/checkActivity/{activity_id}', [PageNavController::class, 'checkActivityLocked'])->name('check.activity');
     Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
     // Route::get('/explore/quiz/{quiz_id}', [PageNavController::class,'exploreQuiz'])->name('explore.quiz');
-    Route::get('/quiz/{quiz_id}', [PageNavController::class,'getQuiz'])->name('quiz.show');
+    // Route::get('/quiz/{quiz_id}', [PageNavController::class,'getQuiz'])->name('quiz.show');
 
     Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
     Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
@@ -136,11 +136,3 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/activity/{activity_id}', [ContentManagementController::class,'deleteActivity'])->name('activity.delete');
     });
 });
-
-// Route::get('/note', [NoteController::class, 'index'])->name('note.index');
-// Route::get('/note/create', [NoteController::class, 'create'])->name('note.create');
-// Route::post('/note', [NoteController::class,'store'])->name('note.store');
-// Route::get('/note/{id}', [NoteController::class, 'show'])->name('note.show');
-// Route::post('/note/{id}/edit', [NoteController::class,'edit'])->name('note.edit');
-// Route::put('/note/{id}', [NoteController::class,'update'])->name('note.update');
-// Route::delete('/note/{id}', [NoteController::class, 'destroy'])->name('note.destroy');
