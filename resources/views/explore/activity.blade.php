@@ -190,42 +190,6 @@
         });
     }
 
-    //url route -  route('quiz.show', ['quiz_id' => $quiz ? $quiz->id : 0]) }}
-    //QUIZZES
-    // function getQuiz() {
-    //     const quizUrl = new URL('');
-    //     //reques
-    //     fetch (quizUrl, {
-    //         method: 'GET',
-    //             headers: {
-    //                 'X-CSRF-TOKEN': '',
-    //                 'Accept': 'application/json'
-    //             },
-    //             credentials: 'same-origin'
-    //     })
-    //     .then(response => {
-    //         if (response.status === 403) {
-    //             alert('You do not have permission to access this activity.');
-    //             window.location.href = '/explore/home';
-    //         }
-    //         else if (!response.ok === 200) {
-    //             alert('An error occurred.');
-    //         }
-    //         else {
-    //             return response.json();
-    //         }
-    //     })
-    //     .then(data => {
-    //         //render component into container
-    //         document.getElementById('quizContainer').innerHTML = data.html;
-    //         //initialize quiz in the quiz component
-    //         initializeQuiz();
-    //     })
-    //     .catch(error => {
-    //         console.error('Error performing search', error);
-    //     });
-    // }
-
     //FAVORITES
     //get favorite button, icon, isFavorited value
     const favButton = document.getElementById('favorite_btn');

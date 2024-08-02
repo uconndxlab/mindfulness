@@ -153,20 +153,8 @@ class PageNavController extends Controller
         
         return view("explore.activity", compact('activity', 'is_favorited', 'page_info', 'content', 'quiz'));
     }
-    
+
     //QUIZ
-    // public function getQuiz($quiz_id) {
-    //     $quiz = Quiz::findOrFail($quiz_id)->with('activity')->first();
-    //     if ($this->checkActivityLocked($quiz->activity->id, true)[0]) {
-    //         return response()->json(['message' => 'Forbidden'], 403);
-    //     }
-    //     //get question
-    //     $quiz = json_decode($quiz->question_options, true);
-
-    //     $view = view('components.quiz', ['quiz' => $quiz, 'quiz_id' => $quiz_id])->render();
-    //     return response()->json(['html' => $view], 200);
-    // }
-
     public function exploreQuiz($quiz_id, Request $request) {
         //find quiz
         $quiz = Quiz::findOrFail($quiz_id);
