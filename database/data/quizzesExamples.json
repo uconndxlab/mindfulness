@@ -10,23 +10,23 @@
                 "options_feedback": [
                     {
                         "option": "I want to feel better about parenthood (be more present for my child)",
-                        "feedback": null,
-                        "correct": 2,
+                        "feedback": "I want to feel better about parenthood (be more present for my child)",
+                        "correct": 0,
                         "audio_path": null,
                         "above": null,
-                        "other": false
+                        "other": true
                     },
                     {
                         "option": "I want to feel less stressed (relax more, sleep better)",
-                        "feedback": null,
-                        "correct": 2,
+                        "feedback": "I want to feel less stressed (relax more, sleep better)",
+                        "correct": 1,
                         "audio_path": null,
                         "above": null,
-                        "other": false
+                        "other": true
                     },
                     {
                         "option": "I want to learn how to deal with a difficult relationship",
-                        "feedback": null,
+                        "feedback": "I want to learn how to deal with a difficult relationship",
                         "correct": 2,
                         "audio_path": null,
                         "above": null,
@@ -34,7 +34,7 @@
                     },
                     {
                         "option": "All of the above",
-                        "feedback": null,
+                        "feedback": "All of the above",
                         "correct": 2,
                         "audio_path": null,
                         "all_above": true,
@@ -43,7 +43,7 @@
                     },
                     {
                         "option": "None of the above",
-                        "feedback": null,
+                        "feedback": "None of the above",
                         "correct": 2,
                         "audio_path": null,
                         "above": "none",
@@ -62,12 +62,12 @@
                         "audio_path": null,
                         "correct": 2,
                         "above": null,
-                        "other": false
+                        "other": true
                     },
                     {
                         "option": "I can do at least 15 minutes every day.",
                         "feedback": "Great job! You should be able to finish the activities every day in just 15 minutes. When you have a 15-minute stretch, we recommend you do all the activities at once. Then, use any extra time during the day to practice them again, instead of moving on to the next day's activities. The more you practice, the stronger these skills will become.",
-                        "audio_path": null,
+                        "audio_path": "1.2 Curiosity (AI)(3 min).mp3",
                         "correct": 2,
                         "above": null,
                         "other": false

@@ -96,7 +96,7 @@
         @endif
         @if($activity->completion_message)
             <div id="comp_message" class="mt-1" style="display: none;">
-                <pre class="text-success">{{ $activity->completion_message }}</pre>
+                <p class="text-success">{{ $activity->completion_message }}</p>
             </div>
         @endif
     </div>

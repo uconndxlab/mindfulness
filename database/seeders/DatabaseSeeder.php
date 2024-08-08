@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ConfigSeeder::class);                                   //config
         $this->call(RestructureSeeder::class, false, compact('examples'));  //modules, days, activities
         $this->call(ContentSeeder::class, false, compact('examples'));      //content
-        $this->call(QuizSeeder::class);                                     //quiz
+        $this->call(QuizSeeder::class, false, compact('examples'));                                     //quiz
         $this->call(FaqSeeder::class);                                      //faq
         $this->call(ResetUserProgress::class);                              //favorites, session vars, progress
     }

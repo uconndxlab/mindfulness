@@ -2,16 +2,6 @@
     {
         "activity_id": 1,
         "type": "audio",
-        "file_path": "1.1 Welcome Message (AI)(2 min).mp3",
-        "audio_options": {
-            "AI": {
-                "2": "1.1 Welcome Message (AI)(2 min).mp3"
-            }
-        }
-    },
-    {
-        "activity_id": 2,
-        "type": "audio",
         "file_path": "1.1 Your Childs 30th Birthday (Na)(7 min).m4a",
         "audio_options": {
             "Na": {
@@ -20,7 +10,7 @@
         }
     },
     {
-        "activity_id": 4,
+        "activity_id": 3,
         "type": "audio",
         "file_path": "1.1 Morning Glory Time (Na)(4 min).m4a",
         "audio_options": {
@@ -29,6 +19,20 @@
             }
         }
     },
+    {
+        "activity_id": 4,
+        "type": "audio",
+        "file_path": "1.2 Body Scan (Na)(7 min).m4a",
+        "audio_options": {
+            "Na": {
+                "7": "1.2 Body Scan (Na)(7 min).m4a"
+            }
+        }
+    },
+
+
+
+
     {
         "activity_id": 6,
         "type": "audio",

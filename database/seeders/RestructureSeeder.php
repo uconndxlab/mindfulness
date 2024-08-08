@@ -52,7 +52,7 @@ class RestructureSeeder extends Seeder
         
 
         //populating activities
-        $activities = json_decode(file_get_contents(database_path('data/activities'.$ftype)), true);
+        $activities = json_decode(file_get_contents(database_path('data/activities.json')), true);
 
         $order = 1;
         //skipping next to avoid constraint error
