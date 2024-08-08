@@ -6,13 +6,16 @@ use App\Models\Quiz;
 use App\Models\Note;
 use App\Models\Activity;
 use App\Models\Module;
+use App\Models\QuizAnswers;
 use App\Models\UserActivity;
 use App\Models\Faq;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+
 
 
 class PageNavController extends Controller
@@ -157,82 +160,34 @@ class PageNavController extends Controller
     }
 
     //QUIZ
-    public function exploreQuiz($quiz_id, Request $request) {
-        //find quiz
-        $quiz = Quiz::findOrFail($quiz_id);
-        
-        //check progress
-        $user = Auth::user();
-        $user->load('progress_activities');
-        $activity = Activity::findOrFail($quiz->activity->id);
-        $status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
-        if ($status != 'completed'  || $activity->deleted == true) {
-            return redirect()->back();
-        }
-
-        //see if an answer is saved
-        $saved_answer = Session::get('saved_answer');
-        if ($saved_answer && $saved_answer['quiz_id'] == $quiz_id) {
-            //convert options and get feedback
-            $options = $quiz->options_feedback ?? [];
-            //passing information through quiz
-            $quiz->saved_answer = $saved_answer['answer'];
-            $quiz->feedback = $options[$saved_answer['answer']]['feedback'];
-            $quiz->is_correct = $saved_answer['correct'];
-        }
-        else {
-            Session::forget('saved_answer');
-            $quiz->saved_answer = null;
-        }
-
-        $page_info = [];
-
-        //setting exit route
-        $exit = Session::get('current_nav');
-        $page_info['exit_route'] = $exit ? $exit['route'] : route('explore.home');
-
-        //set the end behavior - next only on same day
-        if (!$request->library) {
-            if ($quiz->activity->next && Activity::find($quiz->activity->next)->day->id == $quiz->activity->day->id) {
-                $page_info['redirect_label'] = "NEXT";
-                $page_info['redirect_route'] = route('explore.activity', ['activity_id' => $quiz->activity->next]);
-            }
-            else {
-                $page_info['redirect_label'] = "FINISH";
-                $page_info['redirect_route'] = $exit;
-            }
-        }
-
-        //setting back route/label
-        $page_info['back_label'] = ' Back to '.$quiz->activity->title;
-        $page_info['back_route'] = route('explore.activity', ['activity_id' => $quiz->activity_id, 'library' => $request->library]);
-        
-        $page_info['hide_bottom_nav'] = true;
-        return view('explore.quiz', compact('quiz', 'page_info'));
-    }
-    
     public function submitQuiz(Request $request)
     {
-        //get quiz and check answer
-        $quiz = Quiz::find($request->quiz_id);
-        $selected_option = intval($request->answer);
-        $is_correct = $quiz->correct_answer == $selected_option+1;
-        $feedback = null;
-        
-        //convert options and get feedback
-        $options = $quiz->options_feedback ?? [];
-        $feedback = $options[$selected_option]['feedback'];
-        
-        //save answer in case returned to this page soon
-        Session::put('saved_answer', ['quiz_id' => $request->quiz_id, 'answer' => $selected_option, 'correct' => $is_correct]);
-        
-        return redirect()->back()->with([
-            'feedback' => $feedback,
-            'is_correct' => $is_correct
-            ])->withInput();
+        try {
+            //get quiz
+            $quiz = Quiz::findOrFail($request->quiz_id);
+    
+            //get answers from request
+            $answers = [];
+            foreach ($request->all() as $key => $value) {
+                if (Str::startsWith($key, 'answer_') || Str::startsWith($key, 'other_answer_')) {
+                    $answers[$key] = $value;
+                }
+            }
+    
+            QuizAnswers::updateOrCreate([
+                'user_id' => Auth::id(),
+                'quiz_id' => $quiz->id
+            ], [
+                'answers' => json_encode($answers)
+            ]);
+            return response()->json(['success_message' => 'Quiz answers updated successfully.'], 200);
         }
+        catch (\Exception $e) {
+            return response()->json(['error_message' => 'Failed to submit quiz answers.', 'error' => $e], 500);
+        }
+    }
         
-        public function exploreBrowseButton(Request $request) {
+    public function exploreBrowseButton(Request $request) {
             //browse nav button - check for previous explore page
             //active is for double click functionality
         $previous = Session::get('previous_explore');

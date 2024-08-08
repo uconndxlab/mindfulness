@@ -9,6 +9,7 @@
             {{ session('success') }}
         </div>
     @endif
+    <div id="error-messages" class="alert alert-danger" style="display: none;"></div>
     <div class="text-left">
         <div class="d-flex justify-content-between align-items-center">
             <h1 class="display fw-bold">{{ $activity->title }}
@@ -326,6 +327,13 @@
             }
         }
     });
+
+    //SHOW ERRORS
+    const errorDiv = document.getElementById('error-messages');
+    function showError(errorMessage) {
+        errorDiv.textContent = errorMessage;
+        errorDiv.style.display = 'block';
+    }
 </script>
 @endsection
 

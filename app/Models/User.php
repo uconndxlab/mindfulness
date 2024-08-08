@@ -65,4 +65,15 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(UserActivity::class);
     }
+
+    public function quiz_answers($quiz_id = null)
+    {
+        $query = $this->hasMany(QuizAnswers::class);
+
+        if ($quiz_id) {
+            $query->where('quiz_id', $quiz_id);
+        }
+
+        return $query;
+    }
 }

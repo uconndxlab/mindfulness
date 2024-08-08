@@ -1,5 +1,5 @@
 @if (isset($quiz))
-    <form id="quizForm" action="{{ route('quiz.submit', ['quiz_id' => $quiz->id]) }}" method="POST" class="pt-3">
+    <form id="quizForm" method="POST" class="pt-3">
         @csrf
         @foreach ($quiz->question_options as $key => $question)
             <div id="question_{{ $question['number'] }}" class="quiz-div" data-number="{{ $question['number'] }}" data-type="{{ $question['type'] }}"style="display: {{ $question['number'] == 1 ? 'block' : 'none'}};">
@@ -9,13 +9,13 @@
                 <!-- options -->
                 @foreach ($question['options_feedback'] as $index => $option)
                     <div id="options_{{ $question['number'] }}" class="form-check type-{{ $question['type'] }}">
-                        <input class="form-check-input" name="answer_{{ $question['number'] }}" above-behavior="{{ $option['above'] }}" type="{{ $question['type'] }}" data-other="{{ $option['other'] }}" id="option_{{ $question['number'] }}_{{ $index }}">
+                        <input class="form-check-input" name="answer_{{ $question['number'] }}{{ $question['type'] == 'checkbox' ? '[]' : ''}}" above-behavior="{{ $option['above'] }}" type="{{ $question['type'] }}" data-other="{{ $option['other'] }}" id="option_{{ $question['number'] }}_{{ $index }}" value="{{ $index }}">
                         <label class="form-check-label" for="option_{{ $question['number'] }}_{{ $index }}">
                             {{ $option['option'] }}
                         </label>
                         @if ($option['other'])
                             <div class="other-div">
-                                <input type="text" id="other_{{ $question['number'] }}_{{ $index }}" class="form-control" name="other_answer_{{ $question['number'] }}" placeholder="Please specify" disabled>
+                                <input type="text" id="other_{{ $question['number'] }}_{{ $index }}" class="form-control" name="other_answer_{{ $question['number'] }}_{{ $index }}" placeholder="Please specify" disabled>
                             </div>
                         @endif
                     </div>
@@ -58,6 +58,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Initializing quiz...');
             var questionNumber = 1;
+            const quizId = {{ $quiz->id }}
             const questionCount = {{ $quiz->question_count }};
             //for tracking user interaction
             var answerSet = new Set();
@@ -66,6 +67,12 @@
             const prevQBtn = document.getElementById('prev_q_button');
             const nextQBtn = document.getElementById('next_q_button');
             const submitBtn = document.getElementById('submitButton');
+
+            quizForm.addEventListener('submit', function(event) {
+                event.preventDefault(); 
+                console.log('submitting');
+                submitAnswers();
+            });
     
             prevQBtn.addEventListener('click', function () {
                 changeQuestion(questionNumber - 1);
@@ -220,6 +227,30 @@
                 if (answerSet.size == questionCount) {
                     submitBtn.removeAttribute('disabled');
                 }
+            }
+
+            //SUBMISSION
+            function submitAnswers() {
+                const formData = new FormData(document.getElementById('quizForm'));
+                return new Promise((resolve, reject) => {
+                    axios.post('/quiz/' + quizId, formData, {
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(response => {
+                        console.log('Answers submitted!');
+                        activityComplete();
+                        resolve(true);
+                    })
+                    .catch(error => {
+                        console.error('Error submitting answers: ', error);
+                        //display error
+                        const errorMessages = error.response?.data?.error_message || 'An unknown error occurred.';
+                        showError(errorMessages);
+                        reject(false);
+                    });
+                });
             }
         });
     </script>

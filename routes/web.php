@@ -77,7 +77,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/explore/module/{module_id}', [PageNavController::class, 'exploreModule'])->name('explore.module');
     Route::get('/checkActivity/{activity_id}', [PageNavController::class, 'checkActivityLocked'])->name('check.activity');
     Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
-
     Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
     Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
     
