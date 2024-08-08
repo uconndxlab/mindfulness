@@ -42,7 +42,7 @@
                                 @endforeach
                             </ul>
                         @else
-                            <button id="voice_dropdown_button" class="btn btn-xlight dropdown disabled">
+                            <button id="voice_dropdown_button" class="btn btn-xlight dropdown disabled" disabled>
                                 {{ key($content->audio_options) }}
                             </button>
                         @endif
@@ -65,7 +65,7 @@
                                     @endforeach
                                 </ul>
                             @else
-                                <button id="time_dropdown_button_{{ $voice }}" class="btn btn-xlight dropdown disabled time-toggle" time="{{ key($time_options) }}">
+                                <button id="time_dropdown_button_{{ $voice }}" class="btn btn-xlight dropdown disabled time-toggle" time="{{ key($time_options) }}" disabled>
                                     {{ key($time_options) }}
                                 </button>
                             @endif
@@ -101,7 +101,7 @@
     </div>
     <div class="manual-margin-top" id="redirect_div">
         @if (isset($page_info['redirect_route']))
-            <a id="redirect_button" class="btn btn-tertiary disabled" href="{{ $page_info['redirect_route'] }}">{{ $page_info['redirect_label'] }}</a>
+            <a id="redirect_button" class="btn btn-tertiary redirect-btn disabled" href="{{ $page_info['redirect_route'] }}">{{ $page_info['redirect_label'] }}</a>
         @endif
         <a id="skip" class="btn btn-primary" onclick="activityComplete()">skip</a>
     </div>
@@ -185,8 +185,8 @@
 
     //function for unlocking the redirection buttons
     function unlockRedirect() {
-        redirectDiv.querySelectorAll('.disabled').forEach(element => {
-            element.classList.remove('disabled');
+        redirectDiv.querySelectorAll('.redirect-btn').forEach(btn => {
+            btn.classList.remove('disabled');
         });
     }
 

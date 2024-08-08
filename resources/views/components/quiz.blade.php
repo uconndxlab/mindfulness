@@ -2,7 +2,7 @@
     <form id="quizForm" action="{{ route('quiz.submit', ['quiz_id' => $quiz->id]) }}" method="POST" class="pt-3">
         @csrf
         @foreach ($quiz->question_options as $key => $question)
-            <div id="question_{{ $question['number'] }}" class="quiz-div" data-number="{{ $question['number'] }}" data-last="{{ $question['last'] ? 'true' : 'false' }}" data-type="{{ $question['type'] }}"style="display: {{ $question['number'] == 1 ? 'block' : 'none'}};">
+            <div id="question_{{ $question['number'] }}" class="quiz-div" data-number="{{ $question['number'] }}" data-type="{{ $question['type'] }}"style="display: {{ $question['number'] == 1 ? 'block' : 'none'}};">
                 <div class="text-left quiz-question mb-3">
                     <h4>{{ $question['question'] }}</h4>
                 </div>
@@ -43,22 +43,29 @@
             </div>
         @endforeach
         <div class="d-flex justify-content-between">
-            <button id="prev_q_button" type="button" class="btn btn-primary disabled">
+            <button id="prev_q_button" type="button" class="btn btn-primary" disabled>
                 <i class="bi bi-arrow-left"></i>
             </button>
-            <button id="next_q_button" type="button" class="btn btn-primary disabled">
+            <button id="next_q_button" type="button" class="btn btn-primary" disabled>
                 <i class="bi bi-arrow-right"></i>
             </button>
+        </div>
+        <div class=" manual-margin-top">
+            <button type="submit" id="submitButton" class="btn btn-secondary mt-4" disabled>SUBMIT</button>
         </div>
     </form>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Initializing quiz...');
             var questionNumber = 1;
+            const questionCount = {{ $quiz->question_count }};
+            //for tracking user interaction
+            var answerSet = new Set();
     
             const quizForm = document.getElementById('quizForm');
             const prevQBtn = document.getElementById('prev_q_button');
             const nextQBtn = document.getElementById('next_q_button');
+            const submitBtn = document.getElementById('submitButton');
     
             prevQBtn.addEventListener('click', function () {
                 changeQuestion(questionNumber - 1);
@@ -80,7 +87,7 @@
                         audio.pause();
                     });
                     const currentNumber = parseInt(qDiv.getAttribute('data-number'));
-                    const isLast = qDiv.getAttribute('data-last') === 'true';
+                    const isLast = currentNumber === questionCount;
                     const isFirst = currentNumber === 1;
     
                     //handle hiding questions
@@ -88,16 +95,16 @@
                         qDiv.style.display = 'block';
                         //handle prev/next
                         if (isFirst) {
-                            prevQBtn.classList.add('disabled');
+                            prevQBtn.setAttribute('disabled', '');
                         }
                         else {
-                            prevQBtn.classList.remove('disabled');
+                            prevQBtn.removeAttribute('disabled');
                         }
                         if (isLast) {
-                            nextQBtn.classList.add('disabled');
+                            nextQBtn.setAttribute('disabled', '');
                         }
                         else {
-                            nextQBtn.classList.remove('disabled');
+                            nextQBtn.removeAttribute('disabled');
                         }
                     }
                     else {
@@ -107,12 +114,14 @@
             }
             changeQuestion(questionNumber);
 
+
             //SHOWING FEEDBACK
             quizForm.querySelectorAll('.form-check-input').forEach(option => {
                 option.addEventListener('change', function(event) {
                     //build id and get question div
                     const splitId = event.target.id.split('_');
                     const questionId = splitId[1];
+                    unlockSubmit(questionId);
                     const optionId = splitId[2];
                     const feedbackDiv = document.getElementById('feedback_' + questionId + '_' + optionId);
                     if (event.target.checked) {
@@ -201,6 +210,15 @@
                     const optionId = splitId[2];
                     const other = document.getElementById('other_'+questionId+'_'+optionId);
                     box.checked ? other.removeAttribute('disabled') : other.setAttribute('disabled', '');
+                }
+            }
+
+            //SUBMISSION UNLOCK
+            function unlockSubmit(question_no) {
+                //adds each question number to track user interaction
+                answerSet.add(question_no);
+                if (answerSet.size == questionCount) {
+                    submitBtn.removeAttribute('disabled');
                 }
             }
         });
