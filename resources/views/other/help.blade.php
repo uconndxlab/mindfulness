@@ -19,7 +19,7 @@
             </ul>
         </div>
     </nav>
-    <div data-bs-spy="scroll" data-bs-target="#navbar-help" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true" class="scrollspy-example p-3 rounded-2" tabindex="0">
+    <div data-bs-spy="scroll" data-bs-target="#navbar-help" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true" class="scrollspy-example pt-3 pb-3 rounded-2" tabindex="0">
         <div id="tutorial">
             <h5 class="text-center fw-bold mt-4">Tutorial:</h5>
             <x-contentView type="video" file="videoExampleSnarky.MOV"/>
@@ -31,12 +31,12 @@
                 @foreach ($faqs as $index => $faq)
                     <div class="form-group accordion-item border mb-2">
                         <h2 class="accordion-header" id="headingFAQ_{{ $index }}">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFAQ_{{ $index }}" aria-expanded="true" aria-controls="collapseFAQ_{{ $index }}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFAQ_{{ $index }}" aria-expanded="true" aria-controls="collapseFAQ_{{ $index }}">
                                 {{ $faq->question }}
                             </button>
                         </h2>
                         <div id="collapseFAQ_{{ $index }}" class="accordion-collapse collapse" aria-labelledby="headingFAQ_{{ $index }}">
-                            <div class="accordion-body">
+                            <div style="padding: 10px 20px !important;" class="accordion-body">
                                 {{ $faq->answer }}
                             </div>
                         </div>

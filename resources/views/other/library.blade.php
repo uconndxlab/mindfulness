@@ -5,7 +5,7 @@
 @section('content')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.8.0/nouislider.min.css" rel="stylesheet">
 
-<div class="col-md-8">
+<div class="col-lg-8">
     @php
         $route_name = Request::route()->getName();
         $library = [false, false];
@@ -36,7 +36,7 @@
     <div class="">
         <form id="search_filter_form" method="GET">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-lg-8">
                     <div class="input-group mb-3">
                         <i style="padding:0px 10px" id="search-icon" class="bi bi-search"></i>
                         <input id="search_bar" type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder='{{ $page_info['search_text'] }}'>
@@ -54,7 +54,7 @@
             </div>
         
             <div class="row search-filters">
-                <div class="col-md-4">
+                <div class="col-lg-4">
                     <div class="accordion accordion-flush mb-3" id="filter_accordion">
                         
                         @php
@@ -126,7 +126,7 @@
                     <button id="apply_filter_button" type="button" class="btn btn-primary">Apply Filter</button>
                     <button id="clear_filter_button" type="button" style="color:#000!important" class="btn btn-link text-center mt-1 mb-2">Clear Filters</button>
                 </div>
-                <div id="activitiesContainer" class="col-md-8">
+                <div id="activitiesContainer" class="col-lg-8">
                     <x-search-results :activities="collect()"/>
                 </div>
             </div>
