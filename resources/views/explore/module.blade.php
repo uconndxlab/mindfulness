@@ -48,6 +48,7 @@
                             @endif
                         </button>
                     </h2>
+                    <p>{{ $day->description }}</p>
                     <div id="collapse_{{ $index }}" class="accordion-collapse collapse {{ $day->progress['show'] ? 'show' : ''}}" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
                         <div class="accordion-body">
                             @if (!$disabled)
@@ -62,7 +63,7 @@
                                         <a id="moduleLink" class="stretched-link w-100 activity-link {{ $disabled }}" data-id="{{ $activity->id }}" data-title="{{ $activity->title }}" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">
                                             {!! $activity->status == 'completed' ? '<i class="bi bi-check2-square"></i>' : '' !!}
                                             <span class="activity-font">{{ $title }}</span> <br>
-                                            <span class="sub-activity-font">{{ ucfirst($activity->type) }}{{ $activity->time ? ', '.$activity->time.'min' : '' }}</span>
+                                            <span class="sub-activity-font">{{ ucfirst($activity->type) }}{{ $activity->time ? ', '.$activity->time.' min' : '' }}</span>
                                         </a>
                                         <i class="bi bi-arrow-right"></i>
                                     </div>

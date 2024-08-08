@@ -1,7 +1,7 @@
 @if (!isset($activities) || $activities->isEmpty())
     @if (isset($random))
         <div class="text-left muted">
-            No matches found. Here is a random activity you might like to practice:
+            No matches found. Here is an activity you might like to practice:
         </div>
         <div class="card module p-2 mb-2">
             <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $random->id, 'library' => true]) }}">
@@ -23,7 +23,7 @@
                     <div class="card module p-2 mb-2">
                         <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id, 'library' => true]) }}">
                             <span class="activity-font">{{ $activity->title }}</span> <br>
-                            <span class="sub-activity-font">{{ ucfirst($activity->type) }}{{ $activity->time ? ', '.$activity->time.'min' : '' }}{{ $activity->optional ? ', Optional' : '' }}</span>
+                            <span class="sub-activity-font">{{ ucfirst($activity->type) }}{{ $activity->time ? ', '.$activity->time.' min' : '' }}{{ $activity->optional ? ', Optional' : '' }}</span>
                         </a>
                         <i class="bi bi-arrow-right"></i>
                     </div>

@@ -2,7 +2,7 @@
     <form id="quizForm" action="{{ route('quiz.submit', ['quiz_id' => $quiz->id]) }}" method="POST" class="pt-3">
         @csrf
         @foreach ($quiz->question_options as $key => $question)
-            <div id="{{ $key }}" class="quiz-div" data-number="{{ $question['number'] }}" data-last="{{ $question['last'] ? 'true' : 'false' }}" data-type="{{ $question['type'] }}"style="display: {{ $question['number'] == 1 ? 'block' : 'none'}};">
+            <div id="question_{{ $question['number'] }}" class="quiz-div" data-number="{{ $question['number'] }}" data-last="{{ $question['last'] ? 'true' : 'false' }}" data-type="{{ $question['type'] }}"style="display: {{ $question['number'] == 1 ? 'block' : 'none'}};">
                 <div class="text-left quiz-question mb-3">
                     <h4>{{ $question['question'] }}</h4>
                 </div>
@@ -67,9 +67,12 @@
                 changeQuestion(questionNumber + 1);
             });
     
+            //QUESTION CHANGE
             function changeQuestion(q_no) {
                 console.log('Question No.: ' + q_no);
                 questionNumber = q_no;
+
+                //get all questions
                 const quizDivs = quizForm.querySelectorAll('.quiz-div');
                 quizDivs.forEach(qDiv => {
                     //pause any audio
@@ -107,19 +110,21 @@
             //SHOWING FEEDBACK
             quizForm.querySelectorAll('.form-check-input').forEach(option => {
                 option.addEventListener('change', function(event) {
-                    //build id and get div
+                    //build id and get question div
                     const splitId = event.target.id.split('_');
                     const questionId = splitId[1];
                     const optionId = splitId[2];
                     const feedbackDiv = document.getElementById('feedback_' + questionId + '_' + optionId);
-                    quizForm.querySelectorAll('.feedback-div').forEach(fbDiv => {
-                        //hide all other feedback
-                        fbDiv.style.display = 'none';
-                        //pause any audio
-                        fbDiv.querySelectorAll('audio').forEach(audio => {
-                            audio.pause();
+                    if (event.target.checked) {
+                        quizForm.querySelectorAll('.feedback-div').forEach(fbDiv => {
+                            //hide all other feedback
+                            fbDiv.style.display = 'none';
+                            //pause any audio
+                            fbDiv.querySelectorAll('audio').forEach(audio => {
+                                audio.pause();
+                            });
                         });
-                    });
+                    }
                     //show/hide feedback
                     feedbackDiv.style.display = event.target.checked ? 'block' : 'none';
 
