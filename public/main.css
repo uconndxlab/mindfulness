@@ -147,9 +147,30 @@ textarea.form-control {
 }
 
 /*tabs*/
-.navbar .tabs ul li:has(.active){
-    border-bottom:2px solid var(--dark-green);
+.navbar .tabs ul li{
+    background:var(--blue-grey);
 }
+.navbar .tabs ul li:has(.active){
+    background: var(--dark-green);
+}
+
+.navbar .tabs ul li:has(.active) a{
+    color:#fff!important;
+}
+
+.navbar .tabs ul li:first-of-type{
+    border-radius:10px 0px 0px 10px;
+}
+
+.navbar .tabs ul li:last-of-type{
+    border-radius:0px 10px 10px 0px;
+}
+
+.navbar .tabs ul li:not(:first-of-type){
+    border-left:2px solid rgba(0,0,0,0.1);
+}
+
+
 
 /*search filter*/
 #search-icon{

@@ -3,7 +3,7 @@
 @section('title', 'Account')
 
 @section('content')
-<div class="col-md-4">
+<div class="col-md-8">
     @if (session('success'))
     <div class="alert alert-success" role="alert">
         {{ session('success') }}
