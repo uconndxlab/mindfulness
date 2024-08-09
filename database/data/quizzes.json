@@ -14,7 +14,7 @@
                         "correct": 2,
                         "audio_path": null,
                         "above": null,
-                        "other": false
+                        "other": true
                     },
                     {
                         "option": "I want to feel less stressed (relax more, sleep better)",
@@ -22,7 +22,7 @@
                         "correct": 2,
                         "audio_path": null,
                         "above": null,
-                        "other": false
+                        "other": true
                     },
                     {
                         "option": "I want to learn how to deal with a difficult relationship",
@@ -30,7 +30,7 @@
                         "correct": 2,
                         "audio_path": null,
                         "above": null,
-                        "other": false
+                        "other": true
                     },
                     {
                         "option": "All of the above",
@@ -39,7 +39,7 @@
                         "audio_path": null,
                         "all_above": true,
                         "above": "all",
-                        "other": false
+                        "other": true
                     },
                     {
                         "option": "None of the above",

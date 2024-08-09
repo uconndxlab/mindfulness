@@ -15,7 +15,7 @@
                         </label>
                         @if ($option['other'])
                             <div class="other-div">
-                                <input type="text" id="other_{{ $question['number'] }}_{{ $index }}" class="form-control" name="other_answer_{{ $question['number'] }}_{{ $index }}" placeholder="Please specify" disabled>
+                                <input type="text" id="other_{{ $question['number'] }}_{{ $index }}" class="form-control" name="other_answer_{{ $question['number'] }}_{{ $index }}" placeholder="Please describe more..." disabled>
                             </div>
                         @endif
                     </div>
@@ -47,10 +47,10 @@
         @endphp
         <div class="d-flex justify-content-between">
             <button id="prev_q_button" type="button" class="btn btn-primary" disabled style="display: {{ $display }};">
-                <i class="bi bi-arrow-left"></i>
+                <i class="bi bi-arrow-left"></i>Previous
             </button>
             <button id="next_q_button" type="button" class="btn btn-primary" disabled style="display: {{ $display }};">
-                <i class="bi bi-arrow-right"></i>
+                Continue<i class="bi bi-arrow-right"></i>
             </button>
         </div>
         <div class=" manual-margin-top">

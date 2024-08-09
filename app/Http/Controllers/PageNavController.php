@@ -234,7 +234,7 @@ class PageNavController extends Controller
             else if ($request->base_param = 'favorited') {
                 $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
                 $query->whereIn('id', $fav_ids);
-                $empty_text = '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>';
+                $empty_text = '<span>Click the "<i class="bi bi-star"></i>" found in activities to add them to your favorites and view them here!</span>';
             }
         }
 

@@ -107,7 +107,7 @@
                 } else {
                     moreText.style.display = 'none';
                     dots.style.display = 'inline';
-                    readMoreBtn.textContent = 'Read More';
+                    readMoreBtn.textContent = 'Read More...';
                 }
             });
         });
