@@ -2,14 +2,14 @@
     <form id="quizForm" method="POST" class="pt-3">
         @csrf
         @foreach ($quiz->question_options as $key => $question)
-            <div id="question_{{ $question['number'] }}" class="quiz-div" data-number="{{ $question['number'] }}" data-type="{{ $question['type'] }}"style="display: {{ $question['number'] == 1 ? 'block' : 'none'}};">
+            <div id="question_{{ $question['number'] }}" class="quiz-div" data-number="{{ $question['number'] }}" data-type="{{ $question['type'] }}" style="display: {{ $question['number'] == 1 ? 'block' : 'none'}};">
                 <div class="text-left quiz-question mb-3">
                     <h4>{{ $question['question'] }}</h4>
                 </div>
                 <!-- options -->
                 @foreach ($question['options_feedback'] as $index => $option)
                     <div id="options_{{ $question['number'] }}" class="form-check type-{{ $question['type'] }}">
-                        <input class="form-check-input" name="answer_{{ $question['number'] }}{{ $question['type'] == 'checkbox' ? '[]' : ''}}" above-behavior="{{ $option['above'] }}" type="{{ $question['type'] }}" data-other="{{ $option['other'] }}" id="option_{{ $question['number'] }}_{{ $index }}" value="{{ $index }}">
+                        <input class="form-check-input" name="answer_{{ $question['number'] }}[]" above-behavior="{{ $option['above'] }}" type="{{ $question['type'] }}" data-other="{{ $option['other'] }}" id="option_{{ $question['number'] }}_{{ $index }}" value="{{ $index }}">
                         <label class="form-check-label" for="option_{{ $question['number'] }}_{{ $index }}">
                             {{ $option['option'] }}
                         </label>
@@ -42,16 +42,19 @@
                 @endforeach
             </div>
         @endforeach
+        @php
+            $display = $quiz->question_count > 1 ? 'block' : 'none';
+        @endphp
         <div class="d-flex justify-content-between">
-            <button id="prev_q_button" type="button" class="btn btn-primary" disabled>
+            <button id="prev_q_button" type="button" class="btn btn-primary" disabled style="display: {{ $display }};">
                 <i class="bi bi-arrow-left"></i>
             </button>
-            <button id="next_q_button" type="button" class="btn btn-primary" disabled>
+            <button id="next_q_button" type="button" class="btn btn-primary" disabled style="display: {{ $display }};">
                 <i class="bi bi-arrow-right"></i>
             </button>
         </div>
         <div class=" manual-margin-top">
-            <button type="submit" id="submitButton" class="btn btn-secondary mt-4" disabled>SUBMIT</button>
+            <button type="submit" id="submitButton" class="btn btn-secondary mt-4" {{ $quiz->answers ? '' : 'disabled'}}>{{ $quiz->answers ? 'RE-' : ''}}SUBMIT</button>
         </div>
     </form>
     <script>
@@ -62,6 +65,7 @@
             const questionCount = {{ $quiz->question_count }};
             //for tracking user interaction
             var answerSet = new Set();
+            const answers = @json($quiz->answers);
     
             const quizForm = document.getElementById('quizForm');
             const prevQBtn = document.getElementById('prev_q_button');
@@ -80,12 +84,31 @@
             nextQBtn.addEventListener('click', function () {
                 changeQuestion(questionNumber + 1);
             });
-    
+
+            //POPULATE ANSWERS
+            function populateForm(answers) {
+                //loop through answers
+                for (const [key, value] of Object.entries(answers)) {
+                    //handle text
+                    if (typeof value === 'string') {
+                        let inputElement = document.querySelector(`[name="${key}"]`);
+                        inputElement.value = value;
+                    }
+                    //handle check and radio
+                    else if (typeof value === 'object') {
+                        document.querySelectorAll(`[name="${key}[]"]`).forEach(checkbox => {
+                            //also handles unlocking other
+                            checkBox(checkbox, value.includes(checkbox.value))
+                        });
+                    }
+                }
+            }
+            
             //QUESTION CHANGE
             function changeQuestion(q_no) {
                 console.log('Question No.: ' + q_no);
                 questionNumber = q_no;
-
+                
                 //get all questions
                 const quizDivs = quizForm.querySelectorAll('.quiz-div');
                 quizDivs.forEach(qDiv => {
@@ -96,7 +119,7 @@
                     const currentNumber = parseInt(qDiv.getAttribute('data-number'));
                     const isLast = currentNumber === questionCount;
                     const isFirst = currentNumber === 1;
-    
+                    
                     //handle hiding questions
                     if (currentNumber === questionNumber) {
                         qDiv.style.display = 'block';
@@ -120,7 +143,7 @@
                 });
             }
             changeQuestion(questionNumber);
-
+            populateForm(answers);
 
             //SHOWING FEEDBACK
             quizForm.querySelectorAll('.form-check-input').forEach(option => {
