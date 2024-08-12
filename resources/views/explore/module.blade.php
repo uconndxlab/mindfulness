@@ -40,15 +40,22 @@
                 <div class="accordion-item border mb-2">
                     <h2 class="accordion-header" id="heading_{{ $index }}">
                         <button class="accordion-button {{ $day->progress['show'] ? '' : 'collapsed'}}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="false" aria-controls="collapse_{{ $index }}" {{ $disabled }}>
-                            {{ $day->name }}
-                            @if ($day->progress['status'] == 'completed')
-                                <i class="bi bi-check2-square"></i>
-                            @elseif($disabled)
-                                <i class="bi bi-lock"></i>
-                            @endif
+                            <div>
+                                {{ $day->name }}
+                                
+                                @if ($day->progress['status'] == 'completed')
+                                    <i class="bi bi-check2-square"></i>
+                                @elseif($disabled)
+                                    <i class="bi bi-lock"></i>
+                                @endif
+
+                                <br>
+                                <span style="font-weight:400;">{{ $day->description }}</span>
+                            </div>
+                            
                         </button>
                     </h2>
-                    <p>{{ $day->description }}</p>
+                    
                     <div id="collapse_{{ $index }}" class="accordion-collapse collapse {{ $day->progress['show'] ? 'show' : ''}}" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
                         <div class="accordion-body">
                             @if (!$disabled)
@@ -60,10 +67,11 @@
                                         $disabled = $activity->status == 'locked' ? 'disabled' : '';
                                     @endphp
                                     <div class="card p-2 module mb-2">
-                                        <a id="moduleLink" class="stretched-link w-100 activity-link {{ $disabled }}" data-id="{{ $activity->id }}" data-title="{{ $activity->title }}" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">
-                                            {!! $activity->status == 'completed' ? '<i class="bi bi-check2-square"></i>' : '' !!}
-                                            <span class="activity-font">{{ $title }}</span> <br>
-                                            <span class="sub-activity-font">{{ ucfirst($activity->type) }}{{ $activity->time ? ', '.$activity->time.' min' : '' }}</span>
+                                        <a id="moduleLink" style="padding-bottom:10px;" class="stretched-link w-100 activity-link {{ $disabled }}" data-id="{{ $activity->id }}" data-title="{{ $activity->title }}" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">
+                                            
+                                            <div style="display:flex;"><p class="activity-font">{{ $title }}</p> {!! $activity->status == 'completed' ? '<i style="font-size:16px;margin-left:5px;" class="bi bi-check2-square"></i>' : '' !!}</div>
+                                            <span class="sub-activity-font activity-tag-activity">{{ ucfirst($activity->type) }}</span>
+                                            <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $activity->time ? ''.$activity->time.' min' : '' }}</span>
                                         </a>
                                         <i class="bi bi-arrow-right"></i>
                                     </div>
