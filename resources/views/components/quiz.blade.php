@@ -44,6 +44,7 @@
         @endforeach
         @php
             $display = $quiz->question_count > 1 ? 'block' : 'none';
+            $last = $quiz->question_count <=1 ? 'block' : 'none';
         @endphp
         <div class="d-flex justify-content-between">
             <button id="prev_q_button" type="button" class="btn-quiz" disabled style="display: {{ $display }};">
@@ -52,9 +53,10 @@
             <button id="next_q_button" type="button" class="btn-quiz" disabled style="display: {{ $display }};">
                 Next <i class="bi bi-chevron-right "></i>
             </button>
+            <button type="submit" id="submitButton" class="btn-quiz" {{ $quiz->answers ? '' : 'disabled'}} style="display: {{ $last }};">
+                {{ $quiz->answers ? 'Re-' : ''}}Submit <i class="bi bi-arrow-up"></i>
+            </button>
         </div>
-        <div class=" manual-margin-top">
-            <button type="submit" id="submitButton" class="btn btn-secondary mt-4" {{ $quiz->answers ? '' : 'disabled'}}>{{ $quiz->answers ? 'RE-' : ''}}SUBMIT</button>
         </div>
     </form>
     <script>
@@ -123,23 +125,30 @@
                     //handle hiding questions
                     if (currentNumber === questionNumber) {
                         qDiv.style.display = 'block';
-                        //handle prev/next
-                        if (isFirst) {
-                            prevQBtn.setAttribute('disabled', '');
-                        }
-                        else {
-                            prevQBtn.removeAttribute('disabled');
-                        }
-                        if (isLast) {
-                            nextQBtn.setAttribute('disabled', '');
-                        }
-                        else {
-                            nextQBtn.removeAttribute('disabled');
+                        if (questionCount > 1) {
+                            //handle prev/next
+                            if (isFirst) {
+                                prevQBtn.setAttribute('disabled', '');
+                            }
+                            else {
+                                prevQBtn.removeAttribute('disabled');
+                            }
+                            if (isLast) {
+                                nextQBtn.setAttribute('disabled', '');
+                                nextQBtn.style.display = 'none';
+                                submitBtn.style.display = 'block';
+                            }
+                            else {
+                                nextQBtn.removeAttribute('disabled');
+                                nextQBtn.style.display = 'block';
+                                submitBtn.style.display = 'none';
+                            }
                         }
                     }
                     else {
                         qDiv.style.display = 'none';
                     }
+                    
                 });
             }
             changeQuestion(questionNumber);

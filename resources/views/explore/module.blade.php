@@ -70,8 +70,12 @@
                                         <a id="moduleLink" style="padding-bottom:10px;" class="stretched-link w-100 activity-link {{ $disabled }}" data-id="{{ $activity->id }}" data-title="{{ $activity->title }}" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">
                                             
                                             <div style="display:flex;"><p class="activity-font">{{ $title }}</p> {!! $activity->status == 'completed' ? '<i style="font-size:16px;margin-left:5px;" class="bi bi-check2-square"></i>' : '' !!}</div>
-                                            <span class="sub-activity-font activity-tag-activity">{{ ucfirst($activity->type) }}</span>
-                                            <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $activity->time ? ''.$activity->time.' min' : '' }}</span>
+                                            @if ($activity->type)
+                                                <span class="sub-activity-font activity-tag-activity">{{ ucfirst($activity->type) }}</span>
+                                            @endif
+                                            @if ($activity->time)
+                                                <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $activity->time.' min' }}</span>
+                                            @endif
                                         </a>
                                         <i class="bi bi-arrow-right"></i>
                                     </div>
