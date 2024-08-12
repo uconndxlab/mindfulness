@@ -102,7 +102,9 @@
     </div>
     <div class="manual-margin-top" id="redirect_div">
         @if (isset($page_info['redirect_route']))
-            <a id="redirect_button" class="btn btn-tertiary redirect-btn disabled" href="{{ $page_info['redirect_route'] }}">{{ $page_info['redirect_label'] }}</a>
+            <a id="redirect_button" class="btn btn-tertiary redirect-btn disabled" href="{{ $page_info['redirect_route'] }}" style="display: none;">
+                {{ $page_info['redirect_label'] }}
+            </a>
         @endif
         <a id="skip" class="btn btn-primary" onclick="activityComplete()">skip</a>
     </div>
@@ -187,6 +189,7 @@
     //function for unlocking the redirection buttons
     function unlockRedirect() {
         redirectDiv.querySelectorAll('.redirect-btn').forEach(btn => {
+            btn.style.display = 'block';
             btn.classList.remove('disabled');
         });
     }

@@ -53,8 +53,8 @@
             <button id="next_q_button" type="button" class="btn-quiz" disabled style="display: {{ $display }};">
                 Next <i class="bi bi-chevron-right "></i>
             </button>
-            <button type="submit" id="submitButton" class="btn-quiz" {{ $quiz->answers ? '' : 'disabled'}} style="display: {{ $last }};">
-                {{ $quiz->answers ? 'Re-' : ''}}Submit <i class="bi bi-arrow-up"></i>
+            <button type="submit" id="submitButton" class="btn-quiz" disabled style="display: {{ $last }};">
+                Submit <i class="bi bi-arrow-up"></i>
             </button>
         </div>
         </div>
@@ -105,6 +105,7 @@
                     }
                 }
             }
+            populateForm(answers);
             
             //QUESTION CHANGE
             function changeQuestion(q_no) {
@@ -126,7 +127,7 @@
                     if (currentNumber === questionNumber) {
                         qDiv.style.display = 'block';
                         if (questionCount > 1) {
-                            //handle prev/next
+                            //handle prev
                             if (isFirst) {
                                 prevQBtn.setAttribute('disabled', '');
                             }
@@ -134,16 +135,17 @@
                                 prevQBtn.removeAttribute('disabled');
                             }
                             if (isLast) {
-                                nextQBtn.setAttribute('disabled', '');
                                 nextQBtn.style.display = 'none';
                                 submitBtn.style.display = 'block';
+                                nextQBtn.setAttribute('disabled', '');
                             }
                             else {
-                                nextQBtn.removeAttribute('disabled');
-                                nextQBtn.style.display = 'block';
                                 submitBtn.style.display = 'none';
+                                nextQBtn.style.display = 'block';
+                                submitBtn.setAttribute('disabled', '');
                             }
                         }
+                        unlockNext(questionNumber);
                     }
                     else {
                         qDiv.style.display = 'none';
@@ -152,7 +154,27 @@
                 });
             }
             changeQuestion(questionNumber);
-            populateForm(answers);
+
+            //UNLOCK NEXT/SUBMIT
+            function unlockNext(questionNumber) {
+                //handle unlocking of next
+                const questionDiv = document.getElementById('question_'+questionNumber);
+                nextQBtn.setAttribute('disabled', '');
+                submitBtn.setAttribute('disabled', '');
+                //if we find one option is selected, remove the disable from next/submit
+                for (const check of questionDiv.querySelectorAll('.form-check-input')) {
+                    console.log(check.id);
+                    if (check.checked) {
+                        if (questionNumber === questionCount) {
+                            submitBtn.removeAttribute('disabled');
+                        }
+                        else if (questionNumber < questionCount) {
+                            nextQBtn.removeAttribute('disabled');
+                        }
+                        break;
+                    }
+                }
+            }
 
             //SHOWING FEEDBACK
             quizForm.querySelectorAll('.form-check-input').forEach(option => {
@@ -160,7 +182,6 @@
                     //build id and get question div
                     const splitId = event.target.id.split('_');
                     const questionId = splitId[1];
-                    unlockSubmit(questionId);
                     const optionId = splitId[2];
                     const feedbackDiv = document.getElementById('feedback_' + questionId + '_' + optionId);
                     if (event.target.checked) {
@@ -189,16 +210,18 @@
                     var allBoxes = quizDiv.querySelectorAll('.form-check-input');
                     allBoxes.forEach(option => {
                         const behavior = option.getAttribute('above-behavior');
-
+                        
                         option.addEventListener('click', function(event) {
                             const targetCheck = event.target.checked;
+                            //handle unlocking of next
+                            unlockNext(parseInt(quizDiv.getAttribute('data-number')));
                             //checked
                             if (targetCheck) {
                                 //none above
                                 if (behavior == 'none') {
                                     allBoxes.forEach(box => {
                                         if (box != option) {
-                                            checkBox(box, false);;
+                                            checkBox(box, false);
                                         }
                                     });
                                 }
@@ -232,6 +255,8 @@
                     var allBoxes = quizDiv.querySelectorAll('.form-check-input');
                     allBoxes.forEach(option => {
                         option.addEventListener('click', function() {
+                            //handle unlocking of next
+                            unlockNext(parseInt(quizDiv.getAttribute('data-number')));
                             allBoxes.forEach(box => {
                                 checkBox(box, box.checked);
                             });
@@ -240,24 +265,17 @@
                 }
             });
 
+
             //OTHER
             function checkBox(box, checked) {
                 box.checked = checked;
+                const splitId = box.id.split('_');
+                const questionId = splitId[1];
+                const optionId = splitId[2];
+                //handle other
                 if (box.getAttribute('data-other')) {
-                    const splitId = box.id.split('_');
-                    const questionId = splitId[1];
-                    const optionId = splitId[2];
                     const other = document.getElementById('other_'+questionId+'_'+optionId);
                     box.checked ? other.removeAttribute('disabled') : other.setAttribute('disabled', '');
-                }
-            }
-
-            //SUBMISSION UNLOCK
-            function unlockSubmit(question_no) {
-                //adds each question number to track user interaction
-                answerSet.add(question_no);
-                if (answerSet.size == questionCount) {
-                    submitBtn.removeAttribute('disabled');
                 }
             }
 

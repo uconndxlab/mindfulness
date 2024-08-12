@@ -12,23 +12,6 @@
         @endif
     </div>
 
-    <div class="modal fade" id="lockedActivityModal" tabindex="-1" aria-labelledby="lockedActivityModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="lockedActivityModalLabel">Activity Locked</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    This activity is currently locked. Continue progressing to unlock this activity.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="">
         <h4 class="mb-2">Sessions</h4>
     <div class="accordion accordion-flush mb-3" id="accordionDays">
@@ -100,9 +83,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.locked) {
-                            var myModal = new bootstrap.Modal(document.getElementById('lockedActivityModal'));
-                            document.getElementById('lockedActivityModalLabel').innerHTML = 'Locked: ' + activityName;
-                            myModal.show();
+                            showModal('Locked: '+activityName, 'This activity is currently locked. Continue progressing to unlock this activity.');
                         } else {
                             window.location.href = `/explore/activity/${activityId}`;
                         }
