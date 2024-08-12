@@ -279,7 +279,7 @@ class PageNavController extends Controller
                     $query->where('optional', true);
                 }
                 else if ($lower == 'quiz') {
-                    $query->where('type', 'quiz');
+                    $query->where('type', 'reflection');
                 }
             }
         }

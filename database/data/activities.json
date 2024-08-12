@@ -13,7 +13,7 @@
         "id": 2,
         "day_id": 1,
         "title": "Goals",
-        "type": "quiz",
+        "type": "reflection",
         "time": null,
         "order": 2,
         "next_fake": 3

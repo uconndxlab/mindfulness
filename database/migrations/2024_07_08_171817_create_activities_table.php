@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('day_id')->nullable()->constrained('days')->onDelete('set null');
             $table->string('title');
-            $table->enum('type', ['lesson', 'practice', 'quiz', 'journal'])->nullable();
+            $table->enum('type', ['lesson', 'practice', 'reflection', 'journal'])->nullable();
             $table->integer('time')->nullable();
             $table->string('completion_message')->default('Congrats on completing the activity!');
             $table->integer('order');
