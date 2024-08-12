@@ -23,12 +23,11 @@
     </div>
     <div class="manual-margin-top">
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
-            @if ($content->audio_options)
+            @if ($content->audio_options && count($content->audio_options) > 1)
                 <div class="col-6 mt-1">
                     <label class="fw-bold" for="word_otd">Options:</label>
                     <div class="form-group dropdown">
-
-                    <!-- voice selection -->
+                        <!-- voice selection -->
                         @if (count($content->audio_options) > 1)
                             <button id="voice_dropdown_button" class="btn btn-xlight dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ key($content->audio_options) }}
@@ -42,10 +41,6 @@
                                     </li>
                                 @endforeach
                             </ul>
-                        @else
-                            <button id="voice_dropdown_button" class="btn btn-xlight dropdown disabled" disabled>
-                                {{ key($content->audio_options) }}
-                            </button>
                         @endif
                         <input type="hidden" id="voice_select" name="voice_select" value="{{ key($content->audio_options) }}">
                     </div>
@@ -65,10 +60,6 @@
                                         </li>
                                     @endforeach
                                 </ul>
-                            @else
-                                <button id="time_dropdown_button_{{ $voice }}" class="btn btn-xlight dropdown disabled time-toggle" time="{{ key($time_options) }}" disabled>
-                                    {{ key($time_options) }}
-                                </button>
                             @endif
                             <input type="hidden" id="time_select" name="time_select" value="{{ key($time_options) }}">
                         </div>

@@ -53,10 +53,9 @@
             <button id="next_q_button" type="button" class="btn-quiz" disabled style="display: {{ $display }};">
                 Next <i class="bi bi-chevron-right "></i>
             </button>
-            <button type="submit" id="submitButton" class="btn-quiz" disabled style="display: {{ $last }};">
+            <button type="submit" id="submitButton" class="btn-quiz ms-auto" disabled style="display: {{ $last }};">
                 Submit <i class="bi bi-arrow-up"></i>
             </button>
-        </div>
         </div>
     </form>
     <script>
