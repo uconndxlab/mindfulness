@@ -46,11 +46,11 @@
             $display = $quiz->question_count > 1 ? 'block' : 'none';
         @endphp
         <div class="d-flex justify-content-between">
-            <button id="prev_q_button" type="button" class="btn btn-primary" disabled style="display: {{ $display }};">
-                <i class="bi bi-arrow-left"></i>Previous
+            <button id="prev_q_button" type="button" class="btn-quiz" disabled style="display: {{ $display }};">
+                <i class="bi bi-chevron-left"></i> Previous 
             </button>
-            <button id="next_q_button" type="button" class="btn btn-primary" disabled style="display: {{ $display }};">
-                Continue<i class="bi bi-arrow-right"></i>
+            <button id="next_q_button" type="button" class="btn-quiz" disabled style="display: {{ $display }};">
+                Next <i class="bi bi-chevron-right "></i>
             </button>
         </div>
         <div class=" manual-margin-top">
