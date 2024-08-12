@@ -8,18 +8,15 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Mail;
-use URL;
+use Validator;
 
 class ContactFormController extends Controller
 {
     public function submitForm(Request $request)
     {
         try {
-            $previous_url = URL::previous();
-            $redirect = $previous_url.'#contactUs';
-
             //validate
-            $request->validate([
+            $validator = Validator::make($request->all(), [
                 'message' => ['required', 'string'],
                 'subject' => ['required', 'string']
             ], [
@@ -27,7 +24,12 @@ class ContactFormController extends Controller
                 'subject.required' => 'Please provide a brief subject to better help us find and answer your inquiry.',
                 'subject.string' => 'Invalid input.'
             ]);
-    
+        
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => $validator->errors()
+                ], 422);
+            }
             //save to db
             $inquiry = new Inquiry();
             $inquiry->name = Auth::user()->name;
@@ -39,12 +41,10 @@ class ContactFormController extends Controller
             //email
             Mail::to('admin@example.com')->send(new InquiryReceived($inquiry));
 
-            return redirect($redirect)->with([
-                'success' => 'Your inquiry has been submitted!'
-            ]);
+            return response()->json(['success' => 'Your inquiry has been submitted!'], 200);
         }
         catch (ValidationException $e) {
-            return redirect($redirect)->withErrors($e->errors())->withInput();
+            return response()->json(['error_message' => 'Failed to submit quiz answers.', 'error' => $e], 500);
         }
     }
 }
