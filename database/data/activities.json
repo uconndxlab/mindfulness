@@ -85,6 +85,7 @@
         "title": "Journaling",
         "type": "journal",
         "time": null,
+        "completion_message": "Congrats on earning today’s pedal! Four more to go for your first flower. Check out the workbook for tips to help you succeed!",
         "order": 9,
         "next_fake": null
     },
