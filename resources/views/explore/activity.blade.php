@@ -84,6 +84,10 @@
             <div id="quizContainer">
                 <x-quiz :quiz="$quiz"/>
             </div>
+        @elseif ($activity->type == 'journal' && $journal)
+            <div id="journalContainer">
+                <x-journal :journal="$journal"/>
+            </div>
         @endif
         @if($activity->completion_message)
             <div id="comp_message" class="mt-1" style="display: none;">
@@ -109,6 +113,7 @@
     const redirectDiv = document.getElementById('redirect_div');
     const hasContent = {{ $content ? 'true' : 'false' }};
     const hasQuiz = {{ $quiz ? 'true' : 'false' }};
+    const hasJournal = {{ $journal ? 'true' : 'false' }};
 
     //CHECKING COMPLETION
     const status = '{{ $activity->status }}';
@@ -135,6 +140,9 @@
         //do nothing - call activity complete in AJAX request
         console.log('Type: quiz');
         // getQuiz();
+    }
+    else if (hasJournal) {
+        console.log('Type: journal');
     }
     else {
         //if no content - complete activity

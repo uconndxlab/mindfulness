@@ -30,6 +30,11 @@ class Activity extends Model
         return $this->hasOne(Content::class);
     }
 
+    public function journal()
+    {
+        return $this->hasOne(Journal::class);
+    }
+
     public function user_progress()
     {
         return $this->hasMany(UserActivity::class);

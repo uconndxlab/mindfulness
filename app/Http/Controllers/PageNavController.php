@@ -148,17 +148,22 @@ class PageNavController extends Controller
         //get content
         $content = $activity->content;
         $quiz = $activity->quiz;
+        $journal = $activity->journal;
         if ($quiz) {
             $quiz->question_options = json_decode($quiz->question_options, true);
             $temp_answers = $user->quiz_answers($quiz->id)->first();
             $quiz->answers = $temp_answers ? json_decode($temp_answers->answers) : [];
         }
         //decode the audio options
-        if ($content && $content->type == 'audio' && $content->audio_options) {
+        else if ($content && $content->type == 'audio' && $content->audio_options) {
             $content->audio_options = json_decode($content->audio_options, true);
         }
+        else if ($journal) {
+            $temp_answer = $user->notes->where('activity_id', $activity->id)->first();
+            $journal->answer = $temp_answer ? $temp_answer->note : '';
+        }
         
-        return view("explore.activity", compact('activity', 'is_favorited', 'page_info', 'content', 'quiz'));
+        return view("explore.activity", compact('activity', 'is_favorited', 'page_info', 'content', 'quiz', 'journal'));
     }
 
     //QUIZ

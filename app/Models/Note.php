@@ -20,6 +20,7 @@ class Note extends Model
         'note',
         'user_id',
         'word_otd',
+        'activity_id'
     ];
 
     public function activity()

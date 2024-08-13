@@ -12,7 +12,7 @@
     <div class="text-left">
         <h1 class="display fw-bold">Journal</h1>
     </div>
-    <form method="POST" action="{{ route('note.store', ['activity_id' => isset($activity_id) ? $activity_id : null]) }}">
+    <form method="POST" action="{{ route('note.store') }}">
         @csrf
         <div class="form-group dropdown">
             <label class="fw-bold col-12" for="word_dropdown">Word of the day:</label>

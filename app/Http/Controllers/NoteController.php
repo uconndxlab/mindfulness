@@ -2,93 +2,79 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Models\Note;
+use App\Rules\ActIdRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Validator;
 
 class NoteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+
+    public function noteValidator($request) {
+        $validator = null;
+        if ($request->activity) {
+            $validator = Validator::make($request->all(), [
+                'note' => ['required', 'string', 'max:1027', 'regex:/^[a-zA-Z0-9\s.,!?()-]*$/'],
+                'activity_id' => ['required', 'integer', new ActIdRule()]
+            ], [
+                'note.required' => 'A note is required.',
+                'note.string' => 'The note must be a string.',
+                'note.max' => 'The note may not be greater than 1027 characters.',
+                'note.regex' => 'The note may only contain letters, numbers, spaces, and basic punctuation.'
+            ]);
+        }
+        else {
+            $validator = Validator::make($request->all(), [
+                'note' => ['required', 'string', 'max:1027', 'regex:/^[a-zA-Z0-9\s.,!?()-]*$/'],
+                'word_otd' => ['required', 'in:relax,compassion,other', 'regex:/^[a-zA-Z0-9\s.,!?()-]*$/']
+            ], [
+                'note.required' => 'A note is required.',
+                'note.string' => 'The note must be a string.',
+                'note.max' => 'The note may not be greater than 1027 characters.',
+                'note.regex' => 'The note may only contain letters, numbers, spaces, and basic punctuation.',
+                'word_otd.required' => 'Please select a word of the day.',
+                'word_otd.in' => 'Word of the day must come from the provided list.',
+                'word_otd.regex' => 'Word of the day must come from the provided list.'
+            ]);
+        }
+        return $validator;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         try {
-            $validatedData = $request->validate([
-                'note' => ['required', 'string', 'max:1027'],
-                'word_otd' => ['required', 'in:relax,compassion,other'],
-            ], [
-                'note.required' => 'Please enter a note.',
-                'note.string' => 'The note must be a string.',
-                'note.max' => 'The note may not be greater than 1027 characters.',
-                'word_otd.required' => 'Please select a word of the day.',
-                'word_otd.in' => 'Please select a word of the day.',
-            ]);
-    
-            $note = Note::create([
-                'note' => $validatedData['note'],
-                'word_otd' => $validatedData['word_otd'],
-                'user_id' => Auth::id(),
-            ]);
+            $validator = $this->noteValidator($request);
 
-            //if submitted note after activity
-            if ($request->activity_id) {
-                return redirect()->route('explore.activity',  ['activity_id' => $request->activity_id])->with('success', 'Journal submitted!');
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => $validator->errors()
+                ], 422);
             }
     
-            return back()->with('success', 'Note saved.');
-    
-        } catch (ValidationException $e) {
-            return redirect()->back()->withErrors($e->errors())->withInput();
+            if ($request->activity_id) {
+                Note::updateOrCreate([
+                    'user_id' => Auth::id(),
+                    'activity_id' => $request->activity_id
+                ],[
+                    'note' => $request->note,
+                    'word_otd' => Activity::findOrFail($request->activity_id)->title,
+                ]);
+            }
+            else {
+                Note::create([
+                    'user_id' => Auth::id(),
+                    'note' => $request->note,
+                    'word_otd' => $request->word_otd,
+                ]);
+            }
+
+            return response()->json(['success' => 'Note submitted!'], 200);
         }
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Note $note)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Note $note)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Note $note)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Note $note)
-    {
-        //
+        catch (ValidationException $e) {
+            return response()->json(['error_message' => 'Failed to submit note.', 'error' => $e], 500);
+        }
     }
 }
