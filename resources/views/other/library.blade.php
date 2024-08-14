@@ -53,76 +53,91 @@
                 </div>
             </div>
         
-            <div class="row search-filters">
-                <div class="col-lg-4">
-                    <div class="accordion accordion-flush mb-3" id="filter_accordion">
-                        <div class="form-group accordion-item border mb-2">
-                            <h2 class="accordion-header" id="headingTime">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTime" aria-expanded="true" aria-controls="collapseTime">
-                                    Time
-                                </button>
-                            </h2>
-                            <div id="collapseTime" class="accordion-collapse collapse" aria-labelledby="headingTime">
-                                <div class="accordion-body">
-                                    <div id="time_range_slider"></div>
-                                    <div class="d-flex justify-content-between">
-                                        <span id="start_time_label">0 min</span>
-                                        <span id="end_time_label">30 min</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <input type="hidden" name="start_time" id="start_time_input">
-                            <input type="hidden" name="end_time" id="end_time_input">
-                        </div>
-
-                        <div class="form-group accordion-item border mb-2">
-                            <h2 class="accordion-header" id="headingCategory">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory" aria-expanded="true" aria-controls="collapseCategory">
-                                    Category
-                                </button>
-                            </h2>
-                            <div id="collapseCategory" class="accordion-collapse collapse" aria-labelledby="headingCategory">
-                                <div class="accordion-body">
-                                    <div id="category_check">
-                                        @foreach ($categories as $category)
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="category[]" id="category_{{ strtolower($category) }}" value="{{ $category }}">
-                                                <label class="form-check-label" for="category_{{ strtolower($category) }}">
-                                                    {{ $category }}
-                                                </label>
+            <div id="filterResultDiv" style="display: none;">
+                <div class="row search-filters">
+                    <div class="col-lg-4">
+                        <div class="accordion accordion-flush" id="showFilterAccordion">
+                            <div class="form-group accordion-item border mb-2">
+                                <h2 class="accordion-header" id="headingFilter">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
+                                        Show Filters
+                                    </button>
+                                </h2>
+                                <div id="collapseFilter" class="accordion-collapse collapse" aria-labelledby="headingFilter">
+                                    <div class="accordion-body">
+                                        <div class="accordion accordion-flush mb-3" id="filter_accordion">
+                                            <div class="form-group accordion-item border mb-2">
+                                                <h2 class="accordion-header" id="headingTime">
+                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTime" aria-expanded="true" aria-controls="collapseTime">
+                                                        Time
+                                                    </button>
+                                                </h2>
+                                                <div id="collapseTime" class="accordion-collapse collapse" aria-labelledby="headingTime">
+                                                    <div class="accordion-body">
+                                                        <div id="time_range_slider"></div>
+                                                        <div class="d-flex justify-content-between">
+                                                            <span id="start_time_label">0 min</span>
+                                                            <span id="end_time_label">30 min</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <input type="hidden" name="start_time" id="start_time_input">
+                                                <input type="hidden" name="end_time" id="end_time_input">
                                             </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group accordion-item border mb-2">
-                            <h2 class="accordion-header" id="headingModule">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseModule" aria-expanded="true" aria-controls="collapseModule">
-                                    Module
-                                </button>
-                            </h2>
-                            <div id="collapseModule" class="accordion-collapse collapse" aria-labelledby="headingModule">
-                                <div class="accordion-body">
-                                    <div id="module_check">
-                                        @for ($i = 1; $i < 5; $i++)
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="module[]" id="module_{{ $i }}" value="{{ $i }}" {{ in_array($i, request('module', [])) ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="module_{{ $i }}">
-                                                    Module {{ $i }}
-                                                </label>
+                    
+                                            <div class="form-group accordion-item border mb-2">
+                                                <h2 class="accordion-header" id="headingCategory">
+                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory" aria-expanded="true" aria-controls="collapseCategory">
+                                                        Category
+                                                    </button>
+                                                </h2>
+                                                <div id="collapseCategory" class="accordion-collapse collapse" aria-labelledby="headingCategory">
+                                                    <div class="accordion-body">
+                                                        <div id="category_check">
+                                                            @foreach ($categories as $category)
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox" name="category[]" id="category_{{ strtolower($category) }}" value="{{ $category }}">
+                                                                    <label class="form-check-label" for="category_{{ strtolower($category) }}">
+                                                                        {{ $category }}
+                                                                    </label>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        @endfor
+                    
+                                            <div class="form-group accordion-item border mb-2">
+                                                <h2 class="accordion-header" id="headingModule">
+                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseModule" aria-expanded="true" aria-controls="collapseModule">
+                                                        Module
+                                                    </button>
+                                                </h2>
+                                                <div id="collapseModule" class="accordion-collapse collapse" aria-labelledby="headingModule">
+                                                    <div class="accordion-body">
+                                                        <div id="module_check">
+                                                            @for ($i = 1; $i < 5; $i++)
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox" name="module[]" id="module_{{ $i }}" value="{{ $i }}" {{ in_array($i, request('module', [])) ? 'checked' : '' }}>
+                                                                    <label class="form-check-label" for="module_{{ $i }}">
+                                                                        Module {{ $i }}
+                                                                    </label>
+                                                                </div>
+                                                            @endfor
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button id="apply_filter_button" type="button" class="btn btn-primary">Apply Filter</button>
+                                        <button id="clear_filter_button" type="button" style="color:#000!important" class="btn btn-link text-center mt-1 mb-2">Clear Filters</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <button id="apply_filter_button" type="button" class="btn btn-primary">Apply Filter</button>
-                    <button id="clear_filter_button" type="button" style="color:#000!important" class="btn btn-link text-center mt-1 mb-2">Clear Filters</button>
+                    <div id="activitiesContainer" class="col-lg-8"></div>
                 </div>
-                <div id="activitiesContainer" class="col-lg-8"></div>
             </div>
         </form>
     </div>
@@ -145,12 +160,15 @@
 
         //set up accordion
         var collapseTime = new bootstrap.Collapse(document.getElementById('collapseTime'), {
-        toggle: false
+            toggle: false
         });
         var collapseCategory = new bootstrap.Collapse(document.getElementById('collapseCategory'), {
             toggle: false
         });
         var collapseModule = new bootstrap.Collapse(document.getElementById('collapseModule'), {
+            toggle: false
+        });
+        var collapseFilter = new bootstrap.Collapse(document.getElementById('collapseFilter'), {
             toggle: false
         });
 
@@ -165,6 +183,11 @@
                 filters = JSON.parse(sessionStorage.getItem('favorite_filters'));
             }
             if (filters) {
+                //remove transitions temporarily
+                document.querySelectorAll('.collapse, .arrow-selector').forEach(function(element) {
+                    element.style.transition = 'none';
+                });
+
                 //search
                 searchBar.value = filters.search || '';
                 searchBar.focus();
@@ -173,6 +196,7 @@
                 endTimeInput.value = filters.end || 30;
                 if (filters.end != 30 || filters.start != 0) {
                     collapseTime.show();
+                    collapseFilter.show();
                 }
                 
                 //categories
@@ -180,6 +204,7 @@
                     checkbox.checked = filters.categories.includes(checkbox.value);
                     if (checkbox.checked) {
                         collapseCategory.show();
+                        collapseFilter.show();
                     }
                 });
                 //modules
@@ -187,11 +212,19 @@
                     checkbox.checked = filters.modules.includes(checkbox.value);
                     if (checkbox.checked) {
                         collapseModule.show();
+                        collapseFilter.show();
                     }
                 });
                 //page
                 _page = filters.page;
                 // console.log('saved page: ', _page);
+
+                //get smooth transitions back
+                setTimeout(function() {
+                    document.querySelectorAll('.collapse, .arrow-selector').forEach(function(element) {
+                        element.style.transition = '';
+                    });
+                }, 10);
             }
         }
         loadFilters();
@@ -364,6 +397,10 @@
                 console.log('AJAX success');
                 //render component into container
                 document.getElementById('activitiesContainer').innerHTML = data.html;
+                //if first render of page, show the filters and results - originally hidden
+                if (first) {
+                    document.getElementById('filterResultDiv').style.display = 'block';
+                }
                 attachPaginationSearch();
             })
             .catch(error => {
