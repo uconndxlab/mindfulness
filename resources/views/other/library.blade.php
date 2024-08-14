@@ -39,7 +39,7 @@
                 <div class="col-lg-8">
                     <div class="input-group mb-3">
                         <i style="padding:0px 10px" id="search-icon" class="bi bi-search"></i>
-                        <input id="search_bar" type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder='{{ $page_info['search_text'] }}'>
+                        <input id="search_bar" type="text" name="search" id="search" class="form-control" placeholder='{{ $page_info['search_text'] }}'>
                         <span class="input-group-text">
                             <a style="color:#000!important" id="clear_search_button" type="button">CANCEL</a>
                         </span>
@@ -56,17 +56,13 @@
             <div class="row search-filters">
                 <div class="col-lg-4">
                     <div class="accordion accordion-flush mb-3" id="filter_accordion">
-                        
-                        @php
-                            $show_time = (request('start_time') && request('start_time') != 0) || (request('end_time') && request('end_time') != 30);
-                        @endphp
                         <div class="form-group accordion-item border mb-2">
                             <h2 class="accordion-header" id="headingTime">
-                                <button class="accordion-button {{ request('start_time') || request('end_time') ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTime" aria-expanded="true" aria-controls="collapseTime">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTime" aria-expanded="true" aria-controls="collapseTime">
                                     Time
                                 </button>
                             </h2>
-                            <div id="collapseTime" class="accordion-collapse collapse {{ request('start_time') || request('end_time') ? 'show' : '' }}" aria-labelledby="headingTime">
+                            <div id="collapseTime" class="accordion-collapse collapse" aria-labelledby="headingTime">
                                 <div class="accordion-body">
                                     <div id="time_range_slider"></div>
                                     <div class="d-flex justify-content-between">
@@ -75,22 +71,22 @@
                                     </div>
                                 </div>
                             </div>
-                            <input type="hidden" name="start_time" id="start_time_input" value="{{ request('start_time') }}">
-                            <input type="hidden" name="end_time" id="end_time_input" value="{{ request('end_time') }}">
+                            <input type="hidden" name="start_time" id="start_time_input">
+                            <input type="hidden" name="end_time" id="end_time_input">
                         </div>
 
                         <div class="form-group accordion-item border mb-2">
                             <h2 class="accordion-header" id="headingCategory">
-                                <button class="accordion-button {{ request('category') ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory" aria-expanded="true" aria-controls="collapseCategory">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory" aria-expanded="true" aria-controls="collapseCategory">
                                     Category
                                 </button>
                             </h2>
-                            <div id="collapseCategory" class="accordion-collapse collapse {{ request('category') ? 'show' : '' }}" aria-labelledby="headingCategory">
+                            <div id="collapseCategory" class="accordion-collapse collapse" aria-labelledby="headingCategory">
                                 <div class="accordion-body">
                                     <div id="category_check">
                                         @foreach ($categories as $category)
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="category[]" id="category_{{ strtolower($category) }}" value="{{ $category }}" {{ in_array($category, request('category', [])) ? 'checked' : '' }}>
+                                                <input class="form-check-input" type="checkbox" name="category[]" id="category_{{ strtolower($category) }}" value="{{ $category }}">
                                                 <label class="form-check-label" for="category_{{ strtolower($category) }}">
                                                     {{ $category }}
                                                 </label>
@@ -103,11 +99,11 @@
 
                         <div class="form-group accordion-item border mb-2">
                             <h2 class="accordion-header" id="headingModule">
-                                <button class="accordion-button {{ request('module') ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseModule" aria-expanded="true" aria-controls="collapseModule">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseModule" aria-expanded="true" aria-controls="collapseModule">
                                     Module
                                 </button>
                             </h2>
-                            <div id="collapseModule" class="accordion-collapse collapse {{ request('module') ? 'show' : '' }}" aria-labelledby="headingModule">
+                            <div id="collapseModule" class="accordion-collapse collapse" aria-labelledby="headingModule">
                                 <div class="accordion-body">
                                     <div id="module_check">
                                         @for ($i = 1; $i < 5; $i++)
@@ -147,6 +143,17 @@
         //saved page number
         var _page = 1;
 
+        //set up accordion
+        var collapseTime = new bootstrap.Collapse(document.getElementById('collapseTime'), {
+        toggle: false
+        });
+        var collapseCategory = new bootstrap.Collapse(document.getElementById('collapseCategory'), {
+            toggle: false
+        });
+        var collapseModule = new bootstrap.Collapse(document.getElementById('collapseModule'), {
+            toggle: false
+        });
+
         //load in old filter values
         function loadFilters() {
             console.log('loading values');
@@ -164,13 +171,23 @@
                 //time
                 startTimeInput.value = filters.start || 0;
                 endTimeInput.value = filters.end || 30;
+                if (filters.end != 30 || filters.start != 0) {
+                    collapseTime.show();
+                }
+                
                 //categories
                 document.querySelectorAll('input[name="category[]"]').forEach(checkbox => {
                     checkbox.checked = filters.categories.includes(checkbox.value);
+                    if (checkbox.checked) {
+                        collapseCategory.show();
+                    }
                 });
                 //modules
                 document.querySelectorAll('input[name="module[]"]').forEach(checkbox => {
                     checkbox.checked = filters.modules.includes(checkbox.value);
+                    if (checkbox.checked) {
+                        collapseModule.show();
+                    }
                 });
                 //page
                 _page = filters.page;
