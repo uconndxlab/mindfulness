@@ -23,7 +23,15 @@
                     <div class="card module p-2 mb-2">
                         <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id, 'library' => true]) }}">
                             <span class="activity-font">{{ $activity->title }}</span> <br>
-                            <span class="sub-activity-font">{{ ucfirst($activity->type) }}{{ $activity->time ? ', '.$activity->time.' min' : '' }}{{ $activity->optional ? ', Optional' : '' }}</span>
+                            @if ($activity->type)
+                                <span class="sub-activity-font activity-tag-activity">{{ ucfirst($activity->type) }}</span>
+                            @endif
+                            @if ($activity->time)
+                                <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $activity->time.' min' }}</span>
+                            @endif
+                            <span class="sub-activity-font">
+                                {{ $activity->optional ? ', Optional' : '' }} - {{ $activity->day->name.', '.$activity->day->module->name}}
+                            </span>
                         </a>
                         <i class="bi bi-arrow-right"></i>
                     </div>

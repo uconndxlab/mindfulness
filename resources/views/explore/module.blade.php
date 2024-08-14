@@ -35,29 +35,30 @@
                                 <br>
                                 <span style="font-weight:400;">{{ $day->description }}</span>
                             </div>
-                            
                         </button>
                     </h2>
                     
                     <div id="collapse_{{ $index }}" class="accordion-collapse collapse {{ $day->progress['show'] ? 'show' : ''}}" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
                         <div class="accordion-body">
                             @if (!$disabled)
-                                <!--<p>{{ $day->description }}</p>-->
                                 @foreach ($day->activities as $activity)
                                     @php
-                                        $title = $activity->optional ? 'OPTIONAL: '.$activity->title : $activity->title;
                                         $activity->status = $day->progress['activity_status'][$activity->id];
                                         $disabled = $activity->status == 'locked' ? 'disabled' : '';
                                     @endphp
                                     <div class="card p-2 module mb-2">
                                         <a id="moduleLink" style="padding-bottom:10px;" class="stretched-link w-100 activity-link {{ $disabled }}" data-id="{{ $activity->id }}" data-title="{{ $activity->title }}" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">
                                             
-                                            <div style="display:flex;"><p class="activity-font">{{ $title }}</p> {!! $activity->status == 'completed' ? '<i style="font-size:16px;margin-left:5px;" class="bi bi-check2-square"></i>' : '' !!}</div>
+                                            <div style="display:flex;"><p class="activity-font">{{ $activity->title }}</p> {!! $activity->status == 'completed' ? '<i style="font-size:16px;margin-left:5px;" class="bi bi-check2-square"></i>' : '' !!}</div>
                                             @if ($activity->type)
                                                 <span class="sub-activity-font activity-tag-activity">{{ ucfirst($activity->type) }}</span>
                                             @endif
                                             @if ($activity->time)
                                                 <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $activity->time.' min' }}</span>
+                                            @endif
+                                            <!-- TODO -->
+                                            @if ($activity->optional)
+                                                <span class="sub-activity-font activity-tag-???"></i>Optional</span>
                                             @endif
                                         </a>
                                         <i class="bi bi-arrow-right"></i>
