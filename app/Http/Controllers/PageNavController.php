@@ -316,7 +316,7 @@ class PageNavController extends Controller
             $query->where('time', '<=', $end)->where('time', '>=', $start);
         }
             
-        $activities = $query->with('day.module')->orderBy('order')->paginate(5);
+        $activities = $query->with('day.module')->orderBy('order')->paginate(6);
         $view = view('components.search-results', ['activities' => $activities, 'random' => $random_act])->render();
 
         return response()->json(['html' => $view]);
