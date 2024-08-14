@@ -266,31 +266,31 @@ class PageNavController extends Controller
         //handle categories
         $categories = $request->input('category', []);
         if (!empty($categories)) {
-            //filter based on the categories
-            foreach($categories as $category) {
-                $lower = strtolower($category);
-                if ($lower == 'audio' || $lower == 'video') {
-                    $query->whereHas('content', function ($in_query) use ($lower) {
-                        $in_query->where('type', $lower);
-                    });
+            $query->where(function($in_query) use ($categories) {
+                //filter based on the categories
+                foreach($categories as $category) {
+                    $lower = strtolower($category);
+                    if ($lower == 'favorited') {
+                        $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
+                        $in_query->orWhereIn('id', $fav_ids);
+                    }
+                    else if ($lower == 'practice') {
+                        $in_query->orWhere('type', 'practice');
+                    }
+                    else if ($lower == 'lesson') {
+                        $in_query->orWhere('type', 'lesson');
+                    }
+                    else if ($lower == 'journal') {
+                        $in_query->orWhere('type', 'journal');
+                    }
+                    else if ($lower == 'optional') {
+                        $in_query->orWhere('optional', true);
+                    }
+                    else if ($lower == 'reflection') {
+                        $in_query->orWhere('type', 'reflection');
+                    }
                 }
-                else if ($lower == 'favorited') {
-                    $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
-                    $query->whereIn('id', $fav_ids);
-                }
-                else if ($lower == 'meditation') {
-                    $query->where('type', 'practice');
-                }
-                else if ($lower == 'journal') {
-                    $query->where('type', 'journal');
-                }
-                else if ($lower == 'optional') {
-                    $query->where('optional', true);
-                }
-                else if ($lower == 'quiz') {
-                    $query->where('type', 'reflection');
-                }
-            }
+            });
         }
         
         //handle modules
@@ -332,7 +332,7 @@ class PageNavController extends Controller
             'search_text' => 'Search for your favorite activity...'
         ];
 
-        $categories = ['Meditation', 'Audio', 'Video', 'Quiz', 'Journal', 'Optional'];
+        $categories = ['Practice', 'Lesson', 'Reflection', 'Journal', 'Optional'];
 
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.favorites'));
@@ -349,7 +349,7 @@ class PageNavController extends Controller
             'search_text' => 'Search for a meditation exercise...'
         ];
 
-        $categories = ['Favorited', 'Audio', 'Video', 'Quiz', 'Journal', 'Optional'];
+        $categories = ['Favorited', 'Lesson', 'Reflection', 'Journal', 'Optional'];
 
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.meditation'));
