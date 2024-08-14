@@ -256,7 +256,11 @@ class PageNavController extends Controller
         
         //handle search
         if ($request->has('search') && $request->search != '') {
-            $query->where('title', 'like', '%' . $request->search . '%');
+            $query->where(function($in_query) use ($request) {
+                $in_query->where('title', 'like', '%' . $request->search . '%')
+                    ->orWhere('type', 'like', '%' . $request->search . '%')
+                    ->orWhere('time', 'like', '%' . $request->search . '%');
+            });
         }
         
         //handle categories
@@ -312,7 +316,7 @@ class PageNavController extends Controller
             $query->where('time', '<=', $end)->where('time', '>=', $start);
         }
             
-        $activities = $query->with('day.module')->orderBy('order')->paginate(6);
+        $activities = $query->with('day.module')->orderBy('order')->paginate(5);
         $view = view('components.search-results', ['activities' => $activities, 'random' => $random_act])->render();
 
         return response()->json(['html' => $view]);

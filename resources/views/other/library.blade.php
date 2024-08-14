@@ -126,9 +126,7 @@
                     <button id="apply_filter_button" type="button" class="btn btn-primary">Apply Filter</button>
                     <button id="clear_filter_button" type="button" style="color:#000!important" class="btn btn-link text-center mt-1 mb-2">Clear Filters</button>
                 </div>
-                <div id="activitiesContainer" class="col-lg-8">
-                    <x-search-results :activities="collect()"/>
-                </div>
+                <div id="activitiesContainer" class="col-lg-8"></div>
             </div>
         </form>
     </div>
@@ -139,12 +137,15 @@
         var slider = document.getElementById('time_range_slider');
         var startTimeInput = document.getElementById('start_time_input');
         var endTimeInput = document.getElementById('end_time_input');
-
+        
         var sfForm = document.getElementById('search_filter_form');
 
         var searchBar = document.getElementById('search_bar');
-
+        
         var baseParam = '{{ $base_param }}';
+        
+        //saved page number
+        var _page = 1;
 
         //load in old filter values
         function loadFilters() {
@@ -159,6 +160,7 @@
             if (filters) {
                 //search
                 searchBar.value = filters.search || '';
+                searchBar.focus();
                 //time
                 startTimeInput.value = filters.start || 0;
                 endTimeInput.value = filters.end || 30;
@@ -170,6 +172,9 @@
                 document.querySelectorAll('input[name="module[]"]').forEach(checkbox => {
                     checkbox.checked = filters.modules.includes(checkbox.value);
                 });
+                //page
+                _page = filters.page;
+                // console.log('saved page: ', _page);
             }
         }
         loadFilters();
@@ -240,7 +245,7 @@
         //init labels
         slider.noUiSlider.set([parseInt(startVal), parseInt(endVal)]);
         
-        //APPLY/SAVE FILTERS
+        //APPLY/SAVE FILTERS - vars
         var _categories = null;
         var _modules = null;
         var _start = null;
@@ -250,7 +255,7 @@
             search(true);
         });
         function saveFilters() {
-            //save the filters
+            //save the filters (get filter vars)
             _categories = getChecked('categories');
             _modules = getChecked('modules');
             _start = startTimeInput.value;
@@ -273,19 +278,24 @@
             params.append('base_param', '{{ $base_param }}')
             _modules.forEach(module_ => params.append('module[]', module_));
 
+            //page
+            params.append('page', _page);
+
             //saving recent search to session
             const filters = {
                 search: searchBar.value,
                 categories: _categories,
                 modules: _modules,
                 start: _start,
-                end: _end
+                end: _end,
+                page: _page
             };
 
             if (baseParam == 'meditation') {
                 sessionStorage.setItem('meditation_filters', JSON.stringify(filters));
             }
             else {
+                console.log('Saving filters to session:', filters);
                 sessionStorage.setItem('favorite_filters', JSON.stringify(filters));
             }
             
@@ -306,14 +316,20 @@
         }
 
 
-        console.log('about to search...');
         //LOAD SEARCH
-        function search(filters = false) {
+        function search(filters=false, first=false, isSearch=false) {
             //build url
             const searchUrl = new URL('{{ route('library.search') }}');
+            //if changes in filter...
             if (filters) {
+                //save them onto the filter vars
                 saveFilters();
             }
+            if ((filters || isSearch) && !first) {
+                //reset the page if filters or search, and not first load
+                _page = 1;
+            }
+
             const params = getQueryParams();
             searchUrl.search = params;
             console.log(params);
@@ -331,13 +347,28 @@
                 console.log('AJAX success');
                 //render component into container
                 document.getElementById('activitiesContainer').innerHTML = data.html;
+                attachPaginationSearch();
             })
             .catch(error => {
                 console.error('Error performing search', error);
             });
         }
         //search on page load with filters
-        search(true);
+        search(true, true);
+
+        //PAGINATION - add event listeners to cancel pagination redirection and use search instead
+        function attachPaginationSearch() {
+            document.querySelectorAll('.pagination a').forEach(function (link) {
+                link.addEventListener('click', function (event) {
+                    //on click, prevent default, extract number, use in search
+                    event.preventDefault();
+                    const page = this.href.split('page=')[1];
+                    _page = page;
+                    search(false);
+                });
+            });
+        }
+        attachPaginationSearch();
         
         //SUBMISSION - filters (apply button)
         sfForm.addEventListener('submit', function(event) {
@@ -351,7 +382,7 @@
         searchBar.addEventListener('input', function() {
             clearTimeout(timeout);
             timeout = setTimeout(function() {
-                search();
+                search(isSearch=true);
             }, 300);
         });
 
@@ -378,7 +409,7 @@
         function clearSearch() {
             searchBar.value = '';
             searchBar.focus();
-            search();
+            search(isSearch=true);
         }
     });
 </script>
