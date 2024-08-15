@@ -6,15 +6,15 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class SearchResults extends Component
+class JournalSearchResults extends Component
 {
-    public $activities;
+    public $notes;
     /**
      * Create a new component instance.
      */
-    public function __construct($activities)
+    public function __construct($notes)
     {
-        $this->activities = $activities;
+        $this->notes = $notes;
     }
 
     /**
@@ -22,6 +22,6 @@ class SearchResults extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.search-results');
+        return view('components.journal-search-results');
     }
 }

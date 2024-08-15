@@ -1,9 +1,10 @@
 @if (isset($journal))
     <form id="journalForm" method="POST" class="pt-3">
+        <p>*** Reminder: Please do not write any sensitive information here. ***</p>
         @csrf
         <div id="success-message" class="alert alert-success note-err-message" style="display: none;">
             Journal submitted!
-            @if (!isset($journal->activity))
+            @if (isset($journal->activity))
                 <a href="{{ route('journal.library') }}"> View in library.</a>
             @endif
         </div>

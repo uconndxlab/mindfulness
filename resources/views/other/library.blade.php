@@ -10,6 +10,7 @@
         $route_name = Request::route()->getName();
         $top_nav = [false, false];
         if (isset($page_info['journal']) && $page_info['journal']) {
+            $journal_hide = true;
             $tn_right_name = 'History';
             $tn_right_route = route('journal.library');
             $tn_left_name = 'Compose';
@@ -22,6 +23,7 @@
             }
         }
         else {
+            $journal_hide = false;
             $tn_right_name = 'Favorites';
             $tn_right_route = route('library.favorites');
             $tn_left_name = 'Meditation';
@@ -84,7 +86,8 @@
                                 <div id="collapseFilter" class="accordion-collapse collapse" aria-labelledby="headingFilter">
                                     <div class="accordion-body">
                                         <div class="accordion accordion-flush mb-3" id="filter_accordion">
-                                            <div class="form-group accordion-item border mb-2">
+
+                                            <div class="form-group accordion-item border mb-2" style="display: {{ $journal_hide ? 'none' : 'block' }}">
                                                 <h2 class="accordion-header" id="headingTime">
                                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTime" aria-expanded="true" aria-controls="collapseTime">
                                                         Time
@@ -124,8 +127,9 @@
                                                     </div>
                                                 </div>
                                             </div>
-                    
-                                            <div class="form-group accordion-item border mb-2">
+
+                                            
+                                            <div class="form-group accordion-item border mb-2" style="display: {{ $journal_hide ? 'none' : 'block' }}">
                                                 <h2 class="accordion-header" id="headingModule">
                                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseModule" aria-expanded="true" aria-controls="collapseModule">
                                                         Module
@@ -154,7 +158,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="activitiesContainer" class="col-lg-8"></div>
+                    <div id="resultsContainer" class="col-lg-8"></div>
                 </div>
             </div>
         </form>
@@ -172,6 +176,7 @@
         var searchBar = document.getElementById('search_bar');
         
         var baseParam = '{{ $base_param }}';
+        const journalPage = baseParam === 'journal';
         
         //saved page number
         var _page = 1;
@@ -197,8 +202,11 @@
             if (baseParam == 'meditation') {
                 filters = JSON.parse(sessionStorage.getItem('meditation_filters'));
             }
-            else {
+            else if (baseParam == 'favorited') {
                 filters = JSON.parse(sessionStorage.getItem('favorite_filters'));
+            }
+            else if (journalPage) {
+                filters = JSON.parse(sessionStorage.getItem('journal_filters'));
             }
             if (filters) {
                 //remove transitions temporarily
@@ -362,9 +370,13 @@
             if (baseParam == 'meditation') {
                 sessionStorage.setItem('meditation_filters', JSON.stringify(filters));
             }
-            else {
+            else if (baseParam == 'favorited') {
                 console.log('Saving filters to session:', filters);
                 sessionStorage.setItem('favorite_filters', JSON.stringify(filters));
+            }
+            else if (journalPage) {
+                console.log('Saving filters to session:', filters);
+                sessionStorage.setItem('journal_filters', JSON.stringify(filters));
             }
             
             return params.toString();
@@ -387,7 +399,7 @@
         //LOAD SEARCH
         function search(filters=false, first=false, isSearch=false) {
             //build url
-            const searchUrl = new URL('{{ route('library.search') }}');
+            const searchUrl = new URL('{{ $page_info['search_route'] }}');
             //if changes in filter...
             if (filters) {
                 //save them onto the filter vars
@@ -414,10 +426,14 @@
             .then(data => {
                 console.log('AJAX success');
                 //render component into container
-                document.getElementById('activitiesContainer').innerHTML = data.html;
+                document.getElementById('resultsContainer').innerHTML = data.html;
                 //if first render of page, show the filters and results - originally hidden
                 if (first) {
                     document.getElementById('filterResultDiv').style.display = 'block';
+                }
+                if (journalPage) {
+                    //init the read more buttons on the note results
+                    initReadMore();
                 }
                 attachPaginationSearch();
             })
@@ -482,6 +498,30 @@
             searchBar.value = '';
             searchBar.focus();
             search(isSearch=true);
+        }
+
+        //NOTES
+        //READ MORE
+        function initReadMore() {
+            const notesDiv = document.getElementById('past_notes');
+            //get all notes with extra
+            document.querySelectorAll('.note-content-extra').forEach(readMoreDiv => {
+                //get the button and text
+                var readMoreBtn = readMoreDiv.querySelector('.read-more-btn');
+                var dots = readMoreDiv.querySelector('.dots');
+                var moreText = readMoreDiv.querySelector('.more-text');
+                readMoreBtn.addEventListener('click', function() {
+                    if (moreText.style.display === 'none') {
+                        moreText.style.display = 'inline';
+                        dots.style.display = 'none';
+                        readMoreBtn.textContent = 'Read Less';
+                    } else {
+                        moreText.style.display = 'none';
+                        dots.style.display = 'inline';
+                        readMoreBtn.textContent = 'Read More...';
+                    }
+                });
+            });
         }
     });
 </script>

@@ -330,6 +330,7 @@ class PageNavController extends Controller
         $page_info = [
             'journal' => false,
             'title' => 'Favorites',
+            'search_route' => route('library.search'),
             'search_text' => 'Search for your favorite activity...'
         ];
 
@@ -347,6 +348,7 @@ class PageNavController extends Controller
         $page_info = [
             'journal' => false,
             'title' => 'Meditation Library',
+            'search_route' => route('library.search'),
             'search_text' => 'Search for a meditation exercise...'
         ];
 
@@ -385,11 +387,12 @@ class PageNavController extends Controller
         return view('other.compose', compact('page_info', 'journal'));
     }
     public function journalLibrary (Request $request) {
-        $journal = true;
+        $base_param = 'journal';
 
         $page_info = [
             'journal' => true,
             'title' => 'Journal Library',
+            'search_route' => route('journal.search'),
             'search_text' => 'Search your past journals...'
         ];
 
@@ -398,19 +401,24 @@ class PageNavController extends Controller
         //set as the previous library and save as exit
         Session::put('previous_journal', route('journal.library'));
         Session::put('current_nav', ['route' => route('journal.library'), 'back' => 'Journal Library']);
-        return view("other.library", compact('journal', 'page_info', 'categories'));
+        return view("other.library", compact('base_param', 'page_info', 'categories'));
     }
 
-    //check if coming from an activity
+    public function journalSearch (Request $request) {
         //get user
-        // $id = Auth::id();
-        // $notes = Note::where('user_id', $id)->orderBy('created_at', 'desc')->paginate(5);
-        // //formatting the date
-        // foreach ($notes as $note) {
-        //     $date = Carbon::parse($note->created_at);
-        //     $date->setTimezone(new \DateTimeZone('EST'));
-        //     $note->formatted_date = $date->diffForHumans().', '.$date->toFormattedDayDateString();
-        // }
+        $id = Auth::id();
+        $notes = Note::where('user_id', $id)->orderBy('updated_at', 'desc')->paginate(3);
+        //formatting the date
+        foreach ($notes as $note) {
+            $date = Carbon::parse($note->created_at);
+            $date->setTimezone(new \DateTimeZone('EST'));
+            $note->formatted_date = $date->diffForHumans().', '.$date->toFormattedDayDateString();
+        }
+
+        //render view
+        $view = view('components.journal-search-results', ['notes' => $notes])->render();
+        return response()->json(['html' => $view]);
+    }
     
     public function accountPage()
     {

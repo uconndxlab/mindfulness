@@ -17,7 +17,7 @@ class NoteController extends Controller
         $validator = null;
         if ($request->activity) {
             $validator = Validator::make($request->all(), [
-                'note' => ['required', 'string', 'max:1027', 'regex:/^[a-zA-Z0-9\s.,!?()-]*$/'],
+                'note' => ['required', 'string', 'max:1027', 'regex:/^[\w\s.,!?()\-\'"&]*$/'],
                 'activity_id' => ['required', 'integer', new ActIdRule()]
             ], [
                 'note.required' => 'A note is required.',
@@ -28,8 +28,8 @@ class NoteController extends Controller
         }
         else {
             $validator = Validator::make($request->all(), [
-                'note' => ['required', 'string', 'max:1027', 'regex:/^[a-zA-Z0-9\s.,!?()-]*$/'],
-                'word_otd' => ['required', 'in:relax,compassion,other', 'regex:/^[a-zA-Z0-9\s.,!?()-]*$/']
+                'note' => ['required', 'string', 'max:1027', 'regex:/^[\w\s.,!?()\-\'"&]*$/'],
+                'word_otd' => ['required', 'in:relax,compassion,other', 'regex:/^[\w\s.,!?()\-\'"&]*$/']
             ], [
                 'note.required' => 'A note is required.',
                 'note.string' => 'The note must be a string.',
@@ -55,19 +55,20 @@ class NoteController extends Controller
             }
     
             if ($request->activity_id) {
+                $act = Activity::findOrFail($request->activity_id);
                 Note::updateOrCreate([
                     'user_id' => Auth::id(),
                     'activity_id' => $request->activity_id
                 ],[
                     'note' => $request->note,
-                    'word_otd' => Activity::findOrFail($request->activity_id)->title,
+                    'word_otd' => $act->title.' - '.$act->day->name.', '.$act->day->module->name,
                 ]);
             }
             else {
                 Note::create([
                     'user_id' => Auth::id(),
                     'note' => $request->note,
-                    'word_otd' => $request->word_otd,
+                    'word_otd' => ucfirst($request->word_otd),
                 ]);
             }
 

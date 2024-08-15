@@ -54,28 +54,4 @@
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
-<script>
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const notesDiv = document.getElementById('past_notes');
-        //get all notes with extra
-        document.querySelectorAll('.note-content-extra').forEach(readMoreDiv => {
-            //get the button and text
-            var readMoreBtn = readMoreDiv.querySelector('.read-more-btn');
-            var dots = readMoreDiv.querySelector('.dots');
-            var moreText = readMoreDiv.querySelector('.more-text');
-            readMoreBtn.addEventListener('click', function() {
-                if (moreText.style.display === 'none') {
-                    moreText.style.display = 'inline';
-                    dots.style.display = 'none';
-                    readMoreBtn.textContent = 'Read Less';
-                } else {
-                    moreText.style.display = 'none';
-                    dots.style.display = 'inline';
-                    readMoreBtn.textContent = 'Read More...';
-                }
-            });
-        });
-    });
-</script>
 @endsection
