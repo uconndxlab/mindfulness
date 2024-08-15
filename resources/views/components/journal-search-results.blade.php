@@ -1,4 +1,8 @@
-@if (isset($notes))
+@if (!isset($notes) || $notes->isEmpty())
+    <div class="text-left muted">
+        {!! $empty_text ?? 'No matching notes found.' !!}
+    </div>
+@else
     @foreach ($notes as $index => $note)
         <div class="prior-note">
             <div class="top-note">

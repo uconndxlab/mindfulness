@@ -307,13 +307,6 @@ class PageNavController extends Controller
         if ($request->has(['start_time', 'end_time']) && ($request->start_time != 0 || $request->end_time != 30)) {
             $start = $request->start_time;
             $end = $request->end_time;
-            // $query->where('time', '!=', null)->whereRaw("
-            // EXISTS (
-            //     SELECT 1
-            //     FROM json_each(activities.time)
-            //     WHERE CAST(json_each.value AS INTEGER) BETWEEN ? AND ?
-            //     )
-            //     ", [$start, $end]);
             $query->where('time', '<=', $end)->where('time', '>=', $start);
         }
             
@@ -396,7 +389,7 @@ class PageNavController extends Controller
             'search_text' => 'Search your past journals...'
         ];
 
-        $categories = ['Relax', 'Compass', 'Other', 'Activities'];
+        $categories = ['Relax', 'Compassion', 'Other', 'Activities'];
 
         //set as the previous library and save as exit
         Session::put('previous_journal', route('journal.library'));
@@ -407,7 +400,41 @@ class PageNavController extends Controller
     public function journalSearch (Request $request) {
         //get user
         $id = Auth::id();
-        $notes = Note::where('user_id', $id)->orderBy('updated_at', 'desc')->paginate(3);
+        $query = Note::where('user_id', $id);
+
+        //check if empty
+        $empty = !$query->exists();
+        if ($empty) {
+            $view = view('components.journal-search-results', ['empty_text' => '<span>Continue progressing to find a Journal activity, or write your first journal in the <a href="/compose">Compose</a> tab.</span>'])->render();
+            return response()->json(['html' => $view]);
+        }
+
+        //handle search
+        if ($request->has('search') && $request->search != '') {
+            $query->where(function($in_query) use ($request) {
+                $in_query->where('word_otd', 'like', '%' . $request->search . '%')
+                    ->orWhere('note', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        //handle categories
+        $categories = $request->input('category', []);
+        if (!empty($categories)) {
+            $query->where(function($in_query) use ($categories) {
+                //filter based on the categories
+                foreach($categories as $category) {
+                    if ($category == 'Activities') {
+                        $in_query->orWhere('type', 'journal');
+                    }
+                    else {
+                        $in_query->orWhere('word_otd', $category);
+                    }
+                }
+            });
+        }
+
+        $notes = $query->orderBy('updated_at', 'desc')->paginate(3);
+
         //formatting the date
         foreach ($notes as $note) {
             $date = Carbon::parse($note->created_at);
