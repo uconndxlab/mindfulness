@@ -58,7 +58,7 @@
                 if (Str::startsWith($route_name, 'explore.')) {
                     $active_items[0] = true;
                 }
-                else if ($route_name == 'journal') {
+                else if (Str::startsWith($route_name, 'journal.')) {
                     $active_items[1] = true;
                 }
                 else if (Str::startsWith($route_name, 'library.')) {

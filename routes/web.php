@@ -84,7 +84,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //Page Navigation - the controller is not totally necessary
     Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
     Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
-    Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
+
+    Route::get('/journal', [PageNavController::class, 'journal'])->name('journal');
+    Route::get('/compose', [PageNavController::class, 'journalCompose'])->name('journal.compose');
+    Route::get('/journal-library', [PageNavController::class, 'journalLibrary'])->name('journal.library');
+    Route::get('/journal/search', [PageNavController::class, 'journalSearch'])->name('journal.search');
+
     Route::get('/account', [PageNavController::class, 'accountPage'])->name('account');
     Route::get('/help', [PageNavController::class, 'helpPage'])->name('help');
     Route::get('/library', [PageNavController::class, 'library'])->name('library');

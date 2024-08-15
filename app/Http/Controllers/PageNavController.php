@@ -327,8 +327,8 @@ class PageNavController extends Controller
         $base_param = 'favorited';
 
         $page_info = [
+            'journal' => false,
             'title' => 'Favorites',
-            'search_route' => route('library.favorites'),
             'search_text' => 'Search for your favorite activity...'
         ];
 
@@ -344,8 +344,8 @@ class PageNavController extends Controller
         $base_param = 'meditation';
 
         $page_info = [
+            'journal' => false,
             'title' => 'Meditation Library',
-            'search_route' => route('library.meditation'),
             'search_text' => 'Search for a meditation exercise...'
         ];
 
@@ -357,31 +357,57 @@ class PageNavController extends Controller
         return view("other.library", compact('base_param', 'page_info', 'categories'));
     }
     
-    public function journalPage(Request $request)
+    public function journal(Request $request)
     {
-        $page_info = [];
-
-        //check if coming from an activity
-        $activity_id = $request->activity_id;
-        if ($activity_id) {
-            $page_info['back_label'] = ' Back to '.Activity::findOrFail($activity_id)->title;
-            $page_info['back_route'] = route('explore.activity', ['activity_id' => $activity_id, 'library' => $request->library]);
-            $page_info['hide_bottom_nav'] = true;
-            return view("other.journal", compact('activity_id', 'page_info'));
+        //journal navbutton
+        $previous = Session::get('previous_journal');
+        if ($previous) {
+            return redirect()->to($previous);
         }
-
-        //otherwise normal notes page
-        //get user
-        $id = Auth::id();
-        $notes = Note::where('user_id', $id)->orderBy('created_at', 'desc')->paginate(5);
-        //formatting the date
-        foreach ($notes as $note) {
-            $date = Carbon::parse($note->created_at);
-            $date->setTimezone(new \DateTimeZone('EST'));
-            $note->formatted_date = $date->diffForHumans().', '.$date->toFormattedDayDateString();
+        else {
+            return redirect()->route('journal.compose');
         }
-        return view("other.journal", compact('notes', 'page_info'));
     }
+
+    public function journalCompose(Request $request)
+    {
+        $page_info = [
+            'journal' => true,
+            'title' => 'Compose'
+        ];
+
+        //set as the previous journal and save as exit
+        Session::put('previous_journal', route('journal.compose'));
+        Session::put('current_nav', ['route' => route('journal.compose'), 'back' => 'Compose']);
+        return view('other.journal', compact('page_info'));
+    }
+    public function journalLibrary (Request $request) {
+        $journal = true;
+
+        $page_info = [
+            'journal' => true,
+            'title' => 'Journal Library',
+            'search_text' => 'Search your past journals...'
+        ];
+
+        $categories = ['Relax', 'Compass', 'Other', 'Activities'];
+
+        //set as the previous library and save as exit
+        Session::put('previous_journal', route('journal.library'));
+        Session::put('current_nav', ['route' => route('journal.library'), 'back' => 'Journal Library']);
+        return view("other.library", compact('journal', 'page_info', 'categories'));
+    }
+
+    //check if coming from an activity
+        //get user
+        // $id = Auth::id();
+        // $notes = Note::where('user_id', $id)->orderBy('created_at', 'desc')->paginate(5);
+        // //formatting the date
+        // foreach ($notes as $note) {
+        //     $date = Carbon::parse($note->created_at);
+        //     $date->setTimezone(new \DateTimeZone('EST'));
+        //     $note->formatted_date = $date->diffForHumans().', '.$date->toFormattedDayDateString();
+        // }
     
     public function accountPage()
     {

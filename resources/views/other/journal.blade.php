@@ -1,9 +1,51 @@
 @extends('layouts.main')
 
-@section('title', 'Journal')
+@section('title', $page_info['title'])
 
 @section('content')
 <div class="col-md-8">
+    @php
+        $route_name = Request::route()->getName();
+        $top_nav = [false, false];
+        if (isset($page_info['journal']) && $page_info['journal']) {
+            $tn_right_name = 'History';
+            $tn_right_route = route('journal.library');
+            $tn_left_name = 'Compose';
+            $tn_left_route = route('journal.compose');
+            if ($route_name == 'journal.compose') {
+                $top_nav[0] = true;
+            }
+            else {
+                $top_nav[1] = true;
+            }
+        }
+        else {
+            $tn_right_name = 'Favorites';
+            $tn_right_route = route('library.favorites');
+            $tn_left_name = 'Meditation';
+            $tn_left_route = route('library.meditation');
+            if ($route_name == 'library.meditation') {
+                $top_nav[0] = true;
+            }
+            else {
+                $top_nav[1] = true;
+            }
+        }
+    @endphp
+
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="tabs">
+            <ul class="navbar-nav" style="flex-direction:row">
+                <li class="nav-item" style="padding:0px 20px">
+                    <a class="nav-link {{ $top_nav[0] ? 'active disabled' : ''}}" href="{{ $top_nav[0] ? '' : $tn_left_route }}">{{ $tn_left_name }}</a>
+                </li>
+                <li class="nav-item" style="padding:0px 20px">
+                    <a class="nav-link {{ $top_nav[1] ? 'active disabled' : ''}}" href="{{ $top_nav[1] ? '' : $tn_right_route }}">{{ $tn_right_name }}</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
     @if (session('success'))
     <div class="alert alert-success" role="alert">
         {{ session('success') }}
@@ -48,42 +90,6 @@
             </div>
         </div>
     </form>
-    <div id="past_notes">
-        @if (isset($notes))
-            <h3 class="fw-bold mt-3">Previous Notes:</h3>
-            @foreach ($notes as $index => $note)
-                <div class="prior-note">
-                    <div class="top-note">
-                        <h5 class="fw-bold d-flex justify-content-between">
-                            <span>{{ $note->word_otd }}</span>
-                        </h5>
-                        <small>{{ $note->formatted_date }}</small>
-                    </div>
-                    @if (strlen($note->note) > 100)
-                        <div id="note_content_{{ $index }}" class="note-content-extra">
-                            <p class="note-content">
-                                {{ substr($note->note, 0, 75) }}
-                                <span class="dots">
-                                    ...
-                                </span>
-                                <span class="more-text" style="display: none">
-                                    {{ substr($note->note, 75) }}
-                                </span>
-                            </p>
-                            <button id="read_more_{{ $index }}"class="btn btn-link read-more-btn">Read More...</button>
-                        </div>
-                    @else
-                        <p id="note_content_{{ $index }}" class="note-content">
-                            {{ $note->note }}
-                        </p>
-                    @endif
-                </div>
-            @endforeach
-        @endif
-    </div>
-    <div>
-        {{ $notes->appends(request()->query())->links('pagination::bootstrap-5') }}
-    </div>
 </div>
 <script>
     function showWord(item) {
