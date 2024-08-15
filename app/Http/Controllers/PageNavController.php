@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Journal;
 use App\Models\Quiz;
 use App\Models\Note;
 use App\Models\Activity;
@@ -376,10 +377,12 @@ class PageNavController extends Controller
             'title' => 'Compose'
         ];
 
+        $journal = new Journal();
+
         //set as the previous journal and save as exit
         Session::put('previous_journal', route('journal.compose'));
         Session::put('current_nav', ['route' => route('journal.compose'), 'back' => 'Compose']);
-        return view('other.journal', compact('page_info'));
+        return view('other.compose', compact('page_info', 'journal'));
     }
     public function journalLibrary (Request $request) {
         $journal = true;
