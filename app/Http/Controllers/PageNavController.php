@@ -382,6 +382,8 @@ class PageNavController extends Controller
     public function journalLibrary (Request $request) {
         $base_param = 'journal';
 
+        $wipe_filters = $request->activity ? true : false;
+
         $page_info = [
             'journal' => true,
             'title' => 'Journal Library',
@@ -394,7 +396,7 @@ class PageNavController extends Controller
         //set as the previous library and save as exit
         Session::put('previous_journal', route('journal.library'));
         Session::put('current_nav', ['route' => route('journal.library'), 'back' => 'Journal Library']);
-        return view("other.library", compact('base_param', 'page_info', 'categories'));
+        return view("other.library", compact('base_param', 'page_info', 'categories', 'wipe_filters'));
     }
 
     public function journalSearch (Request $request) {
@@ -424,7 +426,7 @@ class PageNavController extends Controller
                 //filter based on the categories
                 foreach($categories as $category) {
                     if ($category == 'Activities') {
-                        $in_query->orWhere('type', 'journal');
+                        $in_query->where('activity_id', '!=', null);
                     }
                     else {
                         $in_query->orWhere('word_otd', $category);

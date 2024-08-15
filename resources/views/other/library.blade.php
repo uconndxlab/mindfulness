@@ -195,6 +195,8 @@
             toggle: false
         });
 
+        const wipeFilters = {{ isset($wipe_filters) && $wipe_filters ? 'true' : 'false'}};
+
         //load in old filter values
         function loadFilters() {
             console.log('loading values');
@@ -253,7 +255,20 @@
                 }, 10);
             }
         }
-        loadFilters();
+        if (!wipeFilters) {
+            loadFilters();
+        }
+        else {
+            if (baseParam == 'meditation') {
+                filters = sessionStorage.removeItem('meditation_filters');
+            }
+            else if (baseParam == 'favorited') {
+                filters = sessionStorage.removeItem('favorite_filters');
+            }
+            else if (journalPage) {
+                filters = sessionStorage.removeItem('journal_filters');
+            }
+        }
         
         //SLIDER INIT
         //gets vals from previous request

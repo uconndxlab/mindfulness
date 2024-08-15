@@ -5,7 +5,7 @@
         <div id="success-message" class="alert alert-success note-err-message" style="display: none;">
             Journal submitted!
             @if (isset($journal->activity))
-                <a href="{{ route('journal.library') }}"> View in library.</a>
+                <a href="{{ route('journal.library', ['activity' => $journal->activity_id]) }}"> View in library.</a>
             @endif
         </div>
         <div id="error-messages" class="alert alert-danger" style="display: none;"></div>

@@ -7,7 +7,7 @@
         <div class="prior-note">
             <div class="top-note">
                 <h5 class="fw-bold d-flex justify-content-between">
-                    <span>{{ $note->word_otd }}</span>
+                    <span>{!! $note->word_otd !!}</span>
                 </h5>
                 <small>{{ $note->formatted_date }}</small>
             </div>

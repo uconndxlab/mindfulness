@@ -61,7 +61,7 @@ class NoteController extends Controller
                     'activity_id' => $request->activity_id
                 ],[
                     'note' => $request->note,
-                    'word_otd' => $act->title.' - '.$act->day->name.', '.$act->day->module->name,
+                    'word_otd' => '<a href="/explore/activity/'.$act->id.'">'.$act->title.'</a> - '.$act->day->name.', '.$act->day->module->name.'</span>',
                 ]);
             }
             else {
