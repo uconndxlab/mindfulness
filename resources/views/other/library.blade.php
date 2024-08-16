@@ -79,7 +79,7 @@
                         <div class="accordion accordion-flush" id="showFilterAccordion">
                             <div class="form-group accordion-item border mb-2">
                                 <h2 class="accordion-header" id="headingFilter">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
+                                    <button id="showFilterButton" class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
                                         Show Filters
                                     </button>
                                 </h2>
@@ -195,6 +195,25 @@
             toggle: false
         });
 
+        //show/hide filter accordion
+        const showFilterBtn = document.getElementById('showFilterButton');
+        var open = false;
+        showFilterBtn.addEventListener('click', function() {
+            if (open) {
+                showFilterBtn.textContent = 'Show Filters';
+                open = false;
+            }
+            else {
+                showFilterBtn.textContent = 'Hide Filters';
+                open = true;
+            }
+        });
+        function openFilters() {
+            showFilterBtn.textContent = 'Hide Filters';
+            open = true;
+            collapseFilter.show();
+        }
+
         const wipeFilters = {{ isset($wipe_filters) && $wipe_filters ? 'true' : 'false'}};
 
         //load in old filter values
@@ -224,7 +243,7 @@
                 endTimeInput.value = filters.end || 30;
                 if (filters.end != 30 || filters.start != 0) {
                     collapseTime.show();
-                    collapseFilter.show();
+                    openFilters();
                 }
                 
                 //categories
@@ -232,7 +251,7 @@
                     checkbox.checked = filters.categories.includes(checkbox.value);
                     if (checkbox.checked) {
                         collapseCategory.show();
-                        collapseFilter.show();
+                        openFilters();
                     }
                 });
                 //modules
@@ -240,7 +259,7 @@
                     checkbox.checked = filters.modules.includes(checkbox.value);
                     if (checkbox.checked) {
                         collapseModule.show();
-                        collapseFilter.show();
+                        openFilters();
                     }
                 });
                 //page
