@@ -112,15 +112,14 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div id="appModalBody" class="modal-body">
-                                This activity is currently locked. Continue progressing to unlock this activity.
                             </div>
+                            <img id="appModalImg" src="" alt="Example Image" class="img-fluid mb-3" style="display: none;">
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
                 </div>
-
                 @yield('content')
             </div>
         </div>
@@ -160,12 +159,21 @@
         @endif
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
         <script>
-            function showModal(label='undefined', body='') {
+            function showModal(label='undefined', body='', media='') {
                 var myModal = new bootstrap.Modal(document.getElementById('appModal'));
                 document.getElementById('appModalLabel').innerHTML = label;
                 document.getElementById('appModalBody').innerHTML = body;
+                if (media != '') {
+                    var modalMedia = document.getElementById('appModalImg');
+                    modalMedia.src = media;
+                    modalMedia.style.display = 'block';
+                }
                 myModal.show();
             }
+            @if(session('modal_data'))
+                showModal("{{ session('modal_data')['label'] }}", `{!! session('modal_data')['body'] !!}`, "{{ session('modal_data')['media'] }}");
+                {{ session()->forget('modal_data') }}
+            @endif
         </script>
     </body>
 </html>

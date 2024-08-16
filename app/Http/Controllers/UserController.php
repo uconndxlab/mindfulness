@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\FinalActivityCompleted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -62,6 +63,11 @@ class UserController extends Controller
                         "status" => 'unlocked'
                     ]);
                 }
+            }
+            
+            //check if final, fire modal event
+            if ($activity->final) {
+                event(new FinalActivityCompleted($activity->day));
             }
 
             //handling optional

@@ -13,7 +13,7 @@
             $journal_hide = true;
             $tn_right_name = 'History';
             $tn_right_route = route('journal.library');
-            $tn_left_name = 'Compose';
+            $tn_left_name = 'Write';
             $tn_left_route = route('journal.compose');
             if ($route_name == 'journal.compose') {
                 $top_nav[0] = true;

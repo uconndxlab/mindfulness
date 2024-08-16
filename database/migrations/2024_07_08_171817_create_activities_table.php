@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('time')->nullable();
             $table->string('completion_message')->default('Congrats on completing the activity!');
             $table->integer('order');
+            $table->boolean('final')->default(false);
             $table->foreignId('next')->nullable()->constrained('activities')->onDelete('set null');
             $table->boolean('optional')->default(false);
             $table->boolean('deleted')->default(false);

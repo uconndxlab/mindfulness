@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('module_id')->nullable()->constrained('modules')->onDelete('set null');
             $table->string('name');
             $table->string('description');
+            $table->string('completion_message')->default('Congrats on completing the day!');
+            $table->string('media_path')->nullable();
             $table->integer('order');
             $table->boolean('deleted')->default(false);
             $table->timestamps();
