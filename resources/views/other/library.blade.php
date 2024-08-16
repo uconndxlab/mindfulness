@@ -79,8 +79,8 @@
                         <div class="accordion accordion-flush" id="showFilterAccordion">
                             <div class="form-group accordion-item border mb-2">
                                 <h2 class="accordion-header" id="headingFilter">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
-                                    <i class="bi bi-sliders" style="padding-right:10px"></i> Filters
+                                    <button id="showFilterButton" class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
+                                        <i class="bi bi-sliders" style="padding-right:10px"></i> Show Filters
                                     </button>
                                 </h2>
                                 <div id="collapseFilter" class="accordion-collapse collapse" aria-labelledby="headingFilter">
@@ -200,16 +200,16 @@
         var open = false;
         showFilterBtn.addEventListener('click', function() {
             if (open) {
-                showFilterBtn.textContent = 'Show Filters';
+                showFilterBtn.innerHTML = `<i class="bi bi-sliders" style="padding-right:10px"></i> Show Filters`;
                 open = false;
             }
             else {
-                showFilterBtn.textContent = 'Hide Filters';
+                showFilterBtn.innerHTML = `<i class="bi bi-sliders" style="padding-right:10px"></i> Hide Filters`;
                 open = true;
             }
         });
         function openFilters() {
-            showFilterBtn.textContent = 'Hide Filters';
+            showFilterBtn.innerHTML = `<i class="bi bi-sliders" style="padding-right:10px"></i> Hide Filters`;
             open = true;
             collapseFilter.show();
         }
