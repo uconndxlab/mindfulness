@@ -427,7 +427,7 @@ body:has(div.dark-background){
     font-weight:400;
 }
 
-.activity-tag-activity, .activity-tag-time{
+.activity-tag-activity, .activity-tag-time, .activity-tag-optional{
     padding: 5px 10px;
     border-radius:100px;
     background:var(--purple);
@@ -442,4 +442,8 @@ body:has(div.dark-background){
     font-size:14px;
     color:#fff;
     margin-right:5px;
+}
+
+.activity-tag-optional{
+    background:#068282;
 }
