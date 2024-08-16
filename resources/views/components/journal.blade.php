@@ -1,9 +1,9 @@
 @if (isset($journal))
     <form id="journalForm" method="POST" class="pt-3">
-        <p>*** Reminder: Please do not write any sensitive information here. ***</p>
+        <p>***Please do not write any sensitive information here.***</p>
         @csrf
         <div id="success-message" class="alert alert-success note-err-message" style="display: none;">
-            Journal submitted!
+            Journal submitted! View past journal entries in the history tab.
             @if (isset($journal->activity))
                 <a href="{{ route('journal.library', ['activity' => $journal->activity_id]) }}"> View in library.</a>
             @endif
@@ -32,7 +32,7 @@
         <div id="error-messages-note" class="text-danger note-err-message" style="display: none;"></div>
         <div class="d-flex justify-content-between">
             <button type="submit" id="submitButton" class="btn-quiz ms-auto" {{ $journal->answer ? '' : 'disabled'}}>
-                Submit <i class="bi bi-arrow-up"></i>
+                Submit Entry <i class="bi bi-arrow-right"></i>
             </button>
         </div>
     </form>

@@ -58,7 +58,7 @@
                                             @endif
                                             <!-- TODO -->
                                             @if ($activity->optional)
-                                                <span class="sub-activity-font activity-tag-???"></i>Optional</span>
+                                                <span class="sub-activity-font activity-tag-optional"></i>Optional</span>
                                             @endif
                                         </a>
                                         <i class="bi bi-arrow-right"></i>

@@ -79,8 +79,8 @@
                         <div class="accordion accordion-flush" id="showFilterAccordion">
                             <div class="form-group accordion-item border mb-2">
                                 <h2 class="accordion-header" id="headingFilter">
-                                    <button id="showFilterButton" class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
-                                        Show Filters
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
+                                    <i class="bi bi-sliders" style="padding-right:10px"></i> Filters
                                     </button>
                                 </h2>
                                 <div id="collapseFilter" class="accordion-collapse collapse" aria-labelledby="headingFilter">
