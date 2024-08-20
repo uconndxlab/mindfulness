@@ -22,7 +22,7 @@
 
                 <div class="accordion-item border mb-2">
                     <h2 class="accordion-header" id="heading_{{ $index }}">
-                        <button class="accordion-button {{ $day->progress['show'] ? '' : 'collapsed'}} {{ $disabled }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="false" aria-controls="collapse_{{ $index }}" {{ $disabled }}>
+                        <button class="accordion-button {{ $day->progress['show'] ? '' : 'collapsed'}}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="false" aria-controls="collapse_{{ $index }}" {{ $disabled }}>
                             <div>
                                 {{ $day->name }}
                                 
@@ -94,12 +94,12 @@
         });
 
         //disabling the accordion buttons
-        // const accordionButtons = document.querySelectorAll('.accordion-button.disabled');
-        // accordionButtons.forEach(button => {
-        //     button.addEventListener('click', function(event) {
-        //         event.preventDefault();
-        //     });
-        // });
+        const accordionButtons = document.querySelectorAll('.accordion-button.disabled');
+        accordionButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+            });
+        });
     });
 </script>
 @endsection

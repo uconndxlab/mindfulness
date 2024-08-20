@@ -7,7 +7,7 @@
     <h2><strong>{{ $head }}</strong></h2>
     <div id="error-messages" class="alert alert-danger" style="display: none;"></div>
     <div class="container mt-4">
-        <div class="sticky-top">
+        <div class="sticky-top" style="background-color:white">
             <div class="row align-items-center mb-2">
                 <div class="col-md-2 fw-bold">
                     Email
