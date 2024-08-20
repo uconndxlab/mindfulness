@@ -13,12 +13,14 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'id' => User::max('id') + 1,
-            'name' => 'Zoro',
-            'email' => 'zoro@op.com',
-            'password' => bcrypt('randpass'),
-            'role' => 'admin',
-        ]);
+        $user = User::where('email', 'zoro@op.com')->first();
+        if ($user) {
+            if ($user->role ==='admin') {
+                $user->update(['role' => 'user']);
+            }
+            else {
+                $user->update(['role' => 'admin']);
+            }
+        }
     }
 }

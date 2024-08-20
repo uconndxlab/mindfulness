@@ -4,9 +4,11 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminOnly
+class UpdateLastActiveAt
 {
     /**
      * Handle an incoming request.
@@ -15,10 +17,8 @@ class AdminOnly
      */
     public function handle(Request $request, Closure $next): Response
     {
-        //check if user is admin
-        if (!($request->user()->role === 'admin')) {
-            abort(404, "Page not found.");
-            abort(403, 'Unauthorized action.');
+        if (Auth::check()) {
+            Auth::user()->update(['last_active_at' => Carbon::now()]);
         }
         return $next($request);
     }

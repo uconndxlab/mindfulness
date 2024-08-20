@@ -6,23 +6,56 @@ use App\Models\Activity;
 use App\Models\User;
 use App\Models\Module;
 use App\Models\Day;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 
 class ContentManagementController extends Controller
 {
+    public function adminLanding(Request $request) {
+        $title = "Admin";
+        $head = "Admin Options";
+        $back_route = route('account');
+        return view('admin.landing', compact('title', 'head', 'back_route'));
+    }
 
+    public function usersList(Request $request) {
+        $users = User::orderBy('last_active_at', 'desc')->get();
+        foreach ($users as $user) {
+            $user->formatted_time = 'inactive';
+            if ($user->last_active_at) {
+                $date = Carbon::parse($user->last_active_at);
+                $date->setTimezone(new \DateTimeZone('EST'));
+                $user->formatted_time = $date->diffForHumans().', '.$date;
+            }
+        }
+        $title = "Admin: Access Control";
+        $head = "Access Control";
+        $page_info = [
+            'hide_bottom_nav' => true,
+            'back_route' => route('admin.landing'),
+            'back_label' => 'Admin Landing',
+        ];
+        return view('admin.users', compact('users', 'title', 'head', 'page_info'));
+    }
 
-    public function __construct(PageNavController $pageNavController)
-    {
-        $this->pageNavController = $pageNavController;
+    public function changeAccess(Request $request) {
+        try {
+            $user = User::findOrFail($request->user_id);
+            $user->update(['lock_access' => !$user->lock_access]);
+
+            return response()->json(['success' => 'Access updated for '.$user->email, 'status' => $user->lock_access], 200);
+        }
+        catch (\Exception $e) {
+            return response()->json(['error_message' => 'Failed to change access.', 'error' => $e], 500);
+        }
     }
 
     //NAVIGATION
     public function indexModule() {
         $title = "Admin Content Management";
         $head = "Modules";
-        $back_route = route('account');
+        $back_route = route('admin.landing');
         $big_list = Module::all();
         $item_type = 'module';
         $lost_list = Day::where('deleted', true)->get();

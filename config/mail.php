@@ -16,6 +16,9 @@ return [
 
     'default' => env('MAIL_MAILER', 'log'),
 
+    //contact email
+    'contact_email' => env('CONTACT_EMAIL'),
+
     /*
     |--------------------------------------------------------------------------
     | Mailer Configurations

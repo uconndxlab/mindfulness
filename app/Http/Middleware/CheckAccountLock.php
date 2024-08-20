@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminOnly
+class CheckAccountLock
 {
     /**
      * Handle an incoming request.
@@ -15,9 +15,7 @@ class AdminOnly
      */
     public function handle(Request $request, Closure $next): Response
     {
-        //check if user is admin
-        if (!($request->user()->role === 'admin')) {
-            abort(404, "Page not found.");
+        if ($request->user()->lock_access) {
             abort(403, 'Unauthorized action.');
         }
         return $next($request);

@@ -14,7 +14,7 @@
 
     <div class="">
         <h4 class="mb-2">Sessions</h4>
-    <div class="accordion accordion-flush mb-3" id="accordionDays">
+        <div class="accordion accordion-flush mb-3" id="accordionDays">
             @foreach ($module->days as $index => $day)
                 @php
                     $disabled = $day->progress['status'] == 'locked' ? 'disabled' : '';
