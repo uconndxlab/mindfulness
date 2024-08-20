@@ -23,6 +23,9 @@
     </div>
     <div class="manual-margin-top">
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
+            @php
+                $controlsList = ($activity->status != 'completed' ? 'noseek' : '').' '.($activity->type === 'practice' ? 'noplaybackrate' : '');
+            @endphp
             @if ($content->audio_options && count($content->audio_options) > 1)
                 <div class="col-6 mt-1">
                     <label class="fw-bold" for="word_otd">Options:</label>
@@ -69,14 +72,14 @@
                 @foreach ($content->audio_options as $voice => $time_options)
                     @foreach ($time_options as $time => $file_path)
                         <div id="content_main" class="content-main" voice="{{ $voice }}" time="{{ $time }}" data-type="audio" style="display: none;">
-                            <x-contentView id="content_view" type="audio" file="{{ $file_path }}"/>
+                            <x-contentView id="content_view" type="audio" file="{{ $file_path }}" controlsList="{{ $controlsList }}"/>
                         </div>
                     @endforeach
                 @endforeach
 
             @else
                 <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: block;">
-                    <x-contentView id="content_view" id2="pdf_download" type="{{ $content->type }}" file="{{ $content->file_path }}"/>
+                    <x-contentView id="content_view" id2="pdf_download" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}"/>
                 </div>
             @endif
 
