@@ -49,6 +49,10 @@
                 top: 0;
                 z-index: 1020;
             }
+            .accordion-button.disabled {
+                pointer-events: none;
+                opacity: 0.5;
+            }
         </style>
     </head>
         @php
