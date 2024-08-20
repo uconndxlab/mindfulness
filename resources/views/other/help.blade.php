@@ -47,12 +47,13 @@
 
         <section id="contactUs">
             <h5 class="text-center fw-bold mt-4">Contact us here:</h5>
+            <p class="text-center">*** IN CASE OF IMMMEDIATE HELP OR CRISIS, DIAL 911 ***</p>
             <p class="text-center">You can reach us via email or phone:</p>
             <p class="text-center">
-                <a href="mailto:example@example.com" class="text-decoration-none">example@example.com</a>
+                <a href="mailto:{{ config('mail.contact_email') }}" class="text-decoration-none">{{ config('mail.contact_email') }}</a>
             </p>
             <p class="text-center">
-                <a href="tel:+1234567890" class="text-decoration-none">+1 (234) 567-890</a>
+                <a href="tel:{{ config('mail.contact_phone') }}" class="text-decoration-none">{{ formatPhone(config('mail.contact_phone')) }}</a>
             </p>
         
             <h5 class="text-center fw-bold">Or use the Contact Form:</h5>

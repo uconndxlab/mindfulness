@@ -11,7 +11,7 @@
     <div class="text-center">
         <x-contentView id="welcome_video" type="audio" file="1.0 Welcome message (3 min).m4a"/>
         <br><br>
-        <a href="{{ route('voiceSelect') }}" class="btn btn-primary">NEXT</a>
+        <a href="{{ route('explore.home') }}" class="btn btn-primary">NEXT</a>
     </div>
 </div>
 @endsection

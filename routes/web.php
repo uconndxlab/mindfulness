@@ -83,7 +83,7 @@ Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock
     //NAVIGATION
     //Page Navigation - the controller is not totally necessary
     Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
-    Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
+    // Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
 
     Route::get('/journal', [PageNavController::class, 'journal'])->name('journal');
     Route::get('/compose', [PageNavController::class, 'journalCompose'])->name('journal.compose');
