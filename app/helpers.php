@@ -27,7 +27,6 @@ if (!function_exists('updateConfig')) {
     }
 }
 
-
 if (!function_exists('getModuleProgress')) {
     function getModuleProgress($user_id, $module_ids)
     {

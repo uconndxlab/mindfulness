@@ -20,6 +20,7 @@ class ContentManagementController extends Controller
     }
 
     public function usersList(Request $request) {
+        $registration_locked = getConfig('registration_locked', false);
         $users = User::orderBy('last_active_at', 'desc')->get();
         foreach ($users as $user) {
             $user->formatted_time = 'inactive';
@@ -36,7 +37,7 @@ class ContentManagementController extends Controller
             'back_route' => route('admin.landing'),
             'back_label' => 'Admin Landing',
         ];
-        return view('admin.users', compact('users', 'title', 'head', 'page_info'));
+        return view('admin.users', compact('users', 'title', 'head', 'page_info', 'registration_locked'));
     }
 
     public function changeAccess(Request $request) {
@@ -48,6 +49,18 @@ class ContentManagementController extends Controller
         }
         catch (\Exception $e) {
             return response()->json(['error_message' => 'Failed to change access.', 'error' => $e], 500);
+        }
+    }
+
+    public function registrationAccess(Request $request) {
+        try {
+            $locked = getConfig('registration_locked', false);
+            updateConfig('registration_locked', !$locked);
+            $msg = !$locked ? 'locked' : 'unlocked';
+            return response()->json(['success' => 'Registration has been '.$msg.'!', 'status' => !$locked], 200);
+        }
+        catch (\Exception $e) {
+            return response()->json(['error_message' => 'Failed to change registration access.', 'error' => $e], 500);
         }
     }
 

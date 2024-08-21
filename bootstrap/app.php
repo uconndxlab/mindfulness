@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AdminOnly;
 use App\Http\Middleware\CheckAccountLock;
+use App\Http\Middleware\CheckRegistrationLock;
 use App\Http\Middleware\UpdateLastActiveAt;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,7 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => AdminOnly::class,
             'update.last.active' => UpdateLastActiveAt::class,
-            'check.account.lock' => CheckAccountLock::class
+            'check.account.lock' => CheckAccountLock::class,
+            'registration.lock' => CheckRegistrationLock::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

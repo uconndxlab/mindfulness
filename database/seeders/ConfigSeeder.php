@@ -20,5 +20,9 @@ class ConfigSeeder extends Seeder
             ['key' => 'first_activity_id'],
             ['value' => '1']
         );
+        Config::updateOrCreate(
+            ['key' => 'registration_locked'],
+            ['value' => false]
+        );
     }
 }

@@ -6,6 +6,12 @@
 <div class="col-md-10">
     <h2><strong>{{ $head }}</strong></h2>
     <div id="error-messages" class="alert alert-danger" style="display: none;"></div>
+    <div id="lock_div_reg">
+        <button id="lock_button_reg" class="btn btn-{{ $registration_locked ? 'danger' : 'primary'}}">
+            <i id="lock_icon_reg" class="bi bi-{{ $registration_locked ? 'unlock' : 'lock'}}"></i> {{ $registration_locked ? 'UNLOCK REGISTRATION' : 'Lock registration'}}
+        </button>
+    </div>
+
     <div class="container mt-4">
         <div class="sticky-top" style="background-color:white">
             <div class="row align-items-center mb-2">
@@ -58,6 +64,54 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const errDiv = document.getElementById('error-messages');
+
+        //handle un/locking registration
+        document.getElementById('lock_button_reg').addEventListener('click', function() {
+            registrationAccess();
+        });
+
+        function registrationAccess() {
+            errDiv.style.display = 'none';
+            return new Promise((resolve, reject) => {
+                axios.post('/registrationLock', {
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => {
+                    console.log(response.data.success);
+                    const locked = response.data.status;
+                    const lockDiv = document.getElementById('lock_div_reg');
+                    if (locked) {
+                        lockDiv.innerHTML = `
+                            <button id="lock_button_reg" class="btn btn-danger">
+                                <i id="lock_icon_reg" class="bi bi-unlock"></i> UNLOCK REGISTRATION
+                            </button>
+                        `;
+                    } else {
+                        lockDiv.innerHTML = `
+                            <button id="lock_button_reg" class="btn btn-primary">
+                                <i id="lock_icon_reg" class="bi bi-lock"></i> Lock registration
+                            </button>
+                        `;
+                    }
+                    const lockButton = document.getElementById('lock_button_reg');
+                    lockButton.addEventListener('click', function() {
+                        registrationAccess();
+                    })
+                    resolve(true);
+                })
+                .catch(error => {
+                    console.error('Error changing access: ', error);
+                    //other errors
+                    const errorMessages = error.response?.data?.error_message || 'An unknown error occurred.';
+                    errDiv.textContent = errorMessages;
+                    errDiv.style.display = 'block';
+                    reject(false);
+                });
+            });
+        }
+
 
         document.querySelectorAll('.user-row').forEach(userRow => {
             const index = userRow.getAttribute('data-index');

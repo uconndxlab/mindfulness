@@ -51,12 +51,14 @@
             <button type="submit" class="btn btn-primary">LOG IN</button>
         </div>
     </form>
-    <div class="text-center mt-3">
-        <hr class="my-4">
-        <span class="text-muted">OR</span>
-    </div>
-    <div class="text-center mt-3">
-        <a class="btn btn-info text-center" href="{{ route('register') }}">SIGN UP</a>
-    </div>
+    @if (!getConfig('registration_locked', false))
+        <div class="text-center mt-3">
+            <hr class="my-4">
+            <span class="text-muted">OR</span>
+        </div>
+        <div class="text-center mt-3">
+            <a class="btn btn-info text-center" href="{{ route('register') }}">SIGN UP</a>
+        </div>
+    @endif
 </div>
 @endsection

@@ -24,10 +24,13 @@ Route::get('/login', [AuthController::class, 'loginPage'])->name('login');
 //login request
 Route::post('/login', [AuthController::class,'authenticate'])->name('login.submit');
 
-//registration page
-Route::get('/account-creation', [AuthController::class, 'registrationPage'])->name('register');
-//registration request
-Route::post('/account-creation', [AuthController::class,'register'])->name('register.submit');
+//REGISTRATION
+Route::middleware('registration.lock')->group(function () { 
+    //registration page
+    Route::get('/account-creation', [AuthController::class, 'registrationPage'])->name('register');
+    //registration request
+    Route::post('/account-creation', [AuthController::class,'register'])->name('register.submit');
+});
 
 //EMAIL VERIFICATION
 Route::middleware('auth')->group(function () {
@@ -114,10 +117,11 @@ Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock
 
     //ADMIN ONLY
     Route::middleware('admin')->group(function () {
-        //Content upload'
+        //Content upload
         Route::get('/adminlanding',[ContentManagementController::class,'adminLanding'])->name('admin.landing');
         Route::get('/usersList', [ContentManagementController::class,'usersList'])->name('users.list');
         Route::post('/changeAccess/{user_id}', [ContentManagementController::class,'changeAccess'])->name('users.access');
+        Route::post('/registrationLock', [ContentManagementController::class,'registrationAccess'])->name('registration.lock');
         //modules
         // Route::get('/module', [ContentManagementController::class,'indexModule'])->name('module.index');
         // Route::get('/module/{module_id}', [ContentManagementController::class,'showModule'])->name('module.show');
