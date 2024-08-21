@@ -6,6 +6,10 @@
         "audio_options": {
             "Na": {
                 "7": "1.1 Your Childs 30th Birthday (Na)(7 min).m4a"
+            },
+            "AI": {
+                "1": "1.2 Introducing COMPASS (AI)(1 min).mp3",
+                "3": "1.2 Curiosity (AI)(3 min).mp3"
             }
         }
     },

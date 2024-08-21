@@ -26,44 +26,46 @@
             @php
                 $controlsList = ($activity->status != 'completed' ? 'noseek' : '').' '.($activity->type === 'practice' ? 'noplaybackrate' : '');
             @endphp
-            @if ($content->audio_options && count($content->audio_options) > 1)
-                <div class="col-6 mt-1">
+            @if ($content->audio_options)
+                <div class="col-6 mt-1" id="audio-options-div" style="display: none;">
                     <label class="fw-bold" for="word_otd">Options:</label>
-                    <div class="form-group dropdown">
+                    @php
+                        $display_voice = count($content->audio_options) > 1 ? 'block' : 'none';
+                    @endphp
+                    <div class="form-group dropdown" data-display="{{ $display_voice }}" style="display: {{ $display_voice }}">
                         <!-- voice selection -->
-                        @if (count($content->audio_options) > 1)
-                            <button id="voice_dropdown_button" class="btn btn-xlight dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {{ key($content->audio_options) }}
-                            </button>
-                            <ul class="dropdown-menu" id="voice_dropdown" name="voice_dropdown">
-                                @foreach ($content->audio_options as $voice => $time_options)
-                                    <li>
-                                        <button class="dropdown-item" type="button" value="{{ $voice }}" onclick="selectVoice('{{ $voice }}')">
-                                            {{ $voice }}
-                                        </button>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @endif
+                        <button id="voice_dropdown_button" class="btn btn-xlight dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ key($content->audio_options) }}
+                        </button>
+                        <ul class="dropdown-menu" id="voice_dropdown" name="voice_dropdown">
+                            @foreach ($content->audio_options as $voice => $time_options)
+                                <li>
+                                    <button class="dropdown-item" type="button" value="{{ $voice }}" onclick="selectVoice('{{ $voice }}')">
+                                        {{ $voice }}
+                                    </button>
+                                </li>
+                            @endforeach
+                        </ul>
                         <input type="hidden" id="voice_select" name="voice_select" value="{{ key($content->audio_options) }}">
                     </div>
                     <!-- time selections -->
                     @foreach ($content->audio_options as $voice => $time_options)
-                        <div class="form-group dropdown time-dropdown" voice="{{ $voice }}" style="display: {{ $voice == key($content->audio_options) ? 'block' : 'none' }};">
-                            @if (count($time_options) > 1)
-                                <button id="time_dropdown_button_{{ $voice }}" class="btn btn-xlight dropdown-toggle time-toggle" time="{{ key($time_options) }}" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {{ key($time_options) }} min
-                                </button>
-                                <ul class="dropdown-menu" id="time_dropdown_{{ $voice }}" name="time_dropdown_{{ $voice }}">
-                                    @foreach ($time_options as $time => $_)
-                                        <li>
-                                            <button class="dropdown-item" type="button" value="{{ $time }}" onclick="selectTime('{{ $time }}')">
-                                                {{ $time }} min
-                                            </button>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endif
+                        @php
+                            $display_time = count($time_options) > 1 ? 'block' : 'none';
+                        @endphp
+                        <div class="form-group dropdown time-dropdown" voice="{{ $voice }}" data-display="{{ $display_time }}" style="display: {{ $display_time }}">
+                            <button id="time_dropdown_button_{{ $voice }}" class="btn btn-xlight dropdown-toggle time-toggle" time="{{ key($time_options) }}" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ key($time_options) }} min
+                            </button>
+                            <ul class="dropdown-menu" id="time_dropdown_{{ $voice }}" name="time_dropdown_{{ $voice }}">
+                                @foreach ($time_options as $time => $_)
+                                    <li>
+                                        <button class="dropdown-item" type="button" value="{{ $time }}" onclick="selectTime('{{ $time }}')">
+                                            {{ $time }} min
+                                        </button>
+                                    </li>
+                                @endforeach
+                            </ul>
                             <input type="hidden" id="time_select" name="time_select" value="{{ key($time_options) }}">
                         </div>
                     @endforeach
@@ -274,8 +276,8 @@
         //make sure the correct dropdown shows
         document.querySelectorAll('.time-dropdown').forEach(dropdown => {
             if (dropdown.getAttribute('voice') === voice) {
-                //show
-                dropdown.style.display = 'block';
+                //display if there are options
+                dropdown.style.display = dropdown.getAttribute('data-display');
                 //get the time value
                 var time = dropdown.querySelector('.time-toggle').getAttribute('time');
                 //set the new time
@@ -290,7 +292,7 @@
         //get the voice
         var voice = document.getElementById('voice_select').value;
         //change the correct drop down
-        document.getElementById('time_dropdown_button_'+voice).innerHTML = time;
+        document.getElementById('time_dropdown_button_'+voice).innerHTML = time+' min';
         //change hidden value
         document.getElementById('time_select').value = time;
         //change the content
@@ -324,7 +326,9 @@
                 const voice_select = document.getElementById('voice_select');
                 const time_select = document.getElementById('time_select');
                 if (voice_select && time_select) {
-                    handleVoiceTimeChange();
+                    //first call to set up options
+                    selectVoice(voice_select.value);
+                    document.getElementById('audio-options-div').style.display = 'block';
                 }
             } else {
                 //behave as normal - event listeners are on all audio items
