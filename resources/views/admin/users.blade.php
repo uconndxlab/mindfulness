@@ -13,51 +13,46 @@
     </div>
 
     <div class="container mt-4">
-        <div class="sticky-top" style="background-color:white">
-            <div class="row align-items-center mb-2">
-                <div class="col-md-2 fw-bold">
-                    Email
-                </div>
-                <div class="col-md-2 fw-bold">
-                    Name
-                </div>
-                <div class="col-md-5 fw-bold">
-                    Last Active
-                </div>
-                <div class="col-md-3 fw-bold text-end">
-                    Change Access
-                </div>
-            </div>
-            <div class="col-12">
-                <hr class="separator-line">
-            </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col">Email</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Last Active</th>
+                        <th scope="col">Role</th>
+                        <th scope="col" class="text-end">Change Access</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($users as $index => $user)
+                        @php
+                            $locked = $user->lock_access;
+                            $is_admin_disable = $user->role === "admin" ? 'disabled' : '';
+                        @endphp
+                        <tr class="user-row" data-index="{{ $index }}" data-id="{{ $user->id }}">
+                            <td style="word-wrap: break-word;">
+                                {{ $user->email }}
+                            </td>
+                            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {{ $user->name }}
+                            </td>
+                            <td>
+                                {{ $user->formatted_time }}
+                            </td>
+                            <td>
+                                {{ ucfirst($user->role) }}
+                            </td>
+                            <td id="lock_div_{{ $index }}" class="text-end">
+                                <button id="lock_button_{{ $index }}" class="btn btn-{{ $locked ? 'danger' : 'primary'}} {{ $is_admin_disable }}" {{ $is_admin_disable }}>
+                                    <i id="lock_icon_{{ $index }}" class="bi bi-{{ $locked ? 'unlock' : 'lock'}}"></i> {{ $locked ? 'UNLOCK ACCOUNT' : 'Lock account'}}
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
-        @foreach($users as $index => $user)
-            @php
-                $locked = $user->lock_access;
-            @endphp
-            <div class="row align-items-center mb-2 user-row" data-index="{{ $index }}" data-id="{{ $user->id }}">
-                <div class="col-md-2">
-                    {{ $user->email }}
-                </div>
-                <div class="col-md-2">
-                    {{ $user->name }}
-                </div>
-                <div class="col-md-5">
-                    {{ $user->formatted_time }}
-                </div>
-                <div id="lock_div_{{ $index }}" class="col-md-3 text-end">
-                    <button id="lock_button_{{ $index }}" class="btn btn-{{ $locked ? 'danger' : 'primary'}}">
-                        <i id="lock_icon_{{ $index }}" class="bi bi-{{ $locked ? 'unlock' : 'lock'}}"></i> {{ $locked ? 'UNLOCK ACCOUNT' : 'Lock account'}}
-                    </button>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <hr class="separator-line">
-                </div>
-            </div>
-        @endforeach
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
