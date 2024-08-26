@@ -3,7 +3,7 @@
         "id": 1,
         "name": "Part 1 - Foundational Skills",
         "description": "Learning new skills and forming new habits are not easy. Be gentle with yourself!",
-        "workbook_path": "pdfExample.pdf",
+        "workbook_path": "exampleWorkbook.pdf",
         "order": 1
     },
     {

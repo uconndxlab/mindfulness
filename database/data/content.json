@@ -16,6 +16,9 @@
         "audio_options": {
             "Na": {
                 "4": "1.1 Morning Glory Time (Na)(4 min).m4a"
+            },
+            "AI": {
+                "2": "1.1 Morning Glory Time (AI)(2 min).mp3"
             }
         }
     },
@@ -26,30 +29,6 @@
         "audio_options": {
             "Na": {
                 "7": "1.2 Body Scan (Na)(7 min).m4a"
-            }
-        }
-    },
-
-
-
-
-    {
-        "activity_id": 6,
-        "type": "audio",
-        "file_path": "1.2 Introducing COMPASS (AI)(1 min).mp3",
-        "audio_options": {
-            "AI": {
-                "4": "1.2 Introducing COMPASS (AI)(1 min).mp3"
-            }
-        }
-    },
-    {
-        "activity_id": 7,
-        "type": "audio",
-        "file_path": "1.2 Curiosity (AI)(3 min).mp3",
-        "audio_options": {
-            "AI": {
-                "3": "1.2 Curiosity (AI)(3 min).mp3"
             }
         }
     },
@@ -69,16 +48,7 @@
         "file_path": "1.2 Body Scan (Na)(13 min)(Optional).m4a",
         "audio_options": {
             "Na": {
-                "13": "1.2 Body Scan (Na)(13 min)(Optional).m4a"
-            }
-        }
-    },
-    {
-        "activity_id": 11,
-        "type": "audio",
-        "file_path": "1.2 Body Scan (Na)(21 min)(Optional).MP3",
-        "audio_options": {
-            "Na": {
+                "13": "1.2 Body Scan (Na)(13 min)(Optional).m4a",
                 "21": "1.2 Body Scan (Na)(21 min)(Optional).MP3"
             }
         }

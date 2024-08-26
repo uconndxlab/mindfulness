@@ -28,11 +28,11 @@
             @endphp
             @if ($content->audio_options)
                 <div class="col-6 mt-1" id="audio-options-div" style="display: none;">
-                    <label class="fw-bold" for="word_otd">Options:</label>
                     @php
                         $display_voice = count($content->audio_options) > 1 ? 'block' : 'none';
                     @endphp
                     <div class="form-group dropdown" data-display="{{ $display_voice }}" style="display: {{ $display_voice }}">
+                        <label class="fw-bold" for="voice_dropdown_button">Voice Selection:</label>
                         <!-- voice selection -->
                         <button id="voice_dropdown_button" class="btn btn-xlight dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             {{ key($content->audio_options) }}
@@ -54,6 +54,7 @@
                             $display_time = count($time_options) > 1 ? 'block' : 'none';
                         @endphp
                         <div class="form-group dropdown time-dropdown" voice="{{ $voice }}" data-display="{{ $display_time }}" style="display: {{ $display_time }}">
+                            <label class="fw-bold" for="time_dropdown_button_{{ $voice }}">Time:</label>
                             <button id="time_dropdown_button_{{ $voice }}" class="btn btn-xlight dropdown-toggle time-toggle" time="{{ key($time_options) }}" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ key($time_options) }} min
                             </button>

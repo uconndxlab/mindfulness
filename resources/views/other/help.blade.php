@@ -22,7 +22,7 @@
     <div data-bs-spy="scroll" data-bs-target="#navbar-help" data-bs-smooth-scroll="true" class="scrollspy-example pt-3 pb-3 rounded-2" tabindex="0">
         <section id="tutorial">
             <h5 class="text-center fw-bold mt-4">Tutorial:</h5>
-            <x-contentView type="video" file="videoExampleSnarky.MOV"/>
+            <x-contentView type="video" file="" controlsList="noplaybackrate nodownload noseek"/>
         </section>
         
         <section id="FAQ">

@@ -426,7 +426,7 @@ class PageNavController extends Controller
                 //filter based on the categories
                 foreach($categories as $category) {
                     if ($category == 'Activities') {
-                        $in_query->where('activity_id', '!=', null);
+                        $in_query->orWhere('activity_id', '!=', null);
                     }
                     else {
                         $in_query->orWhere('word_otd', $category);
