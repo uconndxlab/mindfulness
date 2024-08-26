@@ -14,7 +14,7 @@
                     <a class="nav-link" href="#FAQ">FAQ</a>
                 </li>
                 <li class="nav-item" style="padding:0px 20px">
-                    <a class="nav-link" href="#contactUs">Contact Us</a>
+                    <a class="nav-link" href="#contactUs">Contact</a>
                 </li>
             </ul>
         </div>
@@ -37,7 +37,7 @@
                         </h2>
                         <div id="collapseFAQ_{{ $index }}" class="accordion-collapse collapse" aria-labelledby="headingFAQ_{{ $index }}">
                             <div style="padding: 10px 20px !important;" class="accordion-body">
-                                {{ $faq->answer }}
+                                {!! $faq->answer !!}
                             </div>
                         </div>
                     </div>
@@ -46,8 +46,10 @@
         </section>
 
         <section id="contactUs">
-            <h5 class="text-center fw-bold mt-4">Contact us here:</h5>
-            <p class="text-center">*** IN CASE OF IMMMEDIATE HELP OR CRISIS, DIAL 911 ***</p>
+            <h5 class="text-center fw-bold mt-4">Contact:</h5>
+            <p class="text-center fw-bold">Get Immediate Help in a Crisis</p>
+            <p class="text-center">Call 911 if you or someone you know is in immediate danger or go to the nearest emergency room.</p>
+            <p class="text-center fw-bold mt-3">Contact us here:</p>
             <p class="text-center">You can reach us via email or phone:</p>
             <p class="text-center">
                 <a href="mailto:{{ config('mail.contact_email') }}" class="text-decoration-none">{{ config('mail.contact_email') }}</a>
