@@ -33,6 +33,16 @@
         }
     },
     {
+        "activity_id": 6,
+        "type": "audio",
+        "file_path": "1.2 What is Mindfulness (AI)(6 min).mp3",
+        "audio_options": {
+            "AI": {
+                "6": "1.2 What is Mindfulness (AI)(6 min).mp3"
+            }
+        }
+    },
+    {
         "activity_id": 8,
         "type": "audio",
         "file_path": "1.2 Body Scan (Na)(7 min).m4a",

@@ -55,7 +55,7 @@
         "day_id": 2,
         "title": "What is mindfulness?",
         "type": "lesson",
-        "time": 1,
+        "time": 6,
         "completion_message": "Mindfulness is not what we think. It is simple but not easy: paying attention to the present moment nonjudgmentally, with intention.",
         "order": 6,
         "next_fake": 7
