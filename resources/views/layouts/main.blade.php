@@ -10,6 +10,7 @@
         <style>
             html {
                 overflow-y: scroll;
+                scroll-behavior: smooth;
             }
             .manual-margins {
                 margin-bottom: 6rem;

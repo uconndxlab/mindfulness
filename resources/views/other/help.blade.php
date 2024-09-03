@@ -8,7 +8,7 @@
         <div class="tabs">
             <ul class="navbar-nav" style="flex-direction:row">
                 <li class="nav-item" style="padding:0px 20px">
-                    <a class="nav-link" href="#tutorial">Tutorial</a>
+                    <a id="tutorial-link" class="nav-link" href="#tutorial">Tutorial</a>
                 </li>
                 <li class="nav-item" style="padding:0px 20px">
                     <a class="nav-link" href="#FAQ">FAQ</a>
@@ -148,9 +148,79 @@
 
         //init scrollspy
         var scrollSpy = new bootstrap.ScrollSpy(document.querySelector('.scrollspy-example'), {
-            target: '#navbar-help'
+            target: '#navbar-help',
+            offset: -25
         });
         scrollSpy.refresh();
+
+        //FIX: scrollspy becoming inactive
+        var sections = document.querySelectorAll('section');
+        var navLinks = [];
+        //get navlinks
+        document.querySelectorAll('#navbar-help .nav-link').forEach(function (link) {
+            var section = document.querySelector(link.getAttribute('href'));
+            if (section) {
+                navLinks.push({
+                    link: link,
+                    section: section
+                });
+            }
+        });
+        //onscroll
+        document.addEventListener('scroll', function () {
+            var scrollPosition = window.scrollY;
+            var hasActive = false;
+
+            //check for active
+            navLinks.forEach(function (item) {
+                if (item.link.classList.contains('active')) {
+                    hasActive = true;
+                }
+            });
+
+            //if not found
+            if (!hasActive) {
+                navLinks.forEach(function (item) {
+                    var sectionTop = item.section.offsetTop;
+                    var sectionHeight = item.section.offsetHeight;
+    
+                    //check if in section boundaries
+                    if (scrollPosition >= sectionTop - 75 && scrollPosition < sectionTop + sectionHeight - 75) {
+                        //activate link
+                        if (!item.link.classList.contains('active')) {
+                            item.link.classList.add('active');
+                            hasActive = true;
+                        }
+                    }
+                    else {
+                        //otherwise remove
+                        if (item.link.classList.contains('active')) {
+                            item.link.classList.remove('active');
+                        }
+                    }
+                });
+            }
+            //broken if still not active - set default tutorial
+            if (!hasActive) {
+                document.getElementById('tutorial-link').classList.add('active');
+            }
+        });
+
+
+        //FIX: scrollspy adjust active improperly on clicking
+        navLinks.forEach(function (navLink) {
+            navLink.link.addEventListener('click', function (e) {
+                e.preventDefault();
+                var target = document.querySelector(this.getAttribute('href'));
+                var offset = 60;
+                var scrollPos = target.offsetTop - offset;
+                //scroll
+                window.scrollTo({
+                    top: scrollPos,
+                    behavior: 'smooth'
+                });
+            });
+        });
     });
 </script>
 @endsection
