@@ -343,14 +343,12 @@
                 watchedTime: 0,
                 currentTime: 0
             };
-            var lastUpdated = 'currentTime';
-            var isSeeking = false;
             var endedListener;
             var MAX_DELTA = 1;
 
             player.addEventListener('timeupdate', function () {
                 //block seeking timeupdate
-                if (!isSeeking && !player.seeking) {
+                if (!player.seeking) {
                     //tracking watched time - only update if the time is less than 1 second - prevent seek spam bug
                     var delta = player.currentTime - timeTracking.watchedTime;
                     if (delta <= MAX_DELTA && delta >= 0) {
@@ -360,53 +358,30 @@
                     //tracking the current time (if less than watched)
                     else {
                         timeTracking.currentTime = player.currentTime;
-                        lastUpdated = 'currentTime';
                     }
                 }
             });
 
             //prevent seek
             player.addEventListener('seeking', function () {
-                isSeeking = true;
                 //block seeking if seek puts current ahead of watchedTime
                 //allows rewind and ability to catch up
-                console.log('Seeking');
+                // console.log('Seeking');
                 var delta = player.currentTime - timeTracking.watchedTime;
                 if (delta > 0) {
-                    //temp remove ended listener - seeking spam bug
-                    if (endedListener) {
-                        console.log('removing listener')
-                        player.removeEventListener('ended', endedListener);
-                    }
-
-                    //pause play back from last time
+                    //pause play back from watched time
                     player.pause();
-                    player.currentTime = timeTracking[lastUpdated];
-                    player.play().then(() => {
-                        //add event listener back
-                        if (endedListener) {
-                            console.log('adding listener back')
-                            player.addEventListener('ended', endedListener);
-                        }
-                    }).catch((error) => {
-                        console.error('Error playing the media:', error);
-                    });
+                    player.currentTime = timeTracking['watchedTime'];
+                    player.play();
                 }
-            });
-
-            player.addEventListener('seeked', function () {
-                isSeeking = false;
             });
 
             //init event listener
             endedListener = function() {
-                console.log('Media ended');
-                if (player.currentTime < player.duration) {
-                    console.log('Blocked seek spam');
-                }
+                // console.log('Media ended');
                 activityComplete();
             };
-            console.log('adding end listener');
+            // console.log('adding end listener');
             player.addEventListener('ended', endedListener);
         });
     });
