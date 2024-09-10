@@ -4,6 +4,7 @@ use App\Http\Middleware\AdminOnly;
 use App\Http\Middleware\CheckAccountLock;
 use App\Http\Middleware\CheckRegistrationLock;
 use App\Http\Middleware\UpdateLastActiveAt;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -24,4 +25,8 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })
+    ->withSchedule(function (Schedule $schedule) {
+        $schedule->command('emails:send-inactivity-reminders')->dailyAt('12:00');
+    })
+    ->create();
