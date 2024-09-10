@@ -344,6 +344,7 @@
                 currentTime: 0
             };
             var lastUpdated = 'currentTime';
+            var endedListener;
 
             player.addEventListener('timeupdate', function () {
                 //block seeking timeupdate
@@ -360,18 +361,42 @@
                     }
                 }
             });
+
             //prevent seek
             player.addEventListener('seeking', function () {
                 //block seeking if seek puts current ahead of watchedTime
                 //allows rewind and ability to catch up
+                console.log('Seeking');
                 var delta = player.currentTime - timeTracking.watchedTime;
                 if (delta > 0) {
+                    //temp remove ended listener - seeking spam bug
+                    if (endedListener) {
+                        console.log('removing listener')
+                        player.removeEventListener('ended', endedListener);
+                    }
+
                     //pause play back from last time
                     player.pause();
                     player.currentTime = timeTracking[lastUpdated];
-                    player.play();
+                    player.play().then(() => {
+                        //add event listener back
+                        if (endedListener) {
+                            console.log('adding listener back')
+                            player.addEventListener('ended', endedListener);
+                        }
+                    }).catch((error) => {
+                        console.error('Error playing the media:', error);
+                    });
                 }
             });
+
+            //init event listener
+            endedListener = function() {
+                console.log('Media ended');
+                activityComplete();
+            };
+            console.log('adding end listener');
+            player.addEventListener('ended', endedListener);
         });
     });
 
