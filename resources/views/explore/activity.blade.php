@@ -339,17 +339,37 @@
         //NOSEEK
         var mediaPlayers = document.querySelectorAll('.media-player');
         mediaPlayers.forEach(function(player) {
-            var lastTime = 0;
-            player.addEventListener('timeupdate', function() {
-                console.log('time update: ', player.currentTime);
-                lastTime = player.currentTime;
+            var timeTracking = {
+                watchedTime: 0,
+                currentTime: 0
+            };
+            var lastUpdated = 'currentTime';
+
+            player.addEventListener('timeupdate', function () {
+                //block seeking timeupdate
+                if (!player.seeking) {
+                    //tracking watched time
+                    if (player.currentTime > timeTracking.watchedTime) {
+                        timeTracking.watchedTime = player.currentTime;
+                        lastUpdated = 'watchedTime';
+                    }
+                    //tracking the current time (if less than watched)
+                    else {
+                        timeTracking.currentTime = player.currentTime;
+                        lastUpdated = 'currentTime';
+                    }
+                }
             });
-            player.addEventListener('seeking', function() {
-                console.log('seeking: ', player.currentTime);
-                event.preventDefault();
-                // player.currentTime = lastTime;
-                if (player.currentTime > lastTime) {
-                    player.currentTime = lastTime;
+            //prevent seek
+            player.addEventListener('seeking', function () {
+                //block seeking if seek puts current ahead of watchedTime
+                //allows rewind and ability to catch up
+                var delta = player.currentTime - timeTracking.watchedTime;
+                if (delta > 0) {
+                    //pause play back from last time
+                    player.pause();
+                    player.currentTime = timeTracking[lastUpdated];
+                    player.play();
                 }
             });
         });
