@@ -16,6 +16,7 @@ return new class extends Migration
             $table->longText('note');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('word_otd');
+            $table->foreignId('activity_id')->nullable()->constrained('activities')->onDelete('set null');
             $table->timestamps();
         });
     }

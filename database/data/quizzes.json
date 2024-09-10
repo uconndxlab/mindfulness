@@ -1,17 +1,124 @@
 [
     {
         "activity_id": 2,
-        "question": "Mindfulness is...",
-        "options_feedback": [
-            {
-                "option":"Stopping my thinking and Clearing my mind",
-                "feedback":"The correct answer here is Awareness and Heartfulness! Like you, many people think that mindfulness meditation is about stopping the thinking mind or clearing all thoughts and emotions\u2026 well, that is a wrong idea about mindfulness! The mind is always thinking and it is almost impossible to clear its thoughts and emotions. By practicing mindfulness, we are bringing awareness and heartfulness to all experiences, here and now, welcoming our thoughts and emotions, without pushing them away or taking them too personal or too seriously. We hope that you will learn more about mindfulness in this program!"
+        "question_count": 2,
+        "question_options": {
+            "question_1": {
+                "number": 1,
+                "question": "What goals do you have in mind?",
+                "type": "checkbox",
+                "options_feedback": [
+                    {
+                        "option": "Feel better about parenthood (be more present for my child)",
+                        "feedback": null,
+                        "correct": 2,
+                        "audio_path": null,
+                        "above": null,
+                        "other": true
+                    },
+                    {
+                        "option": "Feel less stressed (relax more, sleep better)",
+                        "feedback": null,
+                        "correct": 2,
+                        "audio_path": null,
+                        "above": null,
+                        "other": true
+                    },
+                    {
+                        "option": "Learn to deal with a difficult relationship",
+                        "feedback": null,
+                        "correct": 2,
+                        "audio_path": null,
+                        "above": null,
+                        "other": true
+                    },
+                    {
+                        "option": "All of the above",
+                        "feedback": null,
+                        "correct": 2,
+                        "audio_path": null,
+                        "all_above": true,
+                        "above": "all",
+                        "other": true
+                    },
+                    {
+                        "option": "None of the above",
+                        "feedback": null,
+                        "correct": 2,
+                        "audio_path": null,
+                        "above": "none",
+                        "other": true
+                    }
+                ]
             },
-            {
-                "option":"Awareness and Heartfulness",
-                "feedback":"Yes, that is the correct answer! By practicing mindfulness, we are bringing awareness and heartfulness to all experiences, here and now, welcoming our thoughts and emotions, without pushing them away or taking them too personal or too seriously. We hope that you will learn more about mindfulness in this program!"
+            "question_2": {
+                "number": 2,
+                "question": "Great! How long do you want to spend practicing in this program every day?",
+                "type": "radio",
+                "options_feedback": [
+                    {
+                        "option": "3-5 minutes every day.",
+                        "feedback": "Great! Every little bit counts, and it's smart to take small steps for big success. Most activities take only three to five minutes. We recommend prioritizing the healing activities each day and listening to the mini-lessons whenever possible, like when you're driving or washing dishes. In the workbook, we gave you more tips on how to find time to practice. Check it out!",
+                        "audio_path": null,
+                        "correct": 2,
+                        "above": null,
+                        "other": false
+                    },
+                    {
+                        "option": "At least 15 minutes every day.",
+                        "feedback": "Great job! You should be able to finish the activities every day in just 15 minutes. When you have a 15-minute stretch, we recommend you do all the activities at once. Then, use any extra time during the day to practice them again, instead of moving on to the next day's activities. The more you practice, the stronger these skills will become.",
+                        "audio_path": null,
+                        "correct": 2,
+                        "above": null,
+                        "other": false
+                    },
+                    {
+                        "option": "At least 30 minutes every day.",
+                        "feedback": "You are doing an amazing job as a parent! We suggest that you try to finish all the activities for one day at once. Then, use any extra time during the day to practice those activities again, instead of moving on to the next day's activities. The more you practice, the stronger these skills will become. We also included some longer optional activities for you. We recommend completing the shorter versions first before trying the longer ones.",
+                        "audio_path": null,
+                        "correct": 2,
+                        "above": null,
+                        "other": false
+                    },
+                    {
+                        "option": "Not sure.",
+                        "feedback": "Many parents have busy schedules, so it can be hard to know how much free time you have for this program. We know that if you set goals for every day, you are more likely to do well and learn the skills. What do you do when you need to take a break? Is there something you can do less of so you can spend 5 minutes or more on this program to reach your goal? Look at your calendar and think about how you spend your time each day. Think of some ideas and try them for a week. In the workbook, we gave you more tips on how to find time to practice. Check it out!",
+                        "audio_path": null,
+                        "correct": 2,
+                        "above": null,
+                        "other": false
+                    }
+                ]
             }
-        ],
-        "correct_answer": 2
+        }
+    },
+    {
+        "activity_id": 7,
+        "question_count": 1,
+        "question_options": {
+            "question_1": {
+                "number": 1,
+                "question": "Mindfulness is….",
+                "type": "radio",
+                "options_feedback": [
+                    {
+                        "option": "Stopping my thinking",
+                        "feedback": null,
+                        "correct": 2,
+                        "audio_path": null,
+                        "above": null,
+                        "other": false
+                    },
+                    {
+                        "option": "Pure awareness and Heartfulness",
+                        "feedback": null,
+                        "correct": 2,
+                        "audio_path": null,
+                        "above": null,
+                        "other": false
+                    }
+                ]
+            }
+        }
     }
 ]

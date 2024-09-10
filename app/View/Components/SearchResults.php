@@ -8,6 +8,7 @@ use Illuminate\View\Component;
 
 class SearchResults extends Component
 {
+    public $activities;
     /**
      * Create a new component instance.
      */

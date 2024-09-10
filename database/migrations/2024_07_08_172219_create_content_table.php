@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('activity_id')->constrained('activities')->onDelete('cascade');
             $table->enum('type', ['audio', 'video', 'pdf']);
             $table->string('file_path');
-            $table->string('completion_message')->default('Congrats on completing the activity!')->nullable();
+            $table->json('audio_options')->nullable();
             $table->timestamps();
         });
     }

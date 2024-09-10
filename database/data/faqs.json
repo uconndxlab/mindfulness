@@ -1,0 +1,74 @@
+[
+    {
+        "question": "Why was this app developed?",
+        "answer": "Healing Hearts is a mindfulness app specifically designed to teach mindfulness to divorcing/divorced or legally separating or separated parent. It aims to help reduce stress and enhance overall well-being."
+    },
+    {
+        "question": "What are the benefits of practicing the activities in this app?",
+        "answer": "The more you use the activities repeatedly, the more benefits you will experience!"
+    },
+    {
+        "question": "Is there any risk related to practicing the activities in this app?",
+        "answer": "Engaging in mindfulness activities can involve certain risks. Physically, you might experience muscle strain or discomfort during or after movement practices. Mentally, mindfulness can sometimes lead to increased anxiety, strong emotions, a sense of being overwhelmed, or a distancing from emotions, particularly during or after meditation sessions. You are responsible for assessing these risks, understanding them, and assuming them knowingly and willingly."
+    },
+    {
+        "question": "How do I get the most benefits out of this app?",
+        "answer": "The more you use the activities repeatedly, the more benefits you will experience!"
+    },
+    {
+        "question": "Why are some activities locked?",
+        "answer": "Activities unlock automatically after you complete the previous ones. This sequential unlocking helps guide your journey through mindfulness."
+    },
+    {
+        "question": "Why are the activities labeled as Monday, Tuesday, ... Friday?",
+        "answer": "You can complete the activities on any day of the week at your convenience. However, we highly recommend you spend at least 5 days a week in our app. The labels help guide your journey through mindfulness."
+    },
+    {
+        "question": "How can I track my progress?",
+        "answer": "You can monitor your progress by visiting your profile page. In addition, after completing all the activities for the day, a petal on the flower icon on the main page will light up to visualize your achievements."
+    },
+    {
+        "question": "Why did I lose my progress?",
+        "answer": "You could be using a different account. Try to use the same email through out your mindfulness journey. You can reach us at frame.lab@uconn.edu or through the contact form on our website for further assistance."
+    },
+    {
+        "question": "I don’t like the teacher’s voice. Do you have other voices?",
+        "answer": "Some activities may only have one voice available, but if we have multiple voices, you can select them on the activity page."
+    },
+    {
+        "question": "Where do I see all the activities at once?",
+        "answer": "The library contains all the completed mindfulness practices. You can filter these practices by lengths and categories."
+    },
+    {
+        "question": "How do I favorite an activity?",
+        "answer": "You can click the star icon next to the activity title to favorite an activity. Favorited activities are accessible through the library."
+    },
+    {
+        "question": "What should I do if I forgot my password?",
+        "answer": "Click \"Forgot Password\" on the login page. You will be directed to a page where you can retrieve or reset your password."
+    },
+    {
+        "question": "How do I delete my account?",
+        "answer": "To delete your account, please contact us at config_email or through the contact form on our website."
+    },
+    {
+        "question": "What should I do if I experience technical issues or have feedback about the app?",
+        "answer": "Please email us at config_email or call us at config_phone to get support on using the app. You can also submit the contact form below."
+    },
+    {
+        "question": "How is my data and privacy protected?",
+        "answer": "All user entries, including journals, are treated as data to the research project and may be used for scientific purposes only after removing identifiable information. Please don’t enter any sensitive information in the app."
+    },
+
+
+
+    
+    {
+        "question": "Where can I find mental health resources for myself or my family?",
+        "answer": "If you, your child, or your family members struggle emotionally, there are ways to get help: Primary Care Provider: Your primary care practitioner can be an important resource, providing initial mental health screenings and referrals to mental health specialists. If you have an appointment with your primary care provider, consider bringing up your mental health concerns and asking for help. Federal Resources: Some federal agencies offer resources for identifying health care providers and help in finding low-cost health services. These include: · Substance Abuse and Mental Health Services Administration (SAMHSA) (https://www.samhsa.gov/): For general information on mental health and to locate treatment services in your area, call SAMHSA's National Helpline at 1-800-662-HELP (4357). SAMHSA also has a Behavioral Health Treatment Services Locator (https://findtreatment.samhsa.gov/) on its website that can be searched by location. · Health Resources and Services Administration (HRSA) (https://www.hrsa.gov/): HRSA works to improve access to health care. The HRSA website has information on finding affordable healthcare, including health centers that offer care on a sliding fee scale. · Centers for Medicare & Medicaid Services (CMS) (https://www.cms.gov/): CMS has information on its website about benefits and eligibility for mental health programs and how to enroll. · The National Library of Medicine (NLM) MedlinePlus (https://medlineplus.gov/): NLM’s website has directories(https://medlineplus.gov/directories/) and lists of organizations(https://medlineplus.gov/organizations/all_organizations.html) that can help in identifying a health practitioner. State and County Agencies: The website of your state or county government may have information about health services in your area. You may be able to find this information by visiting their websites and searching for the health services department. Insurance Companies: If you have health insurance, a representative of your insurance company will know which local providers are covered by your insurance plan. The websites of many health insurance companies have searchable databases that allow you to find a participating practitioner in your area. University, College, or Medical Schools: Your local college, university, or medical school may offer treatment options. To find these, try searching on the website of local university health centers for their psychiatry, psychology, counseling, or social work departments"
+    },
+    {
+        "question": "Where can I find immediate crisis support for myself or my family?",
+        "answer": "Get Immediate Help in a Crisis Call 911 if you or someone you know is in immediate danger or go to the nearest emergency room. 988 Suicide & Crisis Lifeline (https://988lifeline.org/) Call or text 988; Llame al 988 (para ayuda en español) Use Lifeline Chat (https://988lifeline.org/) on the web The Lifeline provides 24-hour, confidential support to anyone in suicidal crisis or emotional distress. Call or text 988 to connect with a trained crisis counselor. Support is also available in English via live chat(https://988lifeline.org/) . Crisis Text Line (https://www.crisistextline.org/) Text “HELLO” to 741741 The Crisis Text hotline is available 24 hours a day, seven days a week throughout the U.S. The Crisis Text Line serves anyone, in any type of crisis, connecting them with a crisis counselor who can provide support and information. *You may have to right-click on the hyperlinks (the blue text) to open the associated webpage. (Resources on this page are provided for informational purposes only and is from the National Institute of Mental Health website. The list is not comprehensive and does not constitute an endorsement by our team or UConn)"
+    }
+]

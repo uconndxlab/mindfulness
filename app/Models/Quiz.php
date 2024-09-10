@@ -17,4 +17,15 @@ class Quiz extends Model
     {
         return $this->belongsTo(Activity::class);
     }
+
+    public function answers($user_id = null)
+    {
+        $query = $this->hasMany(QuizAnswers::class);
+
+        if ($user_id) {
+            $query->where('user_id', $user_id);
+        }
+        
+        return $query;
+    }
 }

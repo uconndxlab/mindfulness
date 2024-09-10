@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
@@ -47,6 +49,15 @@ class AuthController extends Controller
         //check auth and remember
         $remember = $request->has('remember');
         if (Auth::attempt($credentials, $remember)) {
+            //if user is locked
+            if (Auth::user()->lock_access) {
+                //log user out
+                Auth::logout();
+                return back()->withErrors([
+                    'credentials' => 'Your account is locked. If you have any questions, feel free to contact us at <a href="mailto:'.config('mail.contact_email').'">'.config('mail.contact_email').'</a>.',
+                ]);
+            }
+            Auth::user()->update(['last_active_at' => Carbon::now()]);
             return redirect()->intended('/explore/home');
         }
         
@@ -56,6 +67,7 @@ class AuthController extends Controller
     public function logout(Request $request) {
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+        Cache::forget('user_'.Auth::id().'_progress_activities');
         Auth::logout();
         return redirect()->route('login');
     }
@@ -93,6 +105,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email'=> $request->email,
             'password'=> Hash::make($request->password),
+            'last_active_at' => Carbon::now()
         ]);
 
         //unlocking first module/day/activity

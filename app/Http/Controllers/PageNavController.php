@@ -2,16 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Journal;
 use App\Models\Quiz;
 use App\Models\Note;
 use App\Models\Activity;
 use App\Models\Module;
+use App\Models\QuizAnswers;
 use App\Models\UserActivity;
 use App\Models\Faq;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+
 
 
 class PageNavController extends Controller
@@ -79,23 +84,38 @@ class PageNavController extends Controller
         return view("explore.module", compact('module', 'page_info'));
     }
 
+    public function checkActivityLocked($activity_id, $from_controller = false) {
+        //checking cache for progress
+        $cacheKey = 'user_' . Auth::id() . '_progress_activities';
+        $progress = Cache::get($cacheKey);
+        if (!$progress) {
+            $progress = Cache::remember($cacheKey, 30, function () {
+                return Auth::user()->load('progress_activities')->progress_activities;
+            });
+        }
+        $activity = Activity::findOrFail($activity_id);
+        $status = $progress->where('activity_id', $activity_id)->first()->status ?? 'locked';
+        //check if deleted
+        if ($activity->deleted == true) {
+            abort(404, "Page not found.");
+        }
+        //check status
+        $locked = $status === 'locked';
+        if ($from_controller) {
+            return [$locked, $status];
+        }
+        return response()->json(['locked' => $locked, 'status' => $status]);
+    }
+
     public function exploreActivity($activity_id, Request $request)
     {
         $user = Auth::user();
-        //find activity
+        //find activity and check progress again
         $activity = Activity::findOrFail($activity_id);
-        //check progress and set status
-        $user->load('progress_activities');
-        $activity->status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
-        if ($activity->status == 'locked' || $activity->deleted == true) {
-            return redirect()->back();
-        }
-        
-        //get content
-        $content = $activity->content;
-        //decode the audio options
-        if ($content && $content->type == 'audio' && $content->audio_options) {
-            $content->audio_options = json_decode($content->audio_options, true);
+        $check_activity = $this->checkActivityLocked($activity_id, true);
+        $activity->status = $check_activity[1];
+        if ($check_activity[0]) {
+            abort(404, "Page not found.");
         }
         
         //favoriting
@@ -125,98 +145,57 @@ class PageNavController extends Controller
         $page_info['back_route'] = $page_info['exit_route'];
 
         $page_info['hide_bottom_nav'] = true;
-
-        //end behavior - for activities
-        if ($activity->end_behavior != 'none') {
-            if ($activity->end_behavior == "journal") {
-                $page_info['end_label'] = "JOURNAL";
-                $page_info['end_route'] = route('journal', ['activity_id' => $activity->id, 'library' => $request->library]);
-            }
-            else if ($activity->end_behavior == "quiz" && $activity->quiz) {
-                $page_info['end_label'] = "QUIZ";
-                $page_info['end_route'] = route('explore.quiz', ['quiz_id' => $activity->quiz->id, 'library' => $request->library]);
-            }
-        }
-        return view("explore.activity", compact('activity', 'content', 'is_favorited', 'page_info'));
-    }
     
+        //get content
+        $content = $activity->content;
+        $quiz = $activity->quiz;
+        $journal = $activity->journal;
+        if ($quiz) {
+            $quiz->question_options = json_decode($quiz->question_options, true);
+            $temp_answers = $user->quiz_answers($quiz->id)->first();
+            $quiz->answers = $temp_answers ? json_decode($temp_answers->answers) : [];
+        }
+        //decode the audio options
+        else if ($content && $content->type == 'audio' && $content->audio_options) {
+            $content->audio_options = json_decode($content->audio_options, true);
+        }
+        else if ($journal) {
+            $temp_answer = $user->notes->where('activity_id', $activity->id)->first();
+            $journal->answer = $temp_answer ? $temp_answer->note : '';
+        }
+        
+        return view("explore.activity", compact('activity', 'is_favorited', 'page_info', 'content', 'quiz', 'journal'));
+    }
+
     //QUIZ
-    public function exploreQuiz($quiz_id, Request $request) {
-        //find quiz
-        $quiz = Quiz::findOrFail($quiz_id);
-        
-        //check progress
-        $user = Auth::user();
-        $user->load('progress_activities');
-        $activity = Activity::findOrFail($quiz->activity->id);
-        $status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
-        if ($status != 'completed'  || $activity->deleted == true) {
-            return redirect()->back();
-        }
-
-        //see if an answer is saved
-        $saved_answer = Session::get('saved_answer');
-        if ($saved_answer && $saved_answer['quiz_id'] == $quiz_id) {
-            //convert options and get feedback
-            $options = $quiz->options_feedback ?? [];
-            //passing information through quiz
-            $quiz->saved_answer = $saved_answer['answer'];
-            $quiz->feedback = $options[$saved_answer['answer']]['feedback'];
-            $quiz->is_correct = $saved_answer['correct'];
-        }
-        else {
-            Session::forget('saved_answer');
-            $quiz->saved_answer = null;
-        }
-
-        $page_info = [];
-
-        //setting exit route
-        $exit = Session::get('current_nav');
-        $page_info['exit_route'] = $exit ? $exit['route'] : route('explore.home');
-
-        //set the end behavior - next only on same day
-        if (!$request->library) {
-            if ($quiz->activity->next && Activity::find($quiz->activity->next)->day->id == $quiz->activity->day->id) {
-                $page_info['redirect_label'] = "NEXT";
-                $page_info['redirect_route'] = route('explore.activity', ['activity_id' => $quiz->activity->next]);
-            }
-            else {
-                $page_info['redirect_label'] = "FINISH";
-                $page_info['redirect_route'] = $exit;
-            }
-        }
-
-        //setting back route/label
-        $page_info['back_label'] = ' Back to '.$quiz->activity->title;
-        $page_info['back_route'] = route('explore.activity', ['activity_id' => $quiz->activity_id, 'library' => $request->library]);
-        
-        $page_info['hide_bottom_nav'] = true;
-        return view('explore.quiz', compact('quiz', 'page_info'));
-    }
-    
     public function submitQuiz(Request $request)
     {
-        //get quiz and check answer
-        $quiz = Quiz::find($request->quiz_id);
-        $selected_option = intval($request->answer);
-        $is_correct = $quiz->correct_answer == $selected_option+1;
-        $feedback = null;
-        
-        //convert options and get feedback
-        $options = $quiz->options_feedback ?? [];
-        $feedback = $options[$selected_option]['feedback'];
-        
-        //save answer in case returned to this page soon
-        Session::put('saved_answer', ['quiz_id' => $request->quiz_id, 'answer' => $selected_option, 'correct' => $is_correct]);
-        
-        return redirect()->back()->with([
-            'feedback' => $feedback,
-            'is_correct' => $is_correct
-            ])->withInput();
+        try {
+            //get quiz
+            $quiz = Quiz::findOrFail($request->quiz_id);
+    
+            //get answers from request
+            $answers = [];
+            foreach ($request->all() as $key => $value) {
+                if (Str::startsWith($key, 'answer_') || Str::startsWith($key, 'other_answer_')) {
+                    $answers[$key] = $value;
+                }
+            }
+    
+            QuizAnswers::updateOrCreate([
+                'user_id' => Auth::id(),
+                'quiz_id' => $quiz->id
+            ], [
+                'answers' => json_encode($answers)
+            ]);
+            return response()->json(['success_message' => 'Quiz answers updated successfully.'], 200);
         }
+        catch (\Exception $e) {
+            return response()->json(['error_message' => 'Failed to submit quiz answers.', 'error' => $e], 500);
+        }
+    }
         
-        public function exploreBrowseButton(Request $request) {
+    public function exploreBrowseButton(Request $request) {
             //browse nav button - check for previous explore page
             //active is for double click functionality
         $previous = Session::get('previous_explore');
@@ -261,7 +240,7 @@ class PageNavController extends Controller
             else if ($request->base_param = 'favorited') {
                 $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
                 $query->whereIn('id', $fav_ids);
-                $empty_text = '<span>Click the "<i class="bi bi-star"></i>" on lessons add them to your favorites and view them here!</span>';
+                $empty_text = '<span>Click the "<i class="bi bi-star"></i>" found in activities to add them to your favorites and view them here!</span>';
             }
         }
 
@@ -278,37 +257,41 @@ class PageNavController extends Controller
         
         //handle search
         if ($request->has('search') && $request->search != '') {
-            $query->where(function ($in_query) use ($request) {
+            $query->where(function($in_query) use ($request) {
                 $in_query->where('title', 'like', '%' . $request->search . '%')
-                ->orWhere('sub_header', 'like', '%' . $request->search . '%');
+                    ->orWhere('type', 'like', '%' . $request->search . '%')
+                    ->orWhere('time', 'like', '%' . $request->search . '%');
             });
         }
         
         //handle categories
         $categories = $request->input('category', []);
         if (!empty($categories)) {
-            //filter based on the categories
-            foreach($categories as $category) {
-                $lower = strtolower($category);
-                if ($lower == 'audio' || $lower == 'video') {
-                    $query->whereHas('content', function ($in_query) use ($lower) {
-                        $in_query->where('type', $lower);
-                    });
+            $query->where(function($in_query) use ($categories) {
+                //filter based on the categories
+                foreach($categories as $category) {
+                    $lower = strtolower($category);
+                    if ($lower == 'favorited') {
+                        $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
+                        $in_query->orWhereIn('id', $fav_ids);
+                    }
+                    else if ($lower == 'practice') {
+                        $in_query->orWhere('type', 'practice');
+                    }
+                    else if ($lower == 'lesson') {
+                        $in_query->orWhere('type', 'lesson');
+                    }
+                    else if ($lower == 'journal') {
+                        $in_query->orWhere('type', 'journal');
+                    }
+                    else if ($lower == 'optional') {
+                        $in_query->orWhere('optional', true);
+                    }
+                    else if ($lower == 'reflection') {
+                        $in_query->orWhere('type', 'reflection');
+                    }
                 }
-                else if ($lower == 'favorited') {
-                    $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
-                    $query->whereIn('id', $fav_ids);
-                }
-                else if ($lower == 'meditation') {
-                    $query->where('type', 'practice');
-                }
-                else if ($lower == 'optional') {
-                    $query->where('optional', true);
-                }
-                else if ($lower == 'quiz') {
-                    $query->where('end_behavior', 'quiz');
-                }
-            }
+            });
         }
         
         //handle modules
@@ -324,13 +307,7 @@ class PageNavController extends Controller
         if ($request->has(['start_time', 'end_time']) && ($request->start_time != 0 || $request->end_time != 30)) {
             $start = $request->start_time;
             $end = $request->end_time;
-            $query->where('time', '!=', null)->whereRaw("
-            EXISTS (
-                SELECT 1
-                FROM json_each(activities.time)
-                WHERE CAST(json_each.value AS INTEGER) BETWEEN ? AND ?
-                )
-                ", [$start, $end]);
+            $query->where('time', '<=', $end)->where('time', '>=', $start);
         }
             
         $activities = $query->with('day.module')->orderBy('order')->paginate(6);
@@ -344,12 +321,13 @@ class PageNavController extends Controller
         $base_param = 'favorited';
 
         $page_info = [
+            'journal' => false,
             'title' => 'Favorites',
-            'search_route' => route('library.favorites'),
+            'search_route' => route('library.search'),
             'search_text' => 'Search for your favorite activity...'
         ];
 
-        $categories = ['Meditation', 'Audio', 'Video', 'Quiz', 'Optional'];
+        $categories = ['Practice', 'Lesson', 'Reflection', 'Journal', 'Optional'];
 
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.favorites'));
@@ -361,12 +339,13 @@ class PageNavController extends Controller
         $base_param = 'meditation';
 
         $page_info = [
+            'journal' => false,
             'title' => 'Meditation Library',
-            'search_route' => route('library.meditation'),
+            'search_route' => route('library.search'),
             'search_text' => 'Search for a meditation exercise...'
         ];
 
-        $categories = ['Favorited', 'Audio', 'Video', 'Quiz', 'Optional'];
+        $categories = ['Favorited', 'Lesson', 'Reflection', 'Journal', 'Optional'];
 
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.meditation'));
@@ -374,30 +353,100 @@ class PageNavController extends Controller
         return view("other.library", compact('base_param', 'page_info', 'categories'));
     }
     
-    public function journalPage(Request $request)
+    public function journal(Request $request)
     {
-        $page_info = [];
-
-        //check if coming from an activity
-        $activity_id = $request->activity_id;
-        if ($activity_id) {
-            $page_info['back_label'] = ' Back to '.Activity::findOrFail($activity_id)->title;
-            $page_info['back_route'] = route('explore.activity', ['activity_id' => $activity_id, 'library' => $request->library]);
-            $page_info['hide_bottom_nav'] = true;
-            return view("other.journal", compact('activity_id', 'page_info'));
+        //journal navbutton
+        $previous = Session::get('previous_journal');
+        if ($previous) {
+            return redirect()->to($previous);
         }
+        else {
+            return redirect()->route('journal.compose');
+        }
+    }
 
-        //otherwise normal notes page
+    public function journalCompose(Request $request)
+    {
+        $page_info = [
+            'journal' => true,
+            'title' => 'Compose'
+        ];
+
+        $journal = new Journal();
+
+        //set as the previous journal and save as exit
+        Session::put('previous_journal', route('journal.compose'));
+        Session::put('current_nav', ['route' => route('journal.compose'), 'back' => 'Compose']);
+        return view('other.compose', compact('page_info', 'journal'));
+    }
+    public function journalLibrary (Request $request) {
+        $base_param = 'journal';
+
+        $wipe_filters = $request->activity ? true : false;
+
+        $page_info = [
+            'journal' => true,
+            'title' => 'Journal Library',
+            'search_route' => route('journal.search'),
+            'search_text' => 'Search your past journals...'
+        ];
+
+        $categories = ['Relax', 'Compassion', 'Other', 'Activities'];
+
+        //set as the previous library and save as exit
+        Session::put('previous_journal', route('journal.library'));
+        Session::put('current_nav', ['route' => route('journal.library'), 'back' => 'Journal Library']);
+        return view("other.library", compact('base_param', 'page_info', 'categories', 'wipe_filters'));
+    }
+
+    public function journalSearch (Request $request) {
         //get user
         $id = Auth::id();
-        $notes = Note::where('user_id', $id)->orderBy('created_at', 'desc')->paginate(5);
+        $query = Note::where('user_id', $id);
+
+        //check if empty
+        $empty = !$query->exists();
+        if ($empty) {
+            $view = view('components.journal-search-results', ['empty_text' => '<span>Continue progressing to find a Journal activity, or write your first journal in the <a href="/compose">Compose</a> tab.</span>'])->render();
+            return response()->json(['html' => $view]);
+        }
+
+        //handle search
+        if ($request->has('search') && $request->search != '') {
+            $query->where(function($in_query) use ($request) {
+                $in_query->where('word_otd', 'like', '%' . $request->search . '%')
+                    ->orWhere('note', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        //handle categories
+        $categories = $request->input('category', []);
+        if (!empty($categories)) {
+            $query->where(function($in_query) use ($categories) {
+                //filter based on the categories
+                foreach($categories as $category) {
+                    if ($category == 'Activities') {
+                        $in_query->orWhere('activity_id', '!=', null);
+                    }
+                    else {
+                        $in_query->orWhere('word_otd', $category);
+                    }
+                }
+            });
+        }
+
+        $notes = $query->orderBy('updated_at', 'desc')->paginate(3);
+
         //formatting the date
         foreach ($notes as $note) {
             $date = Carbon::parse($note->created_at);
             $date->setTimezone(new \DateTimeZone('EST'));
             $note->formatted_date = $date->diffForHumans().', '.$date->toFormattedDayDateString();
         }
-        return view("other.journal", compact('notes', 'page_info'));
+
+        //render view
+        $view = view('components.journal-search-results', ['notes' => $notes])->render();
+        return response()->json(['html' => $view]);
     }
     
     public function accountPage()

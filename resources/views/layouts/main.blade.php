@@ -10,6 +10,7 @@
         <style>
             html {
                 overflow-y: scroll;
+                scroll-behavior: smooth;
             }
             .manual-margins {
                 margin-bottom: 6rem;
@@ -49,6 +50,10 @@
                 top: 0;
                 z-index: 1020;
             }
+            .accordion-button.disabled {
+                pointer-events: none;
+                opacity: 0.5;
+            }
         </style>
     </head>
         @php
@@ -58,7 +63,7 @@
                 if (Str::startsWith($route_name, 'explore.')) {
                     $active_items[0] = true;
                 }
-                else if ($route_name == 'journal') {
+                else if (Str::startsWith($route_name, 'journal.')) {
                     $active_items[1] = true;
                 }
                 else if (Str::startsWith($route_name, 'library.')) {
@@ -103,6 +108,23 @@
 
         <div class="container manual-margins">
             <div class="row justify-content-center">
+
+                <div class="modal fade" id="appModal" tabindex="-1" aria-labelledby="appModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="appModalLabel"></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div id="appModalBody" class="modal-body">
+                            </div>
+                            <img id="appModalImg" src="" alt="Example Image" class="img-fluid mb-3" style="display: none;">
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 @yield('content')
             </div>
         </div>
@@ -141,5 +163,22 @@
             </nav>
         @endif
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+        <script>
+            function showModal(label='undefined', body='', media='') {
+                var myModal = new bootstrap.Modal(document.getElementById('appModal'));
+                document.getElementById('appModalLabel').innerHTML = label;
+                document.getElementById('appModalBody').innerHTML = body;
+                if (media != '') {
+                    var modalMedia = document.getElementById('appModalImg');
+                    modalMedia.src = media;
+                    modalMedia.style.display = 'block';
+                }
+                myModal.show();
+            }
+            @if(session('modal_data'))
+                showModal("{{ session('modal_data')['label'] }}", `{!! session('modal_data')['body'] !!}`, "{{ session('modal_data')['media'] }}");
+                {{ session()->forget('modal_data') }}
+            @endif
+        </script>
     </body>
 </html>

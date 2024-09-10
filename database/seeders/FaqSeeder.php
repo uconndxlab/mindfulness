@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Faq;
+use Illuminate\Support\Facades\Config;
 
 class FaqSeeder extends Seeder
 {
@@ -13,11 +14,19 @@ class FaqSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 1; $i <= 10; $i++) {
-            Faq::create([
-                'question' => '#'.$i.' This is an example of a question?',
-                'answer' => 'This is the answer for question '.$i,
-            ]);
+        $faqs = json_decode(file_get_contents(database_path('data/faqs.json')), true);
+        foreach ($faqs as $item) {
+            $item['answer'] = str_replace(
+                'config_email', 
+                '<a href="mailto:'.Config::get('mail.contact_email').'" class="text-decoration-none">'.Config::get('mail.contact_email').'</a>', 
+                $item['answer']
+            );
+            $item['answer'] = str_replace(
+                'config_phone',
+                '<a href="tel:'.Config::get('mail.contact_phone').'" class="text-decoration-none">'.formatPhone(Config::get('mail.contact_phone')).'</a>', 
+                $item['answer']
+            );
+            Faq::create($item);
         }
     }
 }

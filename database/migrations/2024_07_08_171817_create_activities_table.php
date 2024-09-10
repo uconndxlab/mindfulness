@@ -15,12 +15,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('day_id')->nullable()->constrained('days')->onDelete('set null');
             $table->string('title');
-            $table->string('sub_header')->nullable();
-            $table->enum('type', ['lesson', 'practice']);
-            $table->enum('end_behavior', ['quiz', 'journal', 'none'])->default('none');
+            $table->enum('type', ['lesson', 'practice', 'reflection', 'journal'])->nullable();
+            $table->integer('time')->nullable();
+            $table->string('completion_message')->default('Congrats on completing the activity!');
             $table->integer('order');
+            $table->boolean('final')->default(false);
             $table->foreignId('next')->nullable()->constrained('activities')->onDelete('set null');
-            $table->boolean('deleted')->default('true');
+            $table->boolean('optional')->default(false);
+            $table->boolean('deleted')->default(false);
             $table->timestamps();
         });
     }

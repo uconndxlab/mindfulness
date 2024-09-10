@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Middleware\AdminOnly;
+use App\Http\Middleware\CheckAccountLock;
+use App\Http\Middleware\CheckRegistrationLock;
+use App\Http\Middleware\UpdateLastActiveAt;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,7 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'admin' => AdminOnly::class
+            'admin' => AdminOnly::class,
+            'update.last.active' => UpdateLastActiveAt::class,
+            'check.account.lock' => CheckAccountLock::class,
+            'registration.lock' => CheckRegistrationLock::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -24,10 +24,13 @@ Route::get('/login', [AuthController::class, 'loginPage'])->name('login');
 //login request
 Route::post('/login', [AuthController::class,'authenticate'])->name('login.submit');
 
-//registration page
-Route::get('/account-creation', [AuthController::class, 'registrationPage'])->name('register');
-//registration request
-Route::post('/account-creation', [AuthController::class,'register'])->name('register.submit');
+//REGISTRATION
+Route::middleware('registration.lock')->group(function () { 
+    //registration page
+    Route::get('/account-creation', [AuthController::class, 'registrationPage'])->name('register');
+    //registration request
+    Route::post('/account-creation', [AuthController::class,'register'])->name('register.submit');
+});
 
 //EMAIL VERIFICATION
 Route::middleware('auth')->group(function () {
@@ -68,23 +71,28 @@ Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('
 
 
 //AUTH protected routes
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock'])->group(function () {
     //logout
     Route::get('/logout', [AuthController::class,'logout'])->name('logout');
 
     //NEW EXPLORE
     Route::get('/explore/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
     Route::get('/explore/module/{module_id}', [PageNavController::class, 'exploreModule'])->name('explore.module');
+    Route::get('/checkActivity/{activity_id}', [PageNavController::class, 'checkActivityLocked'])->name('check.activity');
     Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
-    Route::get('/explore/quiz/{quiz_id}', [PageNavController::class,'exploreQuiz'])->name('explore.quiz');
-    Route::post('/explore/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
+    Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
     Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
     
     //NAVIGATION
     //Page Navigation - the controller is not totally necessary
     Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
-    Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
-    Route::get('/journal', [PageNavController::class, 'journalPage'])->name('journal');
+    // Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
+
+    Route::get('/journal', [PageNavController::class, 'journal'])->name('journal');
+    Route::get('/compose', [PageNavController::class, 'journalCompose'])->name('journal.compose');
+    Route::get('/journal-library', [PageNavController::class, 'journalLibrary'])->name('journal.library');
+    Route::get('/journal/search', [PageNavController::class, 'journalSearch'])->name('journal.search');
+
     Route::get('/account', [PageNavController::class, 'accountPage'])->name('account');
     Route::get('/help', [PageNavController::class, 'helpPage'])->name('help');
     Route::get('/library', [PageNavController::class, 'library'])->name('library');
@@ -110,34 +118,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //ADMIN ONLY
     Route::middleware('admin')->group(function () {
         //Content upload
+        Route::get('/adminlanding',[ContentManagementController::class,'adminLanding'])->name('admin.landing');
+        Route::get('/usersList', [ContentManagementController::class,'usersList'])->name('users.list');
+        Route::post('/changeAccess/{user_id}', [ContentManagementController::class,'changeAccess'])->name('users.access');
+        Route::post('/registrationLock', [ContentManagementController::class,'registrationAccess'])->name('registration.lock');
         //modules
-        Route::get('/module', [ContentManagementController::class,'indexModule'])->name('module.index');
-        Route::get('/module/{module_id}', [ContentManagementController::class,'showModule'])->name('module.show');
-        Route::post('/module/{module_id}/edit', [ContentManagementController::class,'editModule'])->name('module.edit');
-        Route::get('/module/create', [ContentManagementController::class,'createModule'])->name('module.create');
-        Route::post('/module', [ContentManagementController::class,'storeModule'])->name('module.store');
-        Route::delete('/module/{module_id}', [ContentManagementController::class,'deleteModule'])->name('module.delete');
-        //days
-        Route::get('/day', [ContentManagementController::class,'indexDay'])->name('day.index');
-        Route::get('/day/{day_id}', [ContentManagementController::class,'showDay'])->name('day.show');
-        Route::post('/day/{day_id}/edit', [ContentManagementController::class,'editDay'])->name('day.edit');
-        Route::get('/day/create', [ContentManagementController::class,'createDay'])->name('day.create');
-        Route::post('/day', [ContentManagementController::class,'storeDay'])->name('day.store');
-        Route::delete('/day/{day_id}', [ContentManagementController::class,'deleteDay'])->name('day.delete');
-        //activities
-        Route::get('/activity', [ContentManagementController::class,'indexActivity'])->name('activity.index');
-        Route::get('/activity/{activity_id}', [ContentManagementController::class,'showActivity'])->name('activity.show');
-        Route::post('/activity/{activity_id}/edit', [ContentManagementController::class,'editActivity'])->name('activity.edit');
-        Route::get('/activity/create', [ContentManagementController::class,'createActivity'])->name('activity.create');
-        Route::post('/activity', [ContentManagementController::class,'storeActivity'])->name('activity.store');
-        Route::delete('/activity/{activity_id}', [ContentManagementController::class,'deleteActivity'])->name('activity.delete');
+        // Route::get('/module', [ContentManagementController::class,'indexModule'])->name('module.index');
+        // Route::get('/module/{module_id}', [ContentManagementController::class,'showModule'])->name('module.show');
+        // Route::post('/module/{module_id}/edit', [ContentManagementController::class,'editModule'])->name('module.edit');
+        // Route::get('/module/create', [ContentManagementController::class,'createModule'])->name('module.create');
+        // Route::post('/module', [ContentManagementController::class,'storeModule'])->name('module.store');
+        // Route::delete('/module/{module_id}', [ContentManagementController::class,'deleteModule'])->name('module.delete');
+        // //days
+        // Route::get('/day', [ContentManagementController::class,'indexDay'])->name('day.index');
+        // Route::get('/day/{day_id}', [ContentManagementController::class,'showDay'])->name('day.show');
+        // Route::post('/day/{day_id}/edit', [ContentManagementController::class,'editDay'])->name('day.edit');
+        // Route::get('/day/create', [ContentManagementController::class,'createDay'])->name('day.create');
+        // Route::post('/day', [ContentManagementController::class,'storeDay'])->name('day.store');
+        // Route::delete('/day/{day_id}', [ContentManagementController::class,'deleteDay'])->name('day.delete');
+        // //activities
+        // Route::get('/activity', [ContentManagementController::class,'indexActivity'])->name('activity.index');
+        // Route::get('/activity/{activity_id}', [ContentManagementController::class,'showActivity'])->name('activity.show');
+        // Route::post('/activity/{activity_id}/edit', [ContentManagementController::class,'editActivity'])->name('activity.edit');
+        // Route::get('/activity/create', [ContentManagementController::class,'createActivity'])->name('activity.create');
+        // Route::post('/activity', [ContentManagementController::class,'storeActivity'])->name('activity.store');
+        // Route::delete('/activity/{activity_id}', [ContentManagementController::class,'deleteActivity'])->name('activity.delete');
     });
 });
-
-// Route::get('/note', [NoteController::class, 'index'])->name('note.index');
-// Route::get('/note/create', [NoteController::class, 'create'])->name('note.create');
-// Route::post('/note', [NoteController::class,'store'])->name('note.store');
-// Route::get('/note/{id}', [NoteController::class, 'show'])->name('note.show');
-// Route::post('/note/{id}/edit', [NoteController::class,'edit'])->name('note.edit');
-// Route::put('/note/{id}', [NoteController::class,'update'])->name('note.update');
-// Route::delete('/note/{id}', [NoteController::class, 'destroy'])->name('note.destroy');

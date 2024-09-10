@@ -21,7 +21,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'voiceId'
+        'voiceId',
+        'last_active_at',
+        'lock_access'
     ];
 
     /**
@@ -64,5 +66,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function progress_activities()
     {
         return $this->hasMany(UserActivity::class);
+    }
+
+    public function quiz_answers($quiz_id = null)
+    {
+        $query = $this->hasMany(QuizAnswers::class);
+
+        if ($quiz_id) {
+            $query->where('quiz_id', $quiz_id);
+        }
+
+        return $query;
     }
 }

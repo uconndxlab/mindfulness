@@ -27,7 +27,6 @@ if (!function_exists('updateConfig')) {
     }
 }
 
-
 if (!function_exists('getModuleProgress')) {
     function getModuleProgress($user_id, $module_ids)
     {
@@ -169,5 +168,16 @@ if (!function_exists('unlockAll')) {
                 "status" => 'unlocked'
             ]);
         }
+    }
+}
+
+if (!function_exists('formatPhone')) {
+    function formatPhone($phone)
+    {
+        $phone = preg_replace('/[^\d]/', '', $phone);
+        if (strlen($phone) == 10) {
+            return '('.substr($phone, 0, 3).') '.substr($phone, 3, 3).'-'.substr($phone, 6);
+        }
+        return $phone;
     }
 }
