@@ -25,6 +25,7 @@
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
         @php
             $controlsList = ($activity->status != 'completed' ? 'noseek' : '').' '.($activity->type === 'practice' ? 'noplaybackrate' : '');
+            // ($activity->status != 'completed' ? 'noseek' : '').' '.
         @endphp
             @if ($content->audio_options)
                 <div class="col-6 mt-1" id="audio-options-div" style="display: none;">
@@ -154,7 +155,6 @@
         //if no content - complete activity
         activityComplete();
     }
-
 
     //COMPLETION
     function activityComplete(message=true) {
@@ -336,6 +336,21 @@
                 console.log('No audio options available.');
             }
         }
+        //NOSEEK
+        var mediaPlayers = document.querySelectorAll('.media-player');
+        mediaPlayers.forEach(function(player) {
+            var lastTime = 0;
+            player.addEventListener('timeupdate', function() {
+                console.log('time update: ', player.currentTime);
+                lastTime = player.currentTime;
+            });
+            player.addEventListener('seeking', function() {
+                console.log('seeking: ', player.currentTime);
+                if (player.currentTime > lastTime) {
+                    player.currentTime = lastTime;
+                }
+            });
+        });
     });
 
     //SHOW ERRORS
