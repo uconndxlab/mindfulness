@@ -346,6 +346,8 @@
             });
             player.addEventListener('seeking', function() {
                 console.log('seeking: ', player.currentTime);
+                event.preventDefault();
+                // player.currentTime = lastTime;
                 if (player.currentTime > lastTime) {
                     player.currentTime = lastTime;
                 }
