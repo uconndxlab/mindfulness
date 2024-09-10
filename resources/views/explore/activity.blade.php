@@ -344,11 +344,12 @@
                 currentTime: 0
             };
             var lastUpdated = 'currentTime';
+            var isSeeking = false;
             var endedListener;
 
             player.addEventListener('timeupdate', function () {
                 //block seeking timeupdate
-                if (!player.seeking) {
+                if (!isSeeking) {
                     //tracking watched time
                     if (player.currentTime > timeTracking.watchedTime) {
                         timeTracking.watchedTime = player.currentTime;
@@ -364,6 +365,7 @@
 
             //prevent seek
             player.addEventListener('seeking', function () {
+                isSeeking = true;
                 //block seeking if seek puts current ahead of watchedTime
                 //allows rewind and ability to catch up
                 console.log('Seeking');
@@ -390,9 +392,16 @@
                 }
             });
 
+            player.addEventListener('seeked', function () {
+                isSeeking = false;
+            });
+
             //init event listener
             endedListener = function() {
                 console.log('Media ended');
+                if (player.currentTime < player.duration) {
+                    console.log('Blocked seek spam');
+                }
                 activityComplete();
             };
             console.log('adding end listener');
