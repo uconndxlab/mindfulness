@@ -24,8 +24,7 @@
     <div class="manual-margin-top">
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
         @php
-            $controlsList = ($activity->status != 'completed' ? 'noseek' : '').' '.($activity->type === 'practice' ? 'noplaybackrate' : '');
-            // ($activity->status != 'completed' ? 'noseek' : '').' '.
+            $controlsList = ($activity->type === 'practice' ? 'noplaybackrate' : '');
         @endphp
             @if ($content->audio_options)
                 <div class="col-6 mt-1" id="audio-options-div" style="display: none;">
@@ -121,10 +120,12 @@
     const hasContent = {{ $content ? 'true' : 'false' }};
     const hasQuiz = {{ $quiz ? 'true' : 'false' }};
     const hasJournal = {{ $journal ? 'true' : 'false' }};
+    var allowSeek = false;
 
     //CHECKING COMPLETION
     const status = '{{ $activity->status }}';
     if (status == 'completed') {
+        allowSeek = true;
         activityComplete(false);
     }
 
@@ -348,10 +349,11 @@
 
             player.addEventListener('timeupdate', function () {
                 //block seeking timeupdate
-                if (!player.seeking) {
+                //unless seek is allowed
+                if (!player.seeking || allowSeek) {
                     //tracking watched time - only update if the time is less than 1 second - prevent seek spam bug
                     var delta = player.currentTime - timeTracking.watchedTime;
-                    if (delta <= MAX_DELTA && delta >= 0) {
+                    if (delta <= MAX_DELTA && delta >= 0 || allowSeek) {
                         timeTracking.watchedTime = player.currentTime;
                         lastUpdated = 'watchedTime';
                     }
@@ -368,7 +370,8 @@
                 //allows rewind and ability to catch up
                 // console.log('Seeking');
                 var delta = player.currentTime - timeTracking.watchedTime;
-                if (delta > 0) {
+                //if seek is allowed, ignore
+                if (delta > 0 && !allowSeek) {
                     //pause play back from watched time
                     player.pause();
                     player.currentTime = timeTracking['watchedTime'];
