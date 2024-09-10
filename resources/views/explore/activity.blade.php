@@ -23,9 +23,9 @@
     </div>
     <div class="manual-margin-top">
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
-            @php
-                $controlsList = ($activity->status != 'completed' ? 'noseek' : '').' '.($activity->type === 'practice' ? 'noplaybackrate' : '');
-            @endphp
+        @php
+            $controlsList = ($activity->status != 'completed' ? 'noseek' : '').' '.($activity->type === 'practice' ? 'noplaybackrate' : '');
+        @endphp
             @if ($content->audio_options)
                 <div class="col-6 mt-1" id="audio-options-div" style="display: none;">
                     @php
