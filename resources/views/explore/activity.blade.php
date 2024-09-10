@@ -346,12 +346,14 @@
             var lastUpdated = 'currentTime';
             var isSeeking = false;
             var endedListener;
+            var MAX_DELTA = 1;
 
             player.addEventListener('timeupdate', function () {
                 //block seeking timeupdate
-                if (!isSeeking) {
-                    //tracking watched time
-                    if (player.currentTime > timeTracking.watchedTime) {
+                if (!isSeeking && !player.seeking) {
+                    //tracking watched time - only update if the time is less than 1 second - prevent seek spam bug
+                    var delta = player.currentTime - timeTracking.watchedTime;
+                    if (delta <= MAX_DELTA && delta >= 0) {
                         timeTracking.watchedTime = player.currentTime;
                         lastUpdated = 'watchedTime';
                     }
