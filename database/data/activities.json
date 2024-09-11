@@ -45,6 +45,7 @@
         "type": "practice",
         "time": 7,
         "completion_message": "Did you notice any pleasant, neutral, or unpleasant sensations in the body? Pay attention to how these sensations change throughout today!",
+        "final": true,
         "order": 5,
         "next_fake": 6
     },
