@@ -134,8 +134,8 @@
                         "other": false
                     },
                     {
-                        "option": "Like you, many people don’t like the body scan practice. Remember, you don’t need to like it. You just need to do it. Many people found its benefits after sticking to it. The more you practice, the more benefits you will feel. You can do it.",
-                        "feedback": "",
+                        "option": "It didn’t go well.",
+                        "feedback": "Like you, many people don’t like the body scan practice. Remember, you don’t need to like it. You just need to do it. Many people found its benefits after sticking to it. The more you practice, the more benefits you will feel. You can do it.",
                         "correct": 2,
                         "audio_path": null,
                         "above": null,
