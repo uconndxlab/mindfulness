@@ -1,10 +1,10 @@
 [
     {
-        "activity_id": 5,
-        "prompts": "What have you discovered today, and what do you always know? What support do you need in this Healing Hearts journey? What support can you give yourself or get from others?"
+        "activity_id": 2,
+        "prompts": "Write down your ideas – how and when can you fit this program into your routine for the next four weeks?"
     },
     {
-        "activity_id": 9,
-        "prompts": "Where in the body tends to get tight when you feel stressed? Are there any judging thoughts about your body during the body scan that deserve some kindness?"
+        "activity_id": 10,
+        "prompts": "<p>You have practiced the body scan yesterday and today. Write down your discovery here!</p><p>Not sure what to write? Here are some prompts (choose one):</p><ul><li>Where in the body gets tight or stiff when you feel stressed?</li><li>Do you tend to notice unpleasant sensations more than pleasant or neutral sensations?</li><li>Are there any judging thoughts about your body during the body scan that deserve some kindness?</li></ul>"
     }
 ]

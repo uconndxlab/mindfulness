@@ -73,7 +73,8 @@ Check Laravel's documentation on [project set-up](https://laravel.com/docs/11.x/
 
 10. Follow link provided by pervious command to view site, typically `http://localhost:8000`.
 
-### Setting up scheduled reminder emails (Mac, Linux):
+## Setting up scheduled reminder emails:
+### Mac, Linux
 
 1. Open your terminal.
 
@@ -96,7 +97,7 @@ Check Laravel's documentation on [project set-up](https://laravel.com/docs/11.x/
     crontab -l
     ```
 
-### Setting up scheduled reminder emails (Windows):
+### Windows:
 
 1. Open task scheduler:
 

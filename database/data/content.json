@@ -2,6 +2,16 @@
     {
         "activity_id": 1,
         "type": "audio",
+        "file_path": "1.1 Morning Glory Conversation (AI)(5 min).MP3",
+        "audio_options": {
+            "AI": {
+                "5": "1.1 Morning Glory Conversation (AI)(5 min).MP3"
+            }
+        }
+    },
+    {
+        "activity_id": 3,
+        "type": "audio",
         "file_path": "1.1 Your Childs 30th Birthday (Na)(7 min).m4a",
         "audio_options": {
             "Na": {
@@ -10,20 +20,7 @@
         }
     },
     {
-        "activity_id": 3,
-        "type": "audio",
-        "file_path": "1.1 Morning Glory Time (Na)(4 min).m4a",
-        "audio_options": {
-            "Na": {
-                "4": "1.1 Morning Glory Time (Na)(4 min).m4a"
-            },
-            "AI": {
-                "2": "1.1 Morning Glory Time (AI)(2 min).mp3"
-            }
-        }
-    },
-    {
-        "activity_id": 4,
+        "activity_id": 5,
         "type": "audio",
         "file_path": "1.2 Body Scan (Na)(7 min).m4a",
         "audio_options": {
@@ -33,7 +30,17 @@
         }
     },
     {
-        "activity_id": 6,
+        "activity_id": 7,
+        "type": "audio",
+        "file_path": "1.2 Body Scan (Na)(7 min).m4a",
+        "audio_options": {
+            "Na": {
+                "7": "1.2 Body Scan (Na)(7 min).m4a"
+            }
+        }
+    },
+    {
+        "activity_id": 8,
         "type": "audio",
         "file_path": "1.2 What is Mindfulness (AI)(6 min).mp3",
         "audio_options": {
@@ -43,17 +50,7 @@
         }
     },
     {
-        "activity_id": 8,
-        "type": "audio",
-        "file_path": "1.2 Body Scan (Na)(7 min).m4a",
-        "audio_options": {
-            "Na": {
-                "7": "1.2 Body Scan (Na)(7 min).m4a"
-            }
-        }
-    },
-    {
-        "activity_id": 10,
+        "activity_id": 11,
         "type": "audio",
         "file_path": "1.2 Body Scan (Na)(13 min)(Optional).m4a",
         "audio_options": {

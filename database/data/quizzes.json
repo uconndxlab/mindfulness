@@ -1,36 +1,52 @@
 [
     {
-        "activity_id": 2,
+        "activity_id": 4,
         "question_count": 2,
         "question_options": {
             "question_1": {
                 "number": 1,
-                "question": "What goals do you have in mind?",
+                "question": "What goals, intention, purpose do you have? You can select more than one from this list.",
                 "type": "checkbox",
                 "options_feedback": [
                     {
-                        "option": "Feel better about parenthood (be more present for my child)",
+                        "option": "Feel more confident about my parenthood",
                         "feedback": null,
                         "correct": 2,
                         "audio_path": null,
                         "above": null,
-                        "other": true
+                        "other": false
                     },
                     {
-                        "option": "Feel less stressed (relax more, sleep better)",
+                        "option": "Be more present with my child",
                         "feedback": null,
                         "correct": 2,
                         "audio_path": null,
                         "above": null,
-                        "other": true
+                        "other": false
                     },
                     {
-                        "option": "Learn to deal with a difficult relationship",
+                        "option": "Feel less stress, relax more, sleep better",
                         "feedback": null,
                         "correct": 2,
                         "audio_path": null,
                         "above": null,
-                        "other": true
+                        "other": false
+                    },
+                    {
+                        "option": "Feel more at ease in a difficult relationship with my ex",
+                        "feedback": null,
+                        "correct": 2,
+                        "audio_path": null,
+                        "above": null,
+                        "other": false
+                    },
+                    {
+                        "option": "Reconnect with myself, adjust to my new roles",
+                        "feedback": null,
+                        "correct": 2,
+                        "audio_path": null,
+                        "above": null,
+                        "other": false
                     },
                     {
                         "option": "All of the above",
@@ -39,7 +55,7 @@
                         "audio_path": null,
                         "all_above": true,
                         "above": "all",
-                        "other": true
+                        "other": false
                     },
                     {
                         "option": "None of the above",
@@ -59,7 +75,7 @@
                     {
                         "option": "3-5 minutes every day.",
                         "feedback": "Great! Every little bit counts, and it's smart to take small steps for big success. Most activities take only three to five minutes. We recommend prioritizing the healing activities each day and listening to the mini-lessons whenever possible, like when you're driving or washing dishes. In the workbook, we gave you more tips on how to find time to practice. Check it out!",
-                        "audio_path": null,
+                        "audio_path": "1.2 A Reflection Activities.mp3",
                         "correct": 2,
                         "above": null,
                         "other": false
@@ -67,7 +83,7 @@
                     {
                         "option": "At least 15 minutes every day.",
                         "feedback": "Great job! You should be able to finish the activities every day in just 15 minutes. When you have a 15-minute stretch, we recommend you do all the activities at once. Then, use any extra time during the day to practice them again, instead of moving on to the next day's activities. The more you practice, the stronger these skills will become.",
-                        "audio_path": null,
+                        "audio_path": "1.2 B Reflection Activities.mp3",
                         "correct": 2,
                         "above": null,
                         "other": false
@@ -75,7 +91,7 @@
                     {
                         "option": "At least 30 minutes every day.",
                         "feedback": "You are doing an amazing job as a parent! We suggest that you try to finish all the activities for one day at once. Then, use any extra time during the day to practice those activities again, instead of moving on to the next day's activities. The more you practice, the stronger these skills will become. We also included some longer optional activities for you. We recommend completing the shorter versions first before trying the longer ones.",
-                        "audio_path": null,
+                        "audio_path": "1.2 C Reflection Activities.mp3",
                         "correct": 2,
                         "above": null,
                         "other": false
@@ -83,7 +99,7 @@
                     {
                         "option": "Not sure.",
                         "feedback": "Many parents have busy schedules, so it can be hard to know how much free time you have for this program. We know that if you set goals for every day, you are more likely to do well and learn the skills. What do you do when you need to take a break? Is there something you can do less of so you can spend 5 minutes or more on this program to reach your goal? Look at your calendar and think about how you spend your time each day. Think of some ideas and try them for a week. In the workbook, we gave you more tips on how to find time to practice. Check it out!",
-                        "audio_path": null,
+                        "audio_path": "1.2 D Reflection Activities.mp3",
                         "correct": 2,
                         "above": null,
                         "other": false
@@ -93,7 +109,67 @@
         }
     },
     {
-        "activity_id": 7,
+        "activity_id": 6,
+        "question_count": 2,
+        "question_options": {
+            "question_1": {
+                "number": 1,
+                "question": "How did the body scan go?",
+                "type": "radio",
+                "options_feedback": [
+                    {
+                        "option": "It is going great!",
+                        "feedback": "Amazing. Favorite the practice so you can access it easily. Get maximum benefits by practicing as often as possible.",
+                        "correct": 2,
+                        "audio_path": null,
+                        "above": null,
+                        "other": false
+                    },
+                    {
+                        "option": "It is going okay.",
+                        "feedback": "Many people don’t feel immediate benefits. Don’t give up yet! You will see benefits as you practice more. ",
+                        "correct": 2,
+                        "audio_path": null,
+                        "above": null,
+                        "other": false
+                    },
+                    {
+                        "option": "Like you, many people don’t like the body scan practice. Remember, you don’t need to like it. You just need to do it. Many people found its benefits after sticking to it. The more you practice, the more benefits you will feel. You can do it.",
+                        "feedback": "",
+                        "correct": 2,
+                        "audio_path": null,
+                        "above": null,
+                        "other": false
+                    }
+                ]
+            },
+            "question_2": {
+                "number": 2,
+                "question": "Will you challenge yourself by doing it again today?",
+                "type": "radio",
+                "options_feedback": [
+                    {
+                        "option": "Yes I will!",
+                        "feedback": "Amazing! Keep going!",
+                        "correct": 2,
+                        "audio_path": null,
+                        "above": null,
+                        "other": false
+                    },
+                    {
+                        "option": "Not interested in doing it again.",
+                        "feedback": "<span>I am sorry to hear that. If you could give the practice a second chance, you are also giving yourself another chance! Just remember, you don’t have to like it, just trust the practices that have offered tremendous benefits to millions of people. Here is what two parents said:<br>\"I have to admit, I didn’t like the body scan at first. It felt boring and like I wasn’t getting anywhere. But after sticking with it for two weeks, I started noticing subtle changes—I was less tense, more patient, and even slept better. It took time, but now I look forward to those quiet minutes each day to reconnect with myself through a body scan.\"<br>\"Honestly, I found the body scan frustrating at first. I kept getting distracted, and it felt like a waste of time. But I decided to keep going, and gradually, I started feeling more in tune with my body and emotions. Now, it’s my go-to stress reliever, especially in the morning before a long day of work and parenting.\"</span>",
+                        "correct": 2,
+                        "audio_path": null,
+                        "above": null,
+                        "other": false
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "activity_id": 9,
         "question_count": 1,
         "question_options": {
             "question_1": {
@@ -103,7 +179,7 @@
                 "options_feedback": [
                     {
                         "option": "Stopping my thinking",
-                        "feedback": null,
+                        "feedback": "Many people think mindfulness means stopping your thoughts, but it's about noticing your thoughts and feelings without judging them. You'll understand more as you practice in this program.",
                         "correct": 2,
                         "audio_path": null,
                         "above": null,
@@ -111,7 +187,7 @@
                     },
                     {
                         "option": "Pure awareness and Heartfulness",
-                        "feedback": null,
+                        "feedback": "Yes, mindfulness is awareness and heartfulness, welcoming thoughts and feelings without pushing them away. Let’s learn more in this app!",
                         "correct": 2,
                         "audio_path": null,
                         "above": null,
