@@ -39,6 +39,10 @@ class SendInactivityReminderEmails extends Command
                           ->get();
 
         foreach ($inactive_users as $user) {
+            //do not send email to locked accounts
+            if ($user->lock_access) {
+                continue;
+            }
             Mail::to($user->email)->send(new \App\Mail\InactivityReminder($user));
             $this->info('Reminder email sent to: ' . $user->email);
 

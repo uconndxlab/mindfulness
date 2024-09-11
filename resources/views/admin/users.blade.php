@@ -57,11 +57,11 @@
                                     $remind_limit = (int) getConfig('remind_email_day_limit', 0);
                                     $last_active = $user->last_active_at ? Carbon::parse($user->last_active_at) : null;
                                     $last_reminded = $user->last_reminded_at ? Carbon::parse($user->last_reminded_at) : null;
-                                    $remind_disabled = ($last_active && ($last_active->diffInDays(now()) < $remind_limit)) || ($last_reminded && ($last_reminded->diffInDays(now()) < $remind_limit)) ? 'disabled' : '';
+                                    $remind_disabled = $user->lock_access || ($last_active && ($last_active->diffInDays(now()) < $remind_limit)) || ($last_reminded && ($last_reminded->diffInDays(now()) < $remind_limit)) ? 'disabled' : '';
                                     $next_ping_time = null;
                                     $last_type = null;
                                     $last_time = null;
-                                    if ($last_active || $last_reminded) {
+                                    if (!$user->lock_access && ($last_active || $last_reminded)) {
                                         if ($last_active) {
                                             if ($last_reminded && $last_reminded->gt($last_active)) {
                                                 $last_type = 'reminded';
@@ -81,7 +81,11 @@
                                 @endphp
                                 <button id="email_button_{{ $index }}" class="btn btn-primary {{ $remind_disabled }}" {{ $remind_disabled }}>
                                     @if($remind_disabled)
-                                        Last {{ $last_type }} at {{ $last_time }}. Can ping user at {{ $next_ping_time->format('Y-m-d H:i:s') }}.
+                                        @if($user->lock_access)
+                                            Account is locked
+                                        @else
+                                            Last {{ $last_type }} at {{ $last_time }}. Can ping user at {{ $next_ping_time->format('Y-m-d H:i:s') }}.
+                                        @endif
                                     @else
                                         Remind {{ $user->name }} to come back to app
                                     @endif
@@ -176,25 +180,7 @@
                 })
                 .then(response => {
                     console.log(response.data.success);
-                    const locked = response.data.status;
-                    const lockDiv = document.getElementById('lock_div_'+index);
-                    if (locked) {
-                        lockDiv.innerHTML = `
-                            <button id="lock_button_${index}" class="btn btn-danger">
-                                <i id="lock_icon_${index}" class="bi bi-unlock"></i> UNLOCK ACCOUNT
-                            </button>
-                        `;
-                    } else {
-                        lockDiv.innerHTML = `
-                            <button id="lock_button_${index}" class="btn btn-primary">
-                                <i id="lock_icon_${index}" class="bi bi-lock"></i> Lock account
-                            </button>
-                        `;
-                    }
-                    const lockButton = document.getElementById('lock_button_'+index);
-                    lockButton.addEventListener('click', function() {
-                        changeAccess(index, userId);
-                    })
+                    window.location.reload();
                     resolve(true);
                 })
                 .catch(error => {
