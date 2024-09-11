@@ -122,6 +122,7 @@ Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock
         Route::get('/usersList', [ContentManagementController::class,'usersList'])->name('users.list');
         Route::post('/changeAccess/{user_id}', [ContentManagementController::class,'changeAccess'])->name('users.access');
         Route::post('/registrationLock', [ContentManagementController::class,'registrationAccess'])->name('registration.lock');
+        Route::post('/emailRemindUser/{user_id}', [ContentManagementController::class,'emailRemindUser'])->name('users.remind');
         //modules
         // Route::get('/module', [ContentManagementController::class,'indexModule'])->name('module.index');
         // Route::get('/module/{module_id}', [ContentManagementController::class,'showModule'])->name('module.show');

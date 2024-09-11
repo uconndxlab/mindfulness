@@ -9,6 +9,7 @@ use App\Models\Day;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
+use Mail;
 
 class ContentManagementController extends Controller
 {
@@ -49,6 +50,30 @@ class ContentManagementController extends Controller
         }
         catch (\Exception $e) {
             return response()->json(['error_message' => 'Failed to change access.', 'error' => $e], 500);
+        }
+    }
+
+    public function emailRemindUser(Request $request) {
+        try {
+            $user = User::findOrFail($request->user_id);
+            $remind_limit = (int) getConfig('remind_email_day_limit', 0);
+            $last_active = $user->last_active_at ? Carbon::parse($user->last_active_at) : null;
+            $last_reminded = $user->last_reminded_at ? Carbon::parse($user->last_reminded_at) : null;
+
+            //check if user active or reminded within the limit
+            if (($last_active && $last_active->diffInDays(Carbon::now()) < $remind_limit) || 
+                ($last_reminded && $last_reminded->diffInDays(Carbon::now()) < $remind_limit)) {
+                return response()->json(['error_message' => 'User has been active or reminded within the limit.'], 400);
+            }
+            
+            Mail::to($user->email)->send(new \App\Mail\InactivityReminder($user));
+            $user->last_reminded_at = Carbon::now();
+            $user->save();
+
+            return response()->json(['success' => 'Reminder email sent to '.$user->email], 200);
+        }
+        catch (\Exception $e) {
+            return response()->json(['error_message' => 'Failed to send reminder email.', 'error' => $e], 500);
         }
     }
 
