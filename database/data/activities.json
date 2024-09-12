@@ -107,5 +107,15 @@
         "order": 10,
         "optional": true,
         "next_fake": null
+    },
+    {
+        "id": 12,
+        "day_id": 2,
+        "title": "Body Scan - Extended",
+        "type": "practice",
+        "time": 21,
+        "order": 10,
+        "optional": true,
+        "next_fake": null
     }
 ]
