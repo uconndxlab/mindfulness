@@ -5,7 +5,7 @@
 @section('content')
 <div class="col-md-8">
     <div class="text-left">
-        <h1 class="display fw-bold mb-5">Mindfulness Guides</h1>
+        <h1 class="display fw-bold mb-5">{{ config('app.name') }}</h1>
     </div>
 
     <div class="">
