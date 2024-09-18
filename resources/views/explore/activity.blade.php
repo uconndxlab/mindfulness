@@ -97,9 +97,12 @@
         @endif
         @if($activity->completion_message)
             <div id="comp_message" class="mt-1" style="display: none;">
-                <p class="text-success">{{ $activity->completion_message }}</p>
+                <p class="text-success">{!! $activity->completion_message !!}</p>
             </div>
         @endif
+        <div id="bonus_message" class="mt-1" style="display: none;">
+            <a class="text-success" href="{{ route('explore.module', ['module_id' => $activity->day->module_id, 'day_id_accordion' => $activity->day_id]) }}">Click here to view the bonus activities<i class="bi bi-arrow-right"></i></a>
+        </div>
     </div>
     <div class="manual-margin-top" id="redirect_div">
         @if (isset($page_info['redirect_route']))
@@ -181,6 +184,10 @@
             .then(response => {
                 console.log(response.data.message);
                 //unlock redirect only after progress is processed
+                if (response.data.unlocked_bonus) {
+                    const bonusMessageDiv = document.getElementById('bonus_message');
+                    bonusMessageDiv.style.display = 'block';
+                }
                 unlockRedirect();
             })
             .catch(error => {

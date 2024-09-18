@@ -3,9 +3,9 @@
         <p>***Please do not write any sensitive information here.***</p>
         @csrf
         <div id="success-message" class="alert alert-success note-err-message" style="display: none;">
-            Journal submitted! View past journal entries in the history tab.
+            Journal submitted!
             @if (isset($journal->activity))
-                <a href="{{ route('journal.library', ['activity' => $journal->activity_id]) }}"> View in library.</a>
+                <a href="{{ route('journal.library', ['activity' => $journal->activity_id]) }}">Click here to view past journals<i class="bi bi-arrow-right"></i></a>
             @endif
         </div>
         <div id="error-messages" class="alert alert-danger" style="display: none;"></div>
