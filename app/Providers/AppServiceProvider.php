@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Events\FinalActivityCompleted;
 use App\Listeners\ShowCompletionModal;
 use Event;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,5 +27,12 @@ class AppServiceProvider extends ServiceProvider
             FinalActivityCompleted::class,
             [ShowCompletionModal::class, 'handle']
         );
+
+        //remember me for 7 days
+        Auth::extend('session', function ($app, $name, array $config) {
+            $guard = new \Illuminate\Auth\SessionGuard($name, Auth::createUserProvider($config['provider']), $app['session.store'], $app['request']);
+            $guard->setRememberDuration(10080);
+            return $guard;
+        });
     }
 }

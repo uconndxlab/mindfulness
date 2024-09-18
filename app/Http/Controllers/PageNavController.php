@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Log;
 
 
 
@@ -49,11 +50,11 @@ class PageNavController extends Controller
         return view("explore.home", compact('modules'));
     }
 
-    public function exploreModule($module_id)
+    public function exploreModule(Request $request, $module_id)
     {
         //find the module
         $module = Module::with('days.activities')->findOrFail($module_id);
-
+        
         //check progress
         if (getModuleProgress(Auth::id(), [$module_id])[$module_id]['status'] == 'locked') {
             return redirect()->back();
@@ -62,15 +63,21 @@ class PageNavController extends Controller
         //get progress
         $day_ids = $module->days()->pluck('id')->toArray();
         $progress = getDayProgress(Auth::id(), $day_ids);
-
+        
         //sorting the activities within each day
         foreach ($module->days as $day) {
             $day->activities = $day->activities->sortBy(function ($activity) {
                 return [$activity->optional, $activity->order];
             })->values();
-
+            
             //assign the progress
             $day->progress = $progress[$day->id];
+        }
+
+        //handling bonus activity - overrride accordion update
+        $override_accordion = null;
+        if (isset($request->day_id_accordion)) {
+            $override_accordion = $request->day_id_accordion;
         }
 
         //set back route
@@ -81,7 +88,7 @@ class PageNavController extends Controller
         Session::put('current_nav', ['route' => route('explore.module', ['module_id' => $module_id]), 'back' => 'Module '.$module_id]);
         Session::put('previous_explore', route('explore.module', ['module_id' => $module_id]));
         
-        return view("explore.module", compact('module', 'page_info'));
+        return view("explore.module", compact('module', 'page_info', 'override_accordion'));
     }
 
     public function checkActivityLocked($activity_id, $from_controller = false) {

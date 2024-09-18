@@ -1,8 +1,8 @@
 @if ($type == 'audio')
-    <!--<audio id="{{ $id }}" class="media-player" controls controlsList="{{ $controlsList }}" preload="auto" src="{{ Storage::url('content/'.$file) }}"></audio>-->
+    <!--<audio id="{{ $id }}" class="media-player" controls controlsList="{{ isset($controlsList) ? $controlsList : '' }}" preload="auto" src="{{ Storage::url('content/'.$file) }}"></audio>-->
 
     <div class="slide__audio js-audio">
-    <audio id="{{ $id }}" class="slide__audio-player" controlsList="{{ $controlsList }}" preload="auto" src="{{ Storage::url('content/'.$file) }}">
+    <audio id="{{ $id }}" class="slide__audio-player" controlsList="{{ isset($controlsList) ? $controlsList : '' }}" preload="auto" src="{{ Storage::url('content/'.$file) }}">
     </audio>
     <div class="audio__controls">
         <svg version="1.1" id="circle" width="306px" height="306px" viewBox="0 0 100 100">
@@ -103,7 +103,7 @@ function initAudioPlayer(player) {
     </script>
 
 @elseif ($type == 'video')
-    <video id="{{ isset($id) ? $id : '' }}" class="media-player" controls controlsList="{{ $controlsList }}" preload="auto" width="100%" height="auto">
+    <video id="{{ isset($id) ? $id : '' }}" class="media-player" controls controlsList="{{ isset($controlsList) ? $controlsList : '' }}" preload="auto" width="100%" height="auto">
         <source src="{{ Storage::url('content/'.$file) }}" type="video/mp4">
         Your browser does not support the video element.
     </video>

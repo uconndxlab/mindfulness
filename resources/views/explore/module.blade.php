@@ -18,11 +18,17 @@
             @foreach ($module->days as $index => $day)
                 @php
                     $disabled = $day->progress['status'] == 'locked' ? 'disabled' : '';
+                    if ($override_accordion) {
+                        $show = $override_accordion == $day->id;
+                    }
+                    else {
+                        $show = $day->progress['show'];
+                    }
                 @endphp
 
                 <div class="accordion-item border mb-2">
                     <h2 class="accordion-header" id="heading_{{ $index }}">
-                        <button class="accordion-button {{ $day->progress['show'] ? '' : 'collapsed'}} {{ $disabled }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="false" aria-controls="collapse_{{ $index }}">
+                        <button class="accordion-button {{ $show ? '' : 'collapsed'}} {{ $disabled }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="false" aria-controls="collapse_{{ $index }}">
                             <div>
                                 {{ $day->name }}
                                 
@@ -38,7 +44,7 @@
                         </button>
                     </h2>
                     
-                    <div id="collapse_{{ $index }}" class="accordion-collapse collapse {{ $day->progress['show'] ? 'show' : ''}}" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
+                    <div id="collapse_{{ $index }}" class="accordion-collapse collapse {{ $show ? 'show' : ''}}" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
                         <div class="accordion-body">
                             @if (!$disabled)
                                 @foreach ($day->activities as $activity)

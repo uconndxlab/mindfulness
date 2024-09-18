@@ -33,7 +33,7 @@
                     @endphp
                     <div id="feedback_{{ $question['number'] }}_{{ $index }}" class="feedback-div" style="display: none;">
                         <div class="mt-3 {{ $text_color }}">
-                            {{ $option['feedback'] }}
+                            {!! $option['feedback'] !!}
                         </div>
                         @if ($option['audio_path'])
                             <x-contentView id="fbAudio_{{ $question['number'] }}_{{ $index }}" id2="pdf_download" type="audio" file="{{ $option['audio_path'] }}"/>

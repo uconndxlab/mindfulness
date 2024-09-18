@@ -97,9 +97,12 @@
         @endif
         @if($activity->completion_message)
             <div id="comp_message" class="mt-1" style="display: none;">
-                <p class="text-success">{{ $activity->completion_message }}</p>
+                <p class="text-success">{!! $activity->completion_message !!}</p>
             </div>
         @endif
+        <div id="bonus_message" class="mt-1" style="display: none;">
+            <a class="text-success" href="{{ route('explore.module', ['module_id' => $activity->day->module_id, 'day_id_accordion' => $activity->day_id]) }}">Click here to view the bonus activities<i class="bi bi-arrow-right"></i></a>
+        </div>
     </div>
     <div class="manual-margin-top" id="redirect_div">
         @if (isset($page_info['redirect_route']))
@@ -181,6 +184,10 @@
             .then(response => {
                 console.log(response.data.message);
                 //unlock redirect only after progress is processed
+                if (response.data.unlocked_bonus) {
+                    const bonusMessageDiv = document.getElementById('bonus_message');
+                    bonusMessageDiv.style.display = 'block';
+                }
                 unlockRedirect();
             })
             .catch(error => {
@@ -344,47 +351,66 @@
                 watchedTime: 0,
                 currentTime: 0
             };
+            var lastUpdated = 'currentTime';
+            var isSeeking = false;
             var endedListener;
             var MAX_DELTA = 1;
+            //allows seek by setting watched time to the duration
+            if (allowSeek) {
+                timeTracking.watchedTime = player.duration;
+            }
 
             player.addEventListener('timeupdate', function () {
                 //block seeking timeupdate
-                //unless seek is allowed
-                if (!player.seeking || allowSeek) {
+                if (!isSeeking && !player.seeking || allowSeek) {
                     //tracking watched time - only update if the time is less than 1 second - prevent seek spam bug
                     var delta = player.currentTime - timeTracking.watchedTime;
-                    if (delta <= MAX_DELTA && delta >= 0 || allowSeek) {
+                    if (delta <= MAX_DELTA && delta >= 0) {
                         timeTracking.watchedTime = player.currentTime;
                         lastUpdated = 'watchedTime';
                     }
                     //tracking the current time (if less than watched)
                     else {
                         timeTracking.currentTime = player.currentTime;
+                        lastUpdated = 'currentTime';
                     }
                 }
             });
 
             //prevent seek
             player.addEventListener('seeking', function () {
+                isSeeking = true;
                 //block seeking if seek puts current ahead of watchedTime
                 //allows rewind and ability to catch up
-                // console.log('Seeking');
+                console.log('Seeking');
                 var delta = player.currentTime - timeTracking.watchedTime;
-                //if seek is allowed, ignore
-                if (delta > 0 && !allowSeek) {
-                    //pause play back from watched time
+                if (delta > 0) {
+                    //temp remove ended listener - seeking spam bug
+                    if (endedListener) {
+                        console.log('removing listener')
+                        player.removeEventListener('ended', endedListener);
+                    }
+
+                    //pause play back from last time
                     player.pause();
-                    player.currentTime = timeTracking['watchedTime'];
+                    player.currentTime = timeTracking[lastUpdated];
                     player.play();
                 }
             });
 
+            player.addEventListener('seeked', function () {
+                isSeeking = false;
+            });
+
             //init event listener
             endedListener = function() {
-                // console.log('Media ended');
+                console.log('Media ended');
+                if (timeTracking.watchedTime < player.duration) {
+                    console.log('Blocked seek spam');
+                }
                 activityComplete();
             };
-            // console.log('adding end listener');
+            console.log('adding end listener');
             player.addEventListener('ended', endedListener);
         });
     });
