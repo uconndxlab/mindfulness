@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "module_id": 1,
+        "name": "Monday",
+        "description": "Reflect on your deep motivations and set yourself up for success. A good beginning is half the battle!",
+        "completion_message": "<span>Congrats on earning a pedal! Four more to go to earn a flower. Return <a href=\"/explore/home\">Home</a> to view your progress!</span>",
+        "media_path": "Flower-1.svg",
+        "order": 1
+    },
+    {
+        "id": 2,
+        "module_id": 1,
+        "name": "Tuesday",
+        "description": "Learn what mindfulness is and bring mindfulness to your body.",
+        "order": 2
+    }
+]

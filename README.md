@@ -65,19 +65,80 @@ Check Laravel's documentation on [project set-up](https://laravel.com/docs/11.x/
 
 ### Running the app:
 
-8. Compile assets and watch for changes:
+8. Compile assets, watch for changes, and serve:
 
     ```bash
-    npm run dev
-    ```
-
-9. Serve the application:
-
-    ```bash
-    php artisan serve
+    npm run serve
     ```
 
 10. Follow link provided by pervious command to view site, typically `http://localhost:8000`.
+
+## Setting up scheduled reminder emails:
+### Mac, Linux
+
+1. Open your terminal.
+
+2. Open the crontab file for editing by running:
+    ```bash
+    crontab -e
+    ```
+
+3. Add the following line to the crontab file to run the Laravel scheduler every minute:
+    ```bash
+    * * * * * /path/to/php /path/to/your/project/artisan schedule:run >> /dev/null 2>&1
+    ```
+    - Replace `/path/to/php` with the path to your PHP executable. You can find it by running `which php` in your terminal.
+    - Replace `/path/to/your/project` with the path to your Laravel project.
+
+4. Save and exit the crontab file.
+
+5. Verify that the cron job has been added by running:
+    ```bash
+    crontab -l
+    ```
+
+### Windows:
+
+1. Open task scheduler:
+
+    ```bash
+    taskschd.msc
+    ```
+2. Create a New Task:
+   - In the Task Scheduler, click on `Create Task` in the right-hand Actions pane.
+
+3. General Tab:
+   - Give your task a name, e.g., "Laravel Scheduler".
+   - Select "Run whether user is logged on or not".
+   - Check "Run with highest privileges".
+
+4. Triggers Tab:
+   - Click `New` to create a new trigger.
+   - Set the trigger to begin "On a schedule".
+   - Set the schedule to "Daily" and repeat the task every 1 minute, indefinitely. Select "One time" if using this in development.
+   - Ensure the task is enabled.
+   - Note: if using for development, make sure to turn off/disable the task when it is not needed.
+
+5. Actions Tab:
+   - Click `New` to create a new action.
+   - Set the action to "Start a program".
+   - In the "Program/script" field, enter the path to your PHP executable, e.g., `C:\path\to\php.exe`.
+   - In the "Add arguments (optional)" field, enter the path to your Laravel `artisan` file followed by `schedule:run`, e.g., `C:\path\to\your\project\artisan schedule:run`.
+   - In the "Start in (optional)" field, enter the directory of your Laravel project, e.g., `C:\path\to\your\project`.
+
+6. Conditions Tab:
+   - Uncheck "Start the task only if the computer is on AC power" to ensure the task runs even on battery power.
+
+7. Settings Tab:
+   - Ensure "Allow task to be run on demand" is checked.
+   - Ensure "Run task as soon as possible after a scheduled start is missed" is checked.
+   - Ensure "If the task fails, restart every" is set to 1 minute and "Attempt to restart up to" is set to 3 times.
+   - Optionally, choose "Stop the stask if it runs longer than:", and select a time for it to shut off after you are done developing.
+
+8. Save the Task:
+   - Click `OK` to save the task.
+   - You may be prompted to enter your password to create the task.
+
 
 ## Potential Issues:
 

@@ -1,0 +1,107 @@
+[
+    {
+        "id": 1,
+        "day_id": 1,
+        "title": "Your Child's 30th Birthday",
+        "type": "practice",
+        "time": 7,
+        "completion_message": "Great job! Write down your reflections. Come back to these values whenever you need a reminder of why you are here.",
+        "order": 1,
+        "next_fake": 2
+    },
+    {
+        "id": 2,
+        "day_id": 1,
+        "title": "Goals",
+        "type": "reflection",
+        "time": null,
+        "order": 2,
+        "next_fake": 3
+    },
+    {
+        "id": 3,
+        "day_id": 1,
+        "title": "Morning Glory Time",
+        "type": "lesson",
+        "time": 4,
+        "completion_message": "Good job! Put down some time every day on your calendar to come here to practice. Set up some reminders. Commit and stick to the plan. You can do this!",
+        "order": 3,
+        "next_fake": 4
+    },
+    {
+        "id": 4,
+        "day_id": 1,
+        "title": "Body Scan",
+        "type": "practice",
+        "time": 7,
+        "completion_message": "Did you notice any discomfort or tension? Pay attention to that today and see what you discover.",
+        "order": 4,
+        "next_fake": 5
+    },
+    {
+        "id": 5,
+        "day_id": 1,
+        "title": "Journal",
+        "type": "journal",
+        "time": null,
+        "completion_message": "Congrats on writing a journaling activity today! Check out the workbook for tips to help you succeed!",
+        "final": true,
+        "order": 5,
+        "next_fake": 6
+    },
+
+    {
+        "id": 6,
+        "day_id": 2,
+        "title": "What is mindfulness?",
+        "type": "lesson",
+        "time": 6,
+        "completion_message": "Mindfulness is not what we think. It is simple but not easy: paying attention to the present moment nonjudgmentally, with intention.",
+        "order": 6,
+        "next_fake": 7
+    },
+
+    {
+        "id": 7,
+        "day_id": 2,
+        "title": "Mindfulness is….",
+        "type": "reflection",
+        "time": null,
+        "order": 7,
+        "next_fake": 8
+    },
+    {
+        "id": 8,
+        "day_id": 2,
+        "title": "Body Scan",
+        "type": "practice",
+        "time": 7,
+        "completion_message": "Did you notice any discomfort or tension? Pay attention to the sensations throughout today.",
+        "order": 8,
+        "next_fake": 9
+    },
+
+
+    {
+        "id": 9,
+        "day_id": 2,
+        "title": "Journaling Activity",
+        "type": "journal",
+        "time": null,
+        "completion_message": "Congrats on earning today’s pedal! You also unlocked two bonus activities! Give them a try and build your mindfulness muscles.",
+        "final": false,
+        "order": 9,
+        "next_fake": null
+    },
+
+    {
+        "id": 10,
+        "day_id": 2,
+        "title": "Body Scan - Extended",
+        "type": "practice",
+        "time": 13,
+        "order": 9,
+        "optional": true,
+        "next_fake": null
+    }
+]
