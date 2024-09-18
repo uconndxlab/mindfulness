@@ -468,5 +468,266 @@ body:has(div.dark-background){
     background:#068282;
 }
 
+/*audio circle*/
+.slide__audio {
+	position: relative;
+	width: 300px;
+	top: 20%;
+	margin: 0 auto;
+}
 
+.audio__controls {
+	height: 300px;
+	width: 300px;
+	position: relative;
+}
+
+.slide__audio .slide__audio-player {
+	display: none;
+}
+
+.audio__slider {
+	position: absolute;
+	z-index: 3;
+}
+
+.audio__slider::before {
+	content: '';
+	display: block;
+	width: 100%;
+	height: 100%;
+	border: 12px solid var(--light-grey);
+	border-radius: 100%;
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+.audio__slider .rs-container {
+	position: relative;
+}
+
+.audio__slider .rs-bar {
+	top: 50%;
+}
+
+.audio__slider .rs-tooltip {
+	display: none;
+}
+
+.rs-control {
+	position: relative;
+	outline: 0 none
+}
+
+.rs-container {
+	position: relative;
+}
+
+.audio__slider.rs-control,.rs-container.full{
+    width:100%!important;
+    height:100%!important;
+}
+
+.rs-control *,
+.rs-control *:before,
+.rs-control *:after {
+	box-sizing: border-box
+}
+
+.rs-animation .rs-transition {
+	transition: all .5s linear 0s
+}
+
+.rs-bar {
+	transform-origin: 100% 50%
+}
+
+.rs-control .rs-split .rs-path,
+.rs-control .rs-overlay1,
+.rs-control .rs-overlay2 {
+	transform-origin: 50% 100%
+}
+
+.rs-control .rs-overlay {
+	transform-origin: 100% 100%
+}
+
+.rs-control.rs-error {
+	border: 1px dotted;
+	text-align: center
+}
+
+.rs-inner-container {
+	height: 100%;
+	width: 100%;
+	position: relative;
+	overflow: hidden
+}
+
+.rs-block {
+	height: 100%;
+	width: 100%;
+	display: block;
+	position: absolute;
+	top: 0;
+	overflow: hidden;
+	z-index: 3;
+}
+
+.rs-block .rs-inner {
+	-webkit-border-radius: 1000px;
+	border-radius: 1000px;
+	display: block;
+	height: 100%;
+	width: 100%;
+	position: relative
+}
+
+.rs-bar {
+	position: absolute;
+	height: 0;
+	z-index: 10
+}
+
+.rs-bar .rs-seperator {
+	height: 0;
+	border-bottom: medium none;
+	display: block;
+	float: left
+}
+
+.full .rs-bar,
+.half .rs-bar {
+	width: 50%
+}
+
+.full .rs-bar,
+.half.left .rs-bar,
+.half.right .rs-bar {
+	top: 50%;
+}
+
+.bottom .rs-bar {
+	top: 0
+}
+
+.half.right .rs-bar,
+.quarter.right .rs-bar {
+	right: 100%
+}
+
+.rs-handle.rs-move {
+	cursor: move;
+    margin:-13px 0px 0px -7px!important;
+}
+
+.rs-readonly .rs-handle.rs-move {
+	cursor: default
+}
+
+.rs-path {
+	display: block;
+	height: 100%;
+	width: 100%
+}
+
+.rs-split .rs-path {
+	-webkit-border-radius: 1000px 1000px 0 0;
+	border-radius: 1000px 1000px 0 0;
+	overflow: hidden;
+	height: 50%;
+	position: absolute;
+	top: 0;
+	z-index: 2
+}
+
+.rs-tooltip {
+	text-align: center;
+	position: absolute;
+	cursor: default;
+	border: 1px solid transparent;
+	z-index: 10
+}
+
+.rs-handle {
+	border-radius: 1000px;
+	outline: 0 none;
+	float: left
+}
+
+.rs-handle.rs-handle-square {
+	border-radius: 0
+}
+
+.paused .rs-handle,
+.playing .rs-handle,
+.active .rs-handle {
+	background-color: var(--dark-green);
+}
+
+.rs-handle {
+	background-color: var(--dark-green);
+}
+
+.slide__audio #circle {
+	position: absolute;
+	top: 150px;
+	left: 150px;
+	bottom: 0;
+	stroke: var(--dark-green);
+	border-radius: 100%;
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+	z-index: 4;
+}
+
+.play-pause {
+	position: absolute;
+	left: 150px;
+	top: 150px;
+	z-index: 3;
+	width: 150px;
+	background: transparent !important;
+	height: 150px;
+	cursor: pointer;
+	transform: translate(-50%, -50%);
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
+.play-pause:focus{
+    outline:none;
+}
+
+.play-pause::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+#seekbar {
+	stroke-width: 4;
+}
+
+.playing #seekbar {
+	visibility: visible;
+}
+
+.playing .play-pause::after {
+	content: none;
+}
+
+.playing .play-pause::before {
+	opacity: 1;
+}
+
+.play-pause .bi {
+    font-size:50px;
+}
 
