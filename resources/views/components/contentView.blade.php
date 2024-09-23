@@ -97,6 +97,19 @@
                 icon.addClass("bi-play");
                 circle.attr("stroke-dashoffset", totalLength);
             });
+
+            audio.on("seeking", (e) => {
+                let currentTime = audio[0].currentTime;
+                let delta = currentTime - timeTracking.watchedTime;
+                if (delta > 0) {
+                    audio[0].currentTime = timeTracking[lastUpdated];
+                    e.preventDefault();
+                }
+            });
+
+            audio.on("seeked", () => {
+                isSeeking = false;
+            });
         }
     </script>
 @elseif ($type == 'video')
