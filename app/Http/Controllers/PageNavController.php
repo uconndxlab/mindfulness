@@ -50,7 +50,7 @@ class PageNavController extends Controller
         return view("explore.home", compact('modules'));
     }
 
-    public function exploreModule(Request $request, $module_id)
+    public function exploreModule($module_id, $override_accordion=null)
     {
         //find the module
         $module = Module::with('days.activities')->findOrFail($module_id);
@@ -74,12 +74,6 @@ class PageNavController extends Controller
             $day->progress = $progress[$day->id];
         }
 
-        //handling bonus activity - overrride accordion update
-        $override_accordion = null;
-        if (isset($request->day_id_accordion)) {
-            $override_accordion = $request->day_id_accordion;
-        }
-
         //set back route
         $page_info['back_label'] = " Back to Home";
         $page_info['back_route'] = route('explore.home');
@@ -90,6 +84,14 @@ class PageNavController extends Controller
         
         return view("explore.module", compact('module', 'page_info', 'override_accordion'));
     }
+
+public function exploreModuleBonus(Request $request, $module_id) {
+    $override_accordion = null;
+    if (isset($request->day_id_accordion)) {
+        $override_accordion = $request->day_id_accordion;
+    }
+    return $this->exploreModule($module_id, $override_accordion);
+}
 
     public function checkActivityLocked($activity_id, $from_controller = false) {
         //checking cache for progress

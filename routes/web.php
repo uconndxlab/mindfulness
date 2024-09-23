@@ -79,6 +79,8 @@ Route::middleware('web')->group(function () {
         //NEW EXPLORE
         Route::get('/explore/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
         Route::get('/explore/module/{module_id}', [PageNavController::class, 'exploreModule'])->name('explore.module');
+        //using post instead for case with desired accordion open
+        Route::post('/explore/module/{module_id}', [PageNavController::class, 'exploreModuleBonus'])->name('explore.module.bonus');
         Route::get('/checkActivity/{activity_id}', [PageNavController::class, 'checkActivityLocked'])->name('check.activity');
         Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
         Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');

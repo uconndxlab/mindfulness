@@ -101,7 +101,11 @@
             </div>
         @endif
         <div id="bonus_message" class="mt-1" style="display: none;">
-            <a class="text-success" href="{{ route('explore.module', ['module_id' => $activity->day->module_id, 'day_id_accordion' => $activity->day_id]) }}">Click here to view the bonus activities<i class="bi bi-arrow-right"></i></a>
+            <form id="bonusForm" action="{{ route('explore.module.bonus', ['module_id' => $activity->day->module_id]) }}" method="POST" style="display: inline;">
+                @csrf
+                <input type="hidden" name="day_id_accordion" value="{{ $activity->day_id }}">
+                <a class="text-success" href="#" onclick="document.getElementById('bonusForm').submit();">Click here to view the bonus activities<i class="bi bi-arrow-right"></i></a>
+            </form>
         </div>
     </div>
     <div class="manual-margin-top" id="redirect_div">
