@@ -89,7 +89,10 @@
                 let value = ((currentTime / maxduration) * 100);
                 var slider = audio.closest(".js-audio").find(".audio__slider");
                 $(slider).roundSlider("setValue", value);
-                // timeTracking.watchedTime = currentTime;
+                //updating watch time to allow user to seek back to the last watched time
+                if (currentTime > timeTracking.watchedTime) {
+                    timeTracking.watchedTime = currentTime;
+                }
             });
 
             audio.on("ended", () => {
@@ -100,6 +103,7 @@
             });
 
             audio.on("seeking", (e) => {
+                //blocking the user from seeking forward beyond watchedtime
                 let currentTime = audio[0].currentTime;
                 if (currentTime > timeTracking.watchedTime) {
                     audio[0].currentTime = timeTracking.watchedTime;
