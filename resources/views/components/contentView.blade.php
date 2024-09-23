@@ -89,7 +89,7 @@
                 let value = ((currentTime / maxduration) * 100);
                 var slider = audio.closest(".js-audio").find(".audio__slider");
                 $(slider).roundSlider("setValue", value);
-                timeTracking.watchedTime = currentTime;
+                // timeTracking.watchedTime = currentTime;
             });
 
             audio.on("ended", () => {
@@ -101,9 +101,8 @@
 
             audio.on("seeking", (e) => {
                 let currentTime = audio[0].currentTime;
-                let delta = currentTime - timeTracking.watchedTime;
-                if (delta > 0) {
-                    audio[0].currentTime = timeTracking[lastUpdated];
+                if (currentTime > timeTracking.watchedTime) {
+                    audio[0].currentTime = timeTracking.watchedTime;
                     e.preventDefault();
                 }
             });
