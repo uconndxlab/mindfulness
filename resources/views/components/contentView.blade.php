@@ -49,10 +49,7 @@
         }
 
         function initAudioPlayer(player) {
-            let timeTrackingInside = {
-                watchedTime: 0,
-                currentTime: 0
-            }
+            let watchedTime = 0;
 
             let audio = player.find("audio"),
                 play = player.find(".play-pause"),
@@ -95,8 +92,8 @@
                 var slider = audio.closest(".js-audio").find(".audio__slider");
                 $(slider).roundSlider("setValue", value);
                 //updating watch time to allow user to seek back to the last watched time
-                if (timeTrackingInside.currentTime > timeTrackingInside.watchedTime) {
-                    timeTrackingInside.watchedTime = timeTrackingInside.currentTime;
+                if (currentTime > watchedTime) {
+                    watchedTime = currentTime;
                 }
             });
 
@@ -110,8 +107,8 @@
             audio.on("seeking", (e) => {
                 //blocking the user from seeking forward beyond watchedtime
                 let currentTime = audio[0].currentTime;
-                if (currentTime > timeTrackingInside.watchedTime) {
-                    audio[0].currentTime = timeTrackingInside.watchedTime;
+                if (currentTime > watchedTime) {
+                    audio[0].currentTime = watchedTime;
                     e.preventDefault();
                 }
             });
