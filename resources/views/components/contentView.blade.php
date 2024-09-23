@@ -89,6 +89,7 @@
                 let value = ((currentTime / maxduration) * 100);
                 var slider = audio.closest(".js-audio").find(".audio__slider");
                 $(slider).roundSlider("setValue", value);
+                timeTracking.watchedTime = currentTime;
             });
 
             audio.on("ended", () => {
