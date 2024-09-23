@@ -26,7 +26,7 @@
                     }
                 @endphp
 
-                <div class="accordion-item border mb-2">
+                <div class="accordion-item border mb-2" id="day_{{ $day->id }}">
                     <h2 class="accordion-header" id="heading_{{ $index }}">
                         <button class="accordion-button {{ $show ? '' : 'collapsed'}} {{ $disabled }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="false" aria-controls="collapse_{{ $index }}">
                             <div>
@@ -80,6 +80,30 @@
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        //scroll to bonus activity
+        var dayId = @json($override_accordion);
+        if (dayId) {
+            var dayElement = document.getElementById(dayId);
+            if (dayElement) {
+                var button = dayElement.querySelector('.accordion-button');
+                if (button) {
+                    button.click();
+                }
+                setTimeout(function() {
+                    var bonusActivity = dayElement.querySelector('.activity-tag-optional');
+                    if (bonusActivity) {
+                        var offset = 125;
+                        var elementPosition = bonusActivity.getBoundingClientRect().top;
+                        var offsetPosition = elementPosition + window.pageYOffset - offset;
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 500); //adding delay so that accordion can open
+            }
+        }
+
         document.querySelectorAll('.activity-link').forEach(function (activity) {
             activity.addEventListener('click', function (event) {
                 event.preventDefault();

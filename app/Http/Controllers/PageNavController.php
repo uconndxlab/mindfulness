@@ -74,6 +74,8 @@ class PageNavController extends Controller
             $day->progress = $progress[$day->id];
         }
 
+        $override_accordion = $override_accordion ? 'day_'.$override_accordion : null;
+
         //set back route
         $page_info['back_label'] = " Back to Home";
         $page_info['back_route'] = route('explore.home');
