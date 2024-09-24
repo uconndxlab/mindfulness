@@ -75,7 +75,7 @@
             <h5 class="text-center fw-bold mt-4">Contact:</h5>
             <p class="text-center fw-bold">Get Immediate Help in a Crisis</p>
             <p class="text-center">Call 911 if you or someone you know is in immediate danger or go to the nearest emergency room.</p>
-            <p class="text-center fw-bold mt-3">Contact us here:</p>
+            <p class="text-center fw-bold mt-3">For matters related to this app:</p>
             <p class="text-center">You can reach us via email or phone:</p>
             <p class="text-center">
                 <a href="mailto:{{ config('mail.contact_email') }}" class="text-decoration-none">{{ config('mail.contact_email') }}</a>
