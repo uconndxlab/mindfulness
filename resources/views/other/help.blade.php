@@ -11,6 +11,9 @@
                     <a id="tutorial-link" class="nav-link" href="#tutorial">Tutorial</a>
                 </li>
                 <li class="nav-item" style="padding:0px 20px">
+                    <a class="nav-link" href="#teachers">Teachers</a>
+                </li>
+                <li class="nav-item" style="padding:0px 20px">
                     <a class="nav-link" href="#FAQ">FAQ</a>
                 </li>
                 <li class="nav-item" style="padding:0px 20px">
@@ -23,6 +26,29 @@
         <section id="tutorial">
             <h5 class="text-center fw-bold mt-4">Tutorial:</h5>
             <x-contentView type="video" file="" controlsList="noplaybackrate nodownload noseek"/>
+        </section>
+
+        <section id="teachers">
+            <h5 class="text-center fw-bold mt-4">Our Teachers</h5>
+            <div class="row row-cols-1 row-cols-md-2 g-4 justify-content-center">
+                @foreach ($teachers as $teacher)
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-img-top-wrapper" id="teacher-{{ $loop->index }}" style="height: 300px; overflow: hidden;">
+                                <img src="{{ Storage::url('profile_pictures/'.$teacher->profile_picture) }}" class="card-img-top" alt="{{ $teacher->name }}" style="object-fit: cover; width: 100%; height: 100%;">
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title" id="teacher-name-{{ $loop->index }}">{{ $teacher->name }}</h5>
+                                <p class="card-text">
+                                    <span class="short-bio">{{ Str::limit($teacher->bio, 100) }}</span>
+                                    <span class="full-bio" style="display: none;">{{ $teacher->bio }}</span>
+                                </p>
+                                <button class="btn btn-link read-more" data-teacher-index="{{ $loop->index }}">Read More</button>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
         </section>
         
         <section id="FAQ">
@@ -219,6 +245,52 @@
                     top: scrollPos,
                     behavior: 'smooth'
                 });
+            });
+        });
+
+        //read more
+        document.querySelectorAll('.read-more').forEach(button => {
+            button.addEventListener('click', function() {
+                const cardBody = this.closest('.card-body');
+                const shortBio = cardBody.querySelector('.short-bio');
+                const fullBio = cardBody.querySelector('.full-bio');
+                const teacherIndex = this.getAttribute('data-teacher-index');
+                
+                if (shortBio.style.display !== 'none') {
+                    shortBio.style.display = 'none';
+                    fullBio.style.display = 'inline';
+                    this.textContent = 'Read Less';
+
+                    //smooth scroll to bio
+                    const teacherName = document.getElementById(`teacher-name-${teacherIndex}`);
+                    if (teacherName) {
+
+                        var offset = 60;
+                        var elementPosition = teacherName.getBoundingClientRect().top;
+                        var offsetPosition = elementPosition + window.pageYOffset - offset;
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                } else {
+                    shortBio.style.display = 'inline';
+                    fullBio.style.display = 'none';
+                    this.textContent = 'Read More';
+                    
+                    //smooth scroll back to teacher
+                    const teacherElement = document.getElementById(`teacher-${teacherIndex}`);
+                    if (teacherElement) {
+
+                        var offset = 70;
+                        var elementPosition = teacherElement.getBoundingClientRect().top;
+                        var offsetPosition = elementPosition + window.pageYOffset - offset;
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
             });
         });
     });

@@ -8,6 +8,7 @@ use App\Models\Note;
 use App\Models\Activity;
 use App\Models\Module;
 use App\Models\QuizAnswers;
+use App\Models\Teacher;
 use App\Models\UserActivity;
 use App\Models\Faq;
 use Carbon\Carbon;
@@ -477,6 +478,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
     public function helpPage()
     {
         $faqs = Faq::all();
-        return view("other.help", compact('faqs'));
+        $teachers = Teacher::all();
+        return view("other.help", compact('faqs', 'teachers'));
     }
 }
