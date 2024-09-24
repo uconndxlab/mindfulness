@@ -71,11 +71,13 @@ class UserController extends Controller
             }
 
             //handling optional
+            $unlocked_bonus = false;
             $optional_activities = Activity::where('optional', true)->where('order', $activity->order)->get();
             foreach ($optional_activities as $optional) {
                 $optional_status = $activity_progress->where('activity_id', $optional->id)->first()->status ?? 'locked';
                 if ($optional_status == 'locked') {
                     //update entry for optional
+                    $unlocked_bonus = true;
                     UserActivity::updateOrCreate([
                         "user_id" => Auth::id(),
                         "activity_id" => $optional->id,
@@ -89,7 +91,7 @@ class UserController extends Controller
             Session::forget('progress_modules');
             Session::forget('progress_days');
             Cache::forget('user_'.Auth::id().'_progress_activities');
-            return response()->json(['message' => 'Progress updated']);
+            return response()->json(['message' => 'Progress updated', 'unlocked_bonus' => $unlocked_bonus], 200);
         }
         else if ($current_activity_progress->status == 'completed') {
             return response()->json(['message' => 'Activity already completed']);

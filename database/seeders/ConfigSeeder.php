@@ -24,5 +24,9 @@ class ConfigSeeder extends Seeder
             ['key' => 'registration_locked'],
             ['value' => false]
         );
+        Config::updateOrCreate(
+            ['key' => 'remind_email_day_limit'],
+            ['value' => 2]
+        );
     }
 }

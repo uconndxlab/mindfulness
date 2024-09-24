@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('content', function (Blueprint $table) {
             $table->id();
             $table->foreignId('activity_id')->constrained('activities')->onDelete('cascade');
-            $table->enum('type', ['audio', 'video', 'pdf']);
+            $table->enum('type', ['audio', 'video', 'pdf', 'image']);
             $table->string('file_path');
             $table->json('audio_options')->nullable();
             $table->timestamps();

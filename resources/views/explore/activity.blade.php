@@ -23,9 +23,9 @@
     </div>
     <div class="manual-margin-top">
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
-            @php
-                $controlsList = ($activity->status != 'completed' ? 'noseek' : '').' '.($activity->type === 'practice' ? 'noplaybackrate' : '');
-            @endphp
+        @php
+            $controlsList = ($activity->type === 'practice' ? 'noplaybackrate' : '');
+        @endphp
             @if ($content->audio_options)
                 <div class="col-6 mt-1" id="audio-options-div" style="display: none;">
                     @php
@@ -80,11 +80,11 @@
                     @endforeach
                 @endforeach
 
-            @else
-                <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: block;">
-                    <x-contentView id="content_view" id2="pdf_download" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}"/>
-                </div>
-            @endif
+                @else
+                    <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: flex; justify-content: center; align-items: center;">
+                        <x-contentView id="content_view" id2="download_btn" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}"/>
+                    </div>
+                @endif
 
         @elseif ($activity->type == 'reflection' && $quiz)
             <div id="quizContainer">
@@ -97,9 +97,16 @@
         @endif
         @if($activity->completion_message)
             <div id="comp_message" class="mt-1" style="display: none;">
-                <p class="text-success">{{ $activity->completion_message }}</p>
+                <p class="text-success">{!! $activity->completion_message !!}</p>
             </div>
         @endif
+        <div id="bonus_message" class="mt-1" style="display: none;">
+            <form id="bonusForm" action="{{ route('explore.module.bonus', ['module_id' => $activity->day->module_id]) }}" method="POST" style="display: inline;">
+                @csrf
+                <input type="hidden" name="day_id_accordion" value="{{ $activity->day_id }}">
+                <a class="text-success" href="#" onclick="document.getElementById('bonusForm').submit();">Click here to view the bonus activities<i class="bi bi-arrow-right"></i></a>
+            </form>
+        </div>
     </div>
     <div class="manual-margin-top" id="redirect_div">
         @if (isset($page_info['redirect_route']))
@@ -120,23 +127,37 @@
     const hasContent = {{ $content ? 'true' : 'false' }};
     const hasQuiz = {{ $quiz ? 'true' : 'false' }};
     const hasJournal = {{ $journal ? 'true' : 'false' }};
+    var allowSeek = false;
 
     //CHECKING COMPLETION
     const status = '{{ $activity->status }}';
     if (status == 'completed') {
+        allowSeek = true;
         activityComplete(false);
     }
 
+    var type = null;
     //set eventlisteners to call activityComplete
     if (hasContent) {
         console.log('Type: content');
         //applies to all content items
         const content = document.getElementById('content_view');
-        const type = '{{ isset($content->type) ? $content->type : null }}';
+        type = '{{ isset($content->type) ? $content->type : null }}';
         if (type == 'pdf') {
-            const pdfDownload = document.getElementById('pdf_download');
-            pdfDownload.addEventListener('click', activityComplete);
+            const downloadButton = document.getElementById('download_btn');
+            downloadButton.addEventListener('click', activityComplete);
             content.addEventListener('click', activityComplete);
+        }
+        //adding complete button for images
+        else if (type == 'image' && status != 'completed') {
+            const completeButton = document.getElementById('img_complete_activity');
+            completeButton.classList.remove('disabled');
+            completeButton.addEventListener('click', activityComplete);
+            //show and center
+            completeButton.style.display = 'block';
+            completeButton.parentElement.style.display = 'flex';
+            completeButton.parentElement.style.flexDirection = 'column';
+            completeButton.parentElement.style.alignItems = 'center';
         }
         else {
             content.addEventListener('ended', activityComplete);
@@ -154,7 +175,6 @@
         //if no content - complete activity
         activityComplete();
     }
-
 
     //COMPLETION
     function activityComplete(message=true) {
@@ -180,6 +200,16 @@
             .then(response => {
                 console.log(response.data.message);
                 //unlock redirect only after progress is processed
+                if (response.data.unlocked_bonus) {
+                    const bonusMessageDiv = document.getElementById('bonus_message');
+                    bonusMessageDiv.style.display = 'block';
+                }
+                //hiding complete button for images
+                if (type == 'image') {
+                    const completeButton = document.getElementById('img_complete_activity');
+                    completeButton.classList.add('disabled');
+                    completeButton.style.display = 'none';
+                }
                 unlockRedirect();
             })
             .catch(error => {
@@ -336,6 +366,75 @@
                 console.log('No audio options available.');
             }
         }
+        //NOSEEK
+        var mediaPlayers = document.querySelectorAll('.media-player');
+        mediaPlayers.forEach(function(player) {
+            var timeTracking = {
+                watchedTime: 0,
+                currentTime: 0
+            };
+            var lastUpdated = 'currentTime';
+            var isSeeking = false;
+            var endedListener;
+            var MAX_DELTA = 1;
+            //allows seek by setting watched time to the duration
+            if (allowSeek) {
+                timeTracking.watchedTime = player.duration;
+            }
+
+            player.addEventListener('timeupdate', function () {
+                //block seeking timeupdate
+                if (!isSeeking && !player.seeking || allowSeek) {
+                    //tracking watched time - only update if the time is less than 1 second - prevent seek spam bug
+                    var delta = player.currentTime - timeTracking.watchedTime;
+                    if (delta <= MAX_DELTA && delta >= 0) {
+                        timeTracking.watchedTime = player.currentTime;
+                        lastUpdated = 'watchedTime';
+                    }
+                    //tracking the current time (if less than watched)
+                    else {
+                        timeTracking.currentTime = player.currentTime;
+                        lastUpdated = 'currentTime';
+                    }
+                }
+            });
+
+            //prevent seek
+            player.addEventListener('seeking', function () {
+                isSeeking = true;
+                //block seeking if seek puts current ahead of watchedTime
+                //allows rewind and ability to catch up
+                console.log('Seeking');
+                var delta = player.currentTime - timeTracking.watchedTime;
+                if (delta > 0) {
+                    //temp remove ended listener - seeking spam bug
+                    if (endedListener) {
+                        console.log('removing listener')
+                        player.removeEventListener('ended', endedListener);
+                    }
+
+                    //pause play back from last time
+                    player.pause();
+                    player.currentTime = timeTracking[lastUpdated];
+                    player.play();
+                }
+            });
+
+            player.addEventListener('seeked', function () {
+                isSeeking = false;
+            });
+
+            //init event listener
+            endedListener = function() {
+                console.log('Media ended');
+                if (timeTracking.watchedTime < player.duration) {
+                    console.log('Blocked seek spam');
+                }
+                activityComplete();
+            };
+            console.log('adding end listener');
+            player.addEventListener('ended', endedListener);
+        });
     });
 
     //SHOW ERRORS

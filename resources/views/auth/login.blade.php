@@ -7,7 +7,7 @@
     <form method="POST" action="{{ route('login.submit') }}">
         @csrf
         <div class="text-left fs-2 fw-bold mb-1">
-            Mindfulness.
+            {{ config('app.name') }}
         </div>
         <div class="text-left fs-5 fw-bold mb-3">
             Log in to your Account

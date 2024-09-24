@@ -11,6 +11,9 @@
                     <a id="tutorial-link" class="nav-link" href="#tutorial">Tutorial</a>
                 </li>
                 <li class="nav-item" style="padding:0px 20px">
+                    <a class="nav-link" href="#teachers">Teachers</a>
+                </li>
+                <li class="nav-item" style="padding:0px 20px">
                     <a class="nav-link" href="#FAQ">FAQ</a>
                 </li>
                 <li class="nav-item" style="padding:0px 20px">
@@ -23,6 +26,29 @@
         <section id="tutorial">
             <h5 class="text-center fw-bold mt-4">Tutorial:</h5>
             <x-contentView type="video" file="" controlsList="noplaybackrate nodownload noseek"/>
+        </section>
+
+        <section id="teachers">
+            <h5 class="text-center fw-bold mt-4">Our Teachers</h5>
+            <div class="row row-cols-1 row-cols-md-2 g-4 justify-content-center">
+                @foreach ($teachers as $teacher)
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-img-top-wrapper" id="teacher-{{ $loop->index }}" style="height: 300px; overflow: hidden;">
+                                <img src="{{ Storage::url('profile_pictures/'.$teacher->profile_picture) }}" class="card-img-top" alt="{{ $teacher->name }}" style="object-fit: cover; width: 100%; height: 100%;">
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title" id="teacher-name-{{ $loop->index }}">{{ $teacher->name }}</h5>
+                                <p class="card-text">
+                                    <span class="short-bio">{{ Str::limit($teacher->bio, 100) }}</span>
+                                    <span class="full-bio" style="display: none;">{{ $teacher->bio }}</span>
+                                </p>
+                                <button class="btn btn-link read-more" data-teacher-index="{{ $loop->index }}">Read More</button>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
         </section>
         
         <section id="FAQ">
@@ -49,7 +75,7 @@
             <h5 class="text-center fw-bold mt-4">Contact:</h5>
             <p class="text-center fw-bold">Get Immediate Help in a Crisis</p>
             <p class="text-center">Call 911 if you or someone you know is in immediate danger or go to the nearest emergency room.</p>
-            <p class="text-center fw-bold mt-3">Contact us here:</p>
+            <p class="text-center fw-bold mt-3">For matters related to this app:</p>
             <p class="text-center">You can reach us via email or phone:</p>
             <p class="text-center">
                 <a href="mailto:{{ config('mail.contact_email') }}" class="text-decoration-none">{{ config('mail.contact_email') }}</a>
@@ -146,79 +172,102 @@
             });
         }
 
-        //init scrollspy
-        var scrollSpy = new bootstrap.ScrollSpy(document.querySelector('.scrollspy-example'), {
-            target: '#navbar-help',
-            offset: -25
-        });
-        scrollSpy.refresh();
+        //scrollspy
+        var scrollSpyContent = document.querySelector('.scrollspy-example');
+        var navbar = document.getElementById('navbar-help');
+        var navLinks = Array.from(navbar.querySelectorAll('.nav-link'));
+        var sections = Array.from(document.querySelectorAll('section'));
 
-        //FIX: scrollspy becoming inactive
-        var sections = document.querySelectorAll('section');
-        var navLinks = [];
-        //get navlinks
-        document.querySelectorAll('#navbar-help .nav-link').forEach(function (link) {
-            var section = document.querySelector(link.getAttribute('href'));
-            if (section) {
-                navLinks.push({
-                    link: link,
-                    section: section
-                });
-            }
-        });
-        //onscroll
-        document.addEventListener('scroll', function () {
-            var scrollPosition = window.scrollY;
-            var hasActive = false;
+        function getOffset(fromNavLinks = false) {
+            //larger mobile offset - reaches contact, also consider if from navLinks to make sure top hits section title
+            return window.innerWidth <= 768 && !fromNavLinks ? 150 : 70;
+        }
 
-            //check for active
-            navLinks.forEach(function (item) {
-                if (item.link.classList.contains('active')) {
-                    hasActive = true;
-                }
+        function updateActiveLink() {
+            let fromTop = window.scrollY + getOffset();
+            //get the current section
+            let currentSection = sections.find(section => {
+                let sectionTop = section.offsetTop;
+                let sectionHeight = section.offsetHeight;
+                return fromTop >= sectionTop && fromTop < sectionTop + sectionHeight;
             });
 
-            //if not found
-            if (!hasActive) {
-                navLinks.forEach(function (item) {
-                    var sectionTop = item.section.offsetTop;
-                    var sectionHeight = item.section.offsetHeight;
-    
-                    //check if in section boundaries
-                    if (scrollPosition >= sectionTop - 75 && scrollPosition < sectionTop + sectionHeight - 75) {
-                        //activate link
-                        if (!item.link.classList.contains('active')) {
-                            item.link.classList.add('active');
-                            hasActive = true;
-                        }
-                    }
-                    else {
-                        //otherwise remove
-                        if (item.link.classList.contains('active')) {
-                            item.link.classList.remove('active');
-                        }
-                    }
-                });
+            if (currentSection) {
+                //set the active link
+                let newActiveLink = navbar.querySelector(`a[href="#${currentSection.id}"]`);
+                if (newActiveLink && !newActiveLink.classList.contains('active')) {
+                    navLinks.forEach(link => link.classList.remove('active'));
+                    newActiveLink.classList.add('active');
+                }
             }
-            //broken if still not active - set default tutorial
-            if (!hasActive) {
-                document.getElementById('tutorial-link').classList.add('active');
-            }
-        });
+        }
 
+        //init active on launch
+        updateActiveLink();
 
-        //FIX: scrollspy adjust active improperly on clicking
-        navLinks.forEach(function (navLink) {
-            navLink.link.addEventListener('click', function (e) {
+        //update on scroll
+        window.addEventListener('scroll', updateActiveLink);
+
+        //scrollspy smooth scroll to sections
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
                 e.preventDefault();
-                var target = document.querySelector(this.getAttribute('href'));
-                var offset = 60;
-                var scrollPos = target.offsetTop - offset;
-                //scroll
+                let targetId = this.getAttribute('href');
+                let targetSection = document.querySelector(targetId);
+                //if going to contact section, use larger offset on mobile so that contact becomes active 
+                let offset = targetId == 'contactUs' ? getOffset(false) : getOffset(true);
+                let targetPosition = targetSection.offsetTop - offset + 1;
+
                 window.scrollTo({
-                    top: scrollPos,
+                    top: targetPosition,
                     behavior: 'smooth'
                 });
+            });
+        });
+
+        //read more
+        document.querySelectorAll('.read-more').forEach(button => {
+            button.addEventListener('click', function() {
+                const cardBody = this.closest('.card-body');
+                const shortBio = cardBody.querySelector('.short-bio');
+                const fullBio = cardBody.querySelector('.full-bio');
+                const teacherIndex = this.getAttribute('data-teacher-index');
+                
+                if (shortBio.style.display !== 'none') {
+                    shortBio.style.display = 'none';
+                    fullBio.style.display = 'inline';
+                    this.textContent = 'Read Less';
+
+                    //smooth scroll to bio
+                    const teacherName = document.getElementById(`teacher-name-${teacherIndex}`);
+                    if (teacherName) {
+
+                        var offset = 60;
+                        var elementPosition = teacherName.getBoundingClientRect().top;
+                        var offsetPosition = elementPosition + window.pageYOffset - offset;
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                } else {
+                    shortBio.style.display = 'inline';
+                    fullBio.style.display = 'none';
+                    this.textContent = 'Read More';
+                    
+                    //smooth scroll back to teacher
+                    const teacherElement = document.getElementById(`teacher-${teacherIndex}`);
+                    if (teacherElement) {
+
+                        var offset = 70;
+                        var elementPosition = teacherElement.getBoundingClientRect().top;
+                        var offsetPosition = elementPosition + window.pageYOffset - offset;
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
             });
         });
     });

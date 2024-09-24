@@ -8,6 +8,7 @@ use App\Models\Note;
 use App\Models\Activity;
 use App\Models\Module;
 use App\Models\QuizAnswers;
+use App\Models\Teacher;
 use App\Models\UserActivity;
 use App\Models\Faq;
 use Carbon\Carbon;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Log;
 
 
 
@@ -49,11 +51,11 @@ class PageNavController extends Controller
         return view("explore.home", compact('modules'));
     }
 
-    public function exploreModule($module_id)
+    public function exploreModule($module_id, $override_accordion=null)
     {
         //find the module
         $module = Module::with('days.activities')->findOrFail($module_id);
-
+        
         //check progress
         if (getModuleProgress(Auth::id(), [$module_id])[$module_id]['status'] == 'locked') {
             return redirect()->back();
@@ -62,16 +64,18 @@ class PageNavController extends Controller
         //get progress
         $day_ids = $module->days()->pluck('id')->toArray();
         $progress = getDayProgress(Auth::id(), $day_ids);
-
+        
         //sorting the activities within each day
         foreach ($module->days as $day) {
             $day->activities = $day->activities->sortBy(function ($activity) {
                 return [$activity->optional, $activity->order];
             })->values();
-
+            
             //assign the progress
             $day->progress = $progress[$day->id];
         }
+
+        $override_accordion = $override_accordion ? 'day_'.$override_accordion : null;
 
         //set back route
         $page_info['back_label'] = " Back to Home";
@@ -81,8 +85,16 @@ class PageNavController extends Controller
         Session::put('current_nav', ['route' => route('explore.module', ['module_id' => $module_id]), 'back' => 'Module '.$module_id]);
         Session::put('previous_explore', route('explore.module', ['module_id' => $module_id]));
         
-        return view("explore.module", compact('module', 'page_info'));
+        return view("explore.module", compact('module', 'page_info', 'override_accordion'));
     }
+
+public function exploreModuleBonus(Request $request, $module_id) {
+    $override_accordion = null;
+    if (isset($request->day_id_accordion)) {
+        $override_accordion = $request->day_id_accordion;
+    }
+    return $this->exploreModule($module_id, $override_accordion);
+}
 
     public function checkActivityLocked($activity_id, $from_controller = false) {
         //checking cache for progress
@@ -466,6 +478,7 @@ class PageNavController extends Controller
     public function helpPage()
     {
         $faqs = Faq::all();
-        return view("other.help", compact('faqs'));
+        $teachers = Teacher::all();
+        return view("other.help", compact('faqs', 'teachers'));
     }
 }
