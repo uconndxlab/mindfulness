@@ -80,11 +80,11 @@
                     @endforeach
                 @endforeach
 
-            @else
-                <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: block;">
-                    <x-contentView id="content_view" id2="pdf_download" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}"/>
-                </div>
-            @endif
+                @else
+                    <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: flex; justify-content: center; align-items: center;">
+                        <x-contentView id="content_view" id2="download_btn" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}"/>
+                    </div>
+                @endif
 
         @elseif ($activity->type == 'reflection' && $quiz)
             <div id="quizContainer">
@@ -136,16 +136,28 @@
         activityComplete(false);
     }
 
+    var type = null;
     //set eventlisteners to call activityComplete
     if (hasContent) {
         console.log('Type: content');
         //applies to all content items
         const content = document.getElementById('content_view');
-        const type = '{{ isset($content->type) ? $content->type : null }}';
+        type = '{{ isset($content->type) ? $content->type : null }}';
         if (type == 'pdf') {
-            const pdfDownload = document.getElementById('pdf_download');
-            pdfDownload.addEventListener('click', activityComplete);
+            const downloadButton = document.getElementById('download_btn');
+            downloadButton.addEventListener('click', activityComplete);
             content.addEventListener('click', activityComplete);
+        }
+        //adding complete button for images
+        else if (type == 'image' && status != 'completed') {
+            const completeButton = document.getElementById('img_complete_activity');
+            completeButton.classList.remove('disabled');
+            completeButton.addEventListener('click', activityComplete);
+            //show and center
+            completeButton.style.display = 'block';
+            completeButton.parentElement.style.display = 'flex';
+            completeButton.parentElement.style.flexDirection = 'column';
+            completeButton.parentElement.style.alignItems = 'center';
         }
         else {
             content.addEventListener('ended', activityComplete);
@@ -191,6 +203,12 @@
                 if (response.data.unlocked_bonus) {
                     const bonusMessageDiv = document.getElementById('bonus_message');
                     bonusMessageDiv.style.display = 'block';
+                }
+                //hiding complete button for images
+                if (type == 'image') {
+                    const completeButton = document.getElementById('img_complete_activity');
+                    completeButton.classList.add('disabled');
+                    completeButton.style.display = 'none';
                 }
                 unlockRedirect();
             })
