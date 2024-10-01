@@ -57,6 +57,8 @@ class PageNavController extends Controller
         $module = Module::with('days.activities')->findOrFail($module_id);
         
         //check progress
+        $mod_progress = getModuleProgress(Auth::id(), [$module_id]);
+        $module->progress_days = [$mod_progress[$module_id]['completed'], $mod_progress[$module_id]['total']];
         if (getModuleProgress(Auth::id(), [$module_id])[$module_id]['status'] == 'locked') {
             return redirect()->back();
         }

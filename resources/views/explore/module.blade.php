@@ -13,7 +13,7 @@
     </div>
 
     <div class="">
-        <h4 class="mb-2">Sessions</h4>
+        <h5 class="mb-2">Progress: {{ $module->progress_days[0] }}/{{ $module->progress_days[1] }} days completed</h5>
         <div class="accordion accordion-flush mb-3" id="accordionDays">
             @foreach ($module->days as $index => $day)
                 @php
