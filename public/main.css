@@ -447,15 +447,30 @@ body:has(div.dark-background){
     font-weight:400;
 }
 
-.activity-tag-activity, .activity-tag-time, .activity-tag-optional{
+.activity-tag-lesson, .activity-tag-practice,.activity-tag-journal, .activity-tag-reflection,.activity-tag-time, .activity-tag-optional{
     padding: 5px 10px;
     border-radius:100px;
-    background:var(--purple);
     color:#fff;
 }
 
-.activity-tag-time{
+.activity-tag-lesson{
+    background:#a81e27;
+}
+
+.activity-tag-practice{
+    background:#3f83a1;
+}
+
+.activity-tag-journal{
+    background:#7a4e0d;
+}
+
+.activity-tag-reflection{
     background:var(--light-purple);
+}
+
+.activity-tag-time{
+    background:#434343;
 }
 
 .activity-tag-time i{
