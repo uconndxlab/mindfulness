@@ -25,6 +25,7 @@
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
         @php
             $controlsList = ($activity->type === 'practice' ? 'noplaybackrate' : '');
+            $allowSeek = $activity->status == 'completed' ? 'true' : 'false';
         @endphp
             @if ($content->audio_options)
                 <div class="col-6 mt-1" id="audio-options-div" style="display: none;">
@@ -75,14 +76,14 @@
                 @foreach ($content->audio_options as $voice => $time_options)
                     @foreach ($time_options as $time => $file_path)
                         <div id="content_main" class="content-main" voice="{{ $voice }}" time="{{ $time }}" data-type="audio" style="display: none;">
-                            <x-contentView id="content_view" type="audio" file="{{ $file_path }}" controlsList="{{ $controlsList }}"/>
+                            <x-contentView id="content_view" type="audio" file="{{ $file_path }}" controlsList="{{ $controlsList }}" allowSeek="{{ $allowSeek }}"/>
                         </div>
                     @endforeach
                 @endforeach
 
                 @else
                     <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: flex; justify-content: center; align-items: center;">
-                        <x-contentView id="content_view" id2="download_btn" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}"/>
+                        <x-contentView id="content_view" id2="download_btn" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}" allowSeek="{{ $allowSeek }}"/>
                     </div>
                 @endif
 

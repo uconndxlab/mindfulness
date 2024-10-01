@@ -13,6 +13,8 @@
         </div>
     </div>
     <script>
+        var allowSeek = {{ $allowSeek }} == 'true' ? true : false;
+
         $(".js-audio").each(function (index, el) {
             initAudioPlayer($(this), index);
         });
@@ -57,6 +59,11 @@
                 circle = player.find("#seekbar"),
                 getCircle = circle.get(0),
                 totalLength = getCircle.getTotalLength();
+            
+            //if seek is allowed, just set watched to duration
+            if (allowSeek) {
+                watchedTime = audio[0].duration;
+            }
 
             circle.attr({
                 "stroke-dasharray": totalLength,
@@ -107,7 +114,7 @@
             audio.on("seeking", (e) => {
                 //blocking the user from seeking forward beyond watchedtime
                 let currentTime = audio[0].currentTime;
-                if (currentTime > watchedTime) {
+                if (currentTime > watchedTime && !allowSeek) {
                     audio[0].currentTime = watchedTime;
                     e.preventDefault();
                 }
