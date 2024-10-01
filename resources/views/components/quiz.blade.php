@@ -36,7 +36,7 @@
                             {!! $option['feedback'] !!}
                         </div>
                         @if ($option['audio_path'])
-                            <x-contentView id="fbAudio_{{ $question['number'] }}_{{ $index }}" id2="pdf_download" type="audio" file="{{ $option['audio_path'] }}"/>
+                            <x-contentView id="fbAudio_{{ $question['number'] }}_{{ $index }}" id2="pdf_download" type="feedback_audio" file="{{ $option['audio_path'] }}"/>
                         @endif
                     </div>
                 @endforeach
@@ -105,6 +105,13 @@
                 }
             }
             populateForm(answers);
+
+            //pause audios
+            function pauseAudios() {
+                document.querySelectorAll('audio').forEach(audio => {
+                    audio.pause();
+                });
+            }
             
             //QUESTION CHANGE
             function changeQuestion(q_no) {
@@ -115,9 +122,7 @@
                 const quizDivs = quizForm.querySelectorAll('.quiz-div');
                 quizDivs.forEach(qDiv => {
                     //pause any audio
-                    qDiv.querySelectorAll('audio').forEach(audio => {
-                        audio.pause();
-                    });
+                    pauseAudios();
                     const currentNumber = parseInt(qDiv.getAttribute('data-number'));
                     const isLast = currentNumber === questionCount;
                     const isFirst = currentNumber === 1;
@@ -195,7 +200,12 @@
                     }
                     //show/hide feedback
                     feedbackDiv.style.display = event.target.checked ? 'block' : 'none';
-
+                    //autoplay audio in feedback
+                    if (event.target.checked) {
+                        feedbackDiv.querySelectorAll('audio').forEach(audio => {
+                            audio.play();
+                        });
+                    }
                     checkBox(option, event.target.checked);
                 });
             });

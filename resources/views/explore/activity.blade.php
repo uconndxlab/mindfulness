@@ -367,7 +367,7 @@
             }
         }
         //NOSEEK
-        var mediaPlayers = document.querySelectorAll('.media-player');
+        var mediaPlayers = document.querySelectorAll('.slide__audio-player');
         mediaPlayers.forEach(function(player) {
             var timeTracking = {
                 watchedTime: 0,

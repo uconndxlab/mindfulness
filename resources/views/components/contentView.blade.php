@@ -139,4 +139,8 @@
             <button id="img_complete_activity" class="btn btn-workbook mt-3" style="display: none;">GOT IT! WILL DO</button>
         </span>
     </div>
+@elseif ($type == 'feedback_audio')
+    <audio id="{{ $id }}" class="media-player" preload="auto" src="{{ Storage::url('content/'.$file) }}" controls onerror="alert('Error loading audio file');">
+        Your browser does not support the audio element.
+    </audio>
 @endif
