@@ -82,7 +82,7 @@ class PageNavController extends Controller
         $page_info['back_route'] = route('explore.home');
 
         //handle navigation
-        Session::put('current_nav', ['route' => route('explore.module', ['module_id' => $module_id]), 'back' => 'Module '.$module_id]);
+        Session::put('current_nav', ['route' => route('explore.module', ['module_id' => $module_id]), 'back' => 'Part '.$module_id]);
         Session::put('previous_explore', route('explore.module', ['module_id' => $module_id]));
         
         return view("explore.module", compact('module', 'page_info', 'override_accordion'));
