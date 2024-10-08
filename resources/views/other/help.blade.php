@@ -11,6 +11,9 @@
                     <a id="tutorial-link" class="nav-link" href="#tutorial">Tutorial</a>
                 </li>
                 <li class="nav-item" style="padding:0px 20px">
+                    <a class="nav-link" href="#Acknowledgement">Acknowledgement</a>
+                </li>
+                <li class="nav-item" style="padding:0px 20px">
                     <a class="nav-link" href="#teachers">Teachers</a>
                 </li>
                 <li class="nav-item" style="padding:0px 20px">
@@ -26,6 +29,12 @@
         <section id="tutorial">
             <h5 class="text-center fw-bold mt-4">Tutorial:</h5>
             <x-contentView type="video" file="" controlsList="noplaybackrate nodownload noseek"/>
+        </section>
+        <section id="Acknowledgement">
+            <h5 class="text-center fw-bold mt-4">Acknolwedgement</h5>
+            <p class="text-center">
+                The development and testing of the Healing Hearts program was made possible through the generous support of the National Institute of Health (K01MH122502). We gratefully acknowledge their funding. We also extend our heartfelt thanks to our dedicated team members from UConn Digital Experience Group, research assistants, mindfulness teachers, consultants, and collaborators for their invaluable contributions to this project. We are also grateful to the participants who provided valuable feedback during the development and testing phase, helping us to continuously improve the Healing Hearts experience. 
+            </p>
         </section>
 
         <section id="teachers">
