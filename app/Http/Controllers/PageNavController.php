@@ -403,7 +403,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
             'search_text' => 'Search your past journals...'
         ];
 
-        $categories = ['Relax', 'Compassion', 'Other', 'Activities'];
+        $categories = ['Self-care', 'Self-understanding', 'Parenting', 'Gratitude', 'Joy', 'Love', 'Relationships', 'Boundaries'];
 
         //set as the previous library and save as exit
         Session::put('previous_journal', route('journal.library'));
@@ -426,7 +426,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
         //handle search
         if ($request->has('search') && $request->search != '') {
             $query->where(function($in_query) use ($request) {
-                $in_query->where('word_otd', 'like', '%' . $request->search . '%')
+                $in_query->where('topic', 'like', '%' . $request->search . '%')
                     ->orWhere('note', 'like', '%' . $request->search . '%');
             });
         }
@@ -441,7 +441,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
                         $in_query->orWhere('activity_id', '!=', null);
                     }
                     else {
-                        $in_query->orWhere('word_otd', $category);
+                        $in_query->orWhere('topic', $category);
                     }
                 }
             });

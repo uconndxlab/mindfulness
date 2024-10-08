@@ -15,16 +15,21 @@
             </div>
         @else
             <div class="form-group dropdown">
-                <label class="fw-bold col-12" for="word_dropdown">Word of the day:</label>
+                <label class="fw-bold col-12" for="word_dropdown">Please select what you want to talk about in this journal:</label>
                 <button id="word-of-day" class="btn btn-xlight dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Select a word
+                    Select a Topic
                 </button>
                 <ul class="dropdown-menu" id="word_dropdown" name="word_dropdown">
-                    <li><button class="dropdown-item" type="button" value="relax">Relax</button></li>
-                    <li><button class="dropdown-item" type="button" value="compassion">Compassion</button></li>
-                    <li><button class="dropdown-item" type="button" value="other">More options...</button></li>
+                    <li><button class="dropdown-item" type="button" value="self-care">Self-care</button></li>
+                    <li><button class="dropdown-item" type="button" value="self-understanding">Self-understanding</button></li>
+                    <li><button class="dropdown-item" type="button" value="parenting">Parenting</button></li>
+                    <li><button class="dropdown-item" type="button" value="gratitude">Gratitude</button></li>
+                    <li><button class="dropdown-item" type="button" value="joy">Joy</button></li>
+                    <li><button class="dropdown-item" type="button" value="love">Love</button></li>
+                    <li><button class="dropdown-item" type="button" value="relationships">Relationships</button></li>
+                    <li><button class="dropdown-item" type="button" value="boundaries">Boundaries</button></li>
                 </ul>
-                <input type="hidden" name="word_otd" id="word_otd" value="">
+                <input type="hidden" name="topic" id="topic" value="">
             </div>
             <div id="error-messages-word" class="text-danger note-err-message" style="display: none;"></div>
         @endif
@@ -43,7 +48,7 @@
             
             const journalForm = document.getElementById('journalForm');
             const noteInput = document.getElementById('note');
-            const wordOtdInput = document.getElementById('word_otd');
+            const wordOtdInput = document.getElementById('topic');
             const wordOtdButton = document.getElementById('word-of-day');
             const submitBtn = document.getElementById('submitButton');
             
@@ -71,11 +76,12 @@
                 else {
                     body = {
                         note: noteInput.value.trim(),
-                        word_otd: wordOtdInput.value,
+                        topic: wordOtdInput.value,
                         activity: false
                     }
                 }
                 closeResponseMessages();
+                console.log('Submitting note: ', body);
                 return new Promise((resolve, reject) => {
                     axios.post('/note', body, {
                         headers: {
@@ -89,7 +95,7 @@
                             activityComplete();
                         }
                         else {
-                            wordOtdButton.innerHTML = 'Select a word'; 
+                            wordOtdButton.innerHTML = 'Select a Topic'; 
                             wordOtdInput.value = '';
                             note.value = '';
                             unlockSubmit();
@@ -104,8 +110,8 @@
                                 noteErrDiv.textContent = error.response.data.errors.note.join(' ');
                                 noteErrDiv.style.display = 'block';
                             }
-                            if (error.response.data.errors.word_otd) {
-                                wordErrDiv.textContent = error.response.data.errors.word_otd.join(' ');
+                            if (error.response.data.errors.topic) {
+                                wordErrDiv.textContent = error.response.data.errors.topic.join(' ');
                                 wordErrDiv.style.display = 'block';
                             }
                         } else {

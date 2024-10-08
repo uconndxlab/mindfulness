@@ -112,9 +112,15 @@
                                                         Category
                                                     </button>
                                                 </h2>
+                                                @php
+                                                    $journal_search = isset($page_info['journal']) && $page_info['journal'] ? true : false;
+                                                @endphp
                                                 <div id="collapseCategory" class="accordion-collapse collapse" aria-labelledby="headingCategory">
                                                     <div class="accordion-body">
                                                         <div id="category_check">
+                                                            @if ($journal_search)
+                                                                <div class="text-left fw-bold">Topics:</div>
+                                                            @endif
                                                             @foreach ($categories as $category)
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="checkbox" name="category[]" id="category_{{ strtolower($category) }}" value="{{ $category }}">
@@ -123,6 +129,15 @@
                                                                     </label>
                                                                 </div>
                                                             @endforeach
+                                                            @if ($journal_search)
+                                                                <div class="text-left fw-bold mt-1">Other:</div>
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox" name="category[]" id="category_activities" value="Activities">
+                                                                    <label class="form-check-label" for="category_activities">
+                                                                        Activities
+                                                                    </label>
+                                                                </div>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </div>
