@@ -17,6 +17,7 @@ return new class extends Migration
             $table->enum('type', ['audio', 'video', 'pdf', 'image']);
             $table->string('file_path');
             $table->json('audio_options')->nullable();
+            $table->json('instructions')->nullable();
             $table->timestamps();
         });
     }

@@ -23,10 +23,15 @@
     </div>
     <div class="manual-margin-top">
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
-        @php
-            $controlsList = ($activity->type === 'practice' ? 'noplaybackrate' : '');
-            $allowSeek = $activity->status == 'completed' ? 'true' : 'false';
-        @endphp
+            @if (isset($content->instructions))
+                <div class="text-left mb-3">
+                    <h5>{!! $content->instructions !!}</h5>
+                </div>
+            @endif
+            @php
+                $controlsList = ($activity->type === 'practice' ? 'noplaybackrate' : '');
+                $allowSeek = $activity->status == 'completed' ? 'true' : 'false';
+            @endphp
             @if ($content->audio_options)
                 <div class="col-6 mt-1" id="audio-options-div" style="display: none;">
                     @php
