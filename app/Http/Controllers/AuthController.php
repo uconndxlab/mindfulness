@@ -86,7 +86,7 @@ class AuthController extends Controller
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required',  'email',  'max:255',  'unique:'.User::class],
-                'password'=> ['required', Password::defaults()],
+                'password'=> ['required', Password::min(8)->mixedCase()->numbers()],
             ], [
                 'name.required' => 'Please enter a name.',
                 'name.max' => 'Name must be no longer than 255 characters.',

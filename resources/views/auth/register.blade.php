@@ -12,7 +12,7 @@
         </div>
 
         <div class="form-group mb-3">
-            <label class="fw-bold" for="name">First Name</label>
+            <label class="fw-bold mb-1" for="name">First Name</label>
             <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" autocomplete="off">
             @error('name')
                 <span class="invalid-feedback" role="alert">
@@ -22,7 +22,7 @@
         </div>
 
         <div class="form-group mb-3">
-            <label class="fw-bold" for="email">Email</label>
+            <label class="fw-bold mb-1" for="email">Email</label>
             <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" autocomplete="off">
             @error('email')
                 <span class="invalid-feedback" role="alert">
@@ -32,8 +32,9 @@
         </div>
 
         <div class="form-group mb-3">
-            <label class="fw-bold" for="password">Password</label>
+            <label class="fw-bold mb-1" for="password">Password</label><br>
             <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" autocomplete="off">
+            <small>(Must be at least 8 characters, including both letters and numbers.)</small>
             @error('password')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>

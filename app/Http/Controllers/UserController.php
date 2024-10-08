@@ -110,7 +110,7 @@ class UserController extends Controller
             //validate
             $request->validate([
                 'name'=> ['sometimes', 'string', 'max:255'],
-                'password'=> ['sometimes', Password::defaults(), 'nullable'],
+                'password'=> ['sometimes', Password::min(8)->mixedCase()->numbers(), 'nullable'],
                 'oldPass'=>['required'],
             ], [
                 'name.max' => 'Name must be no longer than 255 characters.',

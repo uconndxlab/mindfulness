@@ -31,6 +31,7 @@
         <div class="form-group mb-3">
             <label class="fw-bold" for="password">New Password</label>
             <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password">
+            <small>(Must be at least 8 characters, including both letters and numbers.)</small>
             @error('password')
             <span class="invalid-feedback" role="alert">
                 <strong>{{ $message }}</strong>
