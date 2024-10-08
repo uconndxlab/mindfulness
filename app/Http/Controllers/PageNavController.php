@@ -17,8 +17,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Log;
-
 
 
 class PageNavController extends Controller
@@ -383,14 +381,14 @@ public function exploreModuleBonus(Request $request, $module_id) {
     {
         $page_info = [
             'journal' => true,
-            'title' => 'Compose'
+            'title' => 'Write'
         ];
 
         $journal = new Journal();
 
         //set as the previous journal and save as exit
         Session::put('previous_journal', route('journal.compose'));
-        Session::put('current_nav', ['route' => route('journal.compose'), 'back' => 'Compose']);
+        Session::put('current_nav', ['route' => route('journal.compose'), 'back' => 'Write']);
         return view('other.compose', compact('page_info', 'journal'));
     }
     public function journalLibrary (Request $request) {

@@ -152,7 +152,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ $active_items[3] ? 'active' : '' }}" href="{{ route('account') }}">
-                                <span class="nav-icon-text"><i class="bi bi-person-circle"></i>Account</span>
+                                <span class="nav-icon-text"><i class="bi bi-person-circle"></i>Profile</span>
                             </a>
                         </li>
                         <li class="nav-item">
