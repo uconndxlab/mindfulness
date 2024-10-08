@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Rules\ValidEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -85,13 +86,13 @@ class AuthController extends Controller
         try {
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['required',  'email',  'max:255',  'unique:'.User::class],
+                'email' => ['required',  'email', new ValidEmail(), 'max:255',  'unique:'.User::class],
                 'password'=> ['required', Password::min(8)->mixedCase()->numbers()],
             ], [
                 'name.required' => 'Please enter a name.',
                 'name.max' => 'Name must be no longer than 255 characters.',
                 'email.required' => 'Please enter an email address.',
-                'email.email' => 'Not a valid email.',
+                'email.email' => 'Not a valid email address.',
                 'email.max' => 'Email must be no longer than 255 characters.',
                 'email.unique' => 'The provided email is already in use.',
                 'password.required' => 'Please enter a password.'
