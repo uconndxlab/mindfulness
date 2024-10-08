@@ -746,3 +746,32 @@ body:has(div.dark-background){
     font-size:50px;
 }
 
+/* quizzes and feedback */
+.text-info{
+    color:black!important;
+}
+
+audio.feedback-audio::-webkit-media-controls-panel {
+    background-color: #f5f5f5;
+  }
+
+audio.feedback-audio::-webkit-media-controls-timeline{
+    display:none;
+}
+
+audio.feedback-audio::-webkit-media-controls-play-button{
+    background-color: rgba(117, 186, 150, .25);
+    border-radius:100px;
+    margin-left:-10px;
+}
+
+.feedback-div, .text-success{
+    padding:20px;
+    background:#f5f5f5;
+    border-radius:20px;
+    border:2px solid var(--light-green)
+}
+
+.text-success{
+    margin-top:20px;
+}

@@ -8,7 +8,7 @@
                 </div>
                 <!-- options -->
                 @foreach ($question['options_feedback'] as $index => $option)
-                    <div id="options_{{ $question['number'] }}" class="form-check type-{{ $question['type'] }}">
+                    <div id="options_{{ $question['number'] }}" class="form-check type-{{ $question['type'] }} mb-2">
                         <input class="form-check-input" name="answer_{{ $question['number'] }}[]" above-behavior="{{ $option['above'] }}" type="{{ $question['type'] }}" data-other="{{ $option['other'] }}" id="option_{{ $question['number'] }}_{{ $index }}" value="{{ $index }}">
                         <label class="form-check-label" for="option_{{ $question['number'] }}_{{ $index }}">
                             {{ $option['option'] }}
@@ -31,13 +31,13 @@
                             $text_color = 'text-danger';
                         }
                     @endphp
-                    <div id="feedback_{{ $question['number'] }}_{{ $index }}" class="feedback-div" style="display: none;">
-                        <div class="mt-3 {{ $text_color }}">
-                            {!! $option['feedback'] !!}
-                        </div>
+                    <div id="feedback_{{ $question['number'] }}_{{ $index }}" class="feedback-div mt-4" style="display: none;">
                         @if ($option['audio_path'])
                             <x-contentView id="fbAudio_{{ $question['number'] }}_{{ $index }}" id2="pdf_download" type="feedback_audio" file="{{ $option['audio_path'] }}"/>
                         @endif
+                        <div class="{{ $text_color }}">
+                            {!! $option['feedback'] !!}
+                        </div>
                     </div>
                 @endforeach
             </div>

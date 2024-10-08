@@ -147,7 +147,7 @@
         </span>
     </div>
 @elseif ($type == 'feedback_audio')
-    <audio id="{{ $id }}" class="media-player" preload="auto" src="{{ Storage::url('content/'.$file) }}" controls onerror="alert('Error loading audio file');">
+    <audio id="{{ $id }}" class="media-player feedback-audio" preload="auto" src="{{ Storage::url('content/'.$file) }}" controls onerror="alert('Error loading audio file');">
         Your browser does not support the audio element.
     </audio>
 @endif
