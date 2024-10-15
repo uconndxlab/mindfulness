@@ -39,7 +39,7 @@
         
         <div class="form-group mb-3">
             <label class="fw-bold" for="password">Change Password</label><br>
-            <small>Enter your new password below (must be at least 8 characters, including both letters and numbers)</small>
+            <small>Enter your new password below (Must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number)</small>
             <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password">
             <div id="error-messages-password" class="invalid-feedback contact-message fw-bold" style="display: none;"></div>
         </div>

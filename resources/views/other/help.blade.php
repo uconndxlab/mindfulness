@@ -11,10 +11,7 @@
                     <a id="tutorial-link" class="nav-link" href="#tutorial">Tutorial</a>
                 </li>
                 <li class="nav-item" style="padding:0px 20px">
-                    <a class="nav-link" href="#Acknowledgement">Acknowledgement</a>
-                </li>
-                <li class="nav-item" style="padding:0px 20px">
-                    <a class="nav-link" href="#teachers">Teachers</a>
+                    <a class="nav-link" href="#info">Info</a>
                 </li>
                 <li class="nav-item" style="padding:0px 20px">
                     <a class="nav-link" href="#FAQ">FAQ</a>
@@ -27,17 +24,15 @@
     </nav>
     <div data-bs-spy="scroll" data-bs-target="#navbar-help" data-bs-smooth-scroll="true" class="scrollspy-example pt-3 pb-3 rounded-2" tabindex="0">
         <section id="tutorial">
-            <h5 class="text-center fw-bold mt-4">Tutorial:</h5>
+            <h4 class="text-center fw-bold mt-4">Tutorial:</h4>
             <x-contentView type="video" file="" controlsList="noplaybackrate nodownload noseek"/>
         </section>
-        <section id="Acknowledgement">
-            <h5 class="text-center fw-bold mt-4">Acknolwedgement</h5>
+        <section id="info">
+            <h4 class="text-center fw-bold mt-4">Info about Healing Hearts:</h4>
+            <h5 class="text-center fw-bold mt-2">Acknolwedgement</h5>
             <p class="text-center">
                 The development and testing of the Healing Hearts program was made possible through the generous support of the National Institute of Health (K01MH122502). We gratefully acknowledge their funding. We also extend our heartfelt thanks to our dedicated team members from UConn Digital Experience Group, research assistants, mindfulness teachers, consultants, and collaborators for their invaluable contributions to this project. We are also grateful to the participants who provided valuable feedback during the development and testing phase, helping us to continuously improve the Healing Hearts experience. 
             </p>
-        </section>
-
-        <section id="teachers">
             <h5 class="text-center fw-bold mt-4">Our Teachers</h5>
             <div class="container">
                 @foreach ($teachers as $teacher)
@@ -72,7 +67,7 @@
         </section>
         
         <section id="FAQ">
-            <h5 class="text-center fw-bold mt-4">FAQ</h5>
+            <h4 class="text-center fw-bold mt-4">FAQ</h4>
             <div class="accordion accordion-flush mb-3" id="filter_accordion">
                 @foreach ($faqs as $index => $faq)
                     <div class="form-group accordion-item border mb-2">
@@ -92,7 +87,7 @@
         </section>
 
         <section id="contactUs">
-            <h5 class="text-center fw-bold mt-4">Contact:</h5>
+            <h4 class="text-center fw-bold mt-4">Contact:</h4>
             <p class="text-center fw-bold">Get Immediate Help in a Crisis</p>
             <p class="text-center">Call 911 if you or someone you know is in immediate danger or go to the nearest emergency room.</p>
             <p class="text-center fw-bold mt-3">For matters related to this app:</p>

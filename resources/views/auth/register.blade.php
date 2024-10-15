@@ -34,7 +34,7 @@
         <div class="form-group mb-3">
             <label class="fw-bold mb-1" for="password">Password</label><br>
             <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" autocomplete="off">
-            <small>(Must be at least 8 characters, including both letters and numbers.)</small>
+            <small>(Must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number)</small>
             @error('password')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
