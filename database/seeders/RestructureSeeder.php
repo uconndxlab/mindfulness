@@ -40,7 +40,7 @@ class RestructureSeeder extends Seeder
 
         //populating extra example days
         foreach (Module::all() as $module) {
-            for ($j = $module->id == 1 ? 5 : 1; $j <= 5; $j++) {
+            for ($j = $module->id == 1 ? 6 : 1; $j <= 5; $j++) {
                 $day = Day::create([
                     'module_id' => $module->id,
                     'name' => 'Day '.$j,
