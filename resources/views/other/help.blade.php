@@ -235,7 +235,7 @@
 
         function getOffset(fromNavLinks = false) {
             //larger mobile offset - reaches contact, also consider if from navLinks to make sure top hits section title
-            return window.innerWidth <= 768 && !fromNavLinks ? 150 : 70;
+            return window.innerWidth <= 768 && !fromNavLinks ? 200 : 200;
         }
 
         function updateActiveLink() {
@@ -271,7 +271,7 @@
                 let targetSection = document.querySelector(targetId);
                 //if going to contact section, use larger offset on mobile so that contact becomes active 
                 let offset = targetId == 'contactUs' ? getOffset(false) : getOffset(true);
-                let targetPosition = targetSection.offsetTop - offset + 1;
+                let targetPosition = targetSection.offsetTop - offset + 125;
 
                 window.scrollTo({
                     top: targetPosition,

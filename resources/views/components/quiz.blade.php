@@ -195,6 +195,7 @@
                             //pause any audio
                             fbDiv.querySelectorAll('audio').forEach(audio => {
                                 audio.pause();
+                                audio.currentTime = 0;
                             });
                         });
                     }
