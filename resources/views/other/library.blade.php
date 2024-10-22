@@ -106,21 +106,22 @@
                                                 <input type="hidden" name="end_time" id="end_time_input">
                                             </div>
                     
+                                            @php
+                                                $journal_search = isset($page_info['journal']) && $page_info['journal'] ? true : false;
+                                            @endphp
                                             <div class="form-group accordion-item border mb-2">
                                                 <h2 class="accordion-header" id="headingCategory">
                                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory" aria-expanded="true" aria-controls="collapseCategory">
-                                                        Category
+                                                        @if ($journal_search)
+                                                            Topics
+                                                        @else
+                                                            Category
+                                                        @endif
                                                     </button>
                                                 </h2>
-                                                @php
-                                                    $journal_search = isset($page_info['journal']) && $page_info['journal'] ? true : false;
-                                                @endphp
                                                 <div id="collapseCategory" class="accordion-collapse collapse" aria-labelledby="headingCategory">
                                                     <div class="accordion-body">
                                                         <div id="category_check">
-                                                            @if ($journal_search)
-                                                                <div class="text-left fw-bold">Topics:</div>
-                                                            @endif
                                                             @foreach ($categories as $category)
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="checkbox" name="category[]" id="category_{{ strtolower($category) }}" value="{{ $category }}">
@@ -130,7 +131,7 @@
                                                                 </div>
                                                             @endforeach
                                                             @if ($journal_search)
-                                                                <div class="text-left fw-bold mt-1">Other:</div>
+                                                                <div class="text-left fw-bold mt-1">From Activity:</div>
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="checkbox" name="category[]" id="category_activities" value="Activities">
                                                                     <label class="form-check-label" for="category_activities">
@@ -147,7 +148,7 @@
                                             <div class="form-group accordion-item border mb-2" style="display: {{ $journal_hide ? 'none' : 'block' }}">
                                                 <h2 class="accordion-header" id="headingModule">
                                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseModule" aria-expanded="true" aria-controls="collapseModule">
-                                                        Module
+                                                        Part
                                                     </button>
                                                 </h2>
                                                 <div id="collapseModule" class="accordion-collapse collapse" aria-labelledby="headingModule">
@@ -157,7 +158,7 @@
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="checkbox" name="module[]" id="module_{{ $i }}" value="{{ $i }}" {{ in_array($i, request('module', [])) ? 'checked' : '' }}>
                                                                     <label class="form-check-label" for="module_{{ $i }}">
-                                                                        Module {{ $i }}
+                                                                        Part {{ $i }}
                                                                     </label>
                                                                 </div>
                                                             @endfor

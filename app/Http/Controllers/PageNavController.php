@@ -357,7 +357,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
             'search_text' => 'Search for a meditation exercise...'
         ];
 
-        $categories = ['Favorited', 'Lesson', 'Reflection', 'Journal', 'Optional'];
+        $categories = ['Favorited', 'Optional'];
 
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.meditation'));
