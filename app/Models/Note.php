@@ -19,7 +19,7 @@ class Note extends Model
     protected $fillable = [
         'note',
         'user_id',
-        'word_otd',
+        'topic',
         'activity_id'
     ];
 

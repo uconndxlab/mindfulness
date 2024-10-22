@@ -29,6 +29,8 @@ class DatabaseSeeder extends Seeder
         DB::table('journals')->truncate();
         DB::table('faqs')->truncate();
         DB::table('quiz_answers')->truncate();
+        DB::table('notes')->truncate();
+        DB::table('teachers')->truncate();
         //favs, session, progress wiped in ResetUserProgress
 
         //enable foreign key checks for SQLite
@@ -42,5 +44,6 @@ class DatabaseSeeder extends Seeder
         $this->call(JournalSeeder::class);                                  //jounral
         $this->call(FaqSeeder::class);                                      //faq
         $this->call(ResetUserProgress::class);                              //favorites, session vars, progress
+        $this->call(TeacherSeeder::class);                                  //teachers
     }
 }

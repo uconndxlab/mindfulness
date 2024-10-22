@@ -13,6 +13,8 @@
         </div>
     </div>
     <script>
+        var allowSeek = {{ $allowSeek }} == 'true' ? true : false;
+
         $(".js-audio").each(function (index, el) {
             initAudioPlayer($(this), index);
         });
@@ -57,6 +59,11 @@
                 circle = player.find("#seekbar"),
                 getCircle = circle.get(0),
                 totalLength = getCircle.getTotalLength();
+            
+            //if seek is allowed, just set watched to duration
+            if (allowSeek) {
+                watchedTime = audio[0].duration;
+            }
 
             circle.attr({
                 "stroke-dasharray": totalLength,
@@ -107,7 +114,7 @@
             audio.on("seeking", (e) => {
                 //blocking the user from seeking forward beyond watchedtime
                 let currentTime = audio[0].currentTime;
-                if (currentTime > watchedTime) {
+                if (currentTime > watchedTime && !allowSeek) {
                     audio[0].currentTime = watchedTime;
                     e.preventDefault();
                 }
@@ -119,7 +126,7 @@
         }
     </script>
 @elseif ($type == 'video')
-    <video id="{{ isset($id) ? $id : '' }}" class="media-player" controls controlsList="{{ isset($controlsList) ? $controlsList : '' }}" preload="auto" width="100%" height="auto">
+    <video id="{{ isset($id) ? $id : '' }}" class="media-player video-player" controls controlsList="{{ isset($controlsList) ? $controlsList : '' }}" preload="auto" width="100%" height="auto">
         <source src="{{ Storage::url('content/'.$file) }}" type="video/mp4">
         Your browser does not support the video element.
     </video>
@@ -136,7 +143,11 @@
         <span style="text-align: center;">
             <img id="{{ isset($id) ? $id : '' }}" src="{{ Storage::url('content/'.$file) }}" alt="Image">
             <br>
-            <button id="img_complete_activity" class="btn btn-workbook mt-3" style="display: none;">COMPLETE ACTIVITY</button>
+            <button id="img_complete_activity" class="btn btn-workbook mt-3" style="display: none;">GOT IT! WILL DO</button>
         </span>
     </div>
+@elseif ($type == 'feedback_audio')
+    <audio id="{{ $id }}" class="media-player feedback-audio" preload="auto" src="{{ Storage::url('content/'.$file) }}" controls onerror="alert('Error loading audio file');">
+        Your browser does not support the audio element.
+    </audio>
 @endif

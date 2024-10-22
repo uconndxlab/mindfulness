@@ -23,9 +23,15 @@
     </div>
     <div class="manual-margin-top">
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
-        @php
-            $controlsList = ($activity->type === 'practice' ? 'noplaybackrate' : '');
-        @endphp
+            @if (isset($content->instructions))
+                <div class="text-left mb-3">
+                    <h5>{!! $content->instructions !!}</h5>
+                </div>
+            @endif
+            @php
+                $controlsList = ($activity->type === 'practice' ? 'noplaybackrate' : '');
+                $allowSeek = $activity->status == 'completed' ? 'true' : 'false';
+            @endphp
             @if ($content->audio_options)
                 <div class="col-6 mt-1" id="audio-options-div" style="display: none;">
                     @php
@@ -75,14 +81,14 @@
                 @foreach ($content->audio_options as $voice => $time_options)
                     @foreach ($time_options as $time => $file_path)
                         <div id="content_main" class="content-main" voice="{{ $voice }}" time="{{ $time }}" data-type="audio" style="display: none;">
-                            <x-contentView id="content_view" type="audio" file="{{ $file_path }}" controlsList="{{ $controlsList }}"/>
+                            <x-contentView id="content_view" type="audio" file="{{ $file_path }}" controlsList="{{ $controlsList }}" allowSeek="{{ $allowSeek }}"/>
                         </div>
                     @endforeach
                 @endforeach
 
                 @else
                     <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: flex; justify-content: center; align-items: center;">
-                        <x-contentView id="content_view" id2="download_btn" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}"/>
+                        <x-contentView id="content_view" id2="download_btn" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}" allowSeek="{{ $allowSeek }}"/>
                     </div>
                 @endif
 
@@ -100,7 +106,7 @@
                 <p class="text-success">{!! $activity->completion_message !!}</p>
             </div>
         @endif
-        <div id="bonus_message" class="mt-1" style="display: none;">
+        <div id="bonus_message" class="mt-4" style="display: none;">
             <form id="bonusForm" action="{{ route('explore.module.bonus', ['module_id' => $activity->day->module_id]) }}" method="POST" style="display: inline;">
                 @csrf
                 <input type="hidden" name="day_id_accordion" value="{{ $activity->day_id }}">
@@ -367,7 +373,7 @@
             }
         }
         //NOSEEK
-        var mediaPlayers = document.querySelectorAll('.media-player');
+        var mediaPlayers = document.querySelectorAll('.slide__audio-player, .video-player');
         mediaPlayers.forEach(function(player) {
             var timeTracking = {
                 watchedTime: 0,
@@ -390,11 +396,13 @@
                     if (delta <= MAX_DELTA && delta >= 0) {
                         timeTracking.watchedTime = player.currentTime;
                         lastUpdated = 'watchedTime';
+                        // console.log('Watched time updated: ', timeTracking.watchedTime);
                     }
                     //tracking the current time (if less than watched)
                     else {
                         timeTracking.currentTime = player.currentTime;
                         lastUpdated = 'currentTime';
+                        // console.log('Current time updated');
                     }
                 }
             });
@@ -415,7 +423,7 @@
 
                     //pause play back from last time
                     player.pause();
-                    player.currentTime = timeTracking[lastUpdated];
+                    player.currentTime = timeTracking.watchedTime;
                     player.play();
                 }
             });

@@ -36,8 +36,8 @@ class AppServiceProvider extends ServiceProvider
             if (method_exists($guard, 'setCookieJar')) {
                 $guard->setCookieJar($app['cookie']);
             }
-            //remember duration - 7 days
-            $guard->setRememberDuration(10080);
+            //remember duration - 30 days
+            $guard->setRememberDuration(43200);
 
             return $guard;
         });

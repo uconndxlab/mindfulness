@@ -13,7 +13,7 @@
     </div>
 
     <div class="">
-        <h4 class="mb-2">Sessions</h4>
+        <h5 class="mb-2">Progress: {{ $module->progress_days[0] }}/{{ $module->progress_days[1] }} days completed</h5>
         <div class="accordion accordion-flush mb-3" id="accordionDays">
             @foreach ($module->days as $index => $day)
                 @php
@@ -56,8 +56,17 @@
                                         <a id="moduleLink" style="padding-bottom:10px;" class="stretched-link w-100 activity-link {{ $disabled }}" data-id="{{ $activity->id }}" data-title="{{ $activity->title }}" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">
                                             
                                             <div style="display:flex;"><p class="activity-font">{{ $activity->title }}</p> {!! $activity->status == 'completed' ? '<i style="font-size:16px;margin-left:5px;" class="bi bi-check2-square"></i>' : '' !!}</div>
-                                            @if ($activity->type)
-                                                <span class="sub-activity-font activity-tag-activity">{{ ucfirst($activity->type) }}</span>
+                                            @if ($activity->type == 'lesson')
+                                                <span class="sub-activity-font activity-tag-lesson">{{ ucfirst($activity->type) }}</span>
+                                            @endif
+                                            @if ($activity->type == 'practice')
+                                                <span class="sub-activity-font activity-tag-practice">{{ ucfirst($activity->type) }}</span>
+                                            @endif
+                                            @if ($activity->type == 'reflection')
+                                                <span class="sub-activity-font activity-tag-reflection">{{ ucfirst($activity->type) }}</span>
+                                            @endif
+                                            @if ($activity->type == 'journal')
+                                                <span class="sub-activity-font activity-tag-journal">{{ ucfirst($activity->type) }}</span>
                                             @endif
                                             @if ($activity->time)
                                                 <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $activity->time.' min' }}</span>

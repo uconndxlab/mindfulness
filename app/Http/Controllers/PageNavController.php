@@ -17,8 +17,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Log;
-
 
 
 class PageNavController extends Controller
@@ -57,6 +55,8 @@ class PageNavController extends Controller
         $module = Module::with('days.activities')->findOrFail($module_id);
         
         //check progress
+        $mod_progress = getModuleProgress(Auth::id(), [$module_id]);
+        $module->progress_days = [$mod_progress[$module_id]['completed'], $mod_progress[$module_id]['total']];
         if (getModuleProgress(Auth::id(), [$module_id])[$module_id]['status'] == 'locked') {
             return redirect()->back();
         }
@@ -82,7 +82,7 @@ class PageNavController extends Controller
         $page_info['back_route'] = route('explore.home');
 
         //handle navigation
-        Session::put('current_nav', ['route' => route('explore.module', ['module_id' => $module_id]), 'back' => 'Module '.$module_id]);
+        Session::put('current_nav', ['route' => route('explore.module', ['module_id' => $module_id]), 'back' => 'Part '.$module_id]);
         Session::put('previous_explore', route('explore.module', ['module_id' => $module_id]));
         
         return view("explore.module", compact('module', 'page_info', 'override_accordion'));
@@ -357,7 +357,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
             'search_text' => 'Search for a meditation exercise...'
         ];
 
-        $categories = ['Favorited', 'Lesson', 'Reflection', 'Journal', 'Optional'];
+        $categories = ['Favorited', 'Optional'];
 
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.meditation'));
@@ -381,14 +381,14 @@ public function exploreModuleBonus(Request $request, $module_id) {
     {
         $page_info = [
             'journal' => true,
-            'title' => 'Compose'
+            'title' => 'Write'
         ];
 
         $journal = new Journal();
 
         //set as the previous journal and save as exit
         Session::put('previous_journal', route('journal.compose'));
-        Session::put('current_nav', ['route' => route('journal.compose'), 'back' => 'Compose']);
+        Session::put('current_nav', ['route' => route('journal.compose'), 'back' => 'Write']);
         return view('other.compose', compact('page_info', 'journal'));
     }
     public function journalLibrary (Request $request) {
@@ -403,7 +403,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
             'search_text' => 'Search your past journals...'
         ];
 
-        $categories = ['Relax', 'Compassion', 'Other', 'Activities'];
+        $categories = ['Self-care', 'Self-understanding', 'Parenting', 'Gratitude', 'Joy', 'Love', 'Relationships', 'Boundaries'];
 
         //set as the previous library and save as exit
         Session::put('previous_journal', route('journal.library'));
@@ -426,7 +426,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
         //handle search
         if ($request->has('search') && $request->search != '') {
             $query->where(function($in_query) use ($request) {
-                $in_query->where('word_otd', 'like', '%' . $request->search . '%')
+                $in_query->where('topic', 'like', '%' . $request->search . '%')
                     ->orWhere('note', 'like', '%' . $request->search . '%');
             });
         }
@@ -441,7 +441,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
                         $in_query->orWhere('activity_id', '!=', null);
                     }
                     else {
-                        $in_query->orWhere('word_otd', $category);
+                        $in_query->orWhere('topic', $category);
                     }
                 }
             });

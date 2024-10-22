@@ -29,15 +29,15 @@ class NoteController extends Controller
         else {
             $validator = Validator::make($request->all(), [
                 'note' => ['required', 'string', 'max:1027', 'regex:/^[\w\s.,!?()\-\'"&]*$/'],
-                'word_otd' => ['required', 'in:relax,compassion,other', 'regex:/^[\w\s.,!?()\-\'"&]*$/']
+                'topic' => ['required', 'in:self-care,self-understanding,parenting,gratitude,joy,love,relationships,boundaries', 'regex:/^[\w\s.,!?()\-\'"&]*$/']
             ], [
                 'note.required' => 'A note is required.',
                 'note.string' => 'The note must be a string.',
                 'note.max' => 'The note may not be greater than 1027 characters.',
                 'note.regex' => 'The note may only contain letters, numbers, spaces, and basic punctuation.',
-                'word_otd.required' => 'Please select a word of the day.',
-                'word_otd.in' => 'Word of the day must come from the provided list.',
-                'word_otd.regex' => 'Word of the day must come from the provided list.'
+                'topic.required' => 'Please select a word of the day.',
+                'topic.in' => 'Word of the day must come from the provided list.',
+                'topic.regex' => 'Word of the day must come from the provided list.'
             ]);
         }
         return $validator;
@@ -61,14 +61,14 @@ class NoteController extends Controller
                     'activity_id' => $request->activity_id
                 ],[
                     'note' => $request->note,
-                    'word_otd' => '<a href="/explore/activity/'.$act->id.'">'.$act->title.'</a> - '.$act->day->name.', '.$act->day->module->name.'</span>',
+                    'topic' => '<a href="/explore/activity/'.$act->id.'">'.$act->title.'</a> - '.$act->day->name.', '.$act->day->module->name.'</span>',
                 ]);
             }
             else {
                 Note::create([
                     'user_id' => Auth::id(),
                     'note' => $request->note,
-                    'word_otd' => ucfirst($request->word_otd),
+                    'topic' => ucfirst($request->topic),
                 ]);
             }
 

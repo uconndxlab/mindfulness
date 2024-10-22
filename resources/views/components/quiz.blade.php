@@ -8,7 +8,7 @@
                 </div>
                 <!-- options -->
                 @foreach ($question['options_feedback'] as $index => $option)
-                    <div id="options_{{ $question['number'] }}" class="form-check type-{{ $question['type'] }}">
+                    <div id="options_{{ $question['number'] }}" class="form-check type-{{ $question['type'] }} mb-2">
                         <input class="form-check-input" name="answer_{{ $question['number'] }}[]" above-behavior="{{ $option['above'] }}" type="{{ $question['type'] }}" data-other="{{ $option['other'] }}" id="option_{{ $question['number'] }}_{{ $index }}" value="{{ $index }}">
                         <label class="form-check-label" for="option_{{ $question['number'] }}_{{ $index }}">
                             {{ $option['option'] }}
@@ -31,13 +31,13 @@
                             $text_color = 'text-danger';
                         }
                     @endphp
-                    <div id="feedback_{{ $question['number'] }}_{{ $index }}" class="feedback-div" style="display: none;">
-                        <div class="mt-3 {{ $text_color }}">
+                    <div id="feedback_{{ $question['number'] }}_{{ $index }}" data-show="{{ $option['feedback'] ? 'true' : 'false' }}" class="feedback-div mt-4" style="display: none;">
+                        @if ($option['audio_path'])
+                            <x-contentView id="fbAudio_{{ $question['number'] }}_{{ $index }}" id2="pdf_download" type="feedback_audio" file="{{ $option['audio_path'] }}"/>
+                        @endif
+                        <div class="{{ $text_color }}">
                             {!! $option['feedback'] !!}
                         </div>
-                        @if ($option['audio_path'])
-                            <x-contentView id="fbAudio_{{ $question['number'] }}_{{ $index }}" id2="pdf_download" type="audio" file="{{ $option['audio_path'] }}"/>
-                        @endif
                     </div>
                 @endforeach
             </div>
@@ -105,6 +105,13 @@
                 }
             }
             populateForm(answers);
+
+            //pause audios
+            function pauseAudios() {
+                document.querySelectorAll('audio').forEach(audio => {
+                    audio.pause();
+                });
+            }
             
             //QUESTION CHANGE
             function changeQuestion(q_no) {
@@ -115,9 +122,7 @@
                 const quizDivs = quizForm.querySelectorAll('.quiz-div');
                 quizDivs.forEach(qDiv => {
                     //pause any audio
-                    qDiv.querySelectorAll('audio').forEach(audio => {
-                        audio.pause();
-                    });
+                    pauseAudios();
                     const currentNumber = parseInt(qDiv.getAttribute('data-number'));
                     const isLast = currentNumber === questionCount;
                     const isFirst = currentNumber === 1;
@@ -183,6 +188,8 @@
                     const questionId = splitId[1];
                     const optionId = splitId[2];
                     const feedbackDiv = document.getElementById('feedback_' + questionId + '_' + optionId);
+                    // check if feedback exists
+                    const hasFeedback = feedbackDiv.getAttribute('data-show') === 'true';
                     if (event.target.checked) {
                         quizForm.querySelectorAll('.feedback-div').forEach(fbDiv => {
                             //hide all other feedback
@@ -190,12 +197,20 @@
                             //pause any audio
                             fbDiv.querySelectorAll('audio').forEach(audio => {
                                 audio.pause();
+                                audio.currentTime = 0;
                             });
                         });
                     }
                     //show/hide feedback
-                    feedbackDiv.style.display = event.target.checked ? 'block' : 'none';
-
+                    if (hasFeedback) {
+                        feedbackDiv.style.display = event.target.checked ? 'block' : 'none';
+                    }
+                    //autoplay audio in feedback
+                    if (event.target.checked) {
+                        feedbackDiv.querySelectorAll('audio').forEach(audio => {
+                            audio.play();
+                        });
+                    }
                     checkBox(option, event.target.checked);
                 });
             });

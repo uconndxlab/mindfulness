@@ -152,12 +152,12 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ $active_items[3] ? 'active' : '' }}" href="{{ route('account') }}">
-                                <span class="nav-icon-text"><i class="bi bi-person-circle"></i>Account</span>
+                                <span class="nav-icon-text"><i class="bi bi-person-circle"></i>Profile</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ $active_items[4] ? 'active' : '' }}" href="{{ route('help') }}">
-                                <span class="nav-icon-text"><i class="bi bi-question-lg"></i></i>Help</span>
+                                <span class="nav-icon-text"><i class="bi bi-book"></i>About</span>
                             </a>
                         </li>
                     </ul>

@@ -40,7 +40,7 @@ class RestructureSeeder extends Seeder
 
         //populating extra example days
         foreach (Module::all() as $module) {
-            for ($j = $module->id == 1 ? 4 : 1; $j <= 5; $j++) {
+            for ($j = $module->id == 1 ? 6 : 1; $j <= 5; $j++) {
                 $day = Day::create([
                     'module_id' => $module->id,
                     'name' => 'Day '.$j,
@@ -76,7 +76,7 @@ class RestructureSeeder extends Seeder
             }
         }
     
-        $end = $examples ? 7 : 5;
+        $end = $examples ? 7 : 4;
         Day::all()->each(function ($day) use (&$order, &$act, &$end) {
             //make a bunch of fake activities
             $start = count($day->activities) + 1;
