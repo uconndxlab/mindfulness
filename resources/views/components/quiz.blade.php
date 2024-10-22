@@ -31,7 +31,7 @@
                             $text_color = 'text-danger';
                         }
                     @endphp
-                    <div id="feedback_{{ $question['number'] }}_{{ $index }}" class="feedback-div mt-4" style="display: none;">
+                    <div id="feedback_{{ $question['number'] }}_{{ $index }}" data-show="{{ $option['feedback'] ? 'true' : 'false' }}" class="feedback-div mt-4" style="display: none;">
                         @if ($option['audio_path'])
                             <x-contentView id="fbAudio_{{ $question['number'] }}_{{ $index }}" id2="pdf_download" type="feedback_audio" file="{{ $option['audio_path'] }}"/>
                         @endif
@@ -188,6 +188,8 @@
                     const questionId = splitId[1];
                     const optionId = splitId[2];
                     const feedbackDiv = document.getElementById('feedback_' + questionId + '_' + optionId);
+                    // check if feedback exists
+                    const hasFeedback = feedbackDiv.getAttribute('data-show') === 'true';
                     if (event.target.checked) {
                         quizForm.querySelectorAll('.feedback-div').forEach(fbDiv => {
                             //hide all other feedback
@@ -200,7 +202,9 @@
                         });
                     }
                     //show/hide feedback
-                    feedbackDiv.style.display = event.target.checked ? 'block' : 'none';
+                    if (hasFeedback) {
+                        feedbackDiv.style.display = event.target.checked ? 'block' : 'none';
+                    }
                     //autoplay audio in feedback
                     if (event.target.checked) {
                         feedbackDiv.querySelectorAll('audio').forEach(audio => {
