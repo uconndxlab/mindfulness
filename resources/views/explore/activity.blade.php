@@ -423,7 +423,7 @@
 
                     //pause play back from last time
                     player.pause();
-                    player.currentTime = timeTracking[lastUpdated];
+                    player.currentTime = timeTracking.watchedTime;
                     player.play();
                 }
             });
