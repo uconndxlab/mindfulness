@@ -126,7 +126,7 @@
         }
     </script>
 @elseif ($type == 'video')
-    <video id="{{ isset($id) ? $id : '' }}" class="media-player" controls controlsList="{{ isset($controlsList) ? $controlsList : '' }}" preload="auto" width="100%" height="auto">
+    <video id="{{ isset($id) ? $id : '' }}" class="media-player video-player" controls controlsList="{{ isset($controlsList) ? $controlsList : '' }}" preload="auto" width="100%" height="auto">
         <source src="{{ Storage::url('content/'.$file) }}" type="video/mp4">
         Your browser does not support the video element.
     </video>

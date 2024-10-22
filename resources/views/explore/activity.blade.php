@@ -106,7 +106,7 @@
                 <p class="text-success">{!! $activity->completion_message !!}</p>
             </div>
         @endif
-        <div id="bonus_message" class="mt-1" style="display: none;">
+        <div id="bonus_message" class="mt-4" style="display: none;">
             <form id="bonusForm" action="{{ route('explore.module.bonus', ['module_id' => $activity->day->module_id]) }}" method="POST" style="display: inline;">
                 @csrf
                 <input type="hidden" name="day_id_accordion" value="{{ $activity->day_id }}">
@@ -373,7 +373,7 @@
             }
         }
         //NOSEEK
-        var mediaPlayers = document.querySelectorAll('.slide__audio-player');
+        var mediaPlayers = document.querySelectorAll('.slide__audio-player, .video-player');
         mediaPlayers.forEach(function(player) {
             var timeTracking = {
                 watchedTime: 0,
@@ -396,11 +396,13 @@
                     if (delta <= MAX_DELTA && delta >= 0) {
                         timeTracking.watchedTime = player.currentTime;
                         lastUpdated = 'watchedTime';
+                        // console.log('Watched time updated: ', timeTracking.watchedTime);
                     }
                     //tracking the current time (if less than watched)
                     else {
                         timeTracking.currentTime = player.currentTime;
                         lastUpdated = 'currentTime';
+                        // console.log('Current time updated');
                     }
                 }
             });
