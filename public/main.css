@@ -458,7 +458,7 @@ body:has(div.dark-background){
 }
 
 .activity-tag-practice{
-    background:#3f83a1;
+    background:#3d7e9b;
 }
 
 .activity-tag-journal{
@@ -745,6 +745,30 @@ body:has(div.dark-background){
 .play-pause .bi {
     font-size:50px;
 }
+
+/*audio range*/
+#audioRange::-webkit-slider-thumb {
+    background: var(--dark-green);
+  }
+  
+  #audioRange::-moz-range-thumb {
+    background: var(--dark-green);
+  }
+  
+  #audioRange::-ms-thumb {
+    background: var(--dark-green);
+  }
+
+  #audioRange:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 0 1px #fff, 0 0 0 0.25rem rgba(117, 186, 150, .25);
+  }
+  #audioRange:focus::-moz-range-thumb {
+    box-shadow: 0 0 0 1px #fff, 0 0 0 0.25rem rgba(117, 186, 150, .25);
+  }
+
+  #audioRange::-webkit-slider-runnable-track{
+    background-color:var(--light-grey);
+  }
 
 /* quizzes and feedback */
 .text-info{
