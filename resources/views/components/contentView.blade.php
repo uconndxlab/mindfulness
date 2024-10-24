@@ -1,5 +1,5 @@
 @if ($type == 'audio')
-    <div class="slide__audio js-audio">
+    <div class="slide__audio js-audio col-12">
         <audio id="{{ $id }}" class="slide__audio-player media-player" controlsList="{{ isset($controlsList) ? $controlsList : '' }}" preload="auto" src="{{ Storage::url('content/'.$file) }}">
         </audio>
         <div class="audio__controls">
@@ -12,7 +12,17 @@
             </button>
         </div>
     </div>
+    <div class="col-4 mt-4" style="margin-left:auto;margin-right:auto">
+    <label for="audioRange" class="form-label">Audio Speed:</label>
+    <input type="range" class="form-range" min="0.5" max="1.5" step="0.05" id="audioRange">
+    </div>
     <script>
+        /*audio speed bar*/
+        let aud = document.getElementsByTagName("audio")[0];
+        let audRange = document.getElementById("audioRange");
+        audRange.onchange = function(){aud.playbackRate = audRange.value}
+        /*end audio speed bar*/
+
         var allowSeek = {{ $allowSeek }} == 'true' ? true : false;
 
         $(".js-audio").each(function (index, el) {

@@ -24,8 +24,17 @@
                         <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id, 'library' => true]) }}">
                             <p class="activity-font"style="margin-bottom:0px!important;">{{ $activity->title }}</p> 
                             <p class="sub-activity-font">{{ $activity->day->name.', '.$activity->day->module->name}}</p>
-                            @if ($activity->type)
-                                <span class="sub-activity-font activity-tag-activity">{{ ucfirst($activity->type) }}</span>
+                            @if ($activity->type == 'lesson')
+                                <span class="sub-activity-font activity-tag-lesson">{{ ucfirst($activity->type) }}</span>
+                            @endif
+                            @if ($activity->type == 'practice')
+                                <span class="sub-activity-font activity-tag-practice">{{ ucfirst($activity->type) }}</span>
+                            @endif
+                            @if ($activity->type == 'reflection')
+                                <span class="sub-activity-font activity-tag-reflection">{{ ucfirst($activity->type) }}</span>
+                            @endif
+                            @if ($activity->type == 'journal')
+                                <span class="sub-activity-font activity-tag-journal">{{ ucfirst($activity->type) }}</span>
                             @endif
                             @if ($activity->time)
                                 <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $activity->time.' min' }}</span>
