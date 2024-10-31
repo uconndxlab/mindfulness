@@ -120,7 +120,17 @@
                 {{ $page_info['redirect_label'] }}
             </a>
         @endif
-        <a id="skip" class="btn btn-primary" onclick="activityComplete()">skip</a>
+        <div class="d-flex justify-content-center" style="display: block;">
+            <a id="complete-later" class="btn btn-outline-primary rounded-pill px-4">
+                <i class="bi bi-bookmark me-2"></i>
+                Complete later
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 ms-auto">
+            <a id="skip" class="btn btn-primary" onclick="activityComplete()">skip</a>
+        </div>
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
