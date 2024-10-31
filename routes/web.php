@@ -106,7 +106,9 @@ Route::middleware('web')->group(function () {
         //User updates
         Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
         Route::put('/user/update/namePass', [UserController::class, 'updateNamePass'])->name('user.update.namePass');
-        Route::put('/user/update/progress', [UserController::class,'updateProgress'])->name('user.update.progress');
+        Route::put('/user/update/progress', [UserController::class,'completeActivity'])->name('user.update.progress');
+        Route::get('/user/completeLater/{activity_id}', [UserController::class,'completeLater'])->name('user.complete.later');
+        Route::put('/user/update/unlockNext', [UserController::class,'unlockNext'])->name('user.update.unlockNext');
         
         //favorites
         Route::post('/favorites', [UserController::class, 'addFavorite'])->name('favorites.create');

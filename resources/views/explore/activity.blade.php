@@ -124,10 +124,10 @@
             $comp_late_btn_disp = $activity->status == 'completed' ? 'none' : 'block';
         @endphp
         <div class="d-flex justify-content-center">
-            <a id="complete-later" class="btn btn-outline-primary rounded-pill px-4" style="display: {{ $comp_late_btn_disp }};">
+            <button id="complete-later" class="btn btn-outline-primary rounded-pill px-4" type="button" style="display: {{ $comp_late_btn_disp }};">
                 <i class="bi bi-bookmark me-2"></i>
                 Complete Later
-            </a>
+            </button>
         </div>
     </div>
     <div class="row">
@@ -467,8 +467,20 @@
     }
 
     // COMPLETE LATER
-    compLateBtn.addEventListener('click', function() {
-        showModal
+    document.addEventListener('DOMContentLoaded', function () {
+        const compLateBtn = document.getElementById('complete-later');
+        
+        if (compLateBtn) {
+            compLateBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                console.log('Complete later');
+                showModal('Complete Activity Later?', 
+                    'Continue to return to the menu and unlock the next activity. This activity must still be completed before unlocking the next day.', 
+                    null,
+                    '{{ route('user.complete.later', ['activity_id' => $activity->id]) }}'
+                );
+            });
+        }
     });
 </script>
 @endsection

@@ -34,7 +34,66 @@ class UserController extends Controller
         return redirect(route('explore.home'));
     }
 
-    public function updateProgress(Request $request) {
+    public function completeLater(Request $request) {
+        // find activity and get status
+        $activity = Activity::findOrFail($request->activity_id);
+        $user = Auth::user();
+        $user->load('progress_activities');
+        $status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
+
+        if ($status == 'locked') {
+            return response()->json(['message' => 'Forbidden'], 203);
+        }
+        else if ($status == 'completed') {
+            return response()->json(['message' => 'Activity already completed']);
+        }
+        else if ($status == 'unlocked') {
+            // call unlockNext and get the results
+            $response = $this->unlockNext($request);
+            // if success, redirect to module
+            if ($response->status() == 200) {
+                return redirect(route('explore.module.bonus', ['module_id' => $activity->day->module_id, 'day_id_accordion' => $activity->day_id]));
+            }
+            else {
+                return response()->json(['message' => 'Error completing activity later'], 500);
+            }
+        }
+
+    }
+
+    public function unlockNext(Request $request) {
+        // find activity and get status
+        $activity = Activity::findOrFail($request->activity_id);
+        $user = Auth::user();
+        
+        // unlock next if in same day
+        try {
+            if ($activity->next != null) {
+                $next = Activity::findOrFail($activity->next);
+                if ($next->day == $activity->day) {
+                    $next_activity_status = $user->progress_activities->where('activity_id', $next->id)->first()->status ?? 'locked';
+                    if ($next_activity_status == 'locked') {
+                        //update entry for next
+                        UserActivity::updateOrCreate([
+                            "user_id" => Auth::id(),
+                            "activity_id" => $next->id,
+                        ],[
+                            "status" => 'unlocked'
+                        ]);
+                        Session::forget('progress_modules');
+                        Session::forget('progress_days');
+                        Cache::forget('user_'.Auth::id().'_progress_activities');
+                    }
+                }
+            }
+            return response()->json(['message' => 'Next activity unlocked'], 200);
+        }
+        catch (Exception $e) {
+            return response()->json(['message' => 'Error unlocking next activity'], 500);
+        }
+    }
+
+    public function completeActivity(Request $request) {
         $request->validate([
             'activity_id' => ['required', 'exists:activities,id'],
         ]);
