@@ -107,6 +107,7 @@ Route::middleware('web')->group(function () {
         Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
         Route::put('/user/update/namePass', [UserController::class, 'updateNamePass'])->name('user.update.namePass');
         Route::put('/user/update/progress', [UserController::class,'completeActivity'])->name('user.update.progress');
+        //skipping
         Route::get('/user/completeLater/{activity_id}', [UserController::class,'completeLater'])->name('user.complete.later');
         Route::put('/user/update/unlockNext', [UserController::class,'unlockNext'])->name('user.update.unlockNext');
         
