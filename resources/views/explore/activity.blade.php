@@ -120,10 +120,13 @@
                 {{ $page_info['redirect_label'] }}
             </a>
         @endif
-        <div class="d-flex justify-content-center" style="display: block;">
-            <a id="complete-later" class="btn btn-outline-primary rounded-pill px-4">
+        @php
+            $comp_late_btn_disp = $activity->status == 'completed' ? 'none' : 'block';
+        @endphp
+        <div class="d-flex justify-content-center">
+            <a id="complete-later" class="btn btn-outline-primary rounded-pill px-4" style="display: {{ $comp_late_btn_disp }};">
                 <i class="bi bi-bookmark me-2"></i>
-                Complete later
+                Complete Later
             </a>
         </div>
     </div>
@@ -140,6 +143,7 @@
 
     //COMPLETION ITEMS
     const redirectDiv = document.getElementById('redirect_div');
+    const compLateBtn = document.getElementById('complete-later');
     const hasContent = {{ $content ? 'true' : 'false' }};
     const hasQuiz = {{ $quiz ? 'true' : 'false' }};
     const hasJournal = {{ $journal ? 'true' : 'false' }};
@@ -196,14 +200,6 @@
     function activityComplete(message=true) {
         //show content
         console.log('activity completed');
-        //show message
-        if (message) {
-            const hasMessage = {{ isset($activity->completion_message) ? 'true' : 'false' }};
-            if (hasMessage) {
-                const completionMessageDiv = document.getElementById('comp_message');
-                completionMessageDiv.style.display = 'block';
-            }
-        }
         //update users progress
         if (status == 'unlocked') {
             axios.put('{{ route('user.update.progress') }}', {
@@ -226,23 +222,31 @@
                     completeButton.classList.add('disabled');
                     completeButton.style.display = 'none';
                 }
-                unlockRedirect();
+                unlockRedirect(message);
             })
             .catch(error => {
                 console.error('There was an error updating the progress:', error);
             });
         }
         else if (status == 'completed') {
-            unlockRedirect();
+            unlockRedirect(message);
         }
     }
 
     //function for unlocking the redirection buttons
-    function unlockRedirect() {
+    function unlockRedirect(message=true) {
         redirectDiv.querySelectorAll('.redirect-btn').forEach(btn => {
             btn.style.display = 'block';
             btn.classList.remove('disabled');
         });
+        compLateBtn.style.display = 'none';
+        if (message) {
+            const hasMessage = {{ isset($activity->completion_message) ? 'true' : 'false' }};
+            if (hasMessage) {
+                const completionMessageDiv = document.getElementById('comp_message');
+                completionMessageDiv.style.display = 'block';
+            }
+        }
     }
 
     //FAVORITES
@@ -461,6 +465,11 @@
         errorDiv.textContent = errorMessage;
         errorDiv.style.display = 'block';
     }
+
+    // COMPLETE LATER
+    compLateBtn.addEventListener('click', function() {
+        showModal
+    });
 </script>
 @endsection
 
