@@ -13,7 +13,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use App\Models\UserActivity;
 use App\Models\Activity;
+use App\Models\Day;
 use App\Models\Favorite;
+use Log;
 
 class UserController extends Controller
 {
@@ -41,16 +43,18 @@ class UserController extends Controller
         $user->load('progress_activities');
         $status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
 
-        if ($status == 'locked') {
+        //check if locked, final, or optional
+        if ($status == 'locked' || $activity->final || $activity->optional) {
             return response()->json(['message' => 'Forbidden'], 203);
         }
+        // check if already completed
         else if ($status == 'completed') {
             return response()->json(['message' => 'Activity already completed']);
         }
         else if ($status == 'unlocked') {
             // call unlockNext and get the results
             $response = $this->unlockNext($request);
-            // if success, redirect to module
+            // if success, redirect to module TODO - move to page...
             if ($response->status() == 200) {
                 return redirect(route('explore.module.bonus', ['module_id' => $activity->day->module_id, 'day_id_accordion' => $activity->day_id]));
             }
@@ -71,6 +75,7 @@ class UserController extends Controller
             if ($activity->next != null) {
                 $next = Activity::findOrFail($activity->next);
                 if ($next->day == $activity->day) {
+                    // get status of next activity
                     $next_activity_status = $user->progress_activities->where('activity_id', $next->id)->first()->status ?? 'locked';
                     if ($next_activity_status == 'locked') {
                         //update entry for next
@@ -110,41 +115,54 @@ class UserController extends Controller
             $current_activity_progress->status = 'completed';
             $current_activity_progress->save();
 
-            //check next
-            if ($activity->next != null) {
-                //find next
-                $next = Activity::findOrFail($activity->next);
-                $next_activity_status = $activity_progress->where('activity_id', $next->id)->first()->status ?? 'locked';
-                if ($next_activity_status == 'locked') {
-                    //update entry for next
-                    UserActivity::updateOrCreate([
-                        "user_id" => Auth::id(),
-                        "activity_id" => $next->id,
-                    ],[
-                        "status" => 'unlocked'
-                    ]);
-                }
-            }
-            
-            //check if final, fire modal event
-            if ($activity->final) {
+            // check if day is completed using helper
+            $day_completed = checkUserDay(Auth::id(), $activity->day_id);
+
+            $next_id = $activity->next;
+            $unlocked_bonus = false;
+            // if day is completed...
+            if ($day_completed) {
+                // fire modal
                 event(new FinalActivityCompleted($activity->day));
+                // unlock optional activities within day
+                $optional_activities = Activity::where('optional', true)->where('day_id', $activity->day_id)->get();
+                foreach ($optional_activities as $optional) {
+                    $optional_status = $activity_progress->where('activity_id', $optional->id)->first()->status ?? 'locked';
+                    if ($optional_status == 'locked') {
+                        $unlocked_bonus = true;
+                        //update entry for optional
+                        UserActivity::updateOrCreate([
+                            "user_id" => Auth::id(),
+                            "activity_id" => $optional->id,
+                        ],[
+                            "status" => 'unlocked'
+                        ]);
+                    }
+                }
+
+                // get the id for the proper next day
+                $next_id = Activity::where('day_id', $activity->day_id)->orderBy('order')->get()->last()->next;
             }
 
-            //handling optional
-            $unlocked_bonus = false;
-            $optional_activities = Activity::where('optional', true)->where('order', $activity->order)->get();
-            foreach ($optional_activities as $optional) {
-                $optional_status = $activity_progress->where('activity_id', $optional->id)->first()->status ?? 'locked';
-                if ($optional_status == 'locked') {
-                    //update entry for optional
-                    $unlocked_bonus = true;
-                    UserActivity::updateOrCreate([
-                        "user_id" => Auth::id(),
-                        "activity_id" => $optional->id,
-                    ],[
-                        "status" => 'unlocked'
-                    ]);
+            // Log::info('Day completed: '.($day_completed ? 'true' : 'false'));
+            // Log::info('Next ID: '.$next_id);
+            // check next
+            if ($next_id != null) {
+                //find next
+                $next = Activity::findOrFail($activity->next);
+                if ($next->day == $activity->day || $day_completed) {
+                    // Log::info('Next in same day or day completed');
+                    // get status of next activity
+                    $next_activity_status = $activity_progress->where('activity_id', $next_id)->first()->status ?? 'locked';
+                    if ($next_activity_status == 'locked') {
+                        //update entry for next
+                        UserActivity::updateOrCreate([
+                            "user_id" => Auth::id(),
+                            "activity_id" => $next_id,
+                        ],[
+                            "status" => 'unlocked'
+                        ]);
+                    }
                 }
             }
 
