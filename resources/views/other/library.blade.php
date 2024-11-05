@@ -194,34 +194,6 @@
             var startTimeInput = document.getElementById('start_time_input');
             var endTimeInput = document.getElementById('end_time_input');
 
-            //SLIDER INIT
-            //gets vals from previous request
-            var startVal = startTimeInput.value || 0;
-            var endVal = endTimeInput.value || 30;
-            //format mins
-            function minutesToTime(minutes) {
-                return `${String(minutes)} mins`;
-            }
-            noUiSlider.create(slider, {
-                start: [0, 30],
-                connect: true,
-                range: {
-                    'min': 0,
-                    'max': 30
-                },
-                step: 1,
-                format: {
-                    to: function (value) {
-                        return minutesToTime(Math.round(value));
-                    },
-                    from: function (value) {
-                        return value;
-                    }
-                }
-            });
-            var startLabel = document.getElementById('start_time_label');
-            var endLabel = document.getElementById('end_time_label');
-
             //set up accordion
             var collapseTime = new bootstrap.Collapse(document.getElementById('collapseTime'), {
                 toggle: false
@@ -352,6 +324,34 @@
         }
 
         if (slider) {
+            //SLIDER INIT
+            //gets vals from previous request
+            var startVal = startTimeInput.value || 0;
+            var endVal = endTimeInput.value || 30;
+            //format mins
+            function minutesToTime(minutes) {
+                return `${String(minutes)} mins`;
+            }
+            noUiSlider.create(slider, {
+                start: [0, 30],
+                connect: true,
+                range: {
+                    'min': 0,
+                    'max': 30
+                },
+                step: 1,
+                format: {
+                    to: function (value) {
+                        return minutesToTime(Math.round(value));
+                    },
+                    from: function (value) {
+                        return value;
+                    }
+                }
+            });
+            var startLabel = document.getElementById('start_time_label');
+            var endLabel = document.getElementById('end_time_label');
+
             //SLIDER CHANGE
             slider.noUiSlider.on('update', function (values) {
                 //update labels
@@ -384,8 +384,8 @@
                 }
             });
             
-            // //init labels
-            // slider.noUiSlider.set([parseInt(startVal), parseInt(endVal)]);
+            //init labels
+            slider.noUiSlider.set([parseInt(startVal), parseInt(endVal)]);
         }
         
         //APPLY/SAVE FILTERS - vars
