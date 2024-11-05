@@ -123,7 +123,7 @@ class UserController extends Controller
             // if day is completed...
             if ($day_completed) {
                 // fire modal
-                event(new FinalActivityCompleted($activity->day));
+                // event(new FinalActivityCompleted($activity->day));
                 // unlock optional activities within day
                 $optional_activities = Activity::where('optional', true)->where('day_id', $activity->day_id)->get();
                 foreach ($optional_activities as $optional) {
@@ -170,7 +170,7 @@ class UserController extends Controller
             Session::forget('progress_modules');
             Session::forget('progress_days');
             Cache::forget('user_'.Auth::id().'_progress_activities');
-            return response()->json(['message' => 'Progress updated', 'unlocked_bonus' => $unlocked_bonus], 200);
+            return response()->json(['message' => 'Progress updated', 'day_completed' => $day_completed, 'unlocked_bonus' => $unlocked_bonus], 200);
         }
         else if ($current_activity_progress->status == 'completed') {
             return response()->json(['message' => 'Activity already completed']);
