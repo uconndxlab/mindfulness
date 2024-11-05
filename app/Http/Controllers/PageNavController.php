@@ -49,7 +49,7 @@ class PageNavController extends Controller
         return view("explore.home", compact('modules'));
     }
 
-    public function exploreModule($module_id, $override_accordion=null)
+    public function exploreModule($module_id, $accordion_day=null)
     {
         //find the module
         $module = Module::with('days.activities')->findOrFail($module_id);
@@ -74,8 +74,8 @@ class PageNavController extends Controller
             //assign the progress
             $day->progress = $progress[$day->id];
         }
-
-        $override_accordion = $override_accordion ? 'day_'.$override_accordion : null;
+        // $accordion_day = 1;
+        $override_accordion = $accordion_day ? 'day_'.$accordion_day : null;
 
         //set back route
         $page_info['back_label'] = " Back to Home";
@@ -89,11 +89,8 @@ class PageNavController extends Controller
     }
 
 public function exploreModuleBonus(Request $request, $module_id) {
-    $override_accordion = null;
-    if (isset($request->day_id_accordion)) {
-        $override_accordion = $request->day_id_accordion;
-    }
-    return $this->exploreModule($module_id, $override_accordion);
+    $accordion_day = $request->day ?? null;
+    return $this->exploreModule($module_id, $accordion_day);
 }
 
     public function checkActivityLocked($activity_id, $from_controller = false) {

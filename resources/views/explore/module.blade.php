@@ -18,8 +18,9 @@
             @foreach ($module->days as $index => $day)
                 @php
                     $disabled = $day->progress['status'] == 'locked' ? 'disabled' : '';
+                    $show = false;
                     if ($override_accordion) {
-                        $show = $override_accordion == $day->id;
+                        $show = $override_accordion === 'day_'.$day->id;
                     }
                     else {
                         $show = $day->progress['show'];
@@ -28,7 +29,7 @@
 
                 <div class="accordion-item border mb-2" id="day_{{ $day->id }}">
                     <h2 class="accordion-header" id="heading_{{ $index }}">
-                        <button class="accordion-button {{ $show ? '' : 'collapsed'}} {{ $disabled }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="false" aria-controls="collapse_{{ $index }}">
+                        <button class="accordion-button {{ $show ? '' : 'collapsed' }} {{ $disabled }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="{{ $show ? 'true' : 'false' }}" aria-controls="collapse_{{ $index }}">
                             <div>
                                 {{ $day->name }}
                                 
@@ -44,7 +45,7 @@
                         </button>
                     </h2>
                     
-                    <div id="collapse_{{ $index }}" class="accordion-collapse collapse {{ $show ? 'show' : ''}}" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
+                    <div id="collapse_{{ $index }}" class="accordion-collapse collapse {{ $show ? 'show' : '' }}" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
                         <div class="accordion-body">
                             @if (!$disabled)
                                 @foreach ($day->activities as $activity)
@@ -92,12 +93,9 @@
         //scroll to bonus activity
         var dayId = @json($override_accordion);
         if (dayId) {
+            console.log('override found');
             var dayElement = document.getElementById(dayId);
             if (dayElement) {
-                var button = dayElement.querySelector('.accordion-button');
-                if (button) {
-                    button.click();
-                }
                 setTimeout(function() {
                     var bonusActivity = dayElement.querySelector('.activity-tag-optional');
                     if (bonusActivity) {
@@ -109,7 +107,7 @@
                             behavior: 'smooth'
                         });
                     }
-                }, 500); //adding delay so that accordion can open
+                }, 100); //adding delay so that accordion can open
             }
         }
 
