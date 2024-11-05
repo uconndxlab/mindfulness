@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\BonusUnlocked;
 use App\Events\FinalActivityCompleted;
 use Exception;
 use Illuminate\Http\Request;
@@ -119,17 +120,15 @@ class UserController extends Controller
             $day_completed = checkUserDay(Auth::id(), $activity->day_id);
 
             $next_id = $activity->next;
-            $unlocked_bonus = false;
             // if day is completed...
             if ($day_completed) {
-                // fire modal
-                // event(new FinalActivityCompleted($activity->day));
                 // unlock optional activities within day
                 $optional_activities = Activity::where('optional', true)->where('day_id', $activity->day_id)->get();
                 foreach ($optional_activities as $optional) {
                     $optional_status = $activity_progress->where('activity_id', $optional->id)->first()->status ?? 'locked';
                     if ($optional_status == 'locked') {
-                        $unlocked_bonus = true;
+                        // fire modal event for unlocked bonus
+                        event(new BonusUnlocked($activity->day));
                         //update entry for optional
                         UserActivity::updateOrCreate([
                             "user_id" => Auth::id(),
@@ -141,17 +140,17 @@ class UserController extends Controller
                 }
 
                 // get the id for the proper next day
-                $next_id = Activity::where('day_id', $activity->day_id)->orderBy('order')->get()->last()->next;
+                $next_id = Activity::where('day_id', $activity->day_id)->where('optional', false)->orderBy('order')->get()->last()->next;
             }
 
-            // Log::info('Day completed: '.($day_completed ? 'true' : 'false'));
-            // Log::info('Next ID: '.$next_id);
+            Log::info('Day completed: '.($day_completed ? 'true' : 'false'));
+            Log::info('Next ID: '.$next_id);
             // check next
             if ($next_id != null) {
                 //find next
                 $next = Activity::findOrFail($activity->next);
                 if ($next->day == $activity->day || $day_completed) {
-                    // Log::info('Next in same day or day completed');
+                    Log::info('Next in same day or day completed');
                     // get status of next activity
                     $next_activity_status = $activity_progress->where('activity_id', $next_id)->first()->status ?? 'locked';
                     if ($next_activity_status == 'locked') {
@@ -170,7 +169,7 @@ class UserController extends Controller
             Session::forget('progress_modules');
             Session::forget('progress_days');
             Cache::forget('user_'.Auth::id().'_progress_activities');
-            return response()->json(['message' => 'Progress updated', 'day_completed' => $day_completed, 'unlocked_bonus' => $unlocked_bonus], 200);
+            return response()->json(['message' => 'Progress updated', 'day_completed' => $day_completed], 200);
         }
         else if ($current_activity_progress->status == 'completed') {
             return response()->json(['message' => 'Activity already completed']);

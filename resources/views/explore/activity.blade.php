@@ -106,13 +106,6 @@
                 <p class="text-success">{!! $activity->completion_message !!}</p>
             </div>
         @endif
-        <!-- <div id="bonus_message" class="mt-4" style="display: none;">
-            <form id="bonusForm" action="{{ route('explore.module.bonus', ['module_id' => $activity->day->module_id]) }}" method="POST" style="display: inline;">
-                @csrf
-                <input type="hidden" name="day_id_accordion" value="{{ $activity->day_id }}">
-                <a class="text-success" href="#" onclick="document.getElementById('bonusForm').submit();">Click here to view the bonus activities<i class="bi bi-arrow-right"></i></a>
-            </form>
-        </div> -->
     </div>
     <div class="manual-margin-top" id="redirect_div">
         @if (isset($page_info['redirect_route']))
@@ -211,11 +204,7 @@
             })
             .then(response => {
                 console.log(response.data.message);
-                //unlock redirect only after progress is processed
-                // if (response.data.unlocked_bonus) {
-                //     const bonusMessageDiv = document.getElementById('bonus_message');
-                //     bonusMessageDiv.style.display = 'block';
-                // }
+                // unlock redirect only after progress is processed
                 // showing modal on completed days
                 if (response.data.day_completed) {
                     showModal('Day Completed', `{!! $activity->day->completion_message !!}`, '{{ Storage::url('content/'.($activity->day->media_path ? $activity->day->media_path : '')) }}', null);
