@@ -5,8 +5,17 @@
         </div>
         <div class="card module p-2 mb-2">
             <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $random->id, 'library' => true]) }}">
-                <span class="activity-font">{{ $random->title }}</span> <br>
-                <span class="sub-activity-font">{{ ucfirst($random->type) }}{{ $random->time ? ', '.$random->time.'min' : '' }}{{ $random->optional ? ', Optional' : '' }}</span>
+                <p class="activity-font"style="margin-bottom:0px!important;">{{ $random->title }}</p> 
+                <p class="sub-activity-font">{{ $random->day->name.', '.$random->day->module->name}}</p>
+                @if ($random->type)
+                    <span class="sub-activity-font activity-tag-{{ $random->type }}">{{ ucfirst($random->type) }}</span>
+                @endif
+                @if ($random->time)
+                    <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $random->time.' min' }}</span>
+                @endif
+                @if ($random->optional)
+                    <span class="sub-activity-font activity-tag-optional"></i>Optional</span>
+                @endif
             </a>
             <i class="bi bi-arrow-right"></i>
         </div>
@@ -24,17 +33,8 @@
                         <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id, 'library' => true]) }}">
                             <p class="activity-font"style="margin-bottom:0px!important;">{{ $activity->title }}</p> 
                             <p class="sub-activity-font">{{ $activity->day->name.', '.$activity->day->module->name}}</p>
-                            @if ($activity->type == 'lesson')
-                                <span class="sub-activity-font activity-tag-lesson">{{ ucfirst($activity->type) }}</span>
-                            @endif
-                            @if ($activity->type == 'practice')
-                                <span class="sub-activity-font activity-tag-practice">{{ ucfirst($activity->type) }}</span>
-                            @endif
-                            @if ($activity->type == 'reflection')
-                                <span class="sub-activity-font activity-tag-reflection">{{ ucfirst($activity->type) }}</span>
-                            @endif
-                            @if ($activity->type == 'journal')
-                                <span class="sub-activity-font activity-tag-journal">{{ ucfirst($activity->type) }}</span>
+                            @if ($activity->type)
+                                <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>
                             @endif
                             @if ($activity->time)
                                 <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $activity->time.' min' }}</span>

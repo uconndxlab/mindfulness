@@ -98,9 +98,11 @@ Route::middleware('web')->group(function () {
         
         Route::get('/account', [PageNavController::class, 'accountPage'])->name('account');
         Route::get('/help', [PageNavController::class, 'helpPage'])->name('help');
+
+        //LIBRARY
         Route::get('/library', [PageNavController::class, 'library'])->name('library');
-        Route::get('/meditation-library', [PageNavController::class, 'meditationLibrary'])->name('library.meditation');
         Route::get('/favorites', [PageNavController::class, 'favoritesLibrary'])->name('library.favorites');
+        Route::get('/library-search', [PageNavController::class, 'mainLibrary'])->name('library.main');
         Route::get('/search', [PageNavController::class, 'librarySearch'])->name('library.search');
         
         //User updates
