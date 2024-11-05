@@ -18,8 +18,12 @@
                 </button>
             </h1>
         </div>
-        <h5>{{ ucfirst($activity->type) }}</h5>
-
+        @if ($activity->type)
+            <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>
+        @endif
+        @if ($activity->time)
+            <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $activity->time.' min' }}</span>
+        @endif
     </div>
     <div class="manual-margin-top">
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
