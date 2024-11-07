@@ -62,6 +62,13 @@ textarea.form-control {
     color:#fff!important;
 }
 
+.btn-primary:active,
+.btn-primary:focus {
+    color: white !important;
+    background-color: var(--darker-green) !important;
+    border-color: var(--darker-green);
+}
+
 .btn-info{
     background-color:var(--light-green)!important;
     border-color:var(--light-green)!important;

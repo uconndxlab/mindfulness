@@ -113,7 +113,7 @@
     </div>
     <div class="manual-margin-top" id="redirect_div">
         @if (isset($page_info['redirect_route']))
-            <a id="redirect_button" class="btn btn-tertiary redirect-btn disabled" href="{{ $page_info['redirect_route'] }}" style="display: none;">
+            <a id="redirect_button" class="btn btn-primary btn-tertiary redirect-btn disabled" href="{{ $page_info['redirect_route'] }}" style="display: none;">
                 {{ $page_info['redirect_label'] }}
             </a>
         @endif
