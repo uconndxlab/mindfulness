@@ -13,14 +13,21 @@
         </div>
     </div>
     <div class="col-4 mt-4" style="margin-left:auto;margin-right:auto">
-    <label for="audioRange" class="form-label">Audio Speed:</label>
+    <label for="audioRange" class="form-label">Audio Speed: <span id="speed-value">1</span></label>
     <input type="range" class="form-range" min="0.5" max="1.5" step="0.05" id="audioRange">
+    </div>
+    <div class="col-4 d-flex justify-content-between" style="margin-left:auto;margin-right:auto">
+        <small style="color:#bfbfbf">0.5</small>
+        <small style="color:#bfbfbf">1</small>
+        <small style="color:#bfbfbf">1.5</small>
     </div>
     <script>
         /*audio speed bar*/
         let aud = document.getElementsByTagName("audio")[0];
         let audRange = document.getElementById("audioRange");
-        audRange.onchange = function(){aud.playbackRate = audRange.value}
+        audRange.onchange = function(){
+            document.getElementById("speed-value").innerHTML=audRange.value;
+            aud.playbackRate = audRange.value}
         /*end audio speed bar*/
 
         var allowSeek = {{ $allowSeek }} == 'true' ? true : false;
