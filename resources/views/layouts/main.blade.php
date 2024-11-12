@@ -122,8 +122,8 @@
                             </div>
                             <img id="appModalImg" src="" alt="Example Image" class="img-fluid mb-3" style="display: none;">
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 <a id="additionalBtn" class="btn btn-primary" style="display: none;"></a>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>

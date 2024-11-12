@@ -55,9 +55,11 @@ class UserController extends Controller
         else if ($status == 'unlocked') {
             // call unlockNext and get the results
             $response = $this->unlockNext($request);
-            // if success, redirect to module TODO - move to page...
+            // if success, redirect to next activity
             if ($response->status() == 200) {
-                return redirect(route('explore.module.bonus', ['module_id' => $activity->day->module_id, 'day_id_accordion' => $activity->day_id]));
+                // return redirect(route('explore.module.bonus', ['module_id' => $activity->day->module_id, 'day_id_accordion' => $activity->day_id]));
+                $next_id = $response->original['next_id'];
+                return redirect(route('explore.activity', ['activity_id' => $next_id]));
             }
             else {
                 return response()->json(['message' => 'Error completing activity later'], 500);
@@ -92,7 +94,7 @@ class UserController extends Controller
                     }
                 }
             }
-            return response()->json(['message' => 'Next activity unlocked'], 200);
+            return response()->json(['message' => 'Next activity unlocked', 'next_id' => $next->id], 200);
         }
         catch (Exception $e) {
             return response()->json(['message' => 'Error unlocking next activity'], 500);

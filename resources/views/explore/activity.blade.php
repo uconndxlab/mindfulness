@@ -123,7 +123,7 @@
         <div class="d-flex justify-content-center">
             <button id="complete-later" class="btn btn-outline-primary rounded-pill px-4" type="button" style="display: {{ $comp_late_btn_disp }};">
                 <i class="bi bi-bookmark me-2"></i>
-                Complete Later
+                I will do this later
             </button>
         </div>
     </div>
@@ -136,6 +136,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
     const activity_id = {{ $activity->id }};
+    const day = '{{ $activity->day->name }}';
     const optional = {{ $activity->optional }};
 
     //COMPLETION ITEMS
@@ -472,7 +473,7 @@
                 event.preventDefault();
                 console.log('Complete later');
                 showModal('Complete Activity Later?', 
-                    'Continue to return to the menu and unlock the next activity. This activity must still be completed before unlocking the next day.', 
+                    'Click \'Continue\' to move on to the next activity. This activity must still be completed later in order to finish ' + day + '.', 
                     null,
                     '{{ route('user.complete.later', ['activity_id' => $activity->id]) }}'
                 );
