@@ -45,7 +45,7 @@ class UserController extends Controller
         $status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
 
         //check if locked, final, or optional
-        if ($status == 'locked' || $activity->final || $activity->optional) {
+        if ($status == 'locked' || $activity->final || $activity->optional || $activity->no_skip) {
             return response()->json(['message' => 'Forbidden'], 203);
         }
         // check if already completed

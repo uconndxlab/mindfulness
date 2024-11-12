@@ -118,7 +118,7 @@
             </a>
         @endif
         @php
-            $comp_late_btn_disp = ($activity->status == 'completed') || ($activity->final) ? 'none' : 'block';
+            $comp_late_btn_disp = ($activity->status == 'completed') || ($activity->final) || ($activity->no_skip) ? 'none' : 'block';
         @endphp
         <div class="d-flex justify-content-center">
             <button id="complete-later" class="btn btn-outline-primary rounded-pill px-4" type="button" style="display: {{ $comp_late_btn_disp }};">
