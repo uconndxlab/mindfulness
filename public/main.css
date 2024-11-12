@@ -370,7 +370,7 @@ body:has(div.dark-background){
 
 }
 
-.module:has(.disabled) a, .module:has(.disabled) i{
+.module:has(.disabled) a{
     color:rgba(0,0,0,0.4)!important
 }
 
@@ -379,9 +379,18 @@ body:has(div.dark-background){
     color:#fff!important;
 }
 
-.module i{
+.module i, .accordion-header i{
+    color:var(--dark-green);
+    font-size:16px!important;
+    margin-right:5px;
+}
+
+i.bi-square-fill{
+    color:#cccccc;
+}
+
+i.bi-lock-fill{
     color:#000;
-    font-size:25px;
 }
 
 .accordion .module{

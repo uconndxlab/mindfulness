@@ -30,17 +30,19 @@
                 <div class="accordion-item border mb-2" id="day_{{ $day->id }}">
                     <h2 class="accordion-header" id="heading_{{ $index }}">
                         <button class="accordion-button {{ $show ? '' : 'collapsed' }} {{ $disabled }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="{{ $show ? 'true' : 'false' }}" aria-controls="collapse_{{ $index }}">
-                            <div>
-                                {{ $day->name }}
-                                
+                            <div class="d-flex">                                
                                 @if ($day->progress['status'] == 'completed')
-                                    <i class="bi bi-check2-square"></i>
+                                    <i class="bi bi-check-square-fill"></i>
                                 @elseif($disabled)
-                                    <i class="bi bi-lock"></i>
+                                    <i class="bi bi-lock-fill"></i>
+                                @else
+                                    <i class="bi bi-square-fill"></i>
                                 @endif
-
+                                <div style="padding-right:10px">
+                                {{ $day->name }}
                                 <br>
                                 <span style="font-weight:400;">{{ $day->description }}</span>
+                                </div>
                             </div>
                         </button>
                     </h2>
@@ -56,7 +58,9 @@
                                     <div class="card p-2 module mb-2">
                                         <a id="moduleLink" style="padding-bottom:10px;" class="stretched-link w-100 activity-link {{ $disabled }}" data-id="{{ $activity->id }}" data-title="{{ $activity->title }}" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">
                                             
-                                            <div style="display:flex;"><p class="activity-font">{{ $activity->title }}</p> {!! $activity->status == 'completed' ? '<i style="font-size:16px;margin-left:5px;" class="bi bi-check2-square"></i>' : '' !!}</div>
+                                            <div style="display:flex;">
+                                                {!! $activity->status == 'completed' ? '<i style="font-size:16px;" class="bi bi-check-square-fill"></i>' : '<i style="font-size:16px;" class="bi bi-square-fill"></i>' !!}
+                                            <div><p class="activity-font">{{ $activity->title }}</p>
                                             @if ($activity->type)
                                                 <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>
                                             @endif
@@ -67,6 +71,8 @@
                                             @if ($activity->optional)
                                                 <span class="sub-activity-font activity-tag-optional"></i>Optional</span>
                                             @endif
+                                            </div>
+                                            </div>
                                         </a>
                                         <i class="bi bi-arrow-right"></i>
                                     </div>
