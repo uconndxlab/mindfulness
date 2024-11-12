@@ -127,11 +127,6 @@
             </button>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-4 ms-auto">
-            <a id="skip" class="btn btn-primary" onclick="activityComplete()">skip</a>
-        </div>
-    </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
@@ -478,6 +473,15 @@
                     '{{ route('user.complete.later', ['activity_id' => $activity->id]) }}'
                 );
             });
+        }
+    });
+
+    // SECRET SKIP
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.key.toLowerCase() === 'm') {
+            event.preventDefault();
+            console.log('Secret skip');
+            activityComplete();
         }
     });
 </script>
