@@ -182,7 +182,7 @@
         <audio id="{{ $id }}" class="feedback-aduio-player media-player" controlsList="{{ isset($controlsList) ? $controlsList : '' }}" preload="auto" src="{{ Storage::url('content/'.$file) }}"></audio>
         <div class="feedback-audio__controls d-flex justify-content-between">
             <div class="d-flex">
-                <button class="play-pause">
+                <button class="play-pause" type="button">
                     <i id="icon" class="bi bi-pause"></i>
                 </button>
                 <div class="d-flex" style="margin-top:3px;margin-left:10px"><small id="current-time"></small><small>/</small><small id="max-time"></small></div>
