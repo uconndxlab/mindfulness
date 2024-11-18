@@ -2,6 +2,11 @@
     <div class="slide__audio js-audio col-12">
         <audio id="{{ $id }}" class="slide__audio-player media-player" controlsList="{{ isset($controlsList) ? $controlsList : '' }}" preload="auto" src="{{ Storage::url('content/'.$file) }}">
         </audio>
+        @php
+            // check if playbackrate is allowed in controlslist
+            $controlsList = explode(" ", $controlsList);
+            $noPlaybackRate = in_array("noplaybackrate", $controlsList);
+        @endphp
         <div class="audio__controls">
             <svg version="1.1" id="circle" width="306px" height="306px" viewBox="0 0 100 100">
                 <path id="seekbar" fill="none" stroke-meterlimit="10" d="M50,2.9L50,2.9C76,2.9,97.1,24,97.1,50v0C97.1,76,76,97.1,50,97.1h0C24,97.1,2.9,76,2.9,50v0C2.9,24,24,2.9,50,2.9z"/>
@@ -12,22 +17,31 @@
             </button>
         </div>
     </div>
-    <div class="col-4 mt-4" style="margin-left:auto;margin-right:auto">
-    <label for="audioRange" class="form-label">Audio Speed: <span id="speed-value">1</span></label>
-    <input type="range" class="form-range" min="0.5" max="1.5" step="0.05" id="audioRange">
-    </div>
-    <div class="col-4 d-flex justify-content-between" style="margin-left:auto;margin-right:auto">
-        <small style="color:#bfbfbf">0.5</small>
-        <small style="color:#bfbfbf">1</small>
-        <small style="color:#bfbfbf">1.5</small>
-    </div>
+    @if (!$noPlaybackRate)
+        <div class="col-4 mt-4" style="margin-left:auto;margin-right:auto">
+            <label for="audioRange" class="form-label">Audio Speed: <span id="speed-value">1</span></label>
+            <input type="range" class="form-range" min="0.5" max="1.5" step="0.05" id="audioRange">
+        </div>
+        <div class="col-4 d-flex justify-content-between" style="margin-left:auto;margin-right:auto">
+            <small style="color:#bfbfbf">0.5</small>
+            <small style="color:#bfbfbf">1</small>
+            <small style="color:#bfbfbf">1.5</small>
+        </div>
+    @endif
     <script>
         /*audio speed bar*/
-        let aud = document.getElementsByTagName("audio")[0];
-        let audRange = document.getElementById("audioRange");
-        audRange.onchange = function(){
-            document.getElementById("speed-value").innerHTML=audRange.value;
-            aud.playbackRate = audRange.value}
+        // check if playbackrate is allowed in controlslist
+        let noPlaybackRate = '{{ $noPlaybackRate }}' == 'true' ? true : false;
+        if (!noPlaybackRate) {
+            let aud = document.getElementsByTagName("audio")[0];
+            let audRange = document.getElementById("audioRange");
+            if (audRange) {
+                audRange.onchange = function() {
+                    document.getElementById("speed-value").innerHTML=audRange.value;
+                    aud.playbackRate = audRange.value
+                }
+            }
+        }
         /*end audio speed bar*/
 
         var allowSeek = {{ $allowSeek }} == 'true' ? true : false;
