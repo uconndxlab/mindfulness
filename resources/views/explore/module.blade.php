@@ -38,14 +38,16 @@
                                 @else
                                     <i class="bi bi-square-fill"></i>
                                 @endif
-                                <div class="w-100" style="padding-right:10px">
+                                <div class="w-100" style="min-width: 0;">
                                     <div class="d-flex justify-content-between align-items-start">
-                                        <span class="text-dark fw-bold">{{ $day->name }}</span>
+                                        <div class="flex-grow-1">
+                                            <div class="text-dark fw-bold">{{ $day->name }}</div>
+                                            <div class="text-dark fw-normal">{{ $day->description }}</div>
+                                        </div>
                                         @if ($day->time)
-                                            <span class="badge text-dark bg-light border"><i class="bi bi-clock"></i>{{ $day->time }} min</span>
+                                            <span class="badge text-dark bg-light border ms-2 flex-shrink-0"><i class="bi bi-clock"></i>{{ $day->time }} min</span>
                                         @endif
                                     </div>
-                                    <span class="text-dark fw-normal">{{ $day->description }}</span>
                                 </div>
                             </div>
                         </button>
