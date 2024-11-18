@@ -38,10 +38,14 @@
                                 @else
                                     <i class="bi bi-square-fill"></i>
                                 @endif
-                                <div style="padding-right:10px">
-                                {{ $day->name }}
-                                <br>
-                                <span style="font-weight:400;">{{ $day->description }}</span>
+                                <div class="w-100" style="padding-right:10px">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <span class="text-dark fw-bold">{{ $day->name }}</span>
+                                        @if ($day->time)
+                                            <span class="badge text-dark bg-light border"><i class="bi bi-clock"></i>{{ $day->time }} min</span>
+                                        @endif
+                                    </div>
+                                    <span class="text-dark fw-normal">{{ $day->description }}</span>
                                 </div>
                             </div>
                         </button>
@@ -67,7 +71,6 @@
                                             @if ($activity->time)
                                                 <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $activity->time.' min' }}</span>
                                             @endif
-                                            <!-- TODO -->
                                             @if ($activity->optional)
                                                 <span class="sub-activity-font activity-tag-optional"></i>Optional</span>
                                             @endif
