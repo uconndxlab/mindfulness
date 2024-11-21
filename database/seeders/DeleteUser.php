@@ -10,10 +10,11 @@ class DeleteUser extends Seeder
 {
     /**
      * Run the database seeds.
-     * @param string $email
+     * 
      */
-    public function run(bool $email = null): void
+    public function run(): void
     {
+        $email = '';
         User::where('email', $email)->delete();
     }
 }

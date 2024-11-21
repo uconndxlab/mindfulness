@@ -10,10 +10,10 @@ class AdminSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     * @param string $email
      */
-    public function run(bool $email = null): void
+    public function run(): void
     {
+        $email = '';
         $user = User::where('email', $email)->first();
         if ($user) {
             if ($user->role ==='admin') {
