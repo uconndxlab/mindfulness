@@ -34,7 +34,7 @@
                             $locked = $user->lock_access;
                             $is_admin_disable = $user->role === "admin" ? 'disabled' : '';
                         @endphp
-                        <tr class="user-row" data-index="{{ $index }}" data-id="{{ $user->id }}">
+                        <tr class="user-row" data-index="{{ $index }}" data-id="{{ $user->id }}" data-name="{{ $user->name }}" data-email="{{ $user->email }}">
                             <td style="word-wrap: break-word;">
                                 {{ $user->email }}
                             </td>
@@ -89,6 +89,11 @@
                                     @else
                                         Remind {{ $user->name }} to come back to app
                                     @endif
+                                </button>
+                            </td>
+                            <td id="del_acc_div_{{ $index }}" class="text-end">
+                                <button id="del_button_{{ $index }}" class="btn btn-danger {{ $is_admin_disable }}" {{ $is_admin_disable }}>
+                                    <i id="del_icon_{{ $index }}" class="bi bi-x"></i> Delete Account
                                 </button>
                             </td>
                         </tr>
@@ -154,6 +159,8 @@
         document.querySelectorAll('.user-row').forEach(userRow => {
             const index = userRow.getAttribute('data-index');
             const userId = userRow.getAttribute('data-id');
+            const name = userRow.getAttribute('data-name');
+            const email = userRow.getAttribute('data-email');
             const lockButton = document.getElementById('lock_button_'+index);
             lockButton.addEventListener('click', function() {
                 changeAccess(index, userId);

@@ -131,6 +131,7 @@ Route::middleware('web')->group(function () {
             Route::post('/changeAccess/{user_id}', [ContentManagementController::class,'changeAccess'])->name('users.access');
             Route::post('/registrationLock', [ContentManagementController::class,'registrationAccess'])->name('registration.lock');
             Route::post('/emailRemindUser/{user_id}', [ContentManagementController::class,'emailRemindUser'])->name('users.remind');
+            Route::delete('/deleteUser/{user_id}', [UserController::class,'deleteUser'])->name('users.delete');
             //modules
             // Route::get('/module', [ContentManagementController::class,'indexModule'])->name('module.index');
             // Route::get('/module/{module_id}', [ContentManagementController::class,'showModule'])->name('module.show');

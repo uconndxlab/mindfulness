@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\BonusUnlocked;
 use App\Events\FinalActivityCompleted;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -257,5 +258,20 @@ class UserController extends Controller
             ->delete();
 
         return response()->json(['message' => 'Favorite removed'], 200);
+    }
+
+    public function deleteUser(Request $request, $user_id) {
+        // admin middleware protected function
+        try {
+            $user = User::findOrFail($user_id);
+            if ($user->role == 'admin') {
+                return redirect()->back()->with('error', 'Cannot delete admin account');
+            }
+            $user->delete();
+            return redirect()->back()->with('success', 'User deleted successfully');
+        }
+        catch (Exception $e) {
+            return redirect()->back()->with('error', 'Error deleting user');
+        }
     }
 }
