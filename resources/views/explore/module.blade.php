@@ -123,7 +123,10 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.locked) {
-                            showModal('Locked: '+activityName, 'This activity is currently locked. Continue progressing to unlock this activity.');
+                            showModal({
+                                label: 'Locked: '+activityName,
+                                body: 'This activity is currently locked. Continue progressing to unlock this activity.'
+                            });
                         } else {
                             window.location.href = `/explore/activity/${activityId}`;
                         }

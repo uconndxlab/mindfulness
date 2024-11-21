@@ -207,7 +207,12 @@
                 // unlock redirect only after progress is processed
                 // showing modal on completed days
                 if (response.data.day_completed) {
-                    showModal('Day Completed', `{!! $activity->day->completion_message !!}`, '{{ Storage::url('content/'.($activity->day->media_path ? $activity->day->media_path : '')) }}', null);
+                    showModal({
+                        label: 'Day Completed',
+                        body: `{!! $activity->day->completion_message !!}`,
+                        media: '{{ Storage::url('content/'.($activity->day->media_path ? $activity->day->media_path : '')) }}',
+                        route: null
+                    });
                 }
                 //hiding complete button for images
                 if (type == 'image') {
@@ -467,11 +472,12 @@
             compLateBtn.addEventListener('click', function(event) {
                 event.preventDefault();
                 console.log('Complete later');
-                showModal('Complete Activity Later?', 
-                    'Click \'Continue\' to move on to the next activity. This activity must still be completed later in order to finish ' + day + '.', 
-                    null,
-                    '{{ route('user.complete.later', ['activity_id' => $activity->id]) }}'
-                );
+                showModal({
+                    label: 'Complete Activity Later?',
+                    body: 'Click \'Continue\' to move on to the next activity. This activity must still be completed later in order to finish ' + day + '.',
+                    route: '{{ route('user.complete.later', ['activity_id' => $activity->id]) }}',
+                    method: 'GET'
+                });
             });
         }
     });

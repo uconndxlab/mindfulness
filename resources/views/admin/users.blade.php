@@ -169,6 +169,18 @@
             emailButton.addEventListener('click', function() {
                 emailPingUser(index, userId);
             })
+            const delButton = document.getElementById('del_button_'+index);
+            delButton.addEventListener('click', function() {
+                showModal({
+                    label: `Delete Account: (${name}, ${email})`,
+                    body: 'Are you sure you want to delete this account?',
+                    media: null,
+                    route: '{{ route('users.delete', ['user_id' => $user->id]) }}',
+                    method: 'DELETE',
+                    buttonLabel: 'DELETE',
+                    buttonClass: 'btn-danger'
+                });
+            })
         });
 
         function changeAccess(index, userId) {
