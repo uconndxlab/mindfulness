@@ -11,7 +11,7 @@
                     <span class="sub-activity-font activity-tag-{{ $random->type }}">{{ ucfirst($random->type) }}</span>
                 @endif
                 @if ($random->time)
-                    <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $random->time.' min' }}</span>
+                    <span class="sub-activity-font activity-tag-time">{{ $random->time.' min' }}</span>
                 @endif
                 @if ($random->optional)
                     <span class="sub-activity-font activity-tag-optional"></i>Optional</span>
@@ -37,7 +37,7 @@
                                 <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>
                             @endif
                             @if ($activity->time)
-                                <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $activity->time.' min' }}</span>
+                                <span class="sub-activity-font activity-tag-time"></i>{{ $activity->time.' min' }}</span>
                             @endif
                             @if ($activity->optional)
                                 <span class="sub-activity-font activity-tag-optional"></i>Optional</span>

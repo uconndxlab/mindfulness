@@ -22,7 +22,7 @@
             <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>
         @endif
         @if ($activity->time)
-            <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $activity->time.' min' }}</span>
+            <span class="sub-activity-font activity-tag-time"></i>{{ $activity->time.' min' }}</span>
         @endif
     </div>
     <div class="manual-margin-top">

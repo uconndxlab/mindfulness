@@ -36,7 +36,7 @@
                                 @elseif($disabled)
                                     <i class="bi bi-lock-fill"></i>
                                 @else
-                                    <i class="bi bi-square-fill"></i>
+                                    <i style="visibility:hidden;" class="bi bi-square-fill"></i>
                                 @endif
                                 <div class="w-100" style="min-width: 0;">
                                     <div class="d-flex justify-content-between align-items-start">
@@ -45,7 +45,7 @@
                                             <div class="text-dark fw-normal">{{ $day->description }}</div>
                                         </div>
                                         @if ($day->time)
-                                            <span class="badge text-dark bg-light border ms-2 flex-shrink-0"><i class="bi bi-clock"></i>{{ $day->time }} min</span>
+                                            <span class="badge text-dark bg-light border ms-2 flex-shrink-0">{{ $day->time }} min</span>
                                         @endif
                                     </div>
                                 </div>
@@ -65,13 +65,17 @@
                                         <a id="moduleLink" style="padding-bottom:10px;" class="stretched-link w-100 activity-link {{ $disabled }}" data-id="{{ $activity->id }}" data-title="{{ $activity->title }}" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">
                                             
                                             <div style="display:flex;">
-                                                {!! $activity->status == 'completed' ? '<i style="font-size:16px;" class="bi bi-check-square-fill"></i>' : '<i style="font-size:16px;" class="bi bi-square-fill"></i>' !!}
+                                                @if ($activity->status == 'completed')
+                                                    <i style="font-size:16px;" class="bi bi-check-square-fill"></i>
+                                                @else
+                                                    <i style="font-size:16px; visibility:hidden;" class="bi bi-square-fill"></i>
+                                                @endif
                                             <div><p class="activity-font">{{ $activity->title }}</p>
                                             @if ($activity->type)
                                                 <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>
                                             @endif
                                             @if ($activity->time)
-                                                <span class="sub-activity-font activity-tag-time"><i class="bi bi-clock"></i>{{ $activity->time.' min' }}</span>
+                                                <span class="sub-activity-font activity-tag-time">{{ $activity->time.' min' }}</span>
                                             @endif
                                             @if ($activity->optional)
                                                 <span class="sub-activity-font activity-tag-optional"></i>Optional</span>
