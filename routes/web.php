@@ -35,7 +35,7 @@ Route::middleware('web')->group(function () {
     
     //EMAIL VERIFICATION
     Route::middleware('auth')->group(function () {
-        //THERE ARE BUILT IN VERIFICATION FUNCTIONS
+        //BUILT IN VERIFICATION FUNCTIONS
         Route::get('/email/verify', function () {
             if (Auth::user()->email_verified_at) {
                 return redirect()->back();
