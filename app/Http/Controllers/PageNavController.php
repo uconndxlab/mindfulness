@@ -415,7 +415,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
         //check if empty
         $empty = !$query->exists();
         if ($empty) {
-            $view = view('components.journal-search-results', ['empty_text' => '<span>Continue progressing to find a Journal activity, or write your first journal in the <a href="/compose">Compose</a> tab.</span>'])->render();
+            $view = view('components.journal-search-results', ['empty_text' => '<span>Continue progressing to find a Journal activity, or write your first journal in the <a href="/journal">Journal</a> tab.</span>'])->render();
             return response()->json(['html' => $view]);
         }
 

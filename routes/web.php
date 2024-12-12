@@ -74,7 +74,7 @@ Route::middleware('web')->group(function () {
         Route::get('/logout', [AuthController::class,'logout'])->name('logout');
 
         //NEW EXPLORE
-        Route::get('/explore/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
+        Route::get('/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
         Route::get('/explore/module/{module_id}', [PageNavController::class, 'exploreModule'])->name('explore.module');
         //using post instead for case with desired accordion open
         Route::get('/explore/module/{module_id}/bonus', [PageNavController::class, 'exploreModuleBonus'])->name('explore.module.bonus');
@@ -88,18 +88,18 @@ Route::middleware('web')->group(function () {
         Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
         // Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
         
-        Route::get('/journal', [PageNavController::class, 'journal'])->name('journal');
-        Route::get('/compose', [PageNavController::class, 'journalCompose'])->name('journal.compose');
+        Route::get('/journaltab', [PageNavController::class, 'journal'])->name('journal');
+        Route::get('/journal', [PageNavController::class, 'journalCompose'])->name('journal.compose');
         Route::get('/journal-library', [PageNavController::class, 'journalLibrary'])->name('journal.library');
         Route::get('/journal/search', [PageNavController::class, 'journalSearch'])->name('journal.search');
         
-        Route::get('/account', [PageNavController::class, 'accountPage'])->name('account');
-        Route::get('/help', [PageNavController::class, 'helpPage'])->name('help');
+        Route::get('/profile', [PageNavController::class, 'accountPage'])->name('account');
+        Route::get('/about', [PageNavController::class, 'helpPage'])->name('help');
 
         //LIBRARY
-        Route::get('/library', [PageNavController::class, 'library'])->name('library');
+        Route::get('/librarytab', [PageNavController::class, 'library'])->name('library');
         Route::get('/favorites', [PageNavController::class, 'favoritesLibrary'])->name('library.favorites');
-        Route::get('/library-search', [PageNavController::class, 'mainLibrary'])->name('library.main');
+        Route::get('/library', [PageNavController::class, 'mainLibrary'])->name('library.main');
         Route::get('/search', [PageNavController::class, 'librarySearch'])->name('library.search');
         
         //User updates
