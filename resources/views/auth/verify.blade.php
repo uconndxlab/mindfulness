@@ -20,6 +20,5 @@
         @csrf
         <button type="submit" class="btn btn-primary">Resend Verification Email</button>
     </form>
-    <p>For now, click to verify email ^</p>
 </div>
 @endsection

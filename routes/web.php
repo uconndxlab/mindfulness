@@ -51,9 +51,6 @@ Route::middleware('web')->group(function () {
         Route::post('/email/verification-notification', function (Request $request) {
             $user = Auth::user();
             $user->sendEmailVerificationNotification();
-            // TODO DELETE THIS WHEN EMAIL IS SET UP
-            $user->email_verified_at = now();
-            $user->save();
             if ($user->email_verified_at) {
                 return redirect()->intended('/');
             }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\InquiryReceived;
 use App\Models\Inquiry;
+use Config;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -39,7 +40,7 @@ class ContactFormController extends Controller
             $inquiry->save();
     
             //email
-            Mail::to('admin@example.com')->send(new InquiryReceived($inquiry));
+            Mail::to(Config::get('mail.contact_email'))->send(new InquiryReceived($inquiry));
 
             return response()->json(['success' => 'Your inquiry has been submitted!'], 200);
         }

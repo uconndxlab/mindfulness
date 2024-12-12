@@ -9,7 +9,7 @@
         <p class="">Welcome text goes here. It can wrap on to the following line like this. The following video is just a placeholder. It will be changed.</p>
     </div>
     <div class="text-center">
-        <x-contentView id="welcome_video" type="video" file="Tutorial v1.mp4" controlsList="noplaybackrate nodownload noseek"/>
+        <x-contentView id="welcome_video" type="video" file="Healing Hearts App Tutorial 12 5.mp4" controlsList="noplaybackrate nodownload noseek"/>
         <br><br>
         <a href="{{ route('explore.home') }}" class="btn btn-primary">NEXT</a>
     </div>
