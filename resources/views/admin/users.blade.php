@@ -175,7 +175,7 @@
                     label: `Delete Account: (${name}, ${email})`,
                     body: 'Are you sure you want to delete this account?',
                     media: null,
-                    route: '{{ route('users.delete', ['user_id' => $user->id]) }}',
+                    route: `/deleteUser/${userId}`,
                     method: 'DELETE',
                     buttonLabel: 'DELETE',
                     buttonClass: 'btn-danger'
