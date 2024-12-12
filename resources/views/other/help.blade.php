@@ -25,7 +25,13 @@
     <div data-bs-spy="scroll" data-bs-target="#navbar-help" data-bs-smooth-scroll="true" class="scrollspy-example pt-3 pb-3 rounded-2" tabindex="0">
         <section id="tutorial">
             <h4 class="text-center fw-bold mt-4">Tutorial:</h4>
-            <x-contentView type="video" file="Healing Hearts App Tutorial 12 5.mp4" controlsList="noplaybackrate nodownload"/>
+            <div class="container">
+                <div style="max-width: 270px; margin: auto;">
+                    <div class="ratio" style="--bs-aspect-ratio: 177.77%;">
+                        <x-contentView id="welcome_video" type="video" file="Healing Hearts App Tutorial 12 5.mp4" controlsList="noplaybackrate nodownload noseek"/>
+                    </div>
+                </div>
+            </div>
         </section>
         <section id="info">
             <h4 class="text-center fw-bold mt-4">Info about Healing Hearts:</h4>
