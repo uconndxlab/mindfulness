@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Mail;
 
 Route::middleware('web')->group(function () {
     //default
-    Route::redirect("/","/explore/home");
+    Route::redirect("/","/home");
 
     //AUTHENTICATION
     //login page

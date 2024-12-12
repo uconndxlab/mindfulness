@@ -59,7 +59,7 @@ class AuthController extends Controller
                 ]);
             }
             Auth::user()->update(['last_active_at' => Carbon::now()]);
-            return redirect()->intended('/explore/home');
+            return redirect()->intended('/home');
         }
         
         return back()->withErrors(['credentials' => 'Invalid credentials.'])->withInput();
