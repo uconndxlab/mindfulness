@@ -1,7 +1,7 @@
 @if (!isset($activities) || $activities->isEmpty())
     @if (isset($random))
-        <div class="text-left muted">
-            No matches found. Here is an activity you might like to practice:
+        <div class="text-left muted" style="font-weight:500;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid var(--light-grey);">
+        Oops, there is no match. Check your search keyword/filters. Or, try this recommended activity below:
         </div>
         <div class="card module p-2 mb-2">
             <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $random->id, 'library' => true]) }}">
