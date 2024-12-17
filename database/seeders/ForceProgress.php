@@ -15,7 +15,7 @@ class ForceProgress extends Seeder
      */
     public function run(): void
     {
-        $order = 9;
+        $order = 25;
         $user_name = 'Zoro';
         // find user and list of activities up to point
         $user_id = User::where('name', $user_name)->first()->id;

@@ -30,7 +30,7 @@
                 <div class="accordion-item border mb-2" id="day_{{ $day->id }}">
                     <h2 class="accordion-header" id="heading_{{ $index }}">
                         <button class="accordion-button {{ $show ? '' : 'collapsed' }} {{ $disabled }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="{{ $show ? 'true' : 'false' }}" aria-controls="collapse_{{ $index }}">
-                            <div class="d-flex">                                
+                            <div class="d-flex w-100">                                
                                 @if ($day->progress['status'] == 'completed')
                                     <i class="bi bi-check-square-fill"></i>
                                 @elseif($disabled)
@@ -38,16 +38,14 @@
                                 @else
                                     <i style="visibility:hidden;" class="bi bi-square-fill"></i>
                                 @endif
-                                <div class="w-100" style="min-width: 0;">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <div class="text-dark fw-bold">{{ $day->name }}</div>
-                                            <div class="text-dark fw-normal">{{ $day->description }}</div>
-                                        </div>
-                                        @if ($day->time)
-                                            <span class="badge text-dark bg-light border ms-2 flex-shrink-0">{{ $day->time }} min</span>
-                                        @endif
-                                    </div>
+                                <div class="flex-grow-1 pe-4">
+                                    <div class="text-dark fw-bold">{{ $day->name }}</div>
+                                    <div class="text-dark fw-normal">{{ $day->description }}</div>
+                                </div>
+                                <div class="d-flex align-items-center gap-2" style="min-width: 80px">
+                                    @if ($day->time)
+                                        <span class="badge text-dark bg-light border">{{ $day->time }} min</span>
+                                    @endif
                                 </div>
                             </div>
                         </button>
