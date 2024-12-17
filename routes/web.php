@@ -71,7 +71,7 @@ Route::middleware('web')->group(function () {
     //AUTH protected routes
     Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock'])->group(function () {
         //logout
-        Route::get('/logout', [AuthController::class,'logout'])->name('logout');
+        Route::post('/logout', [AuthController::class,'logout'])->name('logout');
 
         //NEW EXPLORE
         Route::get('/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
