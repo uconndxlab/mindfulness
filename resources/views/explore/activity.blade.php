@@ -141,6 +141,7 @@
     const hasQuiz = {{ $quiz ? 'true' : 'false' }};
     const hasJournal = {{ $journal ? 'true' : 'false' }};
     var allowSeek = false;
+    var completed = false;
 
     //CHECKING COMPLETION
     const status = '{{ $activity->status }}';
@@ -193,6 +194,7 @@
     function activityComplete(message=true) {
         //show content
         console.log('activity completed');
+        completed = true;
         //update users progress
         if (status == 'unlocked') {
             axios.put('{{ route('user.update.progress') }}', {
@@ -488,6 +490,31 @@
             event.preventDefault();
             console.log('Secret skip');
             activityComplete();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        //back button modal - lose progress
+        const backButton = document.getElementById('backButton');
+        if (backButton) {
+            console.log('back button found');
+            backButton.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                if (!completed) {
+                    showModal({
+                        label: 'Leave activity?',
+                        body: 'Leaving will erase your progress on this activity. Are you sure you want to leave?',
+                        route: this.href,
+                        method: 'GET',
+                        buttonLabel: 'Leave Activity',
+                        buttonClass: 'btn-danger',
+                        closeLabel: 'Stay'
+                    });
+                } else {
+                    window.location.href = this.href;
+                }
+            });
         }
     });
 </script>

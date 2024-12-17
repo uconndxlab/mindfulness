@@ -85,7 +85,9 @@
                 <ul class="navbar-nav">
                     @if(isset($page_info['back_route']) && isset($page_info['back_label']))
                         <li class="nav-item mr-auto">
-                            <a class="nav-link" href="{{ $page_info['back_route'] }}"><i class="bi bi-arrow-left"></i>{{ $page_info['back_label'] }}</a>
+                            <a class="nav-link" href="{{ $page_info['back_route'] }}" id="backButton">
+                                <i class="bi bi-arrow-left"></i>{{ $page_info['back_label'] }}
+                            </a>
                         </li>
                     @endif
                 </ul>
@@ -110,7 +112,6 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="appModalLabel"></h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div id="appModalBody" class="modal-body" style="display: none;">
                             </div>
@@ -121,7 +122,7 @@
                                     <input type="hidden" name="_method" id="modalMethod" value="POST">
                                     <div class="d-grid">
                                         <button type="submit" id="additionalBtn" class="btn btn-danger" style="display: none;"></button>
-                                        <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" id="closeBtn" class="btn btn-dark" data-bs-dismiss="modal"></button>
                                     </div>
                                 </form>
                             </div>
@@ -167,8 +168,10 @@
         @endif
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
         <script>
-            document.getElementById('logoutBtn').addEventListener('click', logoutClick);
-
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', logoutClick);
+            }
             function logoutClick() {
                 showModal({
                     label: 'Are you sure you want to logout?',
@@ -188,10 +191,12 @@
                     method = 'POST',
                     buttonLabel = 'Continue',
                     buttonClass = 'btn-primary',
+                    closeLabel = 'Close',
                 } = options;
                 
                 var myModal = new bootstrap.Modal(document.getElementById('appModal'));
                 document.getElementById('appModalLabel').innerHTML = label;
+                document.getElementById('closeBtn').innerHTML = closeLabel;
 
                 if (body) {
                     const modalBody = document.getElementById('appModalBody');
