@@ -182,6 +182,10 @@
                 });
             }
 
+            const modal = document.getElementById('appModal');
+            const myModal = new bootstrap.Modal(modal);
+            const closeBtn = document.getElementById('closeBtn');
+            let currentCancelHandler = null;
             function showModal(options = {}) {
                 const {
                     label = 'undefined',
@@ -192,11 +196,11 @@
                     buttonLabel = 'Continue',
                     buttonClass = 'btn-primary',
                     closeLabel = 'Close',
+                    onCancel = null
                 } = options;
                 
-                var myModal = new bootstrap.Modal(document.getElementById('appModal'));
                 document.getElementById('appModalLabel').innerHTML = label;
-                document.getElementById('closeBtn').innerHTML = closeLabel;
+                closeBtn.innerHTML = closeLabel;
 
                 if (body) {
                     const modalBody = document.getElementById('appModalBody');
@@ -230,6 +234,24 @@
                 } else {
                     additionalBtn.style.display = 'none';
                 }
+
+                // CANCEL HANDLER
+                //handling cancel - call function and dispose modal
+                if (currentCancelHandler) {
+                    // remove exisiting event listeners
+                    modal.removeEventListener('hidden.bs.modal', currentCancelHandler);
+                    closeBtn.removeEventListener('click', currentCancelHandler);
+                }
+
+                // rewrite cancel function
+                currentCancelHandler = () => {
+                    if (onCancel) onCancel();
+                    myModal.hide();
+                };
+
+                // add new listeners
+                modal.addEventListener('hidden.bs.modal', currentCancelHandler, { once: true });
+                // closeBtn.addEventListener('click', currentCancelHandler);
 
                 myModal.show();
             }

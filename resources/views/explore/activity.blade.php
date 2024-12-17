@@ -466,24 +466,6 @@
         errorDiv.style.display = 'block';
     }
 
-    // COMPLETE LATER
-    document.addEventListener('DOMContentLoaded', function () {
-        const compLateBtn = document.getElementById('complete-later');
-        
-        if (compLateBtn) {
-            compLateBtn.addEventListener('click', function(event) {
-                event.preventDefault();
-                console.log('Complete later');
-                showModal({
-                    label: 'Complete Activity Later?',
-                    body: 'Click \'Continue\' to move on to the next activity. This activity must still be completed later in order to finish ' + day + '.',
-                    route: '{{ route('user.complete.later', ['activity_id' => $activity->id]) }}',
-                    method: 'GET'
-                });
-            });
-        }
-    });
-
     // SECRET SKIP
     document.addEventListener('keydown', function(event) {
         if (event.ctrlKey && event.key.toLowerCase() === 'm') {
@@ -494,12 +476,25 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-        //back button modal - lose progress
+        var showBrowserModal = true;
+    
+        //page unload warning - for progress
+        // should call on page reload/changes not initiated by buttons (avoid double modals)
+        window.addEventListener('beforeunload', function(e) {
+            if (!completed && showBrowserModal) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // BACK BUTTON - LOSE PROGRESS
         const backButton = document.getElementById('backButton');
         if (backButton) {
             console.log('back button found');
             backButton.addEventListener('click', function(event) {
                 event.preventDefault();
+                showBrowserModal = false;
+                console.log('will not show other modal');
 
                 if (!completed) {
                     showModal({
@@ -509,11 +504,37 @@
                         method: 'GET',
                         buttonLabel: 'Leave Activity',
                         buttonClass: 'btn-danger',
-                        closeLabel: 'Stay'
+                        closeLabel: 'Stay',
+                        onCancel: function() {
+                            console.log('cancelled in leave')
+                            showBrowserModal = true;
+                        }
                     });
                 } else {
                     window.location.href = this.href;
                 }
+            });
+        }
+
+        // COMPLETE LATER
+        const compLateBtn = document.getElementById('complete-later');
+        if (compLateBtn) {
+            compLateBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                console.log('Complete later');
+                showBrowserModal = false;
+                showModal({
+                    label: 'Complete Activity Later?',
+                    body: 'Click \'Continue\' to move on to the next activity. All progress on this activity will be lost. This activity must still be completed later in order to finish ' + day + '.',
+                    route: '{{ route('user.complete.later', ['activity_id' => $activity->id]) }}',
+                    method: 'GET',
+                    buttonLabel: 'Continue',
+                    buttonClass: 'btn-danger',
+                    onCancel: function() {
+                        console.log('cancelled in complete later')
+                        showBrowserModal = true;
+                    }
+                });
             });
         }
     });
