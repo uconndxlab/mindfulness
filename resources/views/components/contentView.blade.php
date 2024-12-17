@@ -183,7 +183,7 @@
         <div class="feedback-audio__controls d-flex justify-content-between">
             <div class="d-flex">
                 <button class="play-pause" type="button">
-                    <i id="icon" class="bi bi-pause"></i>
+                    <i id="icon" class="bi bi-play"></i>
                 </button>
                 <div class="d-flex" style="margin-top:3px;margin-left:10px"><small id="current-time"></small><small>/</small><small id="max-time"></small></div>
             </div>
