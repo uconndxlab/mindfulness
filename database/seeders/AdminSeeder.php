@@ -13,7 +13,8 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::where('email', 'zoro@op.com')->first();
+        $email = '';
+        $user = User::where('email', $email)->first();
         if ($user) {
             if ($user->role ==='admin') {
                 $user->update(['role' => 'user']);

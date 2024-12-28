@@ -59,7 +59,7 @@ class AuthController extends Controller
                 ]);
             }
             Auth::user()->update(['last_active_at' => Carbon::now()]);
-            return redirect()->intended('/explore/home');
+            return redirect()->intended('/home');
         }
         
         return back()->withErrors(['credentials' => 'Invalid credentials.'])->withInput();
@@ -101,22 +101,27 @@ class AuthController extends Controller
             return redirect()->back()->withErrors($e->errors())->withInput();
         }
 
-        //create user
-        $user = User::create([
-            'name' => $request->name,
-            'email'=> $request->email,
-            'password'=> Hash::make($request->password),
-            'last_active_at' => Carbon::now()
-        ]);
-
-        //unlocking first module/day/activity
-        lockAll($user->id);
-        unlockFirst($user->id);
-
-        //login and redirect
-        event(new Registered($user));
-        $remember = $request->has('remember');
-        Auth::attempt($request->only('email', 'password'), $remember);
-        return redirect(route('welcome'));
+        try {
+            //create user
+            $user = User::create([
+                'name' => $request->name,
+                'email'=> $request->email,
+                'password'=> Hash::make($request->password),
+                'last_active_at' => Carbon::now()
+            ]);
+    
+            //unlocking first module/day/activity
+            lockAll($user->id);
+            unlockFirst($user->id);
+    
+            //login and redirect
+            event(new Registered($user));
+            $remember = $request->has('remember');
+            Auth::attempt($request->only('email', 'password'), $remember);
+            return redirect(route('welcome'));
+        }
+        catch (\Exception $e) {
+            dd($e);
+        }
     }
 }

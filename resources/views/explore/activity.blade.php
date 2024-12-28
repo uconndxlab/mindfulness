@@ -18,8 +18,12 @@
                 </button>
             </h1>
         </div>
-        <h5>{{ ucfirst($activity->type) }}</h5>
-
+        @if ($activity->type)
+            <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>
+        @endif
+        @if ($activity->time)
+            <span class="sub-activity-font activity-tag-time"></i>{{ $activity->time.' min' }}</span>
+        @endif
     </div>
     <div class="manual-margin-top">
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
@@ -106,44 +110,38 @@
                 <p class="text-success">{!! $activity->completion_message !!}</p>
             </div>
         @endif
-        <div id="bonus_message" class="mt-4" style="display: none;">
-            <form id="bonusForm" action="{{ route('explore.module.bonus', ['module_id' => $activity->day->module_id]) }}" method="POST" style="display: inline;">
-                @csrf
-                <input type="hidden" name="day_id_accordion" value="{{ $activity->day_id }}">
-                <a class="text-success" href="#" onclick="document.getElementById('bonusForm').submit();">Click here to view the bonus activities<i class="bi bi-arrow-right"></i></a>
-            </form>
-        </div>
     </div>
     <div class="manual-margin-top" id="redirect_div">
         @if (isset($page_info['redirect_route']))
-            <a id="redirect_button" class="btn btn-tertiary redirect-btn disabled" href="{{ $page_info['redirect_route'] }}" style="display: none;">
+            <a id="redirect_button" class="btn btn-primary btn-tertiary redirect-btn disabled" href="{{ $page_info['redirect_route'] }}" style="display: none;">
                 {{ $page_info['redirect_label'] }}
             </a>
         @endif
-        <div class="d-flex justify-content-center" style="display: block;">
-            <a id="complete-later" class="btn btn-outline-primary rounded-pill px-4">
+        @php
+            $comp_late_btn_disp = ($activity->status == 'completed') || ($activity->final) || ($activity->no_skip) ? 'none' : 'block';
+        @endphp
+        <div class="d-flex justify-content-center">
+            <button id="complete-later" class="btn btn-outline-primary rounded-pill px-4" type="button" style="display: {{ $comp_late_btn_disp }};">
                 <i class="bi bi-bookmark me-2"></i>
-                Complete later
-            </a>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-4 ms-auto">
-            <a id="skip" class="btn btn-primary" onclick="activityComplete()">skip</a>
+                I will do this later
+            </button>
         </div>
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
     const activity_id = {{ $activity->id }};
+    const day = '{{ $activity->day->name }}';
     const optional = {{ $activity->optional }};
 
     //COMPLETION ITEMS
     const redirectDiv = document.getElementById('redirect_div');
+    const compLateBtn = document.getElementById('complete-later');
     const hasContent = {{ $content ? 'true' : 'false' }};
     const hasQuiz = {{ $quiz ? 'true' : 'false' }};
     const hasJournal = {{ $journal ? 'true' : 'false' }};
     var allowSeek = false;
+    var completed = false;
 
     //CHECKING COMPLETION
     const status = '{{ $activity->status }}';
@@ -196,14 +194,7 @@
     function activityComplete(message=true) {
         //show content
         console.log('activity completed');
-        //show message
-        if (message) {
-            const hasMessage = {{ isset($activity->completion_message) ? 'true' : 'false' }};
-            if (hasMessage) {
-                const completionMessageDiv = document.getElementById('comp_message');
-                completionMessageDiv.style.display = 'block';
-            }
-        }
+        completed = true;
         //update users progress
         if (status == 'unlocked') {
             axios.put('{{ route('user.update.progress') }}', {
@@ -215,10 +206,15 @@
             })
             .then(response => {
                 console.log(response.data.message);
-                //unlock redirect only after progress is processed
-                if (response.data.unlocked_bonus) {
-                    const bonusMessageDiv = document.getElementById('bonus_message');
-                    bonusMessageDiv.style.display = 'block';
+                // unlock redirect only after progress is processed
+                // showing modal on completed days
+                if (response.data.day_completed) {
+                    showModal({
+                        label: 'Day Completed',
+                        body: `{!! $activity->day->completion_message !!}`,
+                        media: '{{ Storage::url('content/'.($activity->day->media_path ? $activity->day->media_path : '')) }}',
+                        route: null
+                    });
                 }
                 //hiding complete button for images
                 if (type == 'image') {
@@ -226,23 +222,31 @@
                     completeButton.classList.add('disabled');
                     completeButton.style.display = 'none';
                 }
-                unlockRedirect();
+                unlockRedirect(message);
             })
             .catch(error => {
                 console.error('There was an error updating the progress:', error);
             });
         }
         else if (status == 'completed') {
-            unlockRedirect();
+            unlockRedirect(message);
         }
     }
 
     //function for unlocking the redirection buttons
-    function unlockRedirect() {
+    function unlockRedirect(message=true) {
         redirectDiv.querySelectorAll('.redirect-btn').forEach(btn => {
             btn.style.display = 'block';
             btn.classList.remove('disabled');
         });
+        compLateBtn.style.display = 'none';
+        if (message) {
+            const hasMessage = {{ isset($activity->completion_message) ? 'true' : 'false' }};
+            if (hasMessage) {
+                const completionMessageDiv = document.getElementById('comp_message');
+                completionMessageDiv.style.display = 'block';
+            }
+        }
     }
 
     //FAVORITES
@@ -461,6 +465,79 @@
         errorDiv.textContent = errorMessage;
         errorDiv.style.display = 'block';
     }
+
+    // SECRET SKIP
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.key.toLowerCase() === 'm') {
+            event.preventDefault();
+            console.log('Secret skip');
+            activityComplete();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var showBrowserModal = true;
+    
+        //page unload warning - for progress
+        // should call on page reload/changes not initiated by buttons (avoid double modals)
+        window.addEventListener('beforeunload', function(e) {
+            if (!completed && showBrowserModal) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // BACK BUTTON - LOSE PROGRESS
+        const backButton = document.getElementById('backButton');
+        if (backButton) {
+            console.log('back button found');
+            backButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                showBrowserModal = false;
+                console.log('will not show other modal');
+
+                if (!completed) {
+                    showModal({
+                        label: 'Leave activity?',
+                        body: 'Leaving will erase your progress on this activity. Are you sure you want to leave?',
+                        route: this.href,
+                        method: 'GET',
+                        buttonLabel: 'Leave Activity',
+                        buttonClass: 'btn-danger',
+                        closeLabel: 'Stay',
+                        onCancel: function() {
+                            console.log('cancelled in leave')
+                            showBrowserModal = true;
+                        }
+                    });
+                } else {
+                    window.location.href = this.href;
+                }
+            });
+        }
+
+        // COMPLETE LATER
+        const compLateBtn = document.getElementById('complete-later');
+        if (compLateBtn) {
+            compLateBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                console.log('Complete later');
+                showBrowserModal = false;
+                showModal({
+                    label: 'Complete Activity Later?',
+                    body: 'Click \'Continue\' to move on to the next activity. All progress on this activity will be lost. This activity must still be completed later in order to finish ' + day + '.',
+                    route: '{{ route('user.complete.later', ['activity_id' => $activity->id]) }}',
+                    method: 'GET',
+                    buttonLabel: 'Continue',
+                    buttonClass: 'btn-danger',
+                    onCancel: function() {
+                        console.log('cancelled in complete later')
+                        showBrowserModal = true;
+                    }
+                });
+            });
+        }
+    });
 </script>
 @endsection
 

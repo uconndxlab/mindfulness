@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Mail;
 
 Route::middleware('web')->group(function () {
     //default
-    Route::redirect("/","/explore/home");
+    Route::redirect("/","/home");
 
     //AUTHENTICATION
     //login page
@@ -35,7 +35,7 @@ Route::middleware('web')->group(function () {
     
     //EMAIL VERIFICATION
     Route::middleware('auth')->group(function () {
-        //THERE ARE BUILT IN VERIFICATION FUNCTIONS
+        //BUILT IN VERIFICATION FUNCTIONS
         Route::get('/email/verify', function () {
             if (Auth::user()->email_verified_at) {
                 return redirect()->back();
@@ -51,9 +51,6 @@ Route::middleware('web')->group(function () {
         Route::post('/email/verification-notification', function (Request $request) {
             $user = Auth::user();
             $user->sendEmailVerificationNotification();
-            // TODO DELETE THIS WHEN EMAIL IS SET UP
-            $user->email_verified_at = now();
-            $user->save();
             if ($user->email_verified_at) {
                 return redirect()->intended('/');
             }
@@ -74,13 +71,13 @@ Route::middleware('web')->group(function () {
     //AUTH protected routes
     Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock'])->group(function () {
         //logout
-        Route::get('/logout', [AuthController::class,'logout'])->name('logout');
+        Route::post('/logout', [AuthController::class,'logout'])->name('logout');
 
         //NEW EXPLORE
-        Route::get('/explore/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
+        Route::get('/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
         Route::get('/explore/module/{module_id}', [PageNavController::class, 'exploreModule'])->name('explore.module');
         //using post instead for case with desired accordion open
-        Route::post('/explore/module/{module_id}', [PageNavController::class, 'exploreModuleBonus'])->name('explore.module.bonus');
+        Route::get('/explore/module/{module_id}/bonus', [PageNavController::class, 'exploreModuleBonus'])->name('explore.module.bonus');
         Route::get('/checkActivity/{activity_id}', [PageNavController::class, 'checkActivityLocked'])->name('check.activity');
         Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
         Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
@@ -91,22 +88,27 @@ Route::middleware('web')->group(function () {
         Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
         // Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
         
-        Route::get('/journal', [PageNavController::class, 'journal'])->name('journal');
-        Route::get('/compose', [PageNavController::class, 'journalCompose'])->name('journal.compose');
+        Route::get('/journaltab', [PageNavController::class, 'journal'])->name('journal');
+        Route::get('/journal', [PageNavController::class, 'journalCompose'])->name('journal.compose');
         Route::get('/journal-library', [PageNavController::class, 'journalLibrary'])->name('journal.library');
         Route::get('/journal/search', [PageNavController::class, 'journalSearch'])->name('journal.search');
         
-        Route::get('/account', [PageNavController::class, 'accountPage'])->name('account');
-        Route::get('/help', [PageNavController::class, 'helpPage'])->name('help');
-        Route::get('/library', [PageNavController::class, 'library'])->name('library');
-        Route::get('/meditation-library', [PageNavController::class, 'meditationLibrary'])->name('library.meditation');
+        Route::get('/profile', [PageNavController::class, 'accountPage'])->name('account');
+        Route::get('/about', [PageNavController::class, 'helpPage'])->name('help');
+
+        //LIBRARY
+        Route::get('/librarytab', [PageNavController::class, 'library'])->name('library');
         Route::get('/favorites', [PageNavController::class, 'favoritesLibrary'])->name('library.favorites');
+        Route::get('/library', [PageNavController::class, 'mainLibrary'])->name('library.main');
         Route::get('/search', [PageNavController::class, 'librarySearch'])->name('library.search');
         
         //User updates
         Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
         Route::put('/user/update/namePass', [UserController::class, 'updateNamePass'])->name('user.update.namePass');
-        Route::put('/user/update/progress', [UserController::class,'updateProgress'])->name('user.update.progress');
+        Route::put('/user/update/progress', [UserController::class,'completeActivity'])->name('user.update.progress');
+        //skipping
+        Route::get('/user/completeLater/{activity_id}', [UserController::class,'completeLater'])->name('user.complete.later');
+        Route::put('/user/update/unlockNext', [UserController::class,'unlockNext'])->name('user.update.unlockNext');
         
         //favorites
         Route::post('/favorites', [UserController::class, 'addFavorite'])->name('favorites.create');
@@ -126,6 +128,7 @@ Route::middleware('web')->group(function () {
             Route::post('/changeAccess/{user_id}', [ContentManagementController::class,'changeAccess'])->name('users.access');
             Route::post('/registrationLock', [ContentManagementController::class,'registrationAccess'])->name('registration.lock');
             Route::post('/emailRemindUser/{user_id}', [ContentManagementController::class,'emailRemindUser'])->name('users.remind');
+            Route::delete('/deleteUser/{user_id}', [UserController::class,'deleteUser'])->name('users.delete');
             //modules
             // Route::get('/module', [ContentManagementController::class,'indexModule'])->name('module.index');
             // Route::get('/module/{module_id}', [ContentManagementController::class,'showModule'])->name('module.show');

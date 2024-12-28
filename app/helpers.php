@@ -129,6 +129,30 @@ if (!function_exists('getDayProgress')) {
     }
 }
 
+if (!function_exists('checkUserDay')) {
+    function checkUserDay($user_id, $day_id)
+    {
+        // check all activities within the day to see if they are all completed
+        $day = Day::findOrFail($day_id);
+        $activity_ids = $day->activities->pluck('id')->toArray();
+        $activity_progress = User::findOrFail($user_id)->load('progress_activities')->progress_activities;
+
+        foreach ($activity_ids as $activity_id) {
+            // if optional skip
+            $activity = Activity::findOrFail($activity_id);
+            if ($activity->optional) {
+                continue;
+            }
+            // if not completed return false
+            $status = $activity_progress->where('activity_id', $activity_id)->first()->status ?? 'locked';
+            if ($status != 'completed') {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
 if (!function_exists('unlockFirst')) {
     function unlockFirst($user_id)
     {

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\BonusUnlocked;
 use App\Events\FinalActivityCompleted;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +15,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use App\Models\UserActivity;
 use App\Models\Activity;
+use App\Models\Day;
 use App\Models\Favorite;
+use Log;
 
 class UserController extends Controller
 {
@@ -34,7 +38,71 @@ class UserController extends Controller
         return redirect(route('explore.home'));
     }
 
-    public function updateProgress(Request $request) {
+    public function completeLater(Request $request) {
+        // find activity and get status
+        $activity = Activity::findOrFail($request->activity_id);
+        $user = Auth::user();
+        $user->load('progress_activities');
+        $status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
+
+        //check if locked, final, or optional
+        if ($status == 'locked' || $activity->final || $activity->optional || $activity->no_skip) {
+            return response()->json(['message' => 'Forbidden'], 203);
+        }
+        // check if already completed
+        else if ($status == 'completed') {
+            return response()->json(['message' => 'Activity already completed']);
+        }
+        else if ($status == 'unlocked') {
+            // call unlockNext and get the results
+            $response = $this->unlockNext($request);
+            // if success, redirect to next activity
+            if ($response->status() == 200) {
+                // return redirect(route('explore.module.bonus', ['module_id' => $activity->day->module_id, 'day_id_accordion' => $activity->day_id]));
+                $next_id = $response->original['next_id'];
+                return redirect(route('explore.activity', ['activity_id' => $next_id]));
+            }
+            else {
+                return response()->json(['message' => 'Error completing activity later'], 500);
+            }
+        }
+
+    }
+
+    public function unlockNext(Request $request) {
+        // find activity and get status
+        $activity = Activity::findOrFail($request->activity_id);
+        $user = Auth::user();
+        
+        // unlock next if in same day
+        try {
+            if ($activity->next != null) {
+                $next = Activity::findOrFail($activity->next);
+                if ($next->day == $activity->day) {
+                    // get status of next activity
+                    $next_activity_status = $user->progress_activities->where('activity_id', $next->id)->first()->status ?? 'locked';
+                    if ($next_activity_status == 'locked') {
+                        //update entry for next
+                        UserActivity::updateOrCreate([
+                            "user_id" => Auth::id(),
+                            "activity_id" => $next->id,
+                        ],[
+                            "status" => 'unlocked'
+                        ]);
+                        Session::forget('progress_modules');
+                        Session::forget('progress_days');
+                        Cache::forget('user_'.Auth::id().'_progress_activities');
+                    }
+                }
+            }
+            return response()->json(['message' => 'Next activity unlocked', 'next_id' => $next->id], 200);
+        }
+        catch (Exception $e) {
+            return response()->json(['message' => 'Error unlocking next activity'], 500);
+        }
+    }
+
+    public function completeActivity(Request $request) {
         $request->validate([
             'activity_id' => ['required', 'exists:activities,id'],
         ]);
@@ -51,41 +119,52 @@ class UserController extends Controller
             $current_activity_progress->status = 'completed';
             $current_activity_progress->save();
 
-            //check next
-            if ($activity->next != null) {
-                //find next
-                $next = Activity::findOrFail($activity->next);
-                $next_activity_status = $activity_progress->where('activity_id', $next->id)->first()->status ?? 'locked';
-                if ($next_activity_status == 'locked') {
-                    //update entry for next
-                    UserActivity::updateOrCreate([
-                        "user_id" => Auth::id(),
-                        "activity_id" => $next->id,
-                    ],[
-                        "status" => 'unlocked'
-                    ]);
+            // check if day is completed using helper
+            $day_completed = checkUserDay(Auth::id(), $activity->day_id);
+
+            $next_id = $activity->next;
+            // if day is completed...
+            if ($day_completed) {
+                // unlock optional activities within day
+                $optional_activities = Activity::where('optional', true)->where('day_id', $activity->day_id)->get();
+                foreach ($optional_activities as $optional) {
+                    $optional_status = $activity_progress->where('activity_id', $optional->id)->first()->status ?? 'locked';
+                    if ($optional_status == 'locked') {
+                        // fire modal event for unlocked bonus
+                        event(new BonusUnlocked($activity->day));
+                        //update entry for optional
+                        UserActivity::updateOrCreate([
+                            "user_id" => Auth::id(),
+                            "activity_id" => $optional->id,
+                        ],[
+                            "status" => 'unlocked'
+                        ]);
+                    }
                 }
-            }
-            
-            //check if final, fire modal event
-            if ($activity->final) {
-                event(new FinalActivityCompleted($activity->day));
+
+                // get the id for the proper next day
+                $next_id = Activity::where('day_id', $activity->day_id)->where('optional', false)->orderBy('order')->get()->last()->next;
             }
 
-            //handling optional
-            $unlocked_bonus = false;
-            $optional_activities = Activity::where('optional', true)->where('order', $activity->order)->get();
-            foreach ($optional_activities as $optional) {
-                $optional_status = $activity_progress->where('activity_id', $optional->id)->first()->status ?? 'locked';
-                if ($optional_status == 'locked') {
-                    //update entry for optional
-                    $unlocked_bonus = true;
-                    UserActivity::updateOrCreate([
-                        "user_id" => Auth::id(),
-                        "activity_id" => $optional->id,
-                    ],[
-                        "status" => 'unlocked'
-                    ]);
+            Log::info('Day completed: '.($day_completed ? 'true' : 'false'));
+            Log::info('Next ID: '.$next_id);
+            // check next
+            if ($next_id != null) {
+                //find next
+                $next = Activity::findOrFail($activity->next);
+                if ($next->day == $activity->day || $day_completed) {
+                    Log::info('Next in same day or day completed');
+                    // get status of next activity
+                    $next_activity_status = $activity_progress->where('activity_id', $next_id)->first()->status ?? 'locked';
+                    if ($next_activity_status == 'locked') {
+                        //update entry for next
+                        UserActivity::updateOrCreate([
+                            "user_id" => Auth::id(),
+                            "activity_id" => $next_id,
+                        ],[
+                            "status" => 'unlocked'
+                        ]);
+                    }
                 }
             }
 
@@ -93,7 +172,7 @@ class UserController extends Controller
             Session::forget('progress_modules');
             Session::forget('progress_days');
             Cache::forget('user_'.Auth::id().'_progress_activities');
-            return response()->json(['message' => 'Progress updated', 'unlocked_bonus' => $unlocked_bonus], 200);
+            return response()->json(['message' => 'Progress updated', 'day_completed' => $day_completed], 200);
         }
         else if ($current_activity_progress->status == 'completed') {
             return response()->json(['message' => 'Activity already completed']);
@@ -179,5 +258,20 @@ class UserController extends Controller
             ->delete();
 
         return response()->json(['message' => 'Favorite removed'], 200);
+    }
+
+    public function deleteUser(Request $request, $user_id) {
+        // admin middleware protected function
+        try {
+            $user = User::findOrFail($user_id);
+            if ($user->role == 'admin') {
+                return redirect()->back()->with('error', 'Cannot delete admin account');
+            }
+            $user->delete();
+            return redirect()->back()->with('success', 'User deleted successfully');
+        }
+        catch (Exception $e) {
+            return redirect()->back()->with('error', 'Error deleting user');
+        }
     }
 }

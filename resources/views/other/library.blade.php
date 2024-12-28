@@ -24,17 +24,18 @@
         }
         else {
             $journal_hide = false;
-            $tn_right_name = 'Favorites';
-            $tn_right_route = route('library.favorites');
-            $tn_left_name = 'Meditation';
-            $tn_left_route = route('library.meditation');
-            if ($route_name == 'library.meditation') {
+            $tn_right_name = 'Search';
+            $tn_right_route = route('library.main');
+            $tn_left_name = 'Favorites';
+            $tn_left_route = route('library.favorites');
+            if ($route_name == 'library.favorites') {
                 $top_nav[0] = true;
             }
             else {
                 $top_nav[1] = true;
             }
         }
+        $is_favorites = $route_name == 'library.favorites';
     @endphp
 
     <nav class="navbar navbar-expand-lg navbar-light">
@@ -75,105 +76,107 @@
         
             <div id="filterResultDiv" style="display: none;">
                 <div class="row search-filters">
-                    <div class="col-lg-4">
-                        <div class="accordion accordion-flush" id="showFilterAccordion">
-                            <div class="form-group accordion-item border mb-2">
-                                <h2 class="accordion-header" id="headingFilter">
-                                    <button id="showFilterButton" class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
-                                        <i class="bi bi-sliders" style="padding-right:10px"></i> Show Filters
-                                    </button>
-                                </h2>
-                                <div id="collapseFilter" class="accordion-collapse collapse" aria-labelledby="headingFilter">
-                                    <div class="accordion-body">
-                                        <div class="accordion accordion-flush mb-3" id="filter_accordion">
+                    @if (isset($categories) && !$is_favorites)
+                        <div class="col-lg-4">
+                            <div class="accordion accordion-flush" id="showFilterAccordion">
+                                <div class="form-group accordion-item border mb-2">
+                                    <h2 class="accordion-header" id="headingFilter">
+                                        <button id="showFilterButton" class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
+                                            <i class="bi bi-sliders" style="padding-right:10px"></i> Show Filters
+                                        </button>
+                                    </h2>
+                                    <div id="collapseFilter" class="accordion-collapse collapse" aria-labelledby="headingFilter">
+                                        <div class="accordion-body">
+                                            <div class="accordion accordion-flush mb-3" id="filter_accordion">
 
-                                            <div class="form-group accordion-item border mb-2" style="display: {{ $journal_hide ? 'none' : 'block' }}">
-                                                <h2 class="accordion-header" id="headingTime">
-                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTime" aria-expanded="true" aria-controls="collapseTime">
-                                                        Time
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseTime" class="accordion-collapse collapse" aria-labelledby="headingTime">
-                                                    <div class="accordion-body">
-                                                        <div id="time_range_slider"></div>
-                                                        <div class="d-flex justify-content-between">
-                                                            <span id="start_time_label">0 min</span>
-                                                            <span id="end_time_label">30 min</span>
+                                                <div class="form-group accordion-item border mb-2" style="display: {{ $journal_hide ? 'none' : 'block' }}">
+                                                    <h2 class="accordion-header" id="headingTime">
+                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTime" aria-expanded="true" aria-controls="collapseTime">
+                                                            Time
+                                                        </button>
+                                                    </h2>
+                                                    <div id="collapseTime" class="accordion-collapse collapse" aria-labelledby="headingTime">
+                                                        <div class="accordion-body">
+                                                            <div id="time_range_slider"></div>
+                                                            <div class="d-flex justify-content-between">
+                                                                <span id="start_time_label">0 min</span>
+                                                                <span id="end_time_label">30 min</span>
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    <input type="hidden" name="start_time" id="start_time_input">
+                                                    <input type="hidden" name="end_time" id="end_time_input">
                                                 </div>
-                                                <input type="hidden" name="start_time" id="start_time_input">
-                                                <input type="hidden" name="end_time" id="end_time_input">
-                                            </div>
-                    
-                                            @php
-                                                $journal_search = isset($page_info['journal']) && $page_info['journal'] ? true : false;
-                                            @endphp
-                                            <div class="form-group accordion-item border mb-2">
-                                                <h2 class="accordion-header" id="headingCategory">
-                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory" aria-expanded="true" aria-controls="collapseCategory">
-                                                        @if ($journal_search)
-                                                            Topics
-                                                        @else
-                                                            Category
-                                                        @endif
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseCategory" class="accordion-collapse collapse" aria-labelledby="headingCategory">
-                                                    <div class="accordion-body">
-                                                        <div id="category_check">
-                                                            @foreach ($categories as $category)
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox" name="category[]" id="category_{{ strtolower($category) }}" value="{{ $category }}">
-                                                                    <label class="form-check-label" for="category_{{ strtolower($category) }}">
-                                                                        {{ $category }}
-                                                                    </label>
-                                                                </div>
-                                                            @endforeach
+                        
+                                                @php
+                                                    $journal_search = isset($page_info['journal']) && $page_info['journal'] ? true : false;
+                                                @endphp
+                                                <div class="form-group accordion-item border mb-2">
+                                                    <h2 class="accordion-header" id="headingCategory">
+                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory" aria-expanded="true" aria-controls="collapseCategory">
                                                             @if ($journal_search)
-                                                                <div class="text-left fw-bold mt-1">From Activity:</div>
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox" name="category[]" id="category_activities" value="Activities">
-                                                                    <label class="form-check-label" for="category_activities">
-                                                                        Activities
-                                                                    </label>
-                                                                </div>
+                                                                Topics
+                                                            @else
+                                                                Category
                                                             @endif
+                                                        </button>
+                                                    </h2>
+                                                    <div id="collapseCategory" class="accordion-collapse collapse" aria-labelledby="headingCategory">
+                                                        <div class="accordion-body">
+                                                            <div id="category_check">
+                                                                @foreach ($categories as $category)
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" type="checkbox" name="category[]" id="category_{{ strtolower($category) }}" value="{{ $category }}">
+                                                                        <label class="form-check-label" for="category_{{ strtolower($category) }}">
+                                                                            {{ $category }}
+                                                                        </label>
+                                                                    </div>
+                                                                @endforeach
+                                                                @if ($journal_search)
+                                                                    <div class="text-left fw-bold mt-1">From Activity:</div>
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" type="checkbox" name="category[]" id="category_activities" value="Activities">
+                                                                        <label class="form-check-label" for="category_activities">
+                                                                            Activities
+                                                                        </label>
+                                                                    </div>
+                                                                @endif
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                            
-                                            <div class="form-group accordion-item border mb-2" style="display: {{ $journal_hide ? 'none' : 'block' }}">
-                                                <h2 class="accordion-header" id="headingModule">
-                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseModule" aria-expanded="true" aria-controls="collapseModule">
-                                                        Part
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseModule" class="accordion-collapse collapse" aria-labelledby="headingModule">
-                                                    <div class="accordion-body">
-                                                        <div id="module_check">
-                                                            @for ($i = 1; $i < 5; $i++)
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox" name="module[]" id="module_{{ $i }}" value="{{ $i }}" {{ in_array($i, request('module', [])) ? 'checked' : '' }}>
-                                                                    <label class="form-check-label" for="module_{{ $i }}">
-                                                                        Part {{ $i }}
-                                                                    </label>
-                                                                </div>
-                                                            @endfor
+                                                
+                                                <div class="form-group accordion-item border mb-2" style="display: {{ $journal_hide ? 'none' : 'block' }}">
+                                                    <h2 class="accordion-header" id="headingModule">
+                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseModule" aria-expanded="true" aria-controls="collapseModule">
+                                                            Part
+                                                        </button>
+                                                    </h2>
+                                                    <div id="collapseModule" class="accordion-collapse collapse" aria-labelledby="headingModule">
+                                                        <div class="accordion-body">
+                                                            <div id="module_check">
+                                                                @for ($i = 1; $i < 5; $i++)
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" type="checkbox" name="module[]" id="module_{{ $i }}" value="{{ $i }}" {{ in_array($i, request('module', [])) ? 'checked' : '' }}>
+                                                                        <label class="form-check-label" for="module_{{ $i }}">
+                                                                            Part {{ $i }}
+                                                                        </label>
+                                                                    </div>
+                                                                @endfor
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <button id="apply_filter_button" type="button" class="btn btn-primary">Apply Filter</button>
+                                            <button id="clear_filter_button" type="button" style="color:#000!important" class="btn btn-link text-center mt-1 mb-2">Clear Filters</button>
                                         </div>
-                                        <button id="apply_filter_button" type="button" class="btn btn-primary">Apply Filter</button>
-                                        <button id="clear_filter_button" type="button" style="color:#000!important" class="btn btn-link text-center mt-1 mb-2">Clear Filters</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                     <div id="resultsContainer" class="col-lg-8"></div>
                 </div>
             </div>
@@ -183,12 +186,55 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.8.0/nouislider.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var slider = document.getElementById('time_range_slider');
-        var startTimeInput = document.getElementById('start_time_input');
-        var endTimeInput = document.getElementById('end_time_input');
-        
-        var sfForm = document.getElementById('search_filter_form');
+        //init
+        const isFavorites = {{ $is_favorites ? 'true' : 'false' }};
+        var slider = null;
+        if (!isFavorites) {
+            var slider = document.getElementById('time_range_slider');
+            var startTimeInput = document.getElementById('start_time_input');
+            var endTimeInput = document.getElementById('end_time_input');
 
+            //set up accordion
+            var collapseTime = new bootstrap.Collapse(document.getElementById('collapseTime'), {
+                toggle: false
+            });
+            var collapseCategory = new bootstrap.Collapse(document.getElementById('collapseCategory'), {
+                toggle: false
+            });
+            var collapseModule = new bootstrap.Collapse(document.getElementById('collapseModule'), {
+                toggle: false
+            });
+            var collapseFilter = new bootstrap.Collapse(document.getElementById('collapseFilter'), {
+                toggle: false
+            });
+    
+            //show/hide filter accordion
+            const showFilterBtn = document.getElementById('showFilterButton');
+            var open = false;
+            showFilterBtn.addEventListener('click', function() {
+                if (open) {
+                    showFilterBtn.innerHTML = `<i class="bi bi-sliders" style="padding-right:10px"></i> Show Filters`;
+                    open = false;
+                }
+                else {
+                    showFilterBtn.innerHTML = `<i class="bi bi-sliders" style="padding-right:10px"></i> Hide Filters`;
+                    open = true;
+                }
+            });
+            function openFilters() {
+                showFilterBtn.innerHTML = `<i class="bi bi-sliders" style="padding-right:10px"></i> Hide Filters`;
+                open = true;
+                collapseFilter.show();
+            }
+
+            //when apply search with filters
+            document.getElementById('apply_filter_button').addEventListener('click', function() {
+                search(true);
+            });
+
+            document.getElementById('clear_filter_button').addEventListener('click', clearFilters);
+        }
+        var sfForm = document.getElementById('search_filter_form');
         var searchBar = document.getElementById('search_bar');
         
         var baseParam = '{{ $base_param }}';
@@ -197,47 +243,15 @@
         //saved page number
         var _page = 1;
 
-        //set up accordion
-        var collapseTime = new bootstrap.Collapse(document.getElementById('collapseTime'), {
-            toggle: false
-        });
-        var collapseCategory = new bootstrap.Collapse(document.getElementById('collapseCategory'), {
-            toggle: false
-        });
-        var collapseModule = new bootstrap.Collapse(document.getElementById('collapseModule'), {
-            toggle: false
-        });
-        var collapseFilter = new bootstrap.Collapse(document.getElementById('collapseFilter'), {
-            toggle: false
-        });
-
-        //show/hide filter accordion
-        const showFilterBtn = document.getElementById('showFilterButton');
-        var open = false;
-        showFilterBtn.addEventListener('click', function() {
-            if (open) {
-                showFilterBtn.innerHTML = `<i class="bi bi-sliders" style="padding-right:10px"></i> Show Filters`;
-                open = false;
-            }
-            else {
-                showFilterBtn.innerHTML = `<i class="bi bi-sliders" style="padding-right:10px"></i> Hide Filters`;
-                open = true;
-            }
-        });
-        function openFilters() {
-            showFilterBtn.innerHTML = `<i class="bi bi-sliders" style="padding-right:10px"></i> Hide Filters`;
-            open = true;
-            collapseFilter.show();
-        }
-
         const wipeFilters = {{ isset($wipe_filters) && $wipe_filters ? 'true' : 'false'}};
 
         //load in old filter values
         function loadFilters() {
             console.log('loading values');
             var filters = null;
-            if (baseParam == 'meditation') {
-                filters = JSON.parse(sessionStorage.getItem('meditation_filters'));
+            if (baseParam == 'main') {
+                filters = JSON.parse(sessionStorage.getItem('main_filters'));
+                console.log('main filters:', filters);
             }
             else if (baseParam == 'favorited') {
                 filters = JSON.parse(sessionStorage.getItem('favorite_filters'));
@@ -246,38 +260,42 @@
                 filters = JSON.parse(sessionStorage.getItem('journal_filters'));
             }
             if (filters) {
-                //remove transitions temporarily
-                document.querySelectorAll('.collapse, .arrow-selector').forEach(function(element) {
-                    element.style.transition = 'none';
-                });
-
                 //search
                 searchBar.value = filters.search || '';
                 searchBar.focus();
-                //time
-                startTimeInput.value = filters.start || 0;
-                endTimeInput.value = filters.end || 30;
-                if (filters.end != 30 || filters.start != 0) {
-                    collapseTime.show();
-                    openFilters();
+
+                if (!isFavorites) {
+                    //remove transitions temporarily
+                    document.querySelectorAll('.collapse, .arrow-selector').forEach(function(element) {
+                        element.style.transition = 'none';
+                    });
+    
+                    //time
+                    startTimeInput.value = filters.start || 0;
+                    endTimeInput.value = filters.end || 30;
+                    if (filters.end != 30 || filters.start != 0) {
+                        collapseTime.show();
+                        openFilters();
+                    }
+                    
+                    //categories
+                    document.querySelectorAll('input[name="category[]"]').forEach(checkbox => {
+                        checkbox.checked = filters.categories.includes(checkbox.value);
+                        if (checkbox.checked) {
+                            collapseCategory.show();
+                            openFilters();
+                        }
+                    });
+                    //modules
+                    document.querySelectorAll('input[name="module[]"]').forEach(checkbox => {
+                        checkbox.checked = filters.modules.includes(checkbox.value);
+                        if (checkbox.checked) {
+                            collapseModule.show();
+                            openFilters();
+                        }
+                    });
                 }
-                
-                //categories
-                document.querySelectorAll('input[name="category[]"]').forEach(checkbox => {
-                    checkbox.checked = filters.categories.includes(checkbox.value);
-                    if (checkbox.checked) {
-                        collapseCategory.show();
-                        openFilters();
-                    }
-                });
-                //modules
-                document.querySelectorAll('input[name="module[]"]').forEach(checkbox => {
-                    checkbox.checked = filters.modules.includes(checkbox.value);
-                    if (checkbox.checked) {
-                        collapseModule.show();
-                        openFilters();
-                    }
-                });
+
                 //page
                 _page = filters.page;
                 // console.log('saved page: ', _page);
@@ -294,8 +312,8 @@
             loadFilters();
         }
         else {
-            if (baseParam == 'meditation') {
-                filters = sessionStorage.removeItem('meditation_filters');
+            if (baseParam == 'main') {
+                filters = sessionStorage.removeItem('main_filters');
             }
             else if (baseParam == 'favorited') {
                 filters = sessionStorage.removeItem('favorite_filters');
@@ -304,82 +322,77 @@
                 filters = sessionStorage.removeItem('journal_filters');
             }
         }
-        
-        //SLIDER INIT
-        //gets vals from previous request
-        var startVal = startTimeInput.value || 0;
-        var endVal = endTimeInput.value || 30;
-        
-        //format mins
-        function minutesToTime(minutes) {
-            return `${String(minutes)} mins`;
-        }
-        
-        noUiSlider.create(slider, {
-            start: [0, 30],
-            connect: true,
-            range: {
-                'min': 0,
-                'max': 30
-            },
-            step: 1,
-            format: {
-                to: function (value) {
-                    return minutesToTime(Math.round(value));
+
+        if (slider) {
+            //SLIDER INIT
+            //gets vals from previous request
+            var startVal = startTimeInput.value || 0;
+            var endVal = endTimeInput.value || 30;
+            //format mins
+            function minutesToTime(minutes) {
+                return `${String(minutes)} mins`;
+            }
+            noUiSlider.create(slider, {
+                start: [0, 30],
+                connect: true,
+                range: {
+                    'min': 0,
+                    'max': 30
                 },
-                from: function (value) {
-                    return value;
+                step: 1,
+                format: {
+                    to: function (value) {
+                        return minutesToTime(Math.round(value));
+                    },
+                    from: function (value) {
+                        return value;
+                    }
                 }
-            }
-        });
-        
-        var startLabel = document.getElementById('start_time_label');
-        var endLabel = document.getElementById('end_time_label');
-        
-        //SLIDER CHANGE
-        slider.noUiSlider.on('update', function (values) {
-            //update labels
-            startLabel.textContent = values[0];
-            endLabel.textContent = values[1];
+            });
+            var startLabel = document.getElementById('start_time_label');
+            var endLabel = document.getElementById('end_time_label');
+
+            //SLIDER CHANGE
+            slider.noUiSlider.on('update', function (values) {
+                //update labels
+                startLabel.textContent = values[0];
+                endLabel.textContent = values[1];
+                
+                //convert the # mins to #
+                const timeToMinutes = (time) => {
+                    const [mins, _] = time.split(' ').map(Number);
+                    return mins;
+                };
+                
+                //update hidden input
+                startConverted = timeToMinutes(values[0]);
+                endConverted = timeToMinutes(values[1]);
+                startTimeInput.value = startConverted;
+                endTimeInput.value = endConverted;
+                //remove the inputs if default values
+                if (startConverted === 0 && endConverted === 30) {
+                    startTimeInput.remove();
+                    endTimeInput.remove();
+                } else {
+                    //add inputs back on change
+                    if (!sfForm.contains(startTimeInput)) {
+                        sfForm.appendChild(startTimeInput);
+                    }
+                    if (!sfForm.contains(endTimeInput)) {
+                        sfForm.appendChild(endTimeInput);
+                    }
+                }
+            });
             
-            //convert the # mins to #
-            const timeToMinutes = (time) => {
-                const [mins, _] = time.split(' ').map(Number);
-                return mins;
-            };
-            
-            //update hidden input
-            startConverted = timeToMinutes(values[0]);
-            endConverted = timeToMinutes(values[1]);
-            startTimeInput.value = startConverted;
-            endTimeInput.value = endConverted;
-            //remove the inputs if default values
-            if (startConverted === 0 && endConverted === 30) {
-                startTimeInput.remove();
-                endTimeInput.remove();
-            } else {
-                //add inputs back on change
-                if (!sfForm.contains(startTimeInput)) {
-                    sfForm.appendChild(startTimeInput);
-                }
-                if (!sfForm.contains(endTimeInput)) {
-                    sfForm.appendChild(endTimeInput);
-                }
-            }
-        });
-        
-        //init labels
-        slider.noUiSlider.set([parseInt(startVal), parseInt(endVal)]);
+            //init labels
+            slider.noUiSlider.set([parseInt(startVal), parseInt(endVal)]);
+        }
         
         //APPLY/SAVE FILTERS - vars
         var _categories = null;
         var _modules = null;
         var _start = null;
         var _end = null;
-        //when apply search with filters
-        document.getElementById('apply_filter_button').addEventListener('click', function() {
-            search(true);
-        });
         function saveFilters() {
             //save the filters (get filter vars)
             _categories = getChecked('categories');
@@ -394,31 +407,36 @@
             //search
             params.append('search', searchBar.value);
             
-            //time
-            if (_end != 30 || _start != 0) {
-                params.append('start_time', _start);
-                params.append('end_time', _end);
+            if (!isFavorites) {
+                //time
+                if (_end != 30 || _start != 0) {
+                    params.append('start_time', _start);
+                    params.append('end_time', _end);
+                }
+                //categories and modules
+                _categories.forEach(category => params.append('category[]', category));
+                _modules.forEach(module_ => params.append('module[]', module_));
             }
-            //categories and modules
-            _categories.forEach(category => params.append('category[]', category));
+            
             params.append('base_param', '{{ $base_param }}')
-            _modules.forEach(module_ => params.append('module[]', module_));
-
             //page
             params.append('page', _page);
 
             //saving recent search to session
             const filters = {
                 search: searchBar.value,
-                categories: _categories,
-                modules: _modules,
-                start: _start,
-                end: _end,
                 page: _page
             };
+            if (!isFavorites) {
+                filters.categories = _categories;
+                filters.modules = _modules;
+                filters.start = _start;
+                filters.end = _end;
+            }
 
-            if (baseParam == 'meditation') {
-                sessionStorage.setItem('meditation_filters', JSON.stringify(filters));
+            if (baseParam == 'main') {
+                console.log('Saving filters to session:', filters);
+                sessionStorage.setItem('main_filters', JSON.stringify(filters));
             }
             else if (baseParam == 'favorited') {
                 console.log('Saving filters to session:', filters);
@@ -451,7 +469,7 @@
             //build url
             const searchUrl = new URL('{{ $page_info['search_route'] }}');
             //if changes in filter...
-            if (filters) {
+            if (!isFavorites && filters) {
                 //save them onto the filter vars
                 saveFilters();
             }
@@ -527,7 +545,6 @@
         //CLEAR FILTERS - resubmit/search
         const moduleDiv = document.getElementById('module_check');
         const categoryDiv = document.getElementById('category_check');
-        document.getElementById('clear_filter_button').addEventListener('click', clearFilters);
         function clearFilters() {
             //clear the checkbox fields
             moduleDiv.querySelectorAll('.form-check-input').forEach(checkbox => {

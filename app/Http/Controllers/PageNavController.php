@@ -49,7 +49,7 @@ class PageNavController extends Controller
         return view("explore.home", compact('modules'));
     }
 
-    public function exploreModule($module_id, $override_accordion=null)
+    public function exploreModule($module_id, $accordion_day=null)
     {
         //find the module
         $module = Module::with('days.activities')->findOrFail($module_id);
@@ -74,8 +74,8 @@ class PageNavController extends Controller
             //assign the progress
             $day->progress = $progress[$day->id];
         }
-
-        $override_accordion = $override_accordion ? 'day_'.$override_accordion : null;
+        // $accordion_day = 1;
+        $override_accordion = $accordion_day ? 'day_'.$accordion_day : null;
 
         //set back route
         $page_info['back_label'] = " Back to Home";
@@ -89,11 +89,8 @@ class PageNavController extends Controller
     }
 
 public function exploreModuleBonus(Request $request, $module_id) {
-    $override_accordion = null;
-    if (isset($request->day_id_accordion)) {
-        $override_accordion = $request->day_id_accordion;
-    }
-    return $this->exploreModule($module_id, $override_accordion);
+    $accordion_day = $request->day ?? null;
+    return $this->exploreModule($module_id, $accordion_day);
 }
 
     public function checkActivityLocked($activity_id, $from_controller = false) {
@@ -227,7 +224,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
             return redirect()->to($previous);
         }
         else {
-            return redirect()->route('library.meditation');
+            return redirect()->route('library.main');
         }
     }
 
@@ -245,9 +242,8 @@ public function exploreModuleBonus(Request $request, $module_id) {
         //base param
         $empty_text = null;
         if ($request->base_param) {
-            if ($request->base_param == 'meditation') {
-                $query->where('type', 'practice');
-                $empty_text = 'Keep progressing to unlock more meditation sessions...';
+            if ($request->base_param == 'main') {
+                $empty_text = 'Keep progressing to unlock more exercises...';
             }
             else if ($request->base_param = 'favorited') {
                 $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
@@ -339,29 +335,29 @@ public function exploreModuleBonus(Request $request, $module_id) {
             'search_text' => 'Search for your favorite activity...'
         ];
 
-        $categories = ['Practice', 'Lesson', 'Reflection', 'Journal', 'Optional'];
+        // $categories = [];
 
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.favorites'));
         Session::put('current_nav', ['route' => route('library.favorites'), 'back' => 'Favorites']);
-        return view('other.library', compact('base_param', 'page_info', 'categories'));
+        return view('other.library', compact( 'base_param', 'page_info'));
     }
-    public function meditationLibrary(Request $request)
+    public function mainLibrary(Request $request)
     {
-        $base_param = 'meditation';
+        $base_param = 'main';
 
         $page_info = [
             'journal' => false,
-            'title' => 'Meditation Library',
+            'title' => 'Search',
             'search_route' => route('library.search'),
-            'search_text' => 'Search for a meditation exercise...'
+            'search_text' => 'Search for an exercise...'
         ];
 
-        $categories = ['Favorited', 'Optional'];
+        $categories = ['Practice', 'Lesson', 'Reflection', 'Journal', 'Favorited', 'Optional'];
 
         //set as the previous library and save as exit
-        Session::put('previous_library', route('library.meditation'));
-        Session::put('current_nav', ['route' => route('library.meditation'), 'back' => 'Meditation Library']);
+        Session::put('previous_library', route('library.main'));
+        Session::put('current_nav', ['route' => route('library.main'), 'back' => 'Search']);
         return view("other.library", compact('base_param', 'page_info', 'categories'));
     }
     
@@ -419,7 +415,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
         //check if empty
         $empty = !$query->exists();
         if ($empty) {
-            $view = view('components.journal-search-results', ['empty_text' => '<span>Continue progressing to find a Journal activity, or write your first journal in the <a href="/compose">Compose</a> tab.</span>'])->render();
+            $view = view('components.journal-search-results', ['empty_text' => '<span>Continue progressing to find a Journal activity, or write your first journal in the <a href="/journal">Journal</a> tab.</span>'])->render();
             return response()->json(['html' => $view]);
         }
 

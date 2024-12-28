@@ -205,12 +205,7 @@
                     if (hasFeedback) {
                         feedbackDiv.style.display = event.target.checked ? 'block' : 'none';
                     }
-                    //autoplay audio in feedback
-                    if (event.target.checked) {
-                        feedbackDiv.querySelectorAll('audio').forEach(audio => {
-                            audio.play();
-                        });
-                    }
+                    //autoplay??
                     checkBox(option, event.target.checked);
                 });
             });
