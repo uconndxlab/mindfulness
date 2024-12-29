@@ -163,10 +163,9 @@
     </video>
 @elseif ($type == 'pdf')
     <div>
+        <!-- class="link-workbook" -->
         <span>
-            <a id="{{ isset($id) ? $id : '' }}" class="link-workbook" href="{{ Storage::url('content/'.$file) }}" target="_blank">Open workbook page</a>
-            <br>
-            <a id="{{ isset($id2) ? $id2 : '' }}" class="btn btn-primary btn-workbook" href="{{ Storage::url('content/'.$file) }}" download>DOWNLOAD WORKBOOK <i class="bi bi-download"></i></a>
+            <a id="{{ isset($id) ? $id : '' }}" class="btn btn-primary btn-workbook" href="{{ Storage::url('content/'.$file) }}" target="_blank">Open workbook page <i class="bi bi-arrow-right"></i></a>
         </span>
     </div>
 @elseif ($type == 'image')
