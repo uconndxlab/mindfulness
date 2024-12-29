@@ -107,8 +107,11 @@ class UserController extends Controller
             'activity_id' => ['required', 'exists:activities,id'],
         ]);
 
+        $user = Auth::user();
+
         $activity = Activity::findOrFail($request->activity_id);
-        $activity_progress = Auth::user()->load('progress_activities')->progress_activities;
+        $activity_progress = $user->load('progress_activities')->progress_activities;
+
 
         //get the current activity status
         $current_activity_progress = $activity_progress->where('activity_id', $activity->id)->first();
@@ -156,6 +159,8 @@ class UserController extends Controller
                     Log::info('Next in same day or day completed');
                     // get status of next activity
                     $next_activity_status = $activity_progress->where('activity_id', $next_id)->first()->status ?? 'locked';
+
+                    $new_current_act = $next_id;
                     if ($next_activity_status == 'locked') {
                         //update entry for next
                         UserActivity::updateOrCreate([
@@ -164,6 +169,21 @@ class UserController extends Controller
                         ],[
                             "status" => 'unlocked'
                         ]);
+                    }
+                    // if next is completed (by skipping) - find the next unlocked/locked
+                    else{
+                        while ($next_activity_status == 'completed') {
+                            // find next to unlock
+                            $next = Activity::findOrFail($next->next);
+                            $next_id = $next->id;
+                            $new_current_act = $next_id;
+                            $next_activity_status = $activity_progress->where('activity_id', $next_id)->first()->status ?? 'locked';
+                        }
+                    }
+                    // update current activity - if next completed, update to next unlocked
+                    if ($activity->id == $user->current_activity || $user->current_activity == null) {
+                        $user->current_activity = $new_current_act;
+                        $user->save();
                     }
                 }
             }

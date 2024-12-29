@@ -21,6 +21,8 @@ class ResetUserProgress extends Seeder
         foreach (User::all() as $user) {
             lockAll($user->id);
             unlockFirst($user->id);
+            $user->current_activity = 1;
+            $user->save();
         }
     }
 }
