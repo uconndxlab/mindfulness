@@ -140,11 +140,11 @@ public function exploreModuleBonus(Request $request, $module_id) {
         //make sure that if doing next, the day is not changing
         if (!$request->library) {
             if ($activity->next && Activity::find($activity->next)->day->id == $activity->day->id) {
-                $page_info['redirect_label'] = "NEXT";
+                $page_info['redirect_label'] = "Next Activity";
                 $page_info['redirect_route'] = route('explore.activity', ['activity_id' => $activity->next]);
             }
             else {
-                $page_info['redirect_label'] = "FINISH";
+                $page_info['redirect_label'] = "Back to Part ".$activity->day->module->id;
                 $page_info['redirect_route'] = $page_info['exit_route'];
             }
         }
