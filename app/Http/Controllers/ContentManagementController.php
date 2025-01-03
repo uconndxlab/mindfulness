@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activity;
+use App\Models\Inquiry;
 use App\Models\User;
 use App\Models\Module;
 use App\Models\Day;
@@ -78,6 +79,39 @@ class ContentManagementController extends Controller
         }
         catch (\Exception $e) {
             return response()->json(['error_message' => 'Failed to send reminder email.', 'error' => $e], 500);
+        }
+    }
+
+    public function emailTesting(Request $request, $type) {
+        try {
+            $email = env('TEST_USER_EMAIL');
+            $user = User::where('email', $email)->first();
+
+            if ($request->type == 'inactivity') {
+                Mail::to($user->email)->send(new \App\Mail\InactivityReminder($user));
+            }
+            else if ($request->type == 'inquiry') {
+                $inquiry = Inquiry::create([
+                    'name' => 'Test Inquiry',
+                    'email' => $user->email,
+                    'subject' => 'Test Inquiry Subject',
+                    'message' => 'Test Inquiry Message',
+                ]);
+
+                Mail::to($user->email)->send(new \App\Mail\InquiryReceived($inquiry));
+            }
+            // force send built in verification email
+            else if ($request->type == 'verification') {
+                $user->email_verified_at = null;
+                $user->save();
+                $user->sendEmailVerificationNotification();
+            }
+            else {
+                return response()->json(['error_message' => 'Invalid email type.'], 400);
+            }
+        }
+        catch (\Exception $e) {
+            return response()->json(['error_message' => 'Failed to send test email.', 'error' => $e], 500);
         }
     }
 

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ContactFormController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\UserController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PageNavController;
@@ -128,6 +129,8 @@ Route::middleware('web')->group(function () {
             Route::post('/changeAccess/{user_id}', [ContentManagementController::class,'changeAccess'])->name('users.access');
             Route::post('/registrationLock', [ContentManagementController::class,'registrationAccess'])->name('registration.lock');
             Route::post('/emailRemindUser/{user_id}', [ContentManagementController::class,'emailRemindUser'])->name('users.remind');
+            //email testing
+            Route::get('/sendTestMail/{type}', [ContentManagementController::class,'emailTesting'])->name('email.test');
             Route::delete('/deleteUser/{user_id}', [UserController::class,'deleteUser'])->name('users.delete');
             //modules
             // Route::get('/module', [ContentManagementController::class,'indexModule'])->name('module.index');
