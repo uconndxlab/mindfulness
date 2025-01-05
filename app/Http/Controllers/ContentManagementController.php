@@ -87,10 +87,10 @@ class ContentManagementController extends Controller
             $email = env('TEST_USER_EMAIL');
             $user = User::where('email', $email)->first();
 
-            if ($request->type == 'inactivity') {
+            if ($request->type == 'reminder') {
                 Mail::to($user->email)->send(new \App\Mail\InactivityReminder($user));
             }
-            else if ($request->type == 'inquiry') {
+            else if ($request->type == 'contact') {
                 $inquiry = Inquiry::create([
                     'name' => 'Test Inquiry',
                     'email' => $user->email,

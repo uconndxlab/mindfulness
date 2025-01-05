@@ -20,7 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => AdminOnly::class,
             'update.last.active' => UpdateLastActiveAt::class,
             'check.account.lock' => CheckAccountLock::class,
-            'registration.lock' => CheckRegistrationLock::class
+            'registration.lock' => CheckRegistrationLock::class,
+            'email.rate.limiter' => \App\Http\Middleware\EmailRateLimiter::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
