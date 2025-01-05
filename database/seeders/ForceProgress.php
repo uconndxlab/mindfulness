@@ -21,6 +21,9 @@ class ForceProgress extends Seeder
         $user_id = User::where('email', $email)->first()->id;
         $activity_ids = Activity::all()->pluck('order', 'id')->toArray();
 
+        // clear users session
+        DB::table('sessions')->where('user_id', $user_id)->delete();
+
         // update user progress to complete
         foreach ($activity_ids as $activity_id => $activity_order) {
             $status = $activity_order == $order ? 'unlocked' : ($activity_order < $order ? 'completed' : 'locked');

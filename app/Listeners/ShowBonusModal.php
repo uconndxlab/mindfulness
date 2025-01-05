@@ -35,8 +35,9 @@ class ShowBonusModal
                 'show_modal' => true,
                 'label' => $label,
                 'body' => $body,
-                'additionalRte' => $route,
-                'additionalRteLabel' => $route_label
+                'route' => $route,
+                'method' => 'GET',
+                'buttonLabel' => $route_label
             ]
         ]);
     }

@@ -280,18 +280,30 @@
                 @php
                     $modalData = session('modal_data');
                     $label = $modalData['label'] ?? 'undefined';
-                    $body = $modalData['body'] ?? '';
+                    $body = $modalData['body'] ?? null;
                     $media = $modalData['media'] ?? null;
-                    $additionalRte = $modalData['additionalRte'] ?? null;
-                    $additionalRteLabel = $modalData['additionalRteLabel'] ?? 'Continue';
+                    $route = $modalData['route'] ?? null;
+                    $method = $modalData['method'] ?? 'POST';
+                    $buttonLabel = $modalData['buttonLabel'] ?? 'Continue';
+                    $buttonClass = $modalData['buttonClass'] ?? 'btn-primary';
+                    $closeLabel = $modalData['closeLabel'] ?? 'Close';
+                    $onCancel = $modalData['onCancel'] ?? null;
                 @endphp
-                showModal(
-                    {!! json_encode($label) !!}, 
-                    {!! json_encode($body) !!}, 
-                    {!! json_encode($media) !!}, 
-                    {!! json_encode($additionalRte) !!}, 
-                    {!! json_encode($additionalRteLabel) !!}
-                );
+                showModal({
+                    label: `{!! $label !!}`,
+                    body: `{!! $body !!}`,
+                    media: '{{ $media }}',
+                    route: '{{ $route }}',
+                    method: '{{ $method }}',
+                    buttonLabel: `{!! $buttonLabel !!}`,
+                    buttonClass: '{{ $buttonClass }}',
+                    closeLabel: `{!! $closeLabel !!}`,
+                    onCancel: () => {
+                        @if($onCancel)
+                            {{ $onCancel }}
+                        @endif
+                    }
+                });
                 {{ session()->forget('modal_data') }}
             @endif
         </script>
