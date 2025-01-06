@@ -142,7 +142,7 @@ class AuthController extends Controller
     {
         // throttle
         $key = sha1('send_verify_email|'.$request->ip());
-        $limit = ['attempts' => 4, 'decay' => 60]; // 5 successes per minute
+        $limit = ['attempts' => 4, 'decay' => 60]; // 4 successes per minute
         if (RateLimiter::tooManyAttempts($key, $limit['attempts'])) {
             $seconds = RateLimiter::availableIn($key);
             $timeLeft = Carbon::now()->addSeconds($seconds)->diffForHumans(null, true);

@@ -56,7 +56,8 @@ Route::middleware('web')->group(function () {
     // Auth::routes(['verify' => true]);
     // Auth::routes();
     Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-    Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:3,1')->name('password.email');
+    // throttled in controller
+    Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
     Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
     Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
     
@@ -84,6 +85,7 @@ Route::middleware('web')->group(function () {
         Route::get('/journaltab', [PageNavController::class, 'journal'])->name('journal');
         Route::get('/journal', [PageNavController::class, 'journalCompose'])->name('journal.compose');
         Route::get('/journal-library', [PageNavController::class, 'journalLibrary'])->name('journal.library');
+        // throttle??
         Route::get('/journal/search', [PageNavController::class, 'journalSearch'])->name('journal.search');
         
         Route::get('/profile', [PageNavController::class, 'accountPage'])->name('account');
@@ -93,6 +95,7 @@ Route::middleware('web')->group(function () {
         Route::get('/librarytab', [PageNavController::class, 'library'])->name('library');
         Route::get('/favorites', [PageNavController::class, 'favoritesLibrary'])->name('library.favorites');
         Route::get('/library', [PageNavController::class, 'mainLibrary'])->name('library.main');
+        // throttle??
         Route::get('/search', [PageNavController::class, 'librarySearch'])->name('library.search');
         
         //User updates
@@ -104,13 +107,13 @@ Route::middleware('web')->group(function () {
         Route::put('/user/update/unlockNext', [UserController::class,'unlockNext'])->name('user.update.unlockNext');
         
         //favorites
-        Route::post('/favorites', [UserController::class, 'addFavorite'])->name('favorites.create');
+        Route::post('/favorites', [UserController::class, 'addFavorite'])->middleware('throttle:10,1')->name('favorites.create');
         Route::delete('/favorites/{activity_id}', [UserController::class,'deleteFavorite'])->name('favorites.delete');
         
-        //contact form
+        //contact form - throttled in controller
         Route::post('/contact', [ContactFormController::class, 'submitForm'])->name('contact.submit');
         
-        //NOTES
+        //NOTES - throttled in controller
         Route::resource('note', NoteController::class);
         
         //ADMIN ONLY

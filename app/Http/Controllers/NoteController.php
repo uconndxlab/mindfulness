@@ -6,7 +6,9 @@ use App\Models\Activity;
 use App\Models\Note;
 use App\Rules\ActIdRule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 use Validator;
 
@@ -46,6 +48,15 @@ class NoteController extends Controller
     public function store(Request $request)
     {
         try {
+            // throttle
+            $key = sha1('store_note|'.$request->ip().'|'.Auth::user()->email);
+            $limit = ['attempts' => 3, 'decay' => 60]; // 3 successes per minute
+            if (RateLimiter::tooManyAttempts($key, $limit['attempts'])) {
+                $seconds = RateLimiter::availableIn($key);
+                $timeLeft = Carbon::now()->addSeconds($seconds)->diffForHumans(null, true);
+                return response()->json(['error_message' => "Too many attempts. Please try again in {$timeLeft}."], 429);
+            }
+
             $validator = $this->noteValidator($request);
 
             if ($validator->fails()) {
@@ -72,6 +83,7 @@ class NoteController extends Controller
                 ]);
             }
 
+            RateLimiter::hit($key, $limit['decay']);
             return response()->json(['success' => 'Note submitted!'], 200);
         }
         catch (ValidationException $e) {
