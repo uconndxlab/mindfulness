@@ -7,6 +7,12 @@
     <form method="POST" action="{{ route('register.submit') }}">
         @csrf
 
+        @error('error')
+            <div class="alert alert-danger" role="alert">
+                {{ $message }}
+            </div>
+        @enderror
+
         <div class="text-left fs-5 fw-bold mb-3">
             Create an Account
         </div>

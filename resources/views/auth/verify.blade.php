@@ -10,6 +10,12 @@
         </div>
     @endif
 
+    @error('error')
+        <div class="alert alert-danger" role="alert">
+            {{ $message }}
+        </div>
+    @enderror
+
     <h1>Email Verification</h1>
 
     <p>Please check your email for a verification link.</p>

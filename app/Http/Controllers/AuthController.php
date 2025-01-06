@@ -6,6 +6,7 @@ use App\Rules\ValidEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
@@ -18,6 +19,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 class AuthController extends Controller
 {
     use AuthenticatesUsers;
+
 
     public function loginPage()
     {
@@ -81,7 +83,17 @@ class AuthController extends Controller
     //account registration
     public function register(Request $request) : RedirectResponse
     {
-        //TODO - finish validation - custom error messages, confirmed?
+        // throttling registration attempts
+        // make key, and check if too many attempts
+        $key = sha1('register|'.$request->ip());
+        $limit = ['attempts' => 4, 'decay' => 3600]; // 3 successes per hour
+        if (RateLimiter::tooManyAttempts($key, $limit['attempts'])) {
+            $seconds = RateLimiter::availableIn($key);
+            $timeLeft = Carbon::now()->addSeconds($seconds)->diffForHumans(null, true);
+
+            return back()->withErrors(['error' => "Too many registration attempts. Please try again in {$timeLeft}."]);
+        }
+
         //validate inputs
         try {
             $request->validate([
@@ -114,14 +126,36 @@ class AuthController extends Controller
             lockAll($user->id);
             unlockFirst($user->id);
     
-            //login and redirect
+            //login, hit limiter, redirect
             event(new Registered($user));
             $remember = $request->has('remember');
             Auth::attempt($request->only('email', 'password'), $remember);
+            RateLimiter::hit($key, $limit['decay']);
             return redirect(route('welcome'));
         }
         catch (\Exception $e) {
             dd($e);
         }
+    }
+
+    public function sendVerifyEmail(Request $request)
+    {
+        // throttle
+        $key = sha1('send_verify_email|'.$request->ip());
+        $limit = ['attempts' => 4, 'decay' => 60]; // 5 successes per minute
+        if (RateLimiter::tooManyAttempts($key, $limit['attempts'])) {
+            $seconds = RateLimiter::availableIn($key);
+            $timeLeft = Carbon::now()->addSeconds($seconds)->diffForHumans(null, true);
+            return back()->withErrors(['error' => "Too many attempts. Please try again in {$timeLeft}."]);
+        }
+
+        $user = Auth::user();
+        $user->sendEmailVerificationNotification();
+        if ($user->email_verified_at) {
+            return redirect()->intended('/');
+        }
+
+        RateLimiter::hit($key, $limit['decay']);
+        return back()->with('message', 'Verification link sent!');
     }
 }

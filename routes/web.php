@@ -24,13 +24,13 @@ Route::middleware('web')->group(function () {
     //login page
     Route::get('/login', [AuthController::class, 'loginPage'])->name('login');
     //login request
-    Route::post('/login', [AuthController::class,'authenticate'])->name('login.submit');
+    Route::post('/login', [AuthController::class,'authenticate'])->middleware('throttle:10,1')->name('login.submit');
     
     //REGISTRATION
     Route::middleware('registration.lock')->group(function () { 
         //registration page
         Route::get('/account-creation', [AuthController::class, 'registrationPage'])->name('register');
-        //registration request
+        //registration request - throttled in controller
         Route::post('/account-creation', [AuthController::class,'register'])->name('register.submit');
     });
     
@@ -49,22 +49,14 @@ Route::middleware('web')->group(function () {
             return redirect()->intended('/welcome');
         })->middleware('signed')->name('verification.verify');
         
-        Route::post('/email/verification-notification', function (Request $request) {
-            $user = Auth::user();
-            $user->sendEmailVerificationNotification();
-            if ($user->email_verified_at) {
-                return redirect()->intended('/');
-            }
-
-            return back()->with('message', 'Verification link sent!');
-        })->middleware('throttle:6,1')->name('verification.send');
+        Route::post('/email/verification-notification', [AuthController::class, 'sendVerifyEmail'])->name('verification.send');
     });
     
     //FORGOT PASSWORD
     // Auth::routes(['verify' => true]);
     // Auth::routes();
     Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-    Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:3,1')->name('password.email');
     Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
     Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
     
