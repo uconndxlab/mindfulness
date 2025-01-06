@@ -539,7 +539,7 @@
             clearTimeout(timeout);
             timeout = setTimeout(function() {
                 search(isSearch=true);
-            }, 300);
+            }, 750);
         });
 
         //CLEAR FILTERS - resubmit/search
