@@ -306,6 +306,19 @@
                 });
                 {{ session()->forget('modal_data') }}
             @endif
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    pauseAllAudio();
+                }
+            });
+
+            function pauseAllAudio() {
+                const audios = document.querySelectorAll('audio');
+                audios.forEach(audio => {
+                    audio.pause();
+                });
+            }
         </script>
     </body>
 </html>
