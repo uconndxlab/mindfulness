@@ -197,6 +197,7 @@
                 })
                 .then(response => {
                     if (response.data?.success) {
+                        clearInputs();
                         console.log(response.data.success);
                         successDiv.textContent = response.data.success;
                         successDiv.style.display = 'block';
@@ -231,6 +232,11 @@
                 msg.textContent = '';
                 msg.style.display = 'none';
             });
+        }
+
+        function clearInputs() {
+            document.getElementById('subject').value = '';
+            document.getElementById('message').value = '';
         }
 
         //scrollspy
