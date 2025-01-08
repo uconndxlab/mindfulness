@@ -101,6 +101,8 @@ Route::middleware('web')->group(function () {
         Route::get('/explore/module/{module_id}/bonus', [PageNavController::class, 'exploreModuleBonus'])->name('explore.module.bonus');
         Route::get('/checkActivity/{activity_id}', [PageNavController::class, 'checkActivityLocked'])->name('check.activity');
         Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
+        // use for when skipping warning modal
+        Route::get('/explore/activity/{activity_id}/fast', [PageNavController::class, 'exploreActivityBypass'])->name('explore.activity.bypass');
         Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
         Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
         

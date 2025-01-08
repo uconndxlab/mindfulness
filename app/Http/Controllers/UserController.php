@@ -144,9 +144,14 @@ class UserController extends Controller
                         ]);
                     }
                 }
-
                 // get the id for the proper next day
                 $next_id = Activity::where('day_id', $activity->day_id)->where('optional', false)->orderBy('order')->get()->last()->next;
+
+                // mark as last day completed, and block the next day
+                $user->last_day_completed_at = now();
+                $user->last_day_name = $activity->day->name;
+                $user->block_next_day_act = (int) $next_id;
+                $user->save();
             }
 
             Log::info('Day completed: '.($day_completed ? 'true' : 'false'));

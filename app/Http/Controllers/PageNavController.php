@@ -88,10 +88,10 @@ class PageNavController extends Controller
         return view("explore.module", compact('module', 'page_info', 'override_accordion'));
     }
 
-public function exploreModuleBonus(Request $request, $module_id) {
-    $accordion_day = $request->day ?? null;
-    return $this->exploreModule($module_id, $accordion_day);
-}
+    public function exploreModuleBonus(Request $request, $module_id) {
+        $accordion_day = $request->day ?? null;
+        return $this->exploreModule($module_id, $accordion_day);
+    }
 
     public function checkActivityLocked($activity_id, $from_controller = false) {
         //checking cache for progress
@@ -113,7 +113,40 @@ public function exploreModuleBonus(Request $request, $module_id) {
         if ($from_controller) {
             return [$locked, $status];
         }
-        return response()->json(['locked' => $locked, 'status' => $status]);
+
+        // check if locked
+        if ($locked) {
+            return response()->json(['locked' => true, 'modalContent' => [
+                'label' => 'Activity Locked: '.$activity->title,
+                'body' => 'This activity is currently locked. Continue progressing to unlock this activity.'
+            ]]);
+        }
+
+        // check if activity is blocked by day completion
+        $user = Auth::user();
+        $lastCompleteTime = $user->last_day_completed_at;
+        $last_day_name = $user->last_day_name;
+        $blockNextDayAct = $user->block_next_day_act;
+
+        // check if this activity is blocked
+        if ($blockNextDayAct && $blockNextDayAct == $activity->id && $lastCompleteTime) {
+            // get local times
+            $lastCompletionLocal = Carbon::parse($lastCompleteTime)->setTimezone($user->timezone ?? config('app.timezone'));
+            $now = now()->setTimezone($user->timezone ?? config('app.timezone'));
+
+            // if it is not yet the next day, return modal content
+            if ($lastCompletionLocal->isSameDay($now)) {
+                return response()->json(['locked' => true, 'modalContent' => [
+                    'label' => 'You are progressing fast!',
+                    'body' => 'It appears you have already completed <strong>'.$last_day_name.'</strong> today. While your efforts are admirable, we recommend you take your time through this program and take it one day at a time.',
+                    'route' => route('explore.activity.bypass', ['activity_id' => $activity_id]),
+                    'method' => 'GET',
+                    'buttonLabel' => 'Continue to Activity',
+                    'buttonClass' => 'btn-danger'
+                ]]);
+            }
+        }
+        return response()->json(['locked' => false]);
     }
 
     public function exploreActivity($activity_id, Request $request)
@@ -174,6 +207,16 @@ public function exploreModuleBonus(Request $request, $module_id) {
         }
         
         return view("explore.activity", compact('activity', 'is_favorited', 'page_info', 'content', 'quiz', 'journal'));
+    }
+
+    public function exploreActivityBypass($activity_id) {
+        // user bypassed warning modal - remove warning information
+        $user = Auth::user();
+        $user->last_day_completed_at = null;
+        $user->last_day_name = null;
+        $user->block_next_day_act = null;
+        $user->save();
+        return redirect()->route('explore.activity', ['activity_id' => $activity_id]);
     }
 
     //QUIZ
