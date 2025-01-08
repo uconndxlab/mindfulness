@@ -6,6 +6,17 @@
 <div class="col-md-6">
     <form method="POST" action="{{ route('login.submit') }}">
         @csrf
+        @if (session('success'))
+            <div class="alert alert-success" role="alert">
+                {{ session('success') }}
+            </div>
+        @endif
+        @error('error')
+            <div class="alert alert-danger" role="alert">
+                {{ $message }}
+            </div>
+        @enderror
+
         <div class="text-left fs-2 fw-bold mb-1">
             {{ config('app.name') }}
         </div>

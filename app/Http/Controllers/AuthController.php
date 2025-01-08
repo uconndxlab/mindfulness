@@ -158,4 +158,11 @@ class AuthController extends Controller
         RateLimiter::hit($key, $limit['decay']);
         return back()->with('message', 'Verification link sent!');
     }
+
+    public function checkVerification()
+    {
+        return response()->json([
+            'verified' => Auth::user()->email_verified_at ? true : false,
+        ]);
+    }
 }

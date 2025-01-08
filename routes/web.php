@@ -12,6 +12,8 @@ use App\Http\Controllers\ContentManagementController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 use App\Mail\TestMail;
 use Illuminate\Support\Facades\Mail;
@@ -43,14 +45,34 @@ Route::middleware('web')->group(function () {
             }
             return view('auth.verify');
         })->name('verification.notice');
-        
-        Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-            $request->fulfill();
-            return redirect()->intended('/welcome');
-        })->middleware('signed')->name('verification.verify');
-        
         Route::post('/email/verification-notification', [AuthController::class, 'sendVerifyEmail'])->name('verification.send');
+        Route::get('/check-verification', [AuthController::class, 'checkVerification'])->name('verification.check');
     });
+
+    // verify email button in email
+    Route::get('/email/verify/{id}/{hash}', function (Request $request) {
+    
+        try {
+            // find user
+            $user = User::findOrFail($request->id);
+
+            // check hash
+            if (!hash_equals((string) $request->hash, sha1($user->email))) {
+                abort(403, 'Invalid verification link');
+            }
+    
+            // verify the user
+            if (!$user->hasVerifiedEmail()) {
+                $user->markEmailAsVerified();
+            }
+    
+            // redirect to login
+            return redirect('/login')->with('success', 'Email verified successfully. Please login.');
+    
+        } catch (\Exception $e) {
+            return redirect('/login')->with('error', 'Verification failed. Please try again.');
+        }
+    })->middleware('signed')->name('verification.verify');
     
     //FORGOT PASSWORD
     // Auth::routes(['verify' => true]);
