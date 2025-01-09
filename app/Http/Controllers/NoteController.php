@@ -78,7 +78,7 @@ class NoteController extends Controller
                 Note::create([
                     'user_id' => Auth::id(),
                     'note' => $request->note,
-                    'topic' => $request->topic == 'no-topic' ? null : ucfirst($request->topic),
+                    'topic' => $request->topic,
                 ]);
             }
 

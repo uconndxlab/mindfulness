@@ -486,11 +486,8 @@ class PageNavController extends Controller
                     if ($category == 'Activities') {
                         $in_query->orWhere('activity_id', '!=', null);
                     }
-                    else if ($category == 'No Topic') {
-                        $in_query->orWhere('topic', null);
-                    }
                     else {
-                        $in_query->orWhere('topic', $category);
+                        $in_query->orWhere('topic', Str::slug($category));
                     }
                 }
             });

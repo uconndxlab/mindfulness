@@ -7,10 +7,10 @@
         <div class="prior-note">
             <div class="top-note">
                 <h5 class="fw-bold d-flex justify-content-between">
-                    @if ($note->topic)
-                        <span>{!! $note->topic !!}</span>
-                    @else
+                    @if ($note->topic === 'no-topic')
                         <span>No Topic</span>
+                    @else
+                        <span>{!! ucfirst($note->topic) !!}</span>
                     @endif
                 </h5>
                 <small>{{ $note->formatted_date }}</small>
