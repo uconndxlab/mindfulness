@@ -449,7 +449,7 @@ class PageNavController extends Controller
             'search_text' => 'Search your past journals...'
         ];
 
-        $categories = ['Self-care', 'Self-understanding', 'Parenting', 'Gratitude', 'Joy', 'Love', 'Relationships', 'Boundaries'];
+        $categories = ['Self-care', 'Self-understanding', 'Parenting', 'Gratitude', 'Joy', 'Love', 'Relationships', 'Boundaries', 'No Topic'];
 
         //set as the previous library and save as exit
         Session::put('previous_journal', route('journal.library'));
@@ -485,6 +485,9 @@ class PageNavController extends Controller
                 foreach($categories as $category) {
                     if ($category == 'Activities') {
                         $in_query->orWhere('activity_id', '!=', null);
+                    }
+                    else if ($category == 'No Topic') {
+                        $in_query->orWhere('topic', null);
                     }
                     else {
                         $in_query->orWhere('topic', $category);

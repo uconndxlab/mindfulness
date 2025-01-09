@@ -7,6 +7,9 @@
 
 <div class="col-lg-8">
     @php
+        use Illuminate\Support\Facades\Request;
+        use Illuminate\Support\Str;
+
         $route_name = Request::route()->getName();
         $top_nav = [false, false];
         if (isset($page_info['journal']) && $page_info['journal']) {
@@ -127,17 +130,17 @@
                                                                 @foreach ($categories as $category)
                                                                     <div class="form-check">
                                                                         <input class="form-check-input" type="checkbox" name="category[]" id="category_{{ strtolower($category) }}" value="{{ $category }}">
-                                                                        <label class="form-check-label" for="category_{{ strtolower($category) }}">
+                                                                        <label class="form-check-label" for="category_{{ Str::slug($category) }}">
                                                                             {{ $category }}
                                                                         </label>
                                                                     </div>
                                                                 @endforeach
                                                                 @if ($journal_search)
-                                                                    <div class="text-left fw-bold mt-1">From Activity:</div>
+                                                                    <div class="text-left fw-bold mt-1">Other:</div>
                                                                     <div class="form-check">
                                                                         <input class="form-check-input" type="checkbox" name="category[]" id="category_activities" value="Activities">
                                                                         <label class="form-check-label" for="category_activities">
-                                                                            Activities
+                                                                            From Activity
                                                                         </label>
                                                                     </div>
                                                                 @endif

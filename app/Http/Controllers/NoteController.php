@@ -75,13 +75,10 @@ class NoteController extends Controller
                 ]);
             }
             else {
-                if ($request->topic == 'no-topic') {
-                    $request->topic = null;
-                }
                 Note::create([
                     'user_id' => Auth::id(),
                     'note' => $request->note,
-                    'topic' => ucfirst($request->topic),
+                    'topic' => $request->topic == 'no-topic' ? null : ucfirst($request->topic),
                 ]);
             }
 

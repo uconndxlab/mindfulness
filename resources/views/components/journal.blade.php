@@ -92,6 +92,7 @@
                     .then(response => {
                         console.log('Note submitted!');
                         noteSuccessDiv.style.display = 'block';
+                        errDiv.style.display = 'none';
                         if (hasActivity) {
                             activityComplete();
                         }
@@ -125,6 +126,14 @@
                     });
                 });
             }
+
+            //dropdown functionality
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    wordOtdButton.innerHTML = item.innerHTML; 
+                    wordOtdInput.value = item.value;
+                });
+            });
 
             //UNLOCK SUBMIT
             function unlockSubmit() {
