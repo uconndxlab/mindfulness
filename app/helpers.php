@@ -114,7 +114,7 @@ if (!function_exists('getDayProgress')) {
                 if ($completed_count == $total) {
                     $day_status = 'completed';
                 }
-                $progress[$day->id] = ['status' => $day_status, 'completed' => $completed_count, 'total' => $total, 'activity_status' => $activity_status, 'show' => false];
+                $progress[$day->id] = ['status' => $day_status, 'completed' => $completed_count, 'total' => $total, 'activity_status' => $activity_status, 'show' => false, 'one_more' => $completed_count == $total - 1];
             }
             foreach ($show as $_ => $day_id) {
                 if ($progress[$day_id]['status'] == 'unlocked') {

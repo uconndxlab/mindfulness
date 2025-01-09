@@ -134,8 +134,8 @@ class PageNavController extends Controller
             $lastCompletionLocal = Carbon::parse($lastCompleteTime)->setTimezone($user->timezone ?? config('app.timezone'));
             $now = now()->setTimezone($user->timezone ?? config('app.timezone'));
 
-            // if it is not yet the next day, return modal content
-            if ($lastCompletionLocal->isSameDay($now)) {
+            // if it is not yet the next day, return modal content (or less than two hours)
+            if ($lastCompletionLocal->isSameDay($now) || $now->diffInHours($lastCompletionLocal) < 2) {
                 return response()->json(['locked' => true, 'modalContent' => [
                     'label' => 'You are progressing fast!',
                     'body' => 'It appears you have already completed <strong>'.$last_day_name.'</strong> today. While your efforts are admirable, we recommend you take your time through this program and take it one day at a time.',
@@ -178,6 +178,13 @@ class PageNavController extends Controller
             }
             else {
                 $page_info['redirect_label'] = "Back to Part ".$activity->day->module->id;
+                $page_info['redirect_route'] = $page_info['exit_route'];
+            }
+
+            //check if this is the last activity of the day
+            $last_act = getDayProgress($user->id, [$activity->day->id])[$activity->day->id]['one_more'];
+            if ($last_act) {
+                $page_info['redirect_label'] = "Complete ".$activity->day->name;
                 $page_info['redirect_route'] = $page_info['exit_route'];
             }
         }
