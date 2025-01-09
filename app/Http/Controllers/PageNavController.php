@@ -183,7 +183,7 @@ class PageNavController extends Controller
 
             //check if this is the last activity of the day
             $last_act = getDayProgress($user->id, [$activity->day->id])[$activity->day->id]['one_more'];
-            if ($last_act) {
+            if ($last_act && $activity->status == 'unlocked') {
                 $page_info['redirect_label'] = "Complete ".$activity->day->name;
                 $page_info['redirect_route'] = $page_info['exit_route'];
             }
