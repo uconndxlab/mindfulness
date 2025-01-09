@@ -10,7 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 
 class NoteController extends Controller
 {
@@ -31,13 +31,12 @@ class NoteController extends Controller
         else {
             $validator = Validator::make($request->all(), [
                 'note' => ['required', 'string', 'max:1027', 'regex:/^[\w\s.,!?()\-\'"&]*$/'],
-                'topic' => ['required', 'in:self-care,self-understanding,parenting,gratitude,joy,love,relationships,boundaries', 'regex:/^[\w\s.,!?()\-\'"&]*$/']
+                'topic' => ['in:self-care,self-understanding,parenting,gratitude,joy,love,relationships,boundaries,no-topic', 'regex:/^[\w\s.,!?()\-\'"&]*$/']
             ], [
                 'note.required' => 'A note is required.',
                 'note.string' => 'The note must be a string.',
                 'note.max' => 'The note may not be greater than 1027 characters.',
                 'note.regex' => 'The note may only contain letters, numbers, spaces, and basic punctuation.',
-                'topic.required' => 'Please select a word of the day.',
                 'topic.in' => 'Word of the day must come from the provided list.',
                 'topic.regex' => 'Word of the day must come from the provided list.'
             ]);
@@ -76,6 +75,9 @@ class NoteController extends Controller
                 ]);
             }
             else {
+                if ($request->topic == 'no-topic') {
+                    $request->topic = null;
+                }
                 Note::create([
                     'user_id' => Auth::id(),
                     'note' => $request->note,

@@ -3,7 +3,7 @@
         <p>***Please do not write any sensitive information here.***</p>
         @csrf
         <div id="success-message" class="alert alert-success note-err-message" style="display: none;">
-            Journal submitted!
+            Journal saved!
             @if (isset($journal->activity))
                 <a href="{{ route('journal.library', ['activity' => $journal->activity_id]) }}">Click here to view past journals<i class="bi bi-arrow-right"></i></a>
             @endif
@@ -15,7 +15,7 @@
             </div>
         @else
             <div class="form-group dropdown">
-                <label class="fw-bold col-12" for="word_dropdown">Please select what you want to talk about in this journal:</label>
+                <label class="fw-bold col-12" for="word_dropdown">Please select what you want to talk about in this journal (optional):</label>
                 <button id="word-of-day" class="btn btn-xlight dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Select a Topic
                 </button>
@@ -28,8 +28,9 @@
                     <li><button class="dropdown-item" type="button" value="love">Love</button></li>
                     <li><button class="dropdown-item" type="button" value="relationships">Relationships</button></li>
                     <li><button class="dropdown-item" type="button" value="boundaries">Boundaries</button></li>
+                    <li><button class="dropdown-item" type="button" value="no-topic">No Topic</button></li>
                 </ul>
-                <input type="hidden" name="topic" id="topic" value="">
+                <input type="hidden" name="topic" id="topic" value="no-topic">
             </div>
             <div id="error-messages-word" class="text-danger note-err-message" style="display: none;"></div>
         @endif
@@ -37,7 +38,7 @@
         <div id="error-messages-note" class="text-danger note-err-message" style="display: none;"></div>
         <div class="d-flex justify-content-between">
             <button type="submit" id="submitButton" class="btn-quiz ms-auto" {{ $journal->answer ? '' : 'disabled'}}>
-                Submit Entry <i class="bi bi-arrow-right"></i>
+                Save Journal <i class="bi bi-arrow-right"></i>
             </button>
         </div>
     </form>
@@ -96,7 +97,7 @@
                         }
                         else {
                             wordOtdButton.innerHTML = 'Select a Topic'; 
-                            wordOtdInput.value = '';
+                            wordOtdInput.value = 'no-topic';
                             note.value = '';
                             unlockSubmit();
                         }
@@ -125,20 +126,10 @@
                 });
             }
 
-            //dropdown functionality
-            document.querySelectorAll('.dropdown-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    wordOtdButton.innerHTML = item.innerHTML; 
-                    wordOtdInput.value = item.value;
-                    unlockSubmit();
-                });
-            });
-
             //UNLOCK SUBMIT
             function unlockSubmit() {
                 const noteValue = noteInput.value.trim();
-                const wordValue = hasActivity ? '1' : wordOtdInput.value;
-                if (noteValue === '' || wordValue === '') {
+                if (noteValue === '') {
                     submitBtn.setAttribute('disabled', '');
                 }
                 else {
