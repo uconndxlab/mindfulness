@@ -53,7 +53,7 @@
             <a href="{{ route('password.request') }}" class="text-center text- mt-1 mb-2">Forgot Password?</a>
 
             <div class="form-check mt-1 mb-2">
-                <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                <input type="checkbox" class="form-check-input" id="remember" name="remember" checked>
                 <label class="form-check-label" for="remember">Remember Me</label>
             </div>
         </div>

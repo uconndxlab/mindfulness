@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\ContactFormController;
-use App\Http\Controllers\ContentController;
 use App\Http\Controllers\UserController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -11,12 +10,9 @@ use App\Http\Controllers\NoteController;
 use App\Http\Controllers\ContentManagementController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-
-use App\Mail\TestMail;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 
 Route::middleware('web')->group(function () {
     //default
@@ -91,6 +87,17 @@ Route::middleware('web')->group(function () {
     
     //AUTH protected routes
     Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock'])->group(function () {
+        // session extend
+        // Route::post('/extendSession', function () {
+        //     Session::migrate(true);
+        //     return back();
+        // })->name('session.extend');
+        // checking session validity by hitting controller
+        // Route::get('/checkSession', function () {
+        //     return response()->json(['valid' => true]);
+        // })->name('session.check');
+
+
         //logout
         Route::post('/logout', [AuthController::class,'logout'])->name('logout');
 

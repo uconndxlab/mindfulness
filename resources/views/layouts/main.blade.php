@@ -4,6 +4,12 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>@yield('title')</title>
+        @php
+            use Illuminate\Support\Facades\URL;
+            use Illuminate\Support\Str;
+            use Illuminate\Support\Facades\Request;
+            use Illuminate\Support\Facades\Session;
+        @endphp
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <link href="{{ URL::asset('main.css') }}" rel="stylesheet">
@@ -188,6 +194,7 @@
             </nav>
         @endif
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
         <script>
             const logoutBtn = document.getElementById('logoutBtn');
             if (logoutBtn) {
@@ -306,6 +313,44 @@
                 });
                 {{ session()->forget('modal_data') }}
             @endif
+
+            // check session timeout
+            // document.addEventListener('DOMContentLoaded', () => {
+            //     // const sessionStart = { Session::get('session_start', 0) }} * 1000;
+            //     // const sessionLength = { config('session.lifetime') }} * 60 * 1000;
+            //     // const timeRemaining = sessionLength - (new Date().getTime() - sessionStart);
+            //     // console.log('Session has ' + timeRemaining/1000 + 'seconds remaining');
+                
+            //     // // 5 min warning
+            //     // if (timeRemaining > 5 * 60 * 1000) {
+            //     //     setTimeout(() => {
+            //     //         showModal({
+            //     //             label: 'Session Timeout',
+            //     //             body: 'Your session is going to expire in 5 minutes. Would you like to extend your session?',
+            //     //             route: '{ route('session.extend') }}',
+            //     //             method: 'POST',
+            //     //             buttonLabel: 'Extend Session',
+            //     //             buttonClass: 'btn-success'
+            //     //         });
+            //     //     }, timeRemaining - (5 * 60 * 1000) - 50000);
+            //     // }
+
+                
+            // });
+
+            // interval to check session
+            // setInterval(() => {
+            //     console.log('Checking session...');
+            //     axios.get('')
+            //         .then(response => {
+            //             if (!response.data.valid) {
+            //                 window.location.href = '/login';
+            //             }
+            //         })
+            //         .catch(error => {
+            //             console.error('Error:', error);
+            //         });
+            // }, 5000); // check every minute
 
             document.addEventListener('visibilitychange', () => {
                 if (document.hidden) {

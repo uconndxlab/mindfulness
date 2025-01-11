@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
@@ -61,6 +62,9 @@ class AuthController extends Controller
                 ]);
             }
             Auth::user()->update(['last_active_at' => Carbon::now()]);
+
+            // save warning time for session timeout
+            // Session::put('warning_time', now()->addMinutes(config('session.lifetime') - 5)->timestamp);
             return redirect()->intended('/home');
         }
         
@@ -131,6 +135,9 @@ class AuthController extends Controller
             $remember = $request->has('remember');
             Auth::attempt($request->only('email', 'password'), $remember);
             RateLimiter::hit($key, $limit['decay']);
+
+            // save warning time for session timeout
+            // Session::put('warning_time', now()->addMinutes(config('session.lifetime') - 5)->timestamp);
             return redirect(route('welcome'));
         }
         catch (\Exception $e) {
