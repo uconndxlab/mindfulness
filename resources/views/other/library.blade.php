@@ -33,6 +33,7 @@
             $tn_left_route = route('library.favorites');
             if ($route_name == 'library.favorites') {
                 $top_nav[0] = true;
+                $hide_search = true;
             }
             else {
                 $top_nav[1] = true;
@@ -59,7 +60,7 @@
     </div>
     <div class="">
         <form id="search_filter_form" method="GET">
-            <div class="row">
+            <div class="row" style="display: {{ isset($hide_search) && $hide_search ? 'none' : 'block' }};">
                 <div class="col-lg-8">
                     <div class="input-group mb-3">
                         <i style="padding:0px 10px" id="search-icon" class="bi bi-search"></i>
@@ -180,7 +181,7 @@
                             </div>
                         </div>
                     @endif
-                    <div id="resultsContainer" class="col-lg-8"></div>
+                    <div id="resultsContainer" class="col-lg-8 mx-auto"></div>
                 </div>
             </div>
         </form>

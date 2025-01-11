@@ -311,7 +311,8 @@ class PageNavController extends Controller
 
         //pulling random item
         $query_clone = clone $query;
-        $random_act = $query_clone->inRandomOrder()->first();
+        // get a random practice or lesson
+        $random_act = $query_clone->where('type', 'practice')->orWhere('type', 'lesson')->inRandomOrder()->first();
         
         //handle search
         if ($request->has('search') && $request->search != '') {
@@ -400,7 +401,7 @@ class PageNavController extends Controller
             'journal' => false,
             'title' => 'Search',
             'search_route' => route('library.search'),
-            'search_text' => 'Search for an exercise...'
+            'search_text' => 'Search for any activity...'
         ];
 
         $categories = ['Practice', 'Lesson', 'Reflection', 'Journal', 'Favorited', 'Optional'];
