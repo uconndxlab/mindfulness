@@ -87,17 +87,6 @@ Route::middleware('web')->group(function () {
     
     //AUTH protected routes
     Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock'])->group(function () {
-        // session extend
-        // Route::post('/extendSession', function () {
-        //     Session::migrate(true);
-        //     return back();
-        // })->name('session.extend');
-        // checking session validity by hitting controller
-        // Route::get('/checkSession', function () {
-        //     return response()->json(['valid' => true]);
-        // })->name('session.check');
-
-
         //logout
         Route::post('/logout', [AuthController::class,'logout'])->name('logout');
 
