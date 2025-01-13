@@ -482,8 +482,8 @@ i.bi-lock-fill{
 }
 
 .activity-tag-lesson, .activity-tag-practice,.activity-tag-journal, .activity-tag-reflection,.activity-tag-time, .activity-tag-optional{
-    padding: 5px 10px;
-    border-radius:100px;
+    padding: 5px 8px;
+    border-radius:5px;
     color:#fff;
 }
 
