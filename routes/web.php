@@ -92,7 +92,7 @@ Route::middleware('web')->group(function () {
 
         //NEW EXPLORE
         Route::get('/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
-        Route::get('/explore/module/{module_id}', [PageNavController::class, 'exploreModule'])->name('explore.module');
+        Route::get('/explore/module/{module_id}', [PageNavController::class, 'exploreModule'])->name('explore.module')->middleware('auth:sanctum');
         //using post instead for case with desired accordion open
         Route::get('/explore/module/{module_id}/bonus', [PageNavController::class, 'exploreModuleBonus'])->name('explore.module.bonus');
         Route::get('/checkActivity/{activity_id}', [PageNavController::class, 'checkActivityLocked'])->name('check.activity');

@@ -12,6 +12,7 @@ use App\Models\Teacher;
 use App\Models\UserActivity;
 use App\Models\Faq;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
@@ -49,8 +50,15 @@ class PageNavController extends Controller
         return view("explore.home", compact('modules'));
     }
 
-    public function exploreModule($module_id, $accordion_day=null)
+    public function exploreModule(Request $request, $module_id, $accordion_day=null)
     {
+        Log::info('Auth check:', [
+            'is_authenticated' => $request->user() ? 'yes' : 'no',
+            'auth_type' => get_class($request->user()),
+            'token_present' => $request->bearerToken(),
+            'headers' => $request->headers->all()
+        ]);
+
         //find the module
         $module = Module::with('days.activities')->findOrFail($module_id);
         

@@ -61,13 +61,25 @@ class AuthController extends Controller
                 ]);
             }
             Auth::user()->update(['last_active_at' => Carbon::now()]);
-            return redirect()->intended('/home');
+
+            // return token
+            $token = $request->user()->createToken('mobile-app');
+            return response()->json([
+                'token' => $token->plainTextToken,
+            ]);
         }
         
-        return back()->withErrors(['credentials' => 'Invalid credentials.'])->withInput();
+        return response()->json([
+            'message' => 'Invalid credentials',
+        ], 401);
     }
 
     public function logout(Request $request) {
+        // remove sanctum token
+        if ($request->user()) {
+            $request->user()->tokens()->delete();
+        }
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         Cache::forget('user_'.Auth::id().'_progress_activities');

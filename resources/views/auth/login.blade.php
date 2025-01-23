@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="col-md-6">
-    <form method="POST" action="{{ route('login.submit') }}">
+    <form id="loginForm" method="POST" onsubmit="handleLogin(event)">
         @csrf
         @if (session('success'))
             <div class="alert alert-success" role="alert">
@@ -12,10 +12,11 @@
             </div>
         @endif
         @error('error')
-            <div class="alert alert-danger" role="alert">
+            <div id="error" class="alert alert-danger" role="alert">
                 {{ $message }}
             </div>
         @enderror
+        <div id="errorDiv" class="alert alert-danger" style="display: none;" role="alert"></div>
 
         <div class="text-left fs-2 fw-bold mb-1">
             {{ config('app.name') }}
@@ -72,4 +73,38 @@
         </div>
     @endif
 </div>
+<script>
+    localStorage.removeItem('token');
+
+    async function handleLogin(event) {
+        event.preventDefault();
+
+        const form = document.getElementById('loginForm');
+        const formData = new FormData(form);
+
+        try {
+            const response = await axios.post('{{ route('login') }}', {
+                email: formData.get('email'),
+                password: formData.get('password'),
+                remember: formData.get('remember') ? true : false,
+            });
+
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+                console.log('Token set in localStorage:', localStorage.getItem('token')); // Verify token is stored
+                
+                // Set the default header right after getting the token
+                axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+                console.log('Axios headers set:', axios.defaults.headers.common['Authorization']);
+                
+                window.location.href = '{{ route('explore.home') }}';
+            }
+        } catch (error) {
+            console.error(error);
+            const errorDiv = document.getElementById('errorDiv');
+            errorDiv.innerHTML = error.response?.data?.message || 'An error has occurred during login';
+            errorDiv.style.display = 'block';
+        }
+    }
+</script>
 @endsection

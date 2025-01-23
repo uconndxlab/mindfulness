@@ -193,7 +193,20 @@
             </nav>
         @endif
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script>
+            console.log('Checking for token in main layout...'); // Debug line
+            if (localStorage.getItem('token')) {
+                const token = localStorage.getItem('token');
+                console.log('Found token:', token); // Debug line
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                console.log('Set axios header:', axios.defaults.headers.common['Authorization']); // Debug line
+            }
+
+            let currentToken = localStorage.getItem('token');
+            console.log('Current token being sent:', currentToken);
+            console.log('Current axios headers:', axios.defaults.headers.common);
+
             const logoutBtn = document.getElementById('logoutBtn');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', logoutClick);
