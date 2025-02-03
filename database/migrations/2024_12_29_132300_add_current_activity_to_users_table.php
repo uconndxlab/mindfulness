@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             //keep track of lowest non-optional incomplete activity
-            $table->foreignId('current_activity')->nullable()->constrained('activities')->onDelete('set null');
+            if (!Schema::hasColumn('users', 'current_activity')) {
+                $table->foreignId('current_activity')->nullable()->constrained('activities')->onDelete('set null');
+            }
         });
     }
 
@@ -23,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('current_activity');
+            // $table->dropColumn('current_activity');
         });
     }
 };
