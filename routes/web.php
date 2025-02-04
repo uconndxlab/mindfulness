@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ContactFormController;
 use App\Http\Controllers\UserController;
+use App\Models\Email_Body;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -150,6 +151,13 @@ Route::middleware('web')->group(function () {
             Route::post('/emailRemindUser/{user_id}', [ContentManagementController::class,'emailRemindUser'])->name('users.remind');
             //email testing
             Route::get('/sendTestMail/{type}', [ContentManagementController::class,'emailTesting'])->name('email.test');
+
+            Route::get('/showReminderEmail/{user_id}', function (Request $request) {
+                $user = User::findOrFail($request->user_id)->first();
+                $body = Email_Body::where('type', 'reminder')->inRandomOrder()->first()->body;
+                return view('emails.inactivity_reminder', compact('user', 'body'));
+            });
+
             Route::delete('/deleteUser/{user_id}', [UserController::class,'deleteUser'])->name('users.delete');
             //modules
             // Route::get('/module', [ContentManagementController::class,'indexModule'])->name('module.index');
