@@ -6,7 +6,14 @@
     <title>We Miss You!</title>
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    
     <div style="background-color: #ffffff; padding: 20px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="margin-bottom: 20px;">
+            <img src="/icons/android-icon-72x72.png" 
+                 alt="{{ config('app.name') }}" 
+                 style="width: 48px; height: 48; vertical-align: middle; margin-right: 10px;">
+            <span style="font-size: 20px; font-weight: bold; color: #48745D; vertical-align: middle;">{{ config('app.name') }}</span>
+        </div>
         <h1 style="color: #1a492d; margin-bottom: 20px;">Hi {{ $user->name }}!</h1>
 
         <p style="margin-bottom: 15px;">
