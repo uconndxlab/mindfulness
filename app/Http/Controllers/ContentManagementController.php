@@ -56,7 +56,7 @@ class ContentManagementController extends Controller
 
     public function emailRemindUser(Request $request) {
         try {
-            $user = User::findOrFail($request->user_id);
+            $user = User::findOrFail($request->user_id)->first();
             $remind_limit = (int) getConfig('remind_email_day_limit', 0);
             $last_active = $user->last_active_at ? Carbon::parse($user->last_active_at) : null;
             $last_reminded = $user->last_reminded_at ? Carbon::parse($user->last_reminded_at) : null;

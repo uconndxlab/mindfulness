@@ -34,6 +34,8 @@ class DatabaseSeeder extends Seeder
         DB::table('quiz_answers')->truncate();
         DB::table('notes')->truncate();
         DB::table('teachers')->truncate();
+        DB::table('email_bodies')->truncate();
+        DB::table('email_subjects')->truncate();
 
         //enable foreign key checks for SQLite
         DB::statement('PRAGMA foreign_keys = ON;');
@@ -45,6 +47,7 @@ class DatabaseSeeder extends Seeder
         $this->call(QuizSeeder::class, false, compact('examples'));         //quiz
         $this->call(JournalSeeder::class);                                  //jounral
         $this->call(FaqSeeder::class);                                      //faq
+        $this->call(EmailSeeder::class);                                    //email
         // removed ResetUserProgress from here
         $this->call(TeacherSeeder::class);                                  //teachers
     }
