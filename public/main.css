@@ -75,6 +75,10 @@ textarea.form-control {
     color:#000!important;
 }
 
+.btn-nav {
+    padding: 10px 20px!important;
+}
+
 .btn-xlight{
     background-color:var(--xlight-green)!important;
     color:#000!important;

@@ -111,7 +111,7 @@
                 <ul class="navbar-nav">
                     @if(isset($page_info['back_route']) && isset($page_info['back_label']))
                         <li class="nav-item mr-auto">
-                            <a class="nav-link btn" href="{{ $page_info['back_route'] }}" id="backButton">
+                            <a class="nav-link btn btn-nav" href="{{ $page_info['back_route'] }}" id="backButton">
                                 <i class="bi bi-arrow-left"></i>{{ $page_info['back_label'] }}
                             </a>
                         </li>
@@ -121,7 +121,7 @@
                 @if (!(isset($page_info['hide_bottom_nav']) && $page_info['hide_bottom_nav']))
                     <ul class="navbar-nav">
                         <li class="nav-item ml-auto">
-                            <button id="logoutBtn" class="nav-link btn fw-semibold">Logout
+                            <button id="logoutBtn" class="nav-link btn btn-nav fw-semibold">Logout
                                 <i class="bi bi-box-arrow-right"></i>
                             </button>
                         </li>
