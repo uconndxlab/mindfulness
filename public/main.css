@@ -379,8 +379,7 @@ body:has(div.dark-background){
 }
 
 .module:has(.disabled) .sub-activity-font, .module:has(.disabled) .sub-activity-font i{
-    opacity:0.4;
-    color:#fff!important;
+    opacity:0.6;
 }
 
 .module i, .accordion-header i{
@@ -488,27 +487,13 @@ i.bi-lock-fill{
 .activity-tag-lesson, .activity-tag-practice,.activity-tag-journal, .activity-tag-reflection,.activity-tag-time, .activity-tag-optional{
     padding: 5px 8px;
     border-radius:5px;
-    color:#fff;
-}
-
-.activity-tag-lesson{
-    background:#a81e27;
-}
-
-.activity-tag-practice{
-    background:#3d7e9b;
-}
-
-.activity-tag-journal{
-    background:#7a4e0d;
-}
-
-.activity-tag-reflection{
-    background:var(--light-purple);
+    color:var(--light-purple);
+    background:rgba(114, 59, 123,0.1);
 }
 
 .activity-tag-time{
-    background:#434343;
+    color:#434343;
+    background:rgba(67, 67, 67,0.1);
 }
 
 .activity-tag-time i{
@@ -518,7 +503,8 @@ i.bi-lock-fill{
 }
 
 .activity-tag-optional{
-    background:#068282;
+    color:#068282;
+    background:rgba(6, 130, 130,0.1);
 }
 
 /*audio circle*/
@@ -881,4 +867,9 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     font-size:14px;
     padding:3px 10px!important;
     margin:0;
+}
+
+/*profile*/
+#profileDropdown{
+    border-radius:10px!important;
 }
