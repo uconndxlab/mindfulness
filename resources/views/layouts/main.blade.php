@@ -119,26 +119,11 @@
                 </ul>
 
                 @if (!(isset($page_info['hide_bottom_nav']) && $page_info['hide_bottom_nav']))
-                <!-- need to fix centering of dropdown menu -->
                     <ul class="navbar-nav">
                         <li class="nav-item ml-auto">
-                            <div class="dropdown ms-auto">
-                                <button id="profileDropdown" class="nav-link btn btn-nav" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="nav-icon-text"><i class="bi bi-person-circle"></i>{{ Auth::user()->name }}</span>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                                    <li>
-                                        <a class="dropdown-item" href="#">Profile Settings</a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider" />
-                                    </li>
-                                    <li>
-                                        <!-- make into button? -->
-                                        <a id="logoutBtn" class="dropdown-item" href="#">Logout</a>
-                                    </li>
-                                </ul>
-                            </div>
+                            <button id="logoutBtn" class="nav-link btn btn-nav fw-semibold">Logout
+                                <i class="bi bi-box-arrow-right"></i>
+                            </button>
                         </li>
                     </ul>
                 @endif
