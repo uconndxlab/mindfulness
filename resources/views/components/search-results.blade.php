@@ -1,9 +1,9 @@
 @if (!isset($activities) || $activities->isEmpty())
     @if (isset($random))
         <div class="text-left muted" style="margin-top:10px; margin-bottom:10px;padding-bottom:10px;">
-        <p>
+        <p><strong>
         0 results found
-        </p>
+        </strong></p>
         <strong>Please try:</strong>
         <ul class="mt-0">
         <li>Searching again with different keywords</li>

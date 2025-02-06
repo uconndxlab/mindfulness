@@ -56,7 +56,7 @@
     </nav>
 
     <div class="text-left">
-        <h1 class="display fw-bold mb-4">{{ $page_info['title'] }}</h1>
+        <h1 class="display fw-bold mt-2">{{ $page_info['title'] }}</h1>
     </div>
     <div class="">
         <form id="search_filter_form" method="GET">
