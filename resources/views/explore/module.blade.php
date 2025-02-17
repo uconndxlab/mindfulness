@@ -42,10 +42,7 @@
                                     <div class="text-dark fw-bold">{{ $day->name }}</div>
                                     <div class="text-dark fw-normal">{{ $day->description }}</div>
                                 </div>
-                                <div class="d-flex align-items-center gap-2" style="min-width: 80px">
-                                    @if ($day->time)
-                                        <span class="badge text-dark bg-light border">{{ $day->time }} min</span>
-                                    @endif
+                                <div class="d-flex align-items-center gap-2" style="min-width: 60px">
                                 </div>
                             </div>
                         </button>
