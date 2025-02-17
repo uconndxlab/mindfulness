@@ -60,7 +60,7 @@
                                         $disabled = $activity->status == 'locked' ? 'disabled' : '';
                                     @endphp
                                     <div class="card p-2 module mb-2">
-                                        <a id="moduleLink" style="padding-bottom:10px;" class="stretched-link w-100 activity-link {{ $disabled }}" data-id="{{ $activity->id }}" data-title="{{ $activity->title }}" href="{{ route('explore.activity', ['activity_id' => $activity->id]) }}">
+                                        <a id="moduleLink" style="padding-bottom:10px;" class="stretched-link w-100 activity-link {{ $disabled }}" data-id="{{ $activity->id }}" href="#">
                                             
                                             <div style="display:flex;">
                                                 @if ($activity->status == 'completed')
@@ -92,6 +92,7 @@
         </div>
     </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         //scroll to bonus activity
@@ -119,21 +120,22 @@
             activity.addEventListener('click', function (event) {
                 event.preventDefault();
                 var activityId = this.getAttribute('data-id');
-                var activityName = this.getAttribute('data-title');
 
-                fetch(`/checkActivity/${activityId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.locked) {
-                            showModal({
-                                label: 'Locked: '+activityName,
-                                body: 'This activity is currently locked. Continue progressing to unlock this activity.'
-                            });
-                        } else {
-                            window.location.href = `/explore/activity/${activityId}`;
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
+                return new Promise((resolve, reject) => {
+                    axios.get(`/checkActivity/${activityId}`)
+                        .then(response => {
+                            if (response.data.locked) {
+                                showModal(response.data.modalContent);
+                            } else {
+                                window.location.href = `/explore/activity/${activityId}`;
+                            }
+                            resolve(true);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            reject(false);
+                        });
+                });
             });
         });
     });

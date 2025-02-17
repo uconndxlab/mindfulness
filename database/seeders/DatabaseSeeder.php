@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(bool $examples = false): void
     {
+        // for minor non-structural changes
+        // if progress is impacted, reset the user progress
+
         //disable foreign keys
         DB::statement('PRAGMA foreign_keys = OFF;');
 
@@ -31,7 +34,8 @@ class DatabaseSeeder extends Seeder
         DB::table('quiz_answers')->truncate();
         DB::table('notes')->truncate();
         DB::table('teachers')->truncate();
-        //favs, session, progress wiped in ResetUserProgress
+        DB::table('email_bodies')->truncate();
+        DB::table('email_subjects')->truncate();
 
         //enable foreign key checks for SQLite
         DB::statement('PRAGMA foreign_keys = ON;');
@@ -43,7 +47,8 @@ class DatabaseSeeder extends Seeder
         $this->call(QuizSeeder::class, false, compact('examples'));         //quiz
         $this->call(JournalSeeder::class);                                  //jounral
         $this->call(FaqSeeder::class);                                      //faq
-        $this->call(ResetUserProgress::class);                              //favorites, session vars, progress
+        $this->call(EmailSeeder::class);                                    //email
+        // removed ResetUserProgress from here
         $this->call(TeacherSeeder::class);                                  //teachers
     }
 }

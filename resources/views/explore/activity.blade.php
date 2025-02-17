@@ -33,7 +33,7 @@
                 </div>
             @endif
             @php
-                $controlsList = ($activity->type === 'practice' ? 'noplaybackrate' : '');
+                $controlsList = ($activity->type != 'lesson' || $activity->status != 'completed' ? 'noplaybackrate' : '');
                 $allowSeek = $activity->status == 'completed' ? 'true' : 'false';
             @endphp
             @if ($content->audio_options)
@@ -130,6 +130,10 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
+    @php
+        use Illuminate\Support\Facades\Storage;
+    @endphp
+
     const activity_id = {{ $activity->id }};
     const day = '{{ $activity->day->name }}';
     const optional = {{ $activity->optional }};

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activity;
+use App\Models\Inquiry;
 use App\Models\User;
 use App\Models\Module;
 use App\Models\Day;
@@ -56,6 +57,7 @@ class ContentManagementController extends Controller
     public function emailRemindUser(Request $request) {
         try {
             $user = User::findOrFail($request->user_id);
+
             $remind_limit = (int) getConfig('remind_email_day_limit', 0);
             $last_active = $user->last_active_at ? Carbon::parse($user->last_active_at) : null;
             $last_reminded = $user->last_reminded_at ? Carbon::parse($user->last_reminded_at) : null;
@@ -64,6 +66,7 @@ class ContentManagementController extends Controller
             if ($user->lock_access) {
                 return response()->json(['error_message' => 'User access is locked.'], 400);
             }
+
             //check if user active or reminded within the limit
             if (($last_active && $last_active->diffInDays(Carbon::now()) < $remind_limit) || 
                 ($last_reminded && $last_reminded->diffInDays(Carbon::now()) < $remind_limit)) {
@@ -78,6 +81,39 @@ class ContentManagementController extends Controller
         }
         catch (\Exception $e) {
             return response()->json(['error_message' => 'Failed to send reminder email.', 'error' => $e], 500);
+        }
+    }
+
+    public function emailTesting(Request $request, $type) {
+        try {
+            $email = env('TEST_USER_EMAIL');
+            $user = User::where('email', $email)->first();
+
+            if ($request->type == 'reminder') {
+                Mail::to($user->email)->send(new \App\Mail\InactivityReminder($user));
+            }
+            else if ($request->type == 'contact') {
+                $inquiry = Inquiry::create([
+                    'name' => 'Test Inquiry',
+                    'email' => $user->email,
+                    'subject' => 'Test Inquiry Subject',
+                    'message' => 'Test Inquiry Message',
+                ]);
+
+                Mail::to($user->email)->send(new \App\Mail\InquiryReceived($inquiry));
+            }
+            // force send built in verification email
+            else if ($request->type == 'verification') {
+                $user->email_verified_at = null;
+                $user->save();
+                $user->sendEmailVerificationNotification();
+            }
+            else {
+                return response()->json(['error_message' => 'Invalid email type.'], 400);
+            }
+        }
+        catch (\Exception $e) {
+            return response()->json(['error_message' => 'Failed to send test email.', 'error' => $e], 500);
         }
     }
 

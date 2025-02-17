@@ -7,6 +7,9 @@
 
 <div class="col-lg-8">
     @php
+        use Illuminate\Support\Facades\Request;
+        use Illuminate\Support\Str;
+
         $route_name = Request::route()->getName();
         $top_nav = [false, false];
         if (isset($page_info['journal']) && $page_info['journal']) {
@@ -30,6 +33,7 @@
             $tn_left_route = route('library.favorites');
             if ($route_name == 'library.favorites') {
                 $top_nav[0] = true;
+                $hide_search = true;
             }
             else {
                 $top_nav[1] = true;
@@ -52,17 +56,17 @@
     </nav>
 
     <div class="text-left">
-        <h1 class="display fw-bold mb-4">{{ $page_info['title'] }}</h1>
+        <h1 class="display fw-bold mt-2">{{ $page_info['title'] }}</h1>
     </div>
     <div class="">
         <form id="search_filter_form" method="GET">
-            <div class="row">
+            <div class="row" style="display: {{ isset($hide_search) && $hide_search ? 'none' : 'block' }};">
                 <div class="col-lg-8">
                     <div class="input-group mb-3">
                         <i style="padding:0px 10px" id="search-icon" class="bi bi-search"></i>
                         <input id="search_bar" type="text" name="search" id="search" class="form-control" placeholder='{{ $page_info['search_text'] }}'>
                         <span class="input-group-text">
-                            <a style="color:#000!important" id="clear_search_button" type="button">CANCEL</a>
+                            <a style="color:#000!important; visibility: hidden;" id="clear_search_button" type="button">CLEAR</a>
                         </span>
                     </div>
                 </div>
@@ -127,17 +131,17 @@
                                                                 @foreach ($categories as $category)
                                                                     <div class="form-check">
                                                                         <input class="form-check-input" type="checkbox" name="category[]" id="category_{{ strtolower($category) }}" value="{{ $category }}">
-                                                                        <label class="form-check-label" for="category_{{ strtolower($category) }}">
+                                                                        <label class="form-check-label" for="category_{{ Str::slug($category) }}">
                                                                             {{ $category }}
                                                                         </label>
                                                                     </div>
                                                                 @endforeach
                                                                 @if ($journal_search)
-                                                                    <div class="text-left fw-bold mt-1">From Activity:</div>
+                                                                    <div class="text-left fw-bold mt-1">Other:</div>
                                                                     <div class="form-check">
                                                                         <input class="form-check-input" type="checkbox" name="category[]" id="category_activities" value="Activities">
                                                                         <label class="form-check-label" for="category_activities">
-                                                                            Activities
+                                                                            From Activity
                                                                         </label>
                                                                     </div>
                                                                 @endif
@@ -177,7 +181,7 @@
                             </div>
                         </div>
                     @endif
-                    <div id="resultsContainer" class="col-lg-8"></div>
+                    <div id="resultsContainer" class="col-lg-8 mx-auto"></div>
                 </div>
             </div>
         </form>
@@ -229,7 +233,7 @@
 
             //when apply search with filters
             document.getElementById('apply_filter_button').addEventListener('click', function() {
-                search(true);
+                search(true, false, false, applyFilters=true);
             });
 
             document.getElementById('clear_filter_button').addEventListener('click', clearFilters);
@@ -465,7 +469,11 @@
 
 
         //LOAD SEARCH
-        function search(filters=false, first=false, isSearch=false) {
+        function search(filters=false, first=false, isSearch=false, applyFilters=false) {
+            const applyFilterButton = document.getElementById('apply_filter_button');
+            if (applyFilterButton) {
+                applyFilterButton.disabled = true;
+            }
             //build url
             const searchUrl = new URL('{{ $page_info['search_route'] }}');
             //if changes in filter...
@@ -477,6 +485,12 @@
                 //reset the page if filters or search, and not first load
                 _page = 1;
             }
+
+            // hide clear filter button if no filters
+            checkFilters();
+
+            // hide clear search button if no search
+            checkSearch();
 
             const params = getQueryParams();
             searchUrl.search = params;
@@ -494,7 +508,13 @@
             .then(data => {
                 console.log('AJAX success');
                 //render component into container
-                document.getElementById('resultsContainer').innerHTML = data.html;
+                var resultsContainer = document.getElementById('resultsContainer');
+                resultsContainer.innerHTML = data.html;
+                if (applyFilters || isSearch) {
+                    // stop and start effect
+                    $(resultsContainer).stop(true, true).effect("highlight", {color: '#d4edda'}, 1500);
+                }
+
                 //if first render of page, show the filters and results - originally hidden
                 if (first) {
                     document.getElementById('filterResultDiv').style.display = 'block';
@@ -507,10 +527,39 @@
             })
             .catch(error => {
                 console.error('Error performing search', error);
+            })
+            .finally(() => {
+                if (applyFilterButton) {
+                    applyFilterButton.disabled = false;
+                }
             });
         }
         //search on page load with filters
         search(true, true);
+
+        // CHECK FILTERS - see if any filters are applied
+        function checkFilters() {
+            const clearFiltersButton = document.getElementById('clear_filter_button');
+            if (_categories.length != 0 || _modules.length != 0 || _start != '0' || _end != '30') {
+                clearFiltersButton.style.display = 'block';
+                return true;
+            }
+            clearFiltersButton.style.display = 'none';
+            return false;
+        }
+
+        // CHECK SEARCH
+        function checkSearch() {
+            const clearSearch = document.getElementById('clear_search_button');
+            if (searchBar.value != '') {
+                clearSearch.style.visibility = 'visible';
+                clearSearch.disabled = false;
+                return true;
+            }
+            clearSearch.style.visibility = 'hidden';
+            clearSearch.disabled = true;
+            return false;
+        }
 
         //PAGINATION - add event listeners to cancel pagination redirection and use search instead
         function attachPaginationSearch() {
@@ -538,8 +587,8 @@
         searchBar.addEventListener('input', function() {
             clearTimeout(timeout);
             timeout = setTimeout(function() {
-                search(isSearch=true);
-            }, 300);
+                search(true, false, true, false);
+            }, 750);
         });
 
         //CLEAR FILTERS - resubmit/search
@@ -556,7 +605,7 @@
             //resetting the time filter
             slider.noUiSlider.set([0, 30]);
             //submit
-            search(true);
+            search(true, false, false, applyFilters=true);
         }
 
         //CLEAR SEARCH - ignores filters
@@ -564,7 +613,7 @@
         function clearSearch() {
             searchBar.value = '';
             searchBar.focus();
-            search(isSearch=true);
+            search(true, false, isSearch=true, false);
         }
 
         //NOTES

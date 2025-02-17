@@ -15,13 +15,17 @@ class FavoriteAllSeeder extends Seeder
      */
     public function run(): void
     {
-        foreach (User::all() as $user) {
-            foreach (Activity::all() as $activity) {
-                Favorite::updateOrCreate([
-                    "user_id" => $user->id,
-                    "activity_id" => $activity->id,
-                ]);
-            }
+        // get user from email
+        $email = '';
+        $user = User::where('email', $email)->first();
+
+        // favorite all activities
+        $activities = Activity::all();
+        foreach ($activities as $activity) {
+            Favorite::updateOrCreate([
+                'user_id' => $user->id,
+                'activity_id' => $activity->id
+            ]);
         }
     }
 }

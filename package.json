@@ -6,7 +6,7 @@
         "build": "vite build",
         "scheduler": "php artisan schedule:run",
         "start": "concurrently \"npm run dev\" \"php artisan serve\" \"npm run scheduler\"",
-        "serve": "concurrently \"npm run dev\" \"php artisan serve\""
+        "serve": "concurrently \"npm run dev\" \"php artisan serve --host=0.0.0.0\""
     },
     "devDependencies": {
         "axios": "^1.6.4",

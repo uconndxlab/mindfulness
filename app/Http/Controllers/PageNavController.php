@@ -88,10 +88,10 @@ class PageNavController extends Controller
         return view("explore.module", compact('module', 'page_info', 'override_accordion'));
     }
 
-public function exploreModuleBonus(Request $request, $module_id) {
-    $accordion_day = $request->day ?? null;
-    return $this->exploreModule($module_id, $accordion_day);
-}
+    public function exploreModuleBonus(Request $request, $module_id) {
+        $accordion_day = $request->day ?? null;
+        return $this->exploreModule($module_id, $accordion_day);
+    }
 
     public function checkActivityLocked($activity_id, $from_controller = false) {
         //checking cache for progress
@@ -113,7 +113,40 @@ public function exploreModuleBonus(Request $request, $module_id) {
         if ($from_controller) {
             return [$locked, $status];
         }
-        return response()->json(['locked' => $locked, 'status' => $status]);
+
+        // check if locked
+        if ($locked) {
+            return response()->json(['locked' => true, 'modalContent' => [
+                'label' => 'Activity Locked: '.$activity->title,
+                'body' => 'This activity is currently locked. Continue progressing to unlock this activity.'
+            ]]);
+        }
+
+        // check if activity is blocked by day completion
+        $user = Auth::user();
+        $lastCompleteTime = $user->last_day_completed_at;
+        $last_day_name = $user->last_day_name;
+        $blockNextDayAct = $user->block_next_day_act;
+
+        // check if this activity is blocked
+        if ($blockNextDayAct && $blockNextDayAct == $activity->id && $lastCompleteTime) {
+            // get local times
+            $lastCompletionLocal = Carbon::parse($lastCompleteTime)->setTimezone($user->timezone ?? config('app.timezone'));
+            $now = now()->setTimezone($user->timezone ?? config('app.timezone'));
+
+            // if it is not yet the next day, return modal content (or less than two hours)
+            if ($lastCompletionLocal->isSameDay($now) || $now->diffInHours($lastCompletionLocal) < 2) {
+                return response()->json(['locked' => true, 'modalContent' => [
+                    'label' => 'You are progressing fast!',
+                    'body' => 'It appears you have already completed <strong>'.$last_day_name.'</strong> today. While your efforts are admirable, we recommend you take your time through this program and take it one day at a time.',
+                    'route' => route('explore.activity.bypass', ['activity_id' => $activity_id]),
+                    'method' => 'GET',
+                    'buttonLabel' => 'Continue to Activity',
+                    'buttonClass' => 'btn-danger'
+                ]]);
+            }
+        }
+        return response()->json(['locked' => false]);
     }
 
     public function exploreActivity($activity_id, Request $request)
@@ -140,11 +173,18 @@ public function exploreModuleBonus(Request $request, $module_id) {
         //make sure that if doing next, the day is not changing
         if (!$request->library) {
             if ($activity->next && Activity::find($activity->next)->day->id == $activity->day->id) {
-                $page_info['redirect_label'] = "NEXT";
+                $page_info['redirect_label'] = "Next Activity";
                 $page_info['redirect_route'] = route('explore.activity', ['activity_id' => $activity->next]);
             }
             else {
-                $page_info['redirect_label'] = "FINISH";
+                $page_info['redirect_label'] = "Back to Part ".$activity->day->module->id;
+                $page_info['redirect_route'] = $page_info['exit_route'];
+            }
+
+            //check if this is the last activity of the day
+            $last_act = getDayProgress($user->id, [$activity->day->id])[$activity->day->id]['one_more'];
+            if ($last_act && $activity->status == 'unlocked') {
+                $page_info['redirect_label'] = "Complete ".$activity->day->name;
                 $page_info['redirect_route'] = $page_info['exit_route'];
             }
         }
@@ -174,6 +214,16 @@ public function exploreModuleBonus(Request $request, $module_id) {
         }
         
         return view("explore.activity", compact('activity', 'is_favorited', 'page_info', 'content', 'quiz', 'journal'));
+    }
+
+    public function exploreActivityBypass($activity_id) {
+        // user bypassed warning modal - remove warning information
+        $user = Auth::user();
+        $user->last_day_completed_at = null;
+        $user->last_day_name = null;
+        $user->block_next_day_act = null;
+        $user->save();
+        return redirect()->route('explore.activity', ['activity_id' => $activity_id]);
     }
 
     //QUIZ
@@ -234,10 +284,15 @@ public function exploreModuleBonus(Request $request, $module_id) {
         $user_id = Auth::id();
         //query for activities - keep as query
         $activity_ids = UserActivity::where('user_id', $user_id)
-        ->where('status', '!=', 'locked')
-        ->pluck('activity_id');
+            ->where('status', '!=', 'locked')
+            ->pluck('activity_id');
+
+        // make sure rand query matches query
         $query = Activity::where('deleted', false)
-        ->whereIn('id', $activity_ids);
+            ->whereIn('id', $activity_ids);
+        $rand_query = Activity::where('deleted', false)
+            ->whereIn('id', $activity_ids);
+        
         
         //base param
         $empty_text = null;
@@ -245,9 +300,10 @@ public function exploreModuleBonus(Request $request, $module_id) {
             if ($request->base_param == 'main') {
                 $empty_text = 'Keep progressing to unlock more exercises...';
             }
-            else if ($request->base_param = 'favorited') {
+            else if ($request->base_param == 'favorited') {
                 $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
                 $query->whereIn('id', $fav_ids);
+                $rand_query->whereIn('id', $fav_ids);
                 $empty_text = '<span>Click the "<i class="bi bi-star"></i>" found in activities to add them to your favorites and view them here!</span>';
             }
         }
@@ -259,9 +315,8 @@ public function exploreModuleBonus(Request $request, $module_id) {
             return response()->json(['html' => $view]);
         }
 
-        //pulling random item
-        $query_clone = clone $query;
-        $random_act = $query_clone->inRandomOrder()->first();
+        // using query copy get random activity
+        $random_act = $rand_query->inRandomOrder()->first();
         
         //handle search
         if ($request->has('search') && $request->search != '') {
@@ -350,7 +405,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
             'journal' => false,
             'title' => 'Search',
             'search_route' => route('library.search'),
-            'search_text' => 'Search for an exercise...'
+            'search_text' => 'Search for any activity...'
         ];
 
         $categories = ['Practice', 'Lesson', 'Reflection', 'Journal', 'Favorited', 'Optional'];
@@ -399,7 +454,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
             'search_text' => 'Search your past journals...'
         ];
 
-        $categories = ['Self-care', 'Self-understanding', 'Parenting', 'Gratitude', 'Joy', 'Love', 'Relationships', 'Boundaries'];
+        $categories = ['Self-care', 'Self-understanding', 'Parenting', 'Gratitude', 'Joy', 'Love', 'Relationships', 'Boundaries', 'No Topic'];
 
         //set as the previous library and save as exit
         Session::put('previous_journal', route('journal.library'));
@@ -437,7 +492,7 @@ public function exploreModuleBonus(Request $request, $module_id) {
                         $in_query->orWhere('activity_id', '!=', null);
                     }
                     else {
-                        $in_query->orWhere('topic', $category);
+                        $in_query->orWhere('topic', Str::slug($category));
                     }
                 }
             });

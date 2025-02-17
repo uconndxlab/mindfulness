@@ -2,6 +2,8 @@
 
 namespace App\Mail;
 
+use App\Models\Email_Body;
+use App\Models\Email_Subject;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,7 +16,7 @@ class InactivityReminder extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $user;
+    public $user, $subject, $body;
 
     /**
      * Create a new message instance.
@@ -22,6 +24,8 @@ class InactivityReminder extends Mailable
     public function __construct(User $user)
     {
         $this->user = $user;
+        $this->subject = Email_Subject::where('type', 'reminder')->inRandomOrder()->first()->subject;
+        $this->body = Email_Body::where('type', 'reminder')->inRandomOrder()->first()->body;
     }
 
     /**
@@ -30,14 +34,15 @@ class InactivityReminder extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'We Miss You!',
+            subject: $this->subject,
         );
     }
 
     public function build()
     {
+
         return $this->view('emails.inactivity_reminder')
-                    ->with(['user' => $this->user]);
+                    ->with(['user' => $this->user, 'body' => $this->body]);
     }
 
     /**

@@ -7,6 +7,12 @@
     <form method="POST" action="{{ route('register.submit') }}">
         @csrf
 
+        @error('error')
+            <div class="alert alert-danger" role="alert">
+                {{ $message }}
+            </div>
+        @enderror
+
         <div class="text-left fs-5 fw-bold mb-3">
             Create an Account
         </div>
@@ -44,7 +50,7 @@
 
         <div class="d-flex justify-content-end">
             <div class="form-check mt-1 mb-2">
-                <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                <input type="checkbox" class="form-check-input" id="remember" name="remember" checked>
                 <label class="form-check-label" for="remember">Remember Me</label>
             </div>
         </div>

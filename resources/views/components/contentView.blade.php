@@ -83,7 +83,6 @@
 
         function initAudioPlayer(player) {
             let watchedTime = 0;
-
             let audio = player.find("audio"),
                 play = player.find(".play-pause"),
                 icon = player.find("#icon"),
@@ -101,25 +100,47 @@
                 "stroke-dashoffset": totalLength
             });
 
+            // pause audio
+            function pauseAudio() {
+                audio[0].pause();
+                player.removeClass("playing");
+                icon.removeClass("bi-pause");
+                player.addClass("paused");
+                icon.addClass("bi-play");
+            }
+            // play audio
+            function playAudio() {
+                $("audio").each((index, el) => {
+                    $("audio")[index].pause();
+                });
+                $(".js-audio").removeClass("playing");
+                
+                // play and change classes/icons
+                audio[0].play();
+                player.removeClass("paused");
+                icon.removeClass("bi-play");
+                player.addClass("playing");
+                icon.addClass("bi-pause");
+            }
+
             play.on("click", () => {
                 if (audio[0].paused) {
-                    $("audio").each((index, el) => {
-                        $("audio")[index].pause();
-                    });
-                    $(".js-audio").removeClass("playing");
-                    audio[0].play();
-                    player.removeClass("paused");
-                    icon.removeClass("bi-play");
-                    player.addClass("playing");
-                    icon.addClass("bi-pause");
+                    playAudio();
                 } else {
-                    audio[0].pause();
-                    player.removeClass("playing");
-                    icon.removeClass("bi-pause");
-                    player.addClass("paused");
-                    icon.addClass("bi-play");
+                    pauseAudio();
                 }
             });
+
+            // overwrite pause function - method replacement
+            // needs to be able to pause without the button
+            const originalPause = audio[0].pause;
+            audio[0].pause = function() {
+                originalPause.apply(this);
+                player.removeClass("playing");
+                icon.removeClass("bi-pause");
+                player.addClass("paused");
+                icon.addClass("bi-play");
+            };
 
             audio.on("timeupdate", () => {
                 let currentTime = audio[0].currentTime,
@@ -163,10 +184,9 @@
     </video>
 @elseif ($type == 'pdf')
     <div>
+        <!-- class="link-workbook" -->
         <span>
-            <a id="{{ isset($id) ? $id : '' }}" class="link-workbook" href="{{ Storage::url('content/'.$file) }}" target="_blank">Open workbook page</a>
-            <br>
-            <a id="{{ isset($id2) ? $id2 : '' }}" class="btn btn-primary btn-workbook" href="{{ Storage::url('content/'.$file) }}" download>DOWNLOAD WORKBOOK <i class="bi bi-download"></i></a>
+            <a id="{{ isset($id) ? $id : '' }}" class="btn btn-primary btn-workbook" href="{{ Storage::url('content/'.$file) }}" target="_blank">Open workbook page <i class="bi bi-arrow-right"></i></a>
         </span>
     </div>
 @elseif ($type == 'image')

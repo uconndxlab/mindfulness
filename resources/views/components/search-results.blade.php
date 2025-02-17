@@ -1,7 +1,17 @@
 @if (!isset($activities) || $activities->isEmpty())
     @if (isset($random))
-        <div class="text-left muted" style="font-weight:500;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid var(--light-grey);">
-        Oops, there is no match. Check your search keyword/filters. Or, try this recommended activity below:
+        <div class="text-left muted" style="margin-top:10px; margin-bottom:10px;padding-bottom:10px;">
+        <p><strong>
+        0 results found
+        </strong></p>
+        <strong>Please try:</strong>
+        <ul class="mt-0">
+        <li>Searching again with different keywords</li>
+        <li>Adjusting your search filters</li>
+        </ul>
+        <strong>Check out:</strong>
+        <br>
+        The recommended activity below
         </div>
         <div class="card module p-2 mb-2">
             <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $random->id, 'library' => true]) }}">

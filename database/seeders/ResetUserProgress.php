@@ -19,8 +19,13 @@ class ResetUserProgress extends Seeder
         DB::table('sessions')->truncate();
 
         foreach (User::all() as $user) {
-            lockAll($user->id);
+            // lockAll($user->id);
             unlockFirst($user->id);
+            $user->current_activity = 1;
+            $user->last_day_completed_at = null;
+            $user->last_day_name = null;
+            $user->block_next_day_act = null;
+            $user->save();
         }
     }
 }

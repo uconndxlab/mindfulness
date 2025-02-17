@@ -4,11 +4,40 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>@yield('title')</title>
+        @php
+            use Illuminate\Support\Facades\URL;
+            use Illuminate\Support\Str;
+            use Illuminate\Support\Facades\Request;
+        @endphp
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <link href="{{ URL::asset('main.css') }}" rel="stylesheet">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+        
+        <!-- icons -->
+        <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
+        <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="96x96" href="/icons/favicon-96x96.png">
+        <link rel="apple-touch-icon" sizes="57x57" href="/icons/apple-icon-57x57.png">
+        <link rel="apple-touch-icon" sizes="60x60" href="/icons/apple-icon-60x60.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="/icons/apple-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="/icons/apple-icon-76x76.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="/icons/apple-icon-114x114.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-icon-120x120.png">
+        <link rel="apple-touch-icon" sizes="144x144" href="/icons/apple-icon-144x144.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-icon-152x152.png">
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-icon-180x180.png">
+        <link rel="manifest" href="/manifest.json">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="msapplication-config" content="/icons/browserconfig.xml">
+        <meta name="msapplication-TileColor" content="#ffffff">
+        <meta name="msapplication-TileImage" content="/icons/ms-icon-144x144.png">
+
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/roundSlider/1.3/roundslider.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
         <style>
             html {
                 overflow-y: scroll;
@@ -85,7 +114,7 @@
                 <ul class="navbar-nav">
                     @if(isset($page_info['back_route']) && isset($page_info['back_label']))
                         <li class="nav-item mr-auto">
-                            <a class="nav-link" href="{{ $page_info['back_route'] }}" id="backButton">
+                            <a class="nav-link btn btn-nav" href="{{ $page_info['back_route'] }}" id="backButton">
                                 <i class="bi bi-arrow-left"></i>{{ $page_info['back_label'] }}
                             </a>
                         </li>
@@ -95,7 +124,7 @@
                 @if (!(isset($page_info['hide_bottom_nav']) && $page_info['hide_bottom_nav']))
                     <ul class="navbar-nav">
                         <li class="nav-item ml-auto">
-                            <button id="logoutBtn" class="btn btn-link nav-link">Logout
+                            <button id="logoutBtn" class="nav-link btn btn-nav fw-semibold">Logout
                                 <i class="bi bi-box-arrow-right"></i>
                             </button>
                         </li>
@@ -259,20 +288,45 @@
                 @php
                     $modalData = session('modal_data');
                     $label = $modalData['label'] ?? 'undefined';
-                    $body = $modalData['body'] ?? '';
+                    $body = $modalData['body'] ?? null;
                     $media = $modalData['media'] ?? null;
-                    $additionalRte = $modalData['additionalRte'] ?? null;
-                    $additionalRteLabel = $modalData['additionalRteLabel'] ?? 'Continue';
+                    $route = $modalData['route'] ?? null;
+                    $method = $modalData['method'] ?? 'POST';
+                    $buttonLabel = $modalData['buttonLabel'] ?? 'Continue';
+                    $buttonClass = $modalData['buttonClass'] ?? 'btn-primary';
+                    $closeLabel = $modalData['closeLabel'] ?? 'Close';
+                    $onCancel = $modalData['onCancel'] ?? null;
                 @endphp
-                showModal(
-                    {!! json_encode($label) !!}, 
-                    {!! json_encode($body) !!}, 
-                    {!! json_encode($media) !!}, 
-                    {!! json_encode($additionalRte) !!}, 
-                    {!! json_encode($additionalRteLabel) !!}
-                );
+                showModal({
+                    label: `{!! $label !!}`,
+                    body: `{!! $body !!}`,
+                    media: '{{ $media }}',
+                    route: '{{ $route }}',
+                    method: '{{ $method }}',
+                    buttonLabel: `{!! $buttonLabel !!}`,
+                    buttonClass: '{{ $buttonClass }}',
+                    closeLabel: `{!! $closeLabel !!}`,
+                    onCancel: () => {
+                        @if($onCancel)
+                            {{ $onCancel }}
+                        @endif
+                    }
+                });
                 {{ session()->forget('modal_data') }}
             @endif
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    pauseAllAudio();
+                }
+            });
+
+            function pauseAllAudio() {
+                const audios = document.querySelectorAll('audio');
+                audios.forEach(audio => {
+                    audio.pause();
+                });
+            }
         </script>
     </body>
 </html>

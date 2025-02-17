@@ -5,101 +5,111 @@
 @section('content')
 @php
     use Carbon\Carbon;
+    use App\Models\Activity;
 @endphp
-<div class="col-md-10">
-    <h2><strong>{{ $head }}</strong></h2>
-    <div id="error-messages" class="alert alert-danger" style="display: none;"></div>
-    <div id="lock_div_reg">
-        <button id="lock_button_reg" class="btn btn-{{ $registration_locked ? 'danger' : 'primary'}}">
-            <i id="lock_icon_reg" class="bi bi-{{ $registration_locked ? 'unlock' : 'lock'}}"></i> {{ $registration_locked ? 'UNLOCK REGISTRATION' : 'Lock registration'}}
-        </button>
+<div class="container-fluid py-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-12">
+            <h2 class="mb-3 fw-bold text-dark">Access Control</h2>
+            <div id="error-messages" class="alert alert-danger" style="display: none;"></div>
+            <div id="lock_div_reg" class="mb-4">
+                <button id="lock_button_reg" class="btn btn-{{ $registration_locked ? 'danger' : 'primary'}}">
+                    <i class="bi bi-{{ $registration_locked ? 'unlock' : 'lock'}}"></i>
+                    {{ $registration_locked ? 'UNLOCK REGISTRATION' : 'Lock Registration'}}
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div class="container mt-4">
-        <div class="table-responsive">
-            <table class="table table-striped table-bordered align-middle">
-                <thead>
-                    <tr>
-                        <th scope="col">Email</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Last Active</th>
-                        <th scope="col">Role</th>
-                        <th scope="col" class="text-end">Change Access</th>
-                        <th scope="col" class="text-end">Reminder Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($users as $index => $user)
-                        @php
-                            $locked = $user->lock_access;
-                            $is_admin_disable = $user->role === "admin" ? 'disabled' : '';
-                        @endphp
-                        <tr class="user-row" data-index="{{ $index }}" data-id="{{ $user->id }}" data-name="{{ $user->name }}" data-email="{{ $user->email }}">
-                            <td style="word-wrap: break-word;">
-                                {{ $user->email }}
-                            </td>
-                            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                {{ $user->name }}
-                            </td>
-                            <td>
-                                {{ $user->formatted_time }}
-                            </td>
-                            <td>
-                                {{ ucfirst($user->role) }}
-                            </td>
-                            <td id="lock_div_{{ $index }}" class="text-end">
-                                <button id="lock_button_{{ $index }}" class="btn btn-{{ $locked ? 'danger' : 'primary'}} {{ $is_admin_disable }}" {{ $is_admin_disable }}>
-                                    <i id="lock_icon_{{ $index }}" class="bi bi-{{ $locked ? 'unlock' : 'lock'}}"></i> {{ $locked ? 'UNLOCK ACCOUNT' : 'Lock account'}}
-                                </button>
-                            </td>
-                            <td id="email_div_{{ $index }}" class="text-end">
-                                @php
-                                    $remind_limit = (int) getConfig('remind_email_day_limit', 0);
-                                    $last_active = $user->last_active_at ? Carbon::parse($user->last_active_at) : null;
-                                    $last_reminded = $user->last_reminded_at ? Carbon::parse($user->last_reminded_at) : null;
-                                    $remind_disabled = $user->lock_access || ($last_active && ($last_active->diffInDays(now()) < $remind_limit)) || ($last_reminded && ($last_reminded->diffInDays(now()) < $remind_limit)) ? 'disabled' : '';
-                                    $next_ping_time = null;
-                                    $last_type = null;
-                                    $last_time = null;
-                                    if (!$user->lock_access && ($last_active || $last_reminded)) {
-                                        if ($last_active) {
-                                            if ($last_reminded && $last_reminded->gt($last_active)) {
-                                                $last_type = 'reminded';
-                                                $next_ping_time = $last_reminded->copy()->addDays($remind_limit);
-                                                $last_time = $last_reminded->format('Y-m-d H:i:s');
-                                            } else {
-                                                $last_type = 'active';
-                                                $next_ping_time = $last_active->copy()->addDays($remind_limit);
-                                                $last_time = $last_active->format('Y-m-d H:i:s');
-                                            }
-                                        } else {
-                                            $last_type = 'reminded';
-                                            $next_ping_time = $last_reminded->copy()->addDays($remind_limit);
-                                            $last_time = $last_reminded->format('Y-m-d H:i:s');
-                                        }
-                                    }
-                                @endphp
-                                <button id="email_button_{{ $index }}" class="btn btn-primary {{ $remind_disabled }}" {{ $remind_disabled }}>
-                                    @if($remind_disabled)
-                                        @if($user->lock_access)
-                                            Account is locked
-                                        @else
-                                            Last {{ $last_type }} at {{ $last_time }}. Can ping user at {{ $next_ping_time->format('Y-m-d H:i:s') }}.
-                                        @endif
-                                    @else
-                                        Remind {{ $user->name }} to come back to app
-                                    @endif
-                                </button>
-                            </td>
-                            <td id="del_acc_div_{{ $index }}" class="text-end">
-                                <button id="del_button_{{ $index }}" class="btn btn-danger {{ $is_admin_disable }}" {{ $is_admin_disable }}>
-                                    <i id="del_icon_{{ $index }}" class="bi bi-x"></i> Delete Account
-                                </button>
-                            </td>
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="px-4 py-3">Email</th>
+                            <th class="px-4 py-3">Name</th>
+                            <th class="px-4 py-3">Last Active</th>
+                            <th class="px-4 py-3">Role</th>
+                            <th class="px-4 py-3 text-end">Change Access</th>
+                            <th class="px-4 py-3 text-end">Reminder Email</th>
+                            <th class="px-4 py-3 text-end">Actions</th>
+                            <th class="px-4 py-3 text-end">Current Activity</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($users as $index => $user)
+                            @php
+                                $locked = $user->lock_access;
+                                $is_admin_disable = $user->role === "admin" ? 'disabled' : '';
+                            @endphp
+                            <tr class="user-row" data-index="{{ $index }}" data-id="{{ $user->id }}" data-name="{{ $user->name }}" data-email="{{ $user->email }}">
+                                <td class="px-4 py-3 text-break">{{ $user->email }}</td>
+                                <td class="px-4 py-3 text-truncate" style="max-width: 200px;">{{ $user->name }}</td>
+                                <td class="px-4 py-3">{{ $user->formatted_time }}</td>
+                                <td class="px-4 py-3">
+                                    <span class="badge bg-{{ $user->role === 'admin' ? 'danger' : 'success' }}">
+                                        {{ ucfirst($user->role) }}
+                                    </span>
+                                </td>
+                                <td id="lock_div_{{ $index }}" class="px-4 py-3 text-end">
+                                    <button id="lock_button_{{ $index }}" class="btn btn-{{ $locked ? 'danger' : 'success' }} btn-sm {{ $is_admin_disable }}" {{ $is_admin_disable }}>
+                                        <i class="bi bi-{{ $locked ? 'unlock' : 'lock'}} me-1"></i>
+                                        {{ $locked ? 'Unlock' : 'Lock'}}
+                                    </button>
+                                </td>
+                                <td id="email_div_{{ $index }}" class="px-4 py-3 text-end">
+                                    @php
+                                        $remind_limit = (int) getConfig('remind_email_day_limit', 0);
+                                        $last_active = $user->last_active_at ? Carbon::parse($user->last_active_at) : null;
+                                        $last_reminded = $user->last_reminded_at ? Carbon::parse($user->last_reminded_at) : null;
+                                        $now = Carbon::now();
+        
+                                        $next_remind_date = null;
+                                        if ($last_active) {
+                                            $next_remind_date = $last_active->copy()->addDays($remind_limit);
+                                        }
+                                        if ($last_reminded && (!$next_remind_date || $last_reminded->gt($last_active))) {
+                                            $next_remind_date = $last_reminded->copy()->addDays($remind_limit);
+                                        }
+                                        
+                                        $remind_disabled = $user->lock_access || ($next_remind_date && $next_remind_date->gt($now));
+                                    @endphp
+
+                                    <button id="email_button_{{ $index }}" class="btn btn-info btn-sm {{ $remind_disabled ? 'disabled' : '' }}">
+                                        @if($user->lock_access)
+                                            Account Locked
+                                        @elseif ($remind_disabled && $next_remind_date)
+                                            Remind again {{ $next_remind_date->diffForHumans(['parts' => 2]) }}
+                                        @else
+                                            <i class="bi bi-envelope me-1"></i>
+                                            Send Reminder
+                                        @endif
+                                    </button>
+                                </td>
+                                <td id="del_acc_div_{{ $index }}" class="px-4 py-3 text-end">
+                                    <button id="del_button_{{ $index }}" class="btn btn-danger btn-sm {{ $is_admin_disable }}" {{ $is_admin_disable }}>
+                                        <i class="bi bi-trash me-1"></i>
+                                        Delete
+                                    </button>
+                                </td>
+                                <td class="px-4 py-3">
+                                    @php
+                                        $current_activity = Activity::find($user->current_activity);
+                                    @endphp
+                                    @if($current_activity)
+                                        <span class="fw-bold text-primary">Part {{ $current_activity->day->module->id }},</span> 
+                                        <span class="fw-semibold">{{ $current_activity->day->name }}</span> - 
+                                        {{ $current_activity->title }}
+                                    @else
+                                        <span class="text-muted">No activity</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
