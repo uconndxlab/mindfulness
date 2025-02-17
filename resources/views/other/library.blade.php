@@ -470,6 +470,10 @@
 
         //LOAD SEARCH
         function search(filters=false, first=false, isSearch=false, applyFilters=false) {
+            const applyFilterButton = document.getElementById('apply_filter_button');
+            if (applyFilterButton) {
+                applyFilterButton.disabled = true;
+            }
             //build url
             const searchUrl = new URL('{{ $page_info['search_route'] }}');
             //if changes in filter...
@@ -480,6 +484,13 @@
             if ((filters || isSearch) && !first) {
                 //reset the page if filters or search, and not first load
                 _page = 1;
+            }
+
+            // hide clear filter button if no filters
+            if (!checkFilters()) {
+                document.getElementById('clear_filter_button').style.display = 'none';
+            } else {
+                document.getElementById('clear_filter_button').style.display = 'block';
             }
 
             const params = getQueryParams();
@@ -517,10 +528,24 @@
             })
             .catch(error => {
                 console.error('Error performing search', error);
+            })
+            .finally(() => {
+                if (applyFilterButton) {
+                    applyFilterButton.disabled = false;
+                }
             });
         }
         //search on page load with filters
         search(true, true);
+
+        // CHECK FILTERS - see if any filters are applied
+        function checkFilters() {
+            if (_categories.length != 0 || _modules.length != 0 || _start != '0' || _end != '30') {
+                // console.log(_categories, _modules, _start, _end);
+                return true;
+            }
+            return false;
+        }
 
         //PAGINATION - add event listeners to cancel pagination redirection and use search instead
         function attachPaginationSearch() {
@@ -574,7 +599,7 @@
         function clearSearch() {
             searchBar.value = '';
             searchBar.focus();
-            search(isSearch=true);
+            search(true, false, isSearch=true, false);
         }
 
         //NOTES
