@@ -540,7 +540,10 @@
         // CHECK FILTERS - see if any filters are applied
         function checkFilters() {
             const clearFiltersButton = document.getElementById('clear_filter_button');
-            if (_categories.length != 0 || _modules.length != 0 || _start != '0' || _end != '30') {
+            if (!clearFiltersButton) {
+                return;
+            }
+            if ((_categories && _categories.length != 0) || (_modules && _modules.length != 0) || _start != '0' || _end != '30') {
                 clearFiltersButton.style.display = 'block';
                 return true;
             }
