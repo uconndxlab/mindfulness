@@ -66,7 +66,7 @@
                         <i style="padding:0px 10px" id="search-icon" class="bi bi-search"></i>
                         <input id="search_bar" type="text" name="search" id="search" class="form-control" placeholder='{{ $page_info['search_text'] }}'>
                         <span class="input-group-text">
-                            <a style="color:#000!important" id="clear_search_button" type="button">CANCEL</a>
+                            <a style="color:#000!important; visibility: hidden;" id="clear_search_button" type="button">CLEAR</a>
                         </span>
                     </div>
                 </div>
@@ -487,11 +487,10 @@
             }
 
             // hide clear filter button if no filters
-            if (!checkFilters()) {
-                document.getElementById('clear_filter_button').style.display = 'none';
-            } else {
-                document.getElementById('clear_filter_button').style.display = 'block';
-            }
+            checkFilters();
+
+            // hide clear search button if no search
+            checkSearch();
 
             const params = getQueryParams();
             searchUrl.search = params;
@@ -540,10 +539,25 @@
 
         // CHECK FILTERS - see if any filters are applied
         function checkFilters() {
+            const clearFiltersButton = document.getElementById('clear_filter_button');
             if (_categories.length != 0 || _modules.length != 0 || _start != '0' || _end != '30') {
-                // console.log(_categories, _modules, _start, _end);
+                clearFiltersButton.style.display = 'block';
                 return true;
             }
+            clearFiltersButton.style.display = 'none';
+            return false;
+        }
+
+        // CHECK SEARCH
+        function checkSearch() {
+            const clearSearch = document.getElementById('clear_search_button');
+            if (searchBar.value != '') {
+                clearSearch.style.visibility = 'visible';
+                clearSearch.disabled = false;
+                return true;
+            }
+            clearSearch.style.visibility = 'hidden';
+            clearSearch.disabled = true;
             return false;
         }
 
