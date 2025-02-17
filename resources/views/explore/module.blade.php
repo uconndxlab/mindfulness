@@ -73,7 +73,7 @@
                                                 <span class="sub-activity-font activity-tag-time">{{ $activity->time.' min' }}</span>
                                             @endif
                                             @if ($activity->optional)
-                                                <span class="sub-activity-font activity-tag-optional"></i>Optional</span>
+                                                <span class="sub-activity-font activity-tag-optional"></i>Bonus</span>
                                             @endif
                                             </div>
                                             </div>

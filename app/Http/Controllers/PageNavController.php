@@ -347,7 +347,7 @@ class PageNavController extends Controller
                     else if ($lower == 'journal') {
                         $in_query->orWhere('type', 'journal');
                     }
-                    else if ($lower == 'optional') {
+                    else if ($lower == 'bonus') {
                         $in_query->orWhere('optional', true);
                     }
                     else if ($lower == 'reflection') {
@@ -408,7 +408,7 @@ class PageNavController extends Controller
             'search_text' => 'Search for any activity...'
         ];
 
-        $categories = ['Practice', 'Lesson', 'Reflection', 'Journal', 'Favorited', 'Optional'];
+        $categories = ['Practice', 'Lesson', 'Reflection', 'Journal', 'Favorited', 'Bonus'];
 
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.main'));
