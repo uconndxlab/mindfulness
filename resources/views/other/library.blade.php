@@ -233,7 +233,7 @@
 
             //when apply search with filters
             document.getElementById('apply_filter_button').addEventListener('click', function() {
-                search(true);
+                search(true, false, false, applyFilters=true);
             });
 
             document.getElementById('clear_filter_button').addEventListener('click', clearFilters);
@@ -469,7 +469,7 @@
 
 
         //LOAD SEARCH
-        function search(filters=false, first=false, isSearch=false) {
+        function search(filters=false, first=false, isSearch=false, applyFilters=false) {
             //build url
             const searchUrl = new URL('{{ $page_info['search_route'] }}');
             //if changes in filter...
@@ -498,7 +498,13 @@
             .then(data => {
                 console.log('AJAX success');
                 //render component into container
-                document.getElementById('resultsContainer').innerHTML = data.html;
+                var resultsContainer = document.getElementById('resultsContainer');
+                resultsContainer.innerHTML = data.html;
+                if (applyFilters || isSearch) {
+                    // stop and start effect
+                    $(resultsContainer).stop(true, true).effect("highlight", {color: '#d4edda'}, 1500);
+                }
+
                 //if first render of page, show the filters and results - originally hidden
                 if (first) {
                     document.getElementById('filterResultDiv').style.display = 'block';
@@ -542,7 +548,7 @@
         searchBar.addEventListener('input', function() {
             clearTimeout(timeout);
             timeout = setTimeout(function() {
-                search(isSearch=true);
+                search(true, false, true, false);
             }, 750);
         });
 
@@ -560,7 +566,7 @@
             //resetting the time filter
             slider.noUiSlider.set([0, 30]);
             //submit
-            search(true);
+            search(true, false, false, applyFilters=true);
         }
 
         //CLEAR SEARCH - ignores filters
