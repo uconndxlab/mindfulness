@@ -284,10 +284,15 @@ class PageNavController extends Controller
         $user_id = Auth::id();
         //query for activities - keep as query
         $activity_ids = UserActivity::where('user_id', $user_id)
-        ->where('status', '!=', 'locked')
-        ->pluck('activity_id');
+            ->where('status', '!=', 'locked')
+            ->pluck('activity_id');
+
+        // make sure rand query matches query
         $query = Activity::where('deleted', false)
-        ->whereIn('id', $activity_ids);
+            ->whereIn('id', $activity_ids);
+        $rand_query = Activity::where('deleted', false)
+            ->whereIn('id', $activity_ids);
+        
         
         //base param
         $empty_text = null;
@@ -295,9 +300,10 @@ class PageNavController extends Controller
             if ($request->base_param == 'main') {
                 $empty_text = 'Keep progressing to unlock more exercises...';
             }
-            else if ($request->base_param = 'favorited') {
+            else if ($request->base_param == 'favorited') {
                 $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
                 $query->whereIn('id', $fav_ids);
+                $rand_query->whereIn('id', $fav_ids);
                 $empty_text = '<span>Click the "<i class="bi bi-star"></i>" found in activities to add them to your favorites and view them here!</span>';
             }
         }
@@ -309,10 +315,8 @@ class PageNavController extends Controller
             return response()->json(['html' => $view]);
         }
 
-        //pulling random item
-        $query_clone = clone $query;
-        // get a random practice or lesson
-        $random_act = $query_clone->where('type', 'practice')->orWhere('type', 'lesson')->inRandomOrder()->first();
+        // using query copy get random activity
+        $random_act = $rand_query->inRandomOrder()->first();
         
         //handle search
         if ($request->has('search') && $request->search != '') {
