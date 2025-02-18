@@ -77,6 +77,14 @@
                     <hr class="separator-line">
                 </div>
             </div>
+
+            <div>
+            <div id="search_page_throbber" style="display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
+                    <div class="spinner-border text-secondary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
         
             <div id="filterResultDiv" style="display: none;">
                 <div class="row search-filters">
@@ -531,6 +539,8 @@
 
                 //if first render of page, show the filters and results - originally hidden
                 if (first) {
+                    // close the page throbber
+                    document.getElementById('search_page_throbber').style.display = 'none';
                     document.getElementById('filterResultDiv').style.display = 'block';
                 }
                 if (journalPage) {
