@@ -532,7 +532,9 @@
                 resultsContainer.innerHTML = data.html;
                 throbber.style.display = 'none';
                 resultsContainer.style.display = 'block';
-                if (applyFilters || isSearch) {
+
+                // highlight effect on load/search/filters - not if empty
+                if ((applyFilters || isSearch) && !data.empty) {
                     // stop and start effect
                     $(resultsContainer).stop(true, true).effect("highlight", {color: '#d4edda'}, 1500);
                 }
@@ -561,7 +563,7 @@
             });
         }
         //search on page load with filters
-        search(true, true);
+        search(true, true, false, true);
 
         // CHECK FILTERS - see if any filters are applied
         function checkFilters() {
