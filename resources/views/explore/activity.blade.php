@@ -26,6 +26,7 @@
         @endif
     </div>
     <div class="manual-margin-top">
+        <!-- audio -->
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
             @if (isset($content->instructions))
                 <div class="text-left mb-3">
@@ -33,69 +34,35 @@
                 </div>
             @endif
             @php
-                $controlsList = ($activity->type != 'lesson' || $activity->status != 'completed' ? 'noplaybackrate' : '');
+                $controlsList = ($activity->type != 'lesson' || $activity->status != 'completed') ? 'noplaybackrate' : '';
                 $allowSeek = $activity->status == 'completed' ? 'true' : 'false';
+                $hasAudioOptions = isset($content->audio_options) && !empty($content->audio_options);
+                
+                if ($hasAudioOptions) {
+                    $defaultVoice = key($content->audio_options);
+                    $multipleVoices = count($content->audio_options) > 1;
+                }
             @endphp
-            @if ($content->audio_options)
-                <div class="col-6 mt-1" id="audio-options-div" style="display: none;">
-                    @php
-                        $display_voice = count($content->audio_options) > 1 ? 'block' : 'none';
-                    @endphp
-                    <div class="form-group dropdown" data-display="{{ $display_voice }}" style="display: {{ $display_voice }}">
-                        <label class="fw-bold" for="voice_dropdown_button">Voice Selection:</label>
-                        <!-- voice selection -->
-                        <button id="voice_dropdown_button" class="btn btn-xlight dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ key($content->audio_options) }}
-                        </button>
-                        <ul class="dropdown-menu" id="voice_dropdown" name="voice_dropdown">
-                            @foreach ($content->audio_options as $voice => $time_options)
-                                <li>
-                                    <button class="dropdown-item" type="button" value="{{ $voice }}" onclick="selectVoice('{{ $voice }}')">
-                                        {{ $voice }}
-                                    </button>
-                                </li>
-                            @endforeach
-                        </ul>
-                        <input type="hidden" id="voice_select" name="voice_select" value="{{ key($content->audio_options) }}">
-                    </div>
-                    <!-- time selections -->
-                    @foreach ($content->audio_options as $voice => $time_options)
-                        @php
-                            $display_time = count($time_options) > 1 ? 'block' : 'none';
-                        @endphp
-                        <div class="form-group dropdown time-dropdown" voice="{{ $voice }}" data-display="{{ $display_time }}" style="display: {{ $display_time }}">
-                            <label class="fw-bold" for="time_dropdown_button_{{ $voice }}">Time:</label>
-                            <button id="time_dropdown_button_{{ $voice }}" class="btn btn-xlight dropdown-toggle time-toggle" time="{{ key($time_options) }}" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {{ key($time_options) }} min
-                            </button>
-                            <ul class="dropdown-menu" id="time_dropdown_{{ $voice }}" name="time_dropdown_{{ $voice }}">
-                                @foreach ($time_options as $time => $_)
-                                    <li>
-                                        <button class="dropdown-item" type="button" value="{{ $time }}" onclick="selectTime('{{ $time }}')">
-                                            {{ $time }} min
-                                        </button>
-                                    </li>
-                                @endforeach
-                            </ul>
-                            <input type="hidden" id="time_select" name="time_select" value="{{ key($time_options) }}">
-                        </div>
-                    @endforeach
-                </div>
+            @if ($hasAudioOptions)
+                <!-- voice selection dropdown -->
+                <x-voice-selector :voices="$content->audio_options" :defaultVoice="$defaultVoice" :showDropdown="$multipleVoices"/>
 
-                @foreach ($content->audio_options as $voice => $time_options)
-                    @foreach ($time_options as $time => $file_path)
-                        <div id="content_main" class="content-main" voice="{{ $voice }}" time="{{ $time }}" data-type="audio" style="display: none;">
+                <!-- audio content views -->
+                <div class="mt-4">
+                    @foreach ($content->audio_options as $voice => $file_path)
+                        <div id="content_main" class="content-main" voice="{{ $voice }}" data-type="audio" style="display: none;">
                             <x-contentView id="content_view" type="audio" file="{{ $file_path }}" controlsList="{{ $controlsList }}" allowSeek="{{ $allowSeek }}"/>
                         </div>
                     @endforeach
-                @endforeach
+                </div>
+            @else
+                <!-- default audio, video, image -->
+                <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: flex; justify-content: center; align-items: center; flex-direction:column;">
+                    <x-contentView id="content_view" id2="download_btn" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}" allowSeek="{{ $allowSeek }}"/>
+                </div>
+            @endif
 
-                @else
-                    <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: flex; justify-content: center; align-items: center; flex-direction:column;">
-                        <x-contentView id="content_view" id2="download_btn" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}" allowSeek="{{ $allowSeek }}"/>
-                    </div>
-                @endif
-
+        <!-- other content types -->
         @elseif ($activity->type == 'reflection' && $quiz)
             <div id="quizContainer">
                 <x-quiz :quiz="$quiz"/>
@@ -320,76 +287,9 @@
             });
         }
     });
-
-
-    //VOICE SELECTION
-    function selectVoice(voice) {
-        //change drop down text and hidden value
-        document.getElementById('voice_dropdown_button').innerHTML = voice;
-        document.getElementById('voice_select').value = voice;
-
-        //make sure the correct dropdown shows
-        document.querySelectorAll('.time-dropdown').forEach(dropdown => {
-            if (dropdown.getAttribute('voice') === voice) {
-                //display if there are options
-                dropdown.style.display = dropdown.getAttribute('data-display');
-                //get the time value
-                var time = dropdown.querySelector('.time-toggle').getAttribute('time');
-                //set the new time
-                selectTime(time);
-            } else {
-                dropdown.style.display = 'none';
-            }
-        });
-    }
-    //TIME SELECTION
-    function selectTime(time) {
-        //get the voice
-        var voice = document.getElementById('voice_select').value;
-        //change the correct drop down
-        document.getElementById('time_dropdown_button_'+voice).innerHTML = time+' min';
-        //change hidden value
-        document.getElementById('time_select').value = time;
-        //change the content
-        handleVoiceTimeChange();
-    }
-
-    function handleVoiceTimeChange() {
-        //get the inputs
-        var voice_input = document.getElementById('voice_select').value;
-        var time_input = document.getElementById('time_select').value;
-
-        //update which content is displayed, pause others, change eventListener
-        document.querySelectorAll('.content-main').forEach(content => {
-            if (content.getAttribute('voice') === voice_input && content.getAttribute('time') === time_input) {
-                content.style.display = 'block';
-                content.querySelector('audio').addEventListener('ended', activityComplete);
-            } else {
-                content.style.display = 'none';
-                content.querySelector('audio').pause();
-                content.querySelector('audio').removeEventListener('ended', activityComplete);
-            }
-        });
-    }
-
+    
     //ON CONTENT LOAD
     document.addEventListener('DOMContentLoaded', function() {
-        if (hasContent) {
-            const audioOptions = @json($content ? $content->audio_options : null);
-            if (audioOptions) {
-                console.log('Audio options loaded:', audioOptions);
-                const voice_select = document.getElementById('voice_select');
-                const time_select = document.getElementById('time_select');
-                if (voice_select && time_select) {
-                    //first call to set up options
-                    selectVoice(voice_select.value);
-                    document.getElementById('audio-options-div').style.display = 'block';
-                }
-            } else {
-                //behave as normal - event listeners are on all audio items
-                console.log('No audio options available.');
-            }
-        }
         //NOSEEK
         var mediaPlayers = document.querySelectorAll('.slide__audio-player, .video-player');
         mediaPlayers.forEach(function(player) {
@@ -461,27 +361,8 @@
             console.log('adding end listener');
             player.addEventListener('ended', endedListener);
         });
-    });
 
-    //SHOW ERRORS
-    const errorDiv = document.getElementById('error-messages');
-    function showError(errorMessage) {
-        errorDiv.textContent = errorMessage;
-        errorDiv.style.display = 'block';
-    }
-
-    // SECRET SKIP
-    document.addEventListener('keydown', function(event) {
-        if (event.ctrlKey && event.key.toLowerCase() === 'm') {
-            event.preventDefault();
-            console.log('Secret skip');
-            activityComplete();
-        }
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
         var showBrowserModal = true;
-    
         //page unload warning - for progress
         // should call on page reload/changes not initiated by buttons (avoid double modals)
         window.addEventListener('beforeunload', function(e) {
@@ -542,6 +423,22 @@
             });
         }
     });
+
+    //SHOW ERRORS
+    const errorDiv = document.getElementById('error-messages');
+    function showError(errorMessage) {
+        errorDiv.textContent = errorMessage;
+        errorDiv.style.display = 'block';
+    }
+
+    // SECRET SKIP
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.key.toLowerCase() === 'm') {
+            event.preventDefault();
+            console.log('Secret skip');
+            activityComplete();
+        }
+    }); 
 </script>
 @endsection
 
