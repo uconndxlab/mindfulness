@@ -181,7 +181,14 @@
                             </div>
                         </div>
                     @endif
-                    <div id="resultsContainer" class="col-lg-8 mx-auto"></div>
+                    <div class="col-lg-8 mx-auto position-relative">
+                        <div id="throbber" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
+                            <div class="spinner-border text-secondary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <div id="resultsContainer"></div>
+                    </div>
                 </div>
             </div>
         </form>
@@ -470,6 +477,12 @@
 
         //LOAD SEARCH
         function search(filters=false, first=false, isSearch=false, applyFilters=false) {
+            // hide past results and show throbber
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.style.display = 'none';
+            const throbber = document.getElementById('throbber');
+            throbber.style.display = 'block';
+
             const applyFilterButton = document.getElementById('apply_filter_button');
             if (applyFilterButton) {
                 applyFilterButton.disabled = true;
@@ -507,9 +520,10 @@
             .then(response => response.json())
             .then(data => {
                 console.log('AJAX success');
-                //render component into container
-                var resultsContainer = document.getElementById('resultsContainer');
+                //render component into container, hide throbber, show results
                 resultsContainer.innerHTML = data.html;
+                throbber.style.display = 'none';
+                resultsContainer.style.display = 'block';
                 if (applyFilters || isSearch) {
                     // stop and start effect
                     $(resultsContainer).stop(true, true).effect("highlight", {color: '#d4edda'}, 1500);
@@ -526,9 +540,11 @@
                 attachPaginationSearch();
             })
             .catch(error => {
+                throbber.style.display = 'none';
                 console.error('Error performing search', error);
             })
             .finally(() => {
+                throbber.style.display = 'none';
                 if (applyFilterButton) {
                     applyFilterButton.disabled = false;
                 }
