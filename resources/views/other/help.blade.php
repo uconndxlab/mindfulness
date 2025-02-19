@@ -24,7 +24,7 @@
     </nav>
     <div data-bs-spy="scroll" data-bs-target="#navbar-help" data-bs-smooth-scroll="true" class="scrollspy-example pt-3 pb-3 rounded-2" tabindex="0">
         <section id="tutorial">
-            <h4 class="text-center fw-bold mt-4">Tutorial:</h4>
+            <h4 class="text-center fw-bold mt-4">Tutorial</h4>
             <div class="container">
                 <div style="max-width: 270px; margin: auto;">
                     <div class="ratio" style="--bs-aspect-ratio: 177.77%;">
@@ -34,7 +34,7 @@
             </div>
         </section>
         <section id="info">
-            <h4 class="text-center fw-bold mt-4">Info about Healing Hearts:</h4>
+            <h4 class="text-center fw-bold mt-4">Info about Healing Hearts</h4>
             <h5 class="text-center fw-bold mt-2">Acknolwedgement</h5>
             <p class="text-center">
                 The development and testing of the Healing Hearts program was made possible through the generous support of the National Institute of Health (K01MH122502). We gratefully acknowledge their funding. We also extend our heartfelt thanks to our dedicated team members from UConn Digital Experience Group, research assistants, mindfulness teachers, consultants, and collaborators for their invaluable contributions to this project. We are also grateful to the participants who provided valuable feedback during the development and testing phase, helping us to continuously improve the Healing Hearts experience. 
@@ -93,8 +93,8 @@
         </section>
 
         <section id="contactUs">
-            <h4 class="text-center fw-bold mt-4">Contact:</h4>
-            <p class="text-center fw-bold">Get Immediate Help in a Crisis</p>
+            <h4 class="text-center fw-bold mt-4">Contact</h4>
+            <p class="text-center fw-bold">Get Immediate Help in a Crisis:</p>
             <p class="text-center">Call 911 if you or someone you know is in immediate danger or go to the nearest emergency room.</p>
             <p class="text-center fw-bold mt-3">For matters related to this app:</p>
             <p class="text-center">You can reach us via email or phone:</p>
@@ -105,7 +105,7 @@
                 <a href="tel:{{ config('mail.contact_phone') }}" class="text-decoration-none">{{ formatPhone(config('mail.contact_phone')) }}</a>
             </p>
         
-            <h5 class="text-center fw-bold">Or use the Contact Form:</h5>
+            <p class="text-center fw-bold">Or use the Contact Form:</p>
             <div id="success-messages" class="alert alert-success contact-message" style="display: none;"></div>
             <div id="error-messages" class="alert alert-danger contact-message" style="display: none;"></div>
             <form id="contact-form" action="{{ route('contact.submit') }}" method="POST">
