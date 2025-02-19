@@ -51,14 +51,14 @@
                 <div class="mt-4">
                     @foreach ($content->audio_options as $voice => $file_path)
                         <div id="content_main" class="content-main" voice="{{ $voice }}" data-type="audio" style="display: none;">
-                            <x-contentView id="content_view" type="audio" file="{{ $file_path }}" controlsList="{{ $controlsList }}" allowSeek="{{ $allowSeek }}"/>
+                            <x-audio-player :file="$file_path" :id="$voice" :controlsList="$controlsList" :allowSeek="$allowSeek"/>
                         </div>
                     @endforeach
                 </div>
             @else
                 <!-- default audio, video, image -->
                 <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: flex; justify-content: center; align-items: center; flex-direction:column;">
-                    <x-contentView id="content_view" id2="download_btn" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}" allowSeek="{{ $allowSeek }}"/>
+                    <x-contentView id="content_view" id2="download_btn" voiceId="none" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}" allowSeek="{{ $allowSeek }}"/>
                 </div>
             @endif
 
