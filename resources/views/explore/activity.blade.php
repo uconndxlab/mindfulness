@@ -50,7 +50,7 @@
                 <!-- audio content views -->
                 <div class="mt-4">
                     @foreach ($content->audio_options as $voice => $file_path)
-                        <div id="content_main" class="content-main" voice="{{ $voice }}" data-type="audio" style="display: none;">
+                        <div id="audio_content" class="content-main" voice="{{ $voice }}" data-type="audio" style="display: none;">
                             <x-audio-player :file="$file_path" :id="$voice" :controlsList="$controlsList" :allowSeek="$allowSeek"/>
                         </div>
                     @endforeach
@@ -128,24 +128,31 @@
         //applies to all content items
         const content = document.getElementById('content_view');
         type = '{{ isset($content->type) ? $content->type : null }}';
-        if (type == 'pdf') {
-            const downloadButton = document.getElementById('download_btn');
-            downloadButton.addEventListener('click', activityComplete);
-            content.addEventListener('click', activityComplete);
-        }
-        //adding complete button for images
-        else if (type == 'image' && status != 'completed') {
-            const completeButton = document.getElementById('img_complete_activity');
-            completeButton.classList.remove('disabled');
-            completeButton.addEventListener('click', activityComplete);
-            //show and center
-            completeButton.style.display = 'block';
-            completeButton.parentElement.style.display = 'flex';
-            completeButton.parentElement.style.flexDirection = 'column';
-            completeButton.parentElement.style.alignItems = 'center';
+        if (content) {
+            if (type == 'pdf') {
+                const downloadButton = document.getElementById('download_btn');
+                downloadButton.addEventListener('click', activityComplete);
+                content.addEventListener('click', activityComplete);
+            }
+            //adding complete button for images
+            else if (type == 'image' && status != 'completed') {
+                const completeButton = document.getElementById('img_complete_activity');
+                completeButton.classList.remove('disabled');
+                completeButton.addEventListener('click', activityComplete);
+                //show and center
+                completeButton.style.display = 'block';
+                completeButton.parentElement.style.display = 'flex';
+                completeButton.parentElement.style.flexDirection = 'column';
+                completeButton.parentElement.style.alignItems = 'center';
+            }
         }
         else {
-            content.addEventListener('ended', activityComplete);
+            // audio
+            const audioContent = document.getElementById('audio_content');
+            if (audioContent) {
+                const audioPlayer = audioContent.querySelector('.slide__audio-player');
+                audioPlayer.addEventListener('ended', activityComplete);
+            }
         }
     }
     else if (hasQuiz) {

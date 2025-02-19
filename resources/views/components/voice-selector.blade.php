@@ -32,6 +32,9 @@
         // show/hide the audio
         document.querySelectorAll('.content-main[voice]').forEach(div => {
             div.style.display = div.getAttribute('voice') === voice ? 'block' : 'none';
+            div.querySelectorAll('audio').forEach(audio => {
+                audio.pause();
+            });
         });
     }
 
