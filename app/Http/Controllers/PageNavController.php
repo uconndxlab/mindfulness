@@ -312,7 +312,7 @@ class PageNavController extends Controller
         $empty = !$query->exists();
         if ($empty) {
             $view = view('components.search-results', ['empty_text' => $empty_text])->render();
-            return response()->json(['html' => $view]);
+            return response()->json(['html' => $view, 'empty' => true]);
         }
 
         // using query copy get random activity
@@ -347,7 +347,7 @@ class PageNavController extends Controller
                     else if ($lower == 'journal') {
                         $in_query->orWhere('type', 'journal');
                     }
-                    else if ($lower == 'optional') {
+                    else if ($lower == 'bonus') {
                         $in_query->orWhere('optional', true);
                     }
                     else if ($lower == 'reflection') {
@@ -376,7 +376,8 @@ class PageNavController extends Controller
         $activities = $query->with('day.module')->orderBy('order')->paginate(6);
         $view = view('components.search-results', ['activities' => $activities, 'random' => $random_act])->render();
 
-        return response()->json(['html' => $view]);
+        // count($activities) === 0
+        return response()->json(['html' => $view, 'empty' => false]);
     }
 
     public function favoritesLibrary(Request $request)
@@ -408,7 +409,7 @@ class PageNavController extends Controller
             'search_text' => 'Search for any activity...'
         ];
 
-        $categories = ['Practice', 'Lesson', 'Reflection', 'Journal', 'Favorited', 'Optional'];
+        $categories = ['Practice', 'Lesson', 'Reflection', 'Journal', 'Favorited', 'Bonus'];
 
         //set as the previous library and save as exit
         Session::put('previous_library', route('library.main'));

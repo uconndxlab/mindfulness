@@ -77,6 +77,14 @@
                     <hr class="separator-line">
                 </div>
             </div>
+
+            <div>
+            <div id="search_page_throbber" style="display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
+                    <div class="spinner-border text-secondary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
         
             <div id="filterResultDiv" style="display: none;">
                 <div class="row search-filters">
@@ -181,7 +189,14 @@
                             </div>
                         </div>
                     @endif
-                    <div id="resultsContainer" class="col-lg-8 mx-auto"></div>
+                    <div class="col-lg-8 mx-auto position-relative">
+                        <div id="throbber" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
+                            <div class="spinner-border text-secondary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <div id="resultsContainer"></div>
+                    </div>
                 </div>
             </div>
         </form>
@@ -470,6 +485,12 @@
 
         //LOAD SEARCH
         function search(filters=false, first=false, isSearch=false, applyFilters=false) {
+            // hide past results and show throbber
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.style.display = 'none';
+            const throbber = document.getElementById('throbber');
+            throbber.style.display = 'block';
+
             const applyFilterButton = document.getElementById('apply_filter_button');
             if (applyFilterButton) {
                 applyFilterButton.disabled = true;
@@ -507,16 +528,21 @@
             .then(response => response.json())
             .then(data => {
                 console.log('AJAX success');
-                //render component into container
-                var resultsContainer = document.getElementById('resultsContainer');
+                //render component into container, hide throbber, show results
                 resultsContainer.innerHTML = data.html;
-                if (applyFilters || isSearch) {
+                throbber.style.display = 'none';
+                resultsContainer.style.display = 'block';
+
+                // highlight effect on load/search/filters - not if empty
+                if ((applyFilters || isSearch) && !data.empty) {
                     // stop and start effect
                     $(resultsContainer).stop(true, true).effect("highlight", {color: '#d4edda'}, 1500);
                 }
 
                 //if first render of page, show the filters and results - originally hidden
                 if (first) {
+                    // close the page throbber
+                    document.getElementById('search_page_throbber').style.display = 'none';
                     document.getElementById('filterResultDiv').style.display = 'block';
                 }
                 if (journalPage) {
@@ -526,21 +552,26 @@
                 attachPaginationSearch();
             })
             .catch(error => {
+                throbber.style.display = 'none';
                 console.error('Error performing search', error);
             })
             .finally(() => {
+                throbber.style.display = 'none';
                 if (applyFilterButton) {
                     applyFilterButton.disabled = false;
                 }
             });
         }
         //search on page load with filters
-        search(true, true);
+        search(true, true, false, true);
 
         // CHECK FILTERS - see if any filters are applied
         function checkFilters() {
             const clearFiltersButton = document.getElementById('clear_filter_button');
-            if (_categories.length != 0 || _modules.length != 0 || _start != '0' || _end != '30') {
+            if (!clearFiltersButton) {
+                return;
+            }
+            if ((_categories && _categories.length != 0) || (_modules && _modules.length != 0) || _start != '0' || _end != '30') {
                 clearFiltersButton.style.display = 'block';
                 return true;
             }

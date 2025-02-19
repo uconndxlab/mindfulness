@@ -24,7 +24,7 @@
                     <span class="sub-activity-font activity-tag-time">{{ $random->time.' min' }}</span>
                 @endif
                 @if ($random->optional)
-                    <span class="sub-activity-font activity-tag-optional"></i>Optional</span>
+                    <span class="sub-activity-font activity-tag-optional"></i>Bonus</span>
                 @endif
             </a>
             <i class="bi bi-arrow-right"></i>
@@ -50,7 +50,7 @@
                                 <span class="sub-activity-font activity-tag-time"></i>{{ $activity->time.' min' }}</span>
                             @endif
                             @if ($activity->optional)
-                                <span class="sub-activity-font activity-tag-optional"></i>Optional</span>
+                                <span class="sub-activity-font activity-tag-optional"></i>Bonus</span>
                             @endif
                         </a>
                         <i class="bi bi-arrow-right"></i>

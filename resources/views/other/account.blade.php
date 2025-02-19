@@ -4,9 +4,9 @@
 
 @section('content')
 <div class="col-md-8">
-    <div class="text-center fs-5 fw-bold mt-5 mb-3">
+    <h4 class="text-center fw-bold mt-5 mb-3">
         Progress
-    </div>
+    </h4>
     @foreach ($modules as $module)
     <div class="prior-note">
         <div class="grey-note">
@@ -26,9 +26,9 @@
     <form id="updateInfoForm" method="POST" action="{{ route('user.update.namePass') }}">
         @csrf
         @Method('put')
-        <div class="text-center fs-5 fw-bold mt-5 mb-3">
+        <h4 class="text-center fw-bold mt-5 mb-3">
             My Account
-        </div>
+        </h4>
         <div id="success-messages" class="alert alert-success contact-message" style="display: none;"></div>
         <div id="error-messages" class="alert alert-danger contact-message" style="display: none;"></div>
         <div class="form-group mb-3">
