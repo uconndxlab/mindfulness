@@ -17,16 +17,14 @@
     </div>
 </div>
 @if (!$noPlaybackRate)
-    <div id="audio-range-{{ $id }}">
-        <div class="col-4 mt-4" style="margin-left:auto;margin-right:auto">
-            <label for="audioRange" class="form-label">Audio Speed: <span id="speed-value">1</span></label>
-            <input type="range" class="form-range" min="0.5" max="1.5" step="0.05" id="audioRange">
-        </div>
-        <div class="col-4 d-flex justify-content-between" style="margin-left:auto;margin-right:auto">
-            <small style="color:#bfbfbf">0.5</small>
-            <small style="color:#bfbfbf">1</small>
-            <small style="color:#bfbfbf">1.5</small>
-        </div>
+    <div class="col-4 mt-4" style="margin-left:auto;margin-right:auto">
+        <label for="audioRange-{{ $id }}" class="form-label">Audio Speed: <span id="speed-value-{{ $id }}">1</span></label>
+        <input type="range" class="form-range audioRange" min="0.5" max="1.5" step="0.05" id="audioRange-{{ $id }}" value="1">
+    </div>
+    <div class="col-4 d-flex justify-content-between" style="margin-left:auto;margin-right:auto">
+        <small style="color:#bfbfbf">0.5</small>
+        <small style="color:#bfbfbf">1</small>
+        <small style="color:#bfbfbf">1.5</small>
     </div>
 @endif
 <script>
@@ -36,19 +34,21 @@
     // init the audioplayer
     initAudioPlayer($("#player-"+id));
 
-    // check if playbackrate is allowed in controlslist
-    let noPlaybackRate = '{{ $noPlaybackRate }}' == 'true' ? true : false;
-    if (!noPlaybackRate) {
-        let aud = document.getElementsByTagName("audio")[0];
-        let audRange = document.getElementById("audioRange");
-        if (audRange) {
-            audRange.onchange = function() {
-                document.getElementById("speed-value").innerHTML=audRange.value;
-                aud.playbackRate = audRange.value
+    // init the playbackrate slider
+    let noPlayBackRate = '{{ $noPlaybackRate }}' == 'true' ? true : false;
+    if (!noPlayBackRate) {
+        let audio = document.getElementById("audio-"+id);
+        let playbackRate = 1;
+        let playbackRateBtn = document.getElementById("audio-range-"+id);
+        let playbackRateValue = document.getElementById("speed-value-"+id);
+        let playbackRateRange = document.getElementById("audioRange-"+id); // update to match the new id
+        if (playbackRateRange) {
+            playbackRateRange.oninput = function() {
+                playbackRateValue.innerHTML = playbackRateRange.value;
+                audio.playbackRate = playbackRateRange.value;
             }
         }
     }
-    /*end audio speed bar*/
 
     var allowSeek = {{ $allowSeek }} == 'true' ? true : false;
 
