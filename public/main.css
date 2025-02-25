@@ -914,6 +914,7 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     flex-direction: column;
     align-items: center;
     height: 70vh;
+    margin: 0 auto;
 }
 
 @media (min-width: 768px) {
@@ -925,8 +926,18 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     }
 }
 
+@media (min-width: 780px) {
+    #pdfContainer {
+        max-width: 540px;
+    }
+}
+
 .pdf-page {
     margin-bottom: 10px;
+}
+
+.pdf-page:last-child {
+    margin-bottom: 0;
 }
 
 .pdf-page canvas {

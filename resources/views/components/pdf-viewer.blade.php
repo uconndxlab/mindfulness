@@ -45,7 +45,7 @@
                     // div
                     const pageDiv = document.createElement('div');
                     pageDiv.classList.add('pdf-page');
-    
+                    
                     // canvas
                     const pageCanvas = document.createElement('canvas');
                     const context = pageCanvas.getContext('2d');
