@@ -1,7 +1,12 @@
-<button class="btn btn-primary btn-workbook" data-bs-toggle="modal" data-bs-target="#pdfModal">
-    View Workbook
-    <i class="bi bi-arrow-right"></i>
-</button>
+<div class="d-flex align-items-center">
+    <button class="btn btn-primary btn-workbook me-1" data-bs-toggle="modal" data-bs-target="#pdfModal">
+        View Workbook
+        <i class="bi bi-arrow-right"></i>
+    </button>
+    <a href="{{ $fpath }}" class="btn btn-icon" download="workbook.pdf">
+        <i class="bi bi-download"></i>
+    </a>
+</div>
 
 <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="appModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -17,33 +22,6 @@
     </div>
 </div>
 
-<style>
-    #pdfContainer {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        height: 70vh;
-    }
-
-    @media (min-width: 768px) {
-        .modal-xl {
-            max-width: 75%;
-        }
-        #pdfContainer {
-            height: 80vh;
-        }
-    }
-
-    .pdf-page {
-        margin-bottom: 10px;
-    }
-
-    .pdf-page canvas {
-        max-width: 100%;
-        height: auto;
-    }
-</style>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs" type="module"></script>
 <script type="module">
     import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs';
@@ -58,7 +36,7 @@
         async function loadPdf() {
             try {
                 const pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
-                console.log('PDF loaded successfully!');
+                // console.log('PDF loaded successfully!');
     
                 for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
                     const page = await pdfDoc.getPage(pageNum);
