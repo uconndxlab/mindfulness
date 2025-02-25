@@ -243,7 +243,19 @@ button:disabled i{
     border-left:2px solid rgba(0,0,0,0.1);
 }
 
+/* scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+}
 
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
 
 /*search filter*/
 #search-icon{
@@ -914,33 +926,51 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     flex-direction: column;
     align-items: center;
     height: 70vh;
-    margin: 0 auto;
+    width: 100%;
+    margin: 0;
+    background-color: var(--dark-grey);
+    padding: 10px 0;
+    padding-right: 0;
+    overflow-y: auto;
+}
+
+.pdf-page {
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    background-color: white;
+    display: flex;
+}
+
+.pdf-page canvas {
+    width: 100%;
+    max-width: 430px;
+    height: auto;
+    border-radius: 4px;
 }
 
 @media (min-width: 768px) {
     .modal-xl {
-        max-width: 75%;
+        max-width: 80%;
     }
     #pdfContainer {
-        height: 80vh;
+        height: 75vh;
     }
 }
 
-@media (min-width: 780px) {
+@media (min-width: 1440px) {
+    .modal-xl {
+        max-width: 1080px;
+    }
     #pdfContainer {
-        max-width: 540px;
+        height: 75vh;
     }
 }
 
-.pdf-page {
-    margin-bottom: 10px;
-}
-
-.pdf-page:last-child {
-    margin-bottom: 0;
-}
-
-.pdf-page canvas {
-    max-width: 100%;
-    height: auto;
+/* ensure modal does not shift body/nav */
+.modal.show,
+.modal-open,
+.modal,
+.navbar-bottom {
+    padding-right: 0px !important;
 }
