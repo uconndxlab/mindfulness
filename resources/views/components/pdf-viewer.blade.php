@@ -70,5 +70,18 @@
         }
 
         loadPdf();
+
+        // handle modal background scrolling
+        if (pdfModal) {
+            // on open
+            pdfModal.addEventListener('shown.bs.modal', function() {
+                modalFreezeBackground();
+            });
+            
+            // restore position
+            pdfModal.addEventListener('hidden.bs.modal', function() {
+                modalRestoreBackground();
+            });
+        }
     });
 </script>

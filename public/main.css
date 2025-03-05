@@ -244,7 +244,7 @@ button:disabled i{
 }
 
 /* scrollbar */
-/* ::-webkit-scrollbar {
+::-webkit-scrollbar {
     width: 12px;
 }
 
@@ -255,7 +255,7 @@ button:disabled i{
 ::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 4px;
-} */
+}
 
 /*search filter*/
 #search-icon{
@@ -967,7 +967,7 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 /* ensure modal does not shift body/nav */
 .modal-open {
     overflow: hidden;
-    padding-right: 0 !important;
+    padding-right: 0px !important;
 }
 
 
