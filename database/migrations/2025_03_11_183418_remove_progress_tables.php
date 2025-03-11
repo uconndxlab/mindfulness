@@ -11,10 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('activities', callback: function (Blueprint $table) {
-            $table->dropColumn(['deleted']);
-        });
-        // Schema::dropIfExists('user_activity');
+        Schema::dropIfExists('user_activity');
     }
 
     /**
@@ -22,8 +19,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('activities', callback: function (Blueprint $table) {
-            $table->boolean('deleted')->default(false);
+        Schema::create('user_activity', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('activity_id')->constrained('activities');
+            $table->boolean('completed')->default(false);
+            $table->boolean('unlocked')->default(false);
+            $table->timestamp('completed_at')->nullable();
+            $table->timestamps();
+
+            $table->unique(['user_id', 'activity_id']);
         });
     }
 };
