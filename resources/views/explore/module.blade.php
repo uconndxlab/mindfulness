@@ -8,7 +8,7 @@
         <h1 class="display fw-bold mb-1">{{ $module->name }}</h1>
         <p>{{ $module->description }}</p>
         @if ($module->workbook_path)
-            <x-contentView type="pdf" file="{{ $module->workbook_path }}"/>
+            <x-pdf-viewer fpath="{{ Storage::url('content/'.$module->workbook_path) }}" wbName="{{ $module->name }}" />
         @endif
     </div>
 

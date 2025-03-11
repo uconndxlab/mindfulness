@@ -283,6 +283,42 @@
 
                 myModal.show();
             }
+
+            function modalFreezeBackground() {
+                // save position
+                const scrollY = window.scrollY;
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${scrollY}px`;
+                document.body.style.width = '100%';
+            }
+
+            function modalRestoreBackground() {
+                // save position and remove
+                const scrollY = document.body.style.top;
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                
+                // restore position
+                window.scrollTo({
+                    top: parseInt(scrollY || '0') * -1,
+                    behavior: 'instant'
+                });
+            }
+
+            // handle modal background scrolling
+            if (appModal) {
+                // on open
+                appModal.addEventListener('shown.bs.modal', function() {
+                    modalFreezeBackground();
+                });
+                
+                // restore position
+                appModal.addEventListener('hidden.bs.modal', function() {
+                    modalRestoreBackground();
+                });
+            }
+
             @if(session('modal_data'))
                 @php
                     $modalData = session('modal_data');

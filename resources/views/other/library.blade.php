@@ -208,7 +208,9 @@
         //init
         const isFavorites = {{ $is_favorites ? 'true' : 'false' }};
         var slider = null;
+        var applyFilterButton = null;
         if (!isFavorites) {
+            var applyFilterButton = document.getElementById('apply_filter_button');
             var slider = document.getElementById('time_range_slider');
             var startTimeInput = document.getElementById('start_time_input');
             var endTimeInput = document.getElementById('end_time_input');
@@ -253,6 +255,7 @@
 
             document.getElementById('clear_filter_button').addEventListener('click', clearFilters);
         }
+
         var sfForm = document.getElementById('search_filter_form');
         var searchBar = document.getElementById('search_bar');
         
@@ -491,7 +494,10 @@
             const throbber = document.getElementById('throbber');
             throbber.style.display = 'block';
 
-            const applyFilterButton = document.getElementById('apply_filter_button');
+            const clearFilterButton = document.getElementById('clear_filter_button');
+            if (clearFilterButton) {
+                clearFilterButton.disabled = true;
+            }
             if (applyFilterButton) {
                 applyFilterButton.disabled = true;
             }
@@ -508,10 +514,9 @@
             }
 
             // hide clear filter button if no filters
-            checkFilters();
-
-            // hide clear search button if no search
-            checkSearch();
+            if (clearFilterButton) {
+                clearFilterButton.style.display = checkFilters() ? 'block' : 'none';
+            }
 
             const params = getQueryParams();
             searchUrl.search = params;
@@ -557,9 +562,8 @@
             })
             .finally(() => {
                 throbber.style.display = 'none';
-                if (applyFilterButton) {
-                    applyFilterButton.disabled = false;
-                }
+                applyFilterButton.disabled = false;
+                clearFilterButton.disabled = false;
             });
         }
         //search on page load with filters
@@ -567,28 +571,16 @@
 
         // CHECK FILTERS - see if any filters are applied
         function checkFilters() {
-            const clearFiltersButton = document.getElementById('clear_filter_button');
-            if (!clearFiltersButton) {
-                return;
-            }
             if ((_categories && _categories.length != 0) || (_modules && _modules.length != 0) || _start != '0' || _end != '30') {
-                clearFiltersButton.style.display = 'block';
                 return true;
             }
-            clearFiltersButton.style.display = 'none';
             return false;
         }
-
         // CHECK SEARCH
         function checkSearch() {
-            const clearSearch = document.getElementById('clear_search_button');
             if (searchBar.value != '') {
-                clearSearch.style.visibility = 'visible';
-                clearSearch.disabled = false;
                 return true;
             }
-            clearSearch.style.visibility = 'hidden';
-            clearSearch.disabled = true;
             return false;
         }
 
@@ -617,6 +609,16 @@
         let timeout = null;
         searchBar.addEventListener('input', function() {
             clearTimeout(timeout);
+            // check if search is empty
+            const clearSearch = document.getElementById('clear_search_button');
+            if (checkSearch()) {
+                clearSearch.style.visibility = 'visible';
+                clearSearch.disabled = false;
+            }
+            else {
+                clearSearch.style.visibility = 'hidden';
+                clearSearch.disabled = true;
+            }
             timeout = setTimeout(function() {
                 search(true, false, true, false);
             }, 750);
