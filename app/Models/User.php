@@ -61,16 +61,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Note::class);
     }
 
-    public function favorites()
-    {
-        return $this->hasMany(Favorite::class);
-    }
-
-    public function progress_activities()
-    {
-        return $this->hasMany(UserActivity::class);
-    }
-
     public function quiz_answers($quiz_id = null)
     {
         $query = $this->hasMany(QuizAnswers::class);
@@ -80,5 +70,86 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return $query;
+    }
+
+    // MDA relations
+    public function activities()
+    {
+        return $this->belongsToMany(Activity::class, 'user_activity')
+            ->withPivot('completed', 'unlocked', 'favorited')
+            ->orderBy('order');
+    }
+
+    public function days()
+    {
+        return $this->belongsToMany(Day::class, 'user_day')
+            ->withPivot('completed', 'unlocked')
+            ->orderBy('order');
+    }
+
+    public function modules()
+    {
+        return $this->belongsToMany(Module::class, 'user_module')
+            ->withPivot('completed', 'unlocked')
+            ->orderBy('order');
+    }
+
+    // activity progress functions
+    public function isActivityCompleted(Activity $activity)
+    {
+        return $this->activities()
+            ->where('activity_id', $activity->id)
+            ->wherePivot('completed', true)
+            ->exists();
+    }
+
+    public function canAccessActivity(Activity $activity)
+    {
+        return $this->activities()
+            ->where('activity_id', $activity->id)
+            ->wherePivot('unlocked', true)
+            ->exists();
+    }
+
+    public function isActivityFavorited(Activity $activity)
+    {
+        return $this->activities()
+            ->where('activity_id', $activity->id)
+            ->wherePivot('favorited', true)
+            ->exists();
+    }
+
+    // day progress functions
+    public function isDayCompleted(Day $day)
+    {
+        return $this->days()
+            ->where('day_id', $day->id)
+            ->wherePivot('completed', true)
+            ->exists();
+    }
+
+    public function canAccessDay(Day $day)
+    {
+        return $this->days()
+            ->where('day_id', $day->id)
+            ->wherePivot('unlocked', true)
+            ->exists();
+    }
+
+    // module progress functions
+    public function isModuleCompleted(Module $module)
+    {
+        return $this->modules()
+            ->where('module_id', $module->id)
+            ->wherePivot('completed', true)
+            ->exists();
+    }
+
+    public function canAccessModule(Module $module)
+    {
+        return $this->modules()
+            ->where('module_id', $module->id)
+            ->wherePivot('unlocked', true)
+            ->exists();
     }
 }

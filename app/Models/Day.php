@@ -16,6 +16,29 @@ class Day extends Model
 
     public function activities()
     {
-        return $this->hasMany(Activity::class);
+        return $this->hasMany(Activity::class)->orderBy('order');
+    }
+
+    // user progress functions
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_day')
+            ->withPivot('completed', 'unlocked');
+    }
+
+    public function isCompletedBy(User $user)
+    {
+        return $this->users()
+            ->where('user_id', $user->id)
+            ->wherePivot('completed', true)
+            ->exists();
+    }
+
+    public function canBeAccessedBy(User $user)
+    {
+        return $this->users()
+            ->where('user_id', $user->id)
+            ->wherePivot('unlocked', true)
+            ->exists();
     }
 }
