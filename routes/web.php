@@ -132,8 +132,7 @@ Route::middleware('web')->group(function () {
         Route::put('/user/update/unlockNext', [UserController::class,'unlockNext'])->name('user.update.unlockNext');
         
         //favorites
-        Route::post('/favorites', [UserController::class, 'addFavorite'])->middleware('throttle:10,1')->name('favorites.create');
-        Route::delete('/favorites/{activity_id}', [UserController::class,'deleteFavorite'])->name('favorites.delete');
+        Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->middleware('throttle:10,1')->name('favorite.toggle');
         
         //contact form - throttled in controller
         Route::post('/contact', [ContactFormController::class, 'submitForm'])->name('contact.submit');

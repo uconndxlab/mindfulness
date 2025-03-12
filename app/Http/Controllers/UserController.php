@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Events\BonusUnlocked;
-use App\Events\FinalActivityCompleted;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,8 +14,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use App\Models\UserActivity;
 use App\Models\Activity;
-use App\Models\Day;
-use App\Models\Favorite;
 use Log;
 
 class UserController extends Controller
@@ -250,39 +247,18 @@ class UserController extends Controller
         }
     }
 
-    public function addFavorite(Request $request) {
-        $request->validate([
-            'activity_id' => ['required', 'exists:activities,id']
-
-        ]);
-
+    public function toggleFavorite(Request $request) {
+        // get user
         $user = Auth::user();
-        //check if user is here yet
-        $activity = Activity::findOrFail($request->activity_id);
-        $user->load('progress_activities');
-        $status = $user->progress_activities->where('activity_id', $activity->id)->first()->status ?? 'locked';
-        if ($status == 'locked') {
-            return response()->json(['message' => 'Forbidden'], 203);
+        $activity = Activity::findOrFail($request->activity_id)->first();
+
+        $status = $user->toggleFavoriteActivity($activity);
+        if ($status) {
+            return response()->json(['message' => 'Activity favorited'], 200);
         }
-
-        Favorite::create([
-            'user_id' => $user->id,
-            'activity_id' => $request->activity_id
-        ]);
-
-        return response()->json(['message' => 'Favorite added'], 201);
-    }
-
-    public function deleteFavorite($activity_id) {
-        Activity::findOrFail($activity_id);
-
-        $user = Auth::user();
-
-        Favorite::where('user_id', $user->id)
-            ->where('activity_id', $activity_id)
-            ->delete();
-
-        return response()->json(['message' => 'Favorite removed'], 200);
+        else {
+            return response()->json(['message' => 'Activity unfavorited'], 200);
+        }
     }
 
     public function deleteUser(Request $request, $user_id) {

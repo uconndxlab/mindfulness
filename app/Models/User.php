@@ -119,6 +119,34 @@ class User extends Authenticatable implements MustVerifyEmail
             ->exists();
     }
 
+    public function favoritedActivities()
+    {
+        return $this->activities()
+            ->wherePivot('unlocked', true)
+            ->wherePivot('favorited', true);
+    }
+
+    public function toggleFavoriteActivity(Activity $activity)
+    {
+        $current_pivot = $this->activities()
+            ->where('activity_id', $activity->id)
+            ->first();
+        
+        if ($current_pivot) {
+            $status = !($current_pivot->pivot->favorited ?? false);
+            $this->activities()->updateExistingPivot($activity->id, [
+                'favorited' => $status
+            ]);
+            return $status;
+        }
+        else {
+            $this->activities()->attach($activity->id, [
+                'favorited' => true
+            ]);
+            return true;
+        }  
+    }
+
     // day progress functions
     public function isDayCompleted(Day $day)
     {

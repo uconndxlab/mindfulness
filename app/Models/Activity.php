@@ -59,4 +59,12 @@ class Activity extends Model
             ->wherePivot('unlocked', true)
             ->exists();
     }
+
+    public function isFavoritedBy(User $user)
+    {
+        return $this->users()
+            ->where('user_id', $user->id)
+            ->wherePivot('favorited', true)
+            ->exists();
+    }
 }

@@ -103,7 +103,7 @@
 
     const activity_id = {{ $activity->id }};
     const day = '{{ $activity->day->name }}';
-    const optional = {{ $activity->optional }};
+    const optional = {{ $activity->optional ? 'true' : 'false' }};
 
     //COMPLETION ITEMS
     const redirectDiv = document.getElementById('redirect_div');
@@ -237,9 +237,9 @@
     }
 
     //FAVORITE HANDLING
-    function addFavorite() {
+    function toggleFavorite() {
         return new Promise((resolve, reject) => {
-            axios.post('{{ route('favorites.create') }}', {
+            axios.post('{{ route('favorite.toggle') }}', {
                 activity_id: activity_id
             }, {
                 headers: {
@@ -248,51 +248,19 @@
             })
             .then(response => {
                 console.log(response.data.message);
+                isFavorited = !isFavorited;
+                favIcon.className = isFavorited ? "bi bi-star-fill" : "bi bi-star";
                 resolve(true);
             })
             .catch(error => {
-                console.error('There was an error adding favorite', error);
+                console.error('There was an error toggling favorite', error);
                 reject(false);
             });
         });
     }
-
-    function removeFavorite() {
-        return new Promise((resolve, reject) => {
-            axios.delete('/favorites/' + activity_id, {
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => {
-                console.log(response.data.message);
-                resolve(true);
-            })
-            .catch(error => {
-                console.error('There was an error removing favorite', error);
-                reject(false);
-            });
-        });
-    }
-
-    //FAVORITE LISTENER
-    favButton.addEventListener('click', () => {
-        if (isFavorited) {
-            removeFavorite().then(success => {
-                if (success) {
-                    isFavorited = false;
-                    favIcon.className = "bi bi-star";
-                }
-            });
-        }
-        else {
-            addFavorite().then(success => {
-                if (success) {
-                    isFavorited = true;
-                    favIcon.className = "bi bi-star-fill";
-                }
-            });
-        }
+    favButton.addEventListener('click', function() {
+        console.log('Toggling favorite');
+        toggleFavorite();
     });
     
     //ON CONTENT LOAD

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->dropColumn(['deleted', 'time']);
         });
         Schema::table('activities', function(Blueprint $table) {
-            $table->boolean('skippable')->default(false)->after('optional');
+            $table->boolean('skippable')->default(true)->after('optional');
             
             // drop columns
             $table->dropColumn(['final', 'deleted', 'no_skip']);

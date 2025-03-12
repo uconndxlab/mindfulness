@@ -161,7 +161,7 @@ class PageNavController extends Controller
         }
         
         //favoriting
-        $is_favorited = $user->favorites()->where('activity_id', $activity_id)->exists();
+        $is_favorited = $user->isActivityFavorited($activity);
 
         $page_info = [];
         
@@ -279,20 +279,10 @@ class PageNavController extends Controller
     }
 
     public function librarySearch(Request $request) {
-
-        //get query of unlocked activities
-        $user_id = Auth::id();
-        //query for activities - keep as query
-        $activity_ids = UserActivity::where('user_id', $user_id)
-            ->where('status', '!=', 'locked')
-            ->pluck('activity_id');
-
-        // make sure rand query matches query
-        $query = Activity::where('deleted', false)
-            ->whereIn('id', $activity_ids);
-        $rand_query = Activity::where('deleted', false)
-            ->whereIn('id', $activity_ids);
-        
+        // get users unlocked activities
+        $user = Auth::user();
+        $query = $user->unlockedActivities();
+        $rand_query = $user->unlockedActivities();
         
         //base param
         $empty_text = null;
@@ -301,9 +291,8 @@ class PageNavController extends Controller
                 $empty_text = 'Keep progressing to unlock more exercises...';
             }
             else if ($request->base_param == 'favorited') {
-                $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
-                $query->whereIn('id', $fav_ids);
-                $rand_query->whereIn('id', $fav_ids);
+                $query = $user->favoritedActivities();
+                $rand_query = $user->favoritedActivities();
                 $empty_text = '<span>Click the "<i class="bi bi-star"></i>" found in activities to add them to your favorites and view them here!</span>';
             }
         }
@@ -330,28 +319,28 @@ class PageNavController extends Controller
         //handle categories
         $categories = $request->input('category', []);
         if (!empty($categories)) {
-            $query->where(function($in_query) use ($categories) {
+            $query->where(function($q) use ($categories, $user) {
                 //filter based on the categories
                 foreach($categories as $category) {
                     $lower = strtolower($category);
                     if ($lower == 'favorited') {
-                        $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
-                        $in_query->orWhereIn('id', $fav_ids);
+                        $fav_ids = $user->favoritedActivities()->pluck('activity.id')->toArray();
+                        $q->orWhereIn('id', $fav_ids);
                     }
                     else if ($lower == 'practice') {
-                        $in_query->orWhere('type', 'practice');
+                        $q->orWhere('type', 'practice');
                     }
                     else if ($lower == 'lesson') {
-                        $in_query->orWhere('type', 'lesson');
+                        $q->orWhere('type', 'lesson');
                     }
                     else if ($lower == 'journal') {
-                        $in_query->orWhere('type', 'journal');
+                        $q->orWhere('type', 'journal');
                     }
                     else if ($lower == 'bonus') {
-                        $in_query->orWhere('optional', true);
+                        $q->orWhere('optional', true);
                     }
                     else if ($lower == 'reflection') {
-                        $in_query->orWhere('type', 'reflection');
+                        $q->orWhere('type', 'reflection');
                     }
                 }
             });

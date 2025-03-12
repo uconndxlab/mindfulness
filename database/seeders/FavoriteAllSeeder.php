@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Activity;
-use App\Models\Favorite;
+use Illuminate\Support\Facades\DB;
 
 class FavoriteAllSeeder extends Seeder
 {
@@ -22,10 +21,16 @@ class FavoriteAllSeeder extends Seeder
         // favorite all activities
         $activities = Activity::all();
         foreach ($activities as $activity) {
-            Favorite::updateOrCreate([
-                'user_id' => $user->id,
-                'activity_id' => $activity->id
-            ]);
+            DB::table('user_activity')->updateOrInsert(
+                [
+                    'user_id' => $user->id,
+                    'activity_id' => $activity->id
+                ],
+                [
+                    'favorited' => true,
+                    'updated_at' => now()
+                ]
+            );
         }
     }
 }
