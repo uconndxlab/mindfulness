@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('activity_id')->constrained('activities');
             $table->boolean('completed')->default(false);
             $table->boolean('unlocked')->default(false);
+            $table->boolean('favorited')->default(false);
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
 
@@ -46,6 +47,8 @@ return new class extends Migration
 
             $table->unique(['user_id', 'module_id']);
         });
+
+        Schema::drop('favorites');
     }
 
     /**
@@ -56,5 +59,13 @@ return new class extends Migration
         Schema::dropIfExists('user_activity');
         Schema::dropIfExists('user_day');
         Schema::dropIfExists('user_module');
+        Schema::create('favorites', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('activity_id')->constrained('activities');
+            $table->timestamps();
+
+            $table->unique(['user_id', 'activity_id']);
+        });
     }
 };
