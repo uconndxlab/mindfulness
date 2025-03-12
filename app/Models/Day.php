@@ -19,6 +19,11 @@ class Day extends Model
         return $this->hasMany(Activity::class)->orderBy('order');
     }
 
+    public function finalActivity()
+    {
+        return $this->activities()->where('optional', false)->orderBy('order', 'desc')->first();
+    }
+
     // user progress functions
     public function users()
     {

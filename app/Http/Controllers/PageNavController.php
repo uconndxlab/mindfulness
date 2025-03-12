@@ -93,26 +93,10 @@ class PageNavController extends Controller
         return $this->exploreModule($module_id, $accordion_day);
     }
 
-    public function checkActivityLocked($activity_id, $from_controller = false) {
-        //checking cache for progress
-        $cacheKey = 'user_' . Auth::id() . '_progress_activities';
-        $progress = Cache::get($cacheKey);
-        if (!$progress) {
-            $progress = Cache::remember($cacheKey, 30, function () {
-                return Auth::user()->load('progress_activities')->progress_activities;
-            });
-        }
-        $activity = Activity::findOrFail($activity_id);
-        $status = $progress->where('activity_id', $activity_id)->first()->status ?? 'locked';
-        //check if deleted
-        if ($activity->deleted == true) {
-            abort(404, "Page not found.");
-        }
-        //check status
-        $locked = $status === 'locked';
-        if ($from_controller) {
-            return [$locked, $status];
-        }
+    public function checkActivityLocked(Activity $activity) {
+        // get user
+        $user = Auth::user();
+        $locked = !($user->canAccessActivity($activity));
 
         // check if locked
         if ($locked) {
@@ -139,7 +123,7 @@ class PageNavController extends Controller
                 return response()->json(['locked' => true, 'modalContent' => [
                     'label' => 'You are progressing fast!',
                     'body' => 'It appears you have already completed <strong>'.$last_day_name.'</strong> today. While your efforts are admirable, we recommend you take your time through this program and take it one day at a time.',
-                    'route' => route('explore.activity.bypass', ['activity_id' => $activity_id]),
+                    'route' => route('explore.activity.bypass', ['activity_id' => $activity->id]),
                     'method' => 'GET',
                     'buttonLabel' => 'Continue to Activity',
                     'buttonClass' => 'btn-danger'
@@ -151,14 +135,10 @@ class PageNavController extends Controller
 
     public function exploreActivity($activity_id, Request $request)
     {
-        $user = Auth::user();
+        $user = Auth::user()->first();
         //find activity and check progress again
-        $activity = Activity::findOrFail($activity_id);
-        $check_activity = $this->checkActivityLocked($activity_id, true);
-        $activity->status = $check_activity[1];
-        if ($check_activity[0]) {
-            abort(404, "Page not found.");
-        }
+        $activity = Activity::findOrFail($activity_id)->first();
+        $check_activity = $this->checkActivityLocked($activity);
         
         //favoriting
         $is_favorited = $user->isActivityFavorited($activity);
@@ -172,21 +152,21 @@ class PageNavController extends Controller
         //NEXT/FINISH redirect
         //make sure that if doing next, the day is not changing
         if (!$request->library) {
-            if ($activity->next && Activity::find($activity->next)->day->id == $activity->day->id) {
+            $next = $activity->nextActivity();
+            // check if this is the last activity of the day
+            if (lastActivityInDay($activity, $user)) {
+                $page_info['redirect_label'] = "Complete ".$activity->day->name;
+                $page_info['redirect_route'] = $page_info['exit_route'];
+            }
+            else if ($next) {
                 $page_info['redirect_label'] = "Next Activity";
-                $page_info['redirect_route'] = route('explore.activity', ['activity_id' => $activity->next]);
+                $page_info['redirect_route'] = route('explore.activity', ['activity_id' => $next->id]);
             }
             else {
                 $page_info['redirect_label'] = "Back to Part ".$activity->day->module->id;
                 $page_info['redirect_route'] = $page_info['exit_route'];
             }
 
-            //check if this is the last activity of the day
-            $last_act = getDayProgress($user->id, [$activity->day->id])[$activity->day->id]['one_more'];
-            if ($last_act && $activity->status == 'unlocked') {
-                $page_info['redirect_label'] = "Complete ".$activity->day->name;
-                $page_info['redirect_route'] = $page_info['exit_route'];
-            }
         }
 
         //setting back route

@@ -111,6 +111,12 @@ class User extends Authenticatable implements MustVerifyEmail
             ->exists();
     }
 
+    public function unlockedActivities()
+    {
+        return $this->activities()
+        ->wherePivot('unlocked', true);
+    }
+
     public function isActivityFavorited(Activity $activity)
     {
         return $this->activities()

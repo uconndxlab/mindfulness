@@ -41,7 +41,11 @@ class Activity extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_activity')
-            ->withPivot('completed', 'unlocked');
+            ->withPivot('completed', 'unlocked', 'favorited');
+    }
+
+    public function nextActivity() {
+        return $this->day->activities()->where('order', '>', $this->order)->first();
     }
 
     public function isCompletedBy(User $user)
