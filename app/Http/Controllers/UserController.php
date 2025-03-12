@@ -289,7 +289,7 @@ class UserController extends Controller
         // admin middleware protected function
         try {
             $user = User::findOrFail($user_id);
-            if ($user->role == 'admin') {
+            if ($user->isAdmin()) {
                 return redirect()->back()->with('error', 'Cannot delete admin account');
             }
             $user->delete();

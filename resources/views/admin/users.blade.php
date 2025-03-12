@@ -41,14 +41,14 @@
                         @foreach ($users as $index => $user)
                             @php
                                 $locked = $user->lock_access;
-                                $is_admin_disable = $user->role === "admin" ? 'disabled' : '';
+                                $is_admin_disable = $user->isAdmin() ? 'disabled' : '';
                             @endphp
                             <tr class="user-row" data-index="{{ $index }}" data-id="{{ $user->id }}" data-name="{{ $user->name }}" data-email="{{ $user->email }}">
                                 <td class="px-4 py-3 text-break">{{ $user->email }}</td>
                                 <td class="px-4 py-3 text-truncate" style="max-width: 200px;">{{ $user->name }}</td>
                                 <td class="px-4 py-3">{{ $user->formatted_time }}</td>
                                 <td class="px-4 py-3">
-                                    <span class="badge bg-{{ $user->role === 'admin' ? 'danger' : 'success' }}">
+                                    <span class="badge bg-{{ $user->isAdmin() ? 'danger' : 'success' }}">
                                         {{ ucfirst($user->role) }}
                                     </span>
                                 </td>

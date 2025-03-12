@@ -16,7 +16,7 @@ class AdminOnly
     public function handle(Request $request, Closure $next): Response
     {
         //check if user is admin
-        if (!($request->user()->role === 'admin')) {
+        if (!($request->user()->isAdmin())) {
             abort(404, "Page not found.");
             abort(403, 'Unauthorized action.');
         }
