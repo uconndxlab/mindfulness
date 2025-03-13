@@ -337,10 +337,6 @@ button:disabled i{
     border-color: var(--dark-green)!important;
 }
 
-#resultsContainer{
-    background:#fff!important;
-}
-
 /*change background color */
 body:has(div.dark-background){
     background-color:var(--dark-green);
