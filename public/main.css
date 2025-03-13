@@ -164,6 +164,38 @@ button:disabled i{
     opacity:0.4;
 }
 
+.btn-danger{
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #B1534E;
+    --bs-btn-border-color: #B1534E;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #9C3021;
+    --bs-btn-hover-border-color: #9C3021;
+    --bs-btn-focus-shadow-rgb: 225, 83, 97;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #9C3021;
+    --bs-btn-active-border-color: #9C3021;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #B1534E;
+    --bs-btn-disabled-border-color: #B1534E;
+}
+.btn-dark{
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #424242;
+    --bs-btn-border-color: #424242;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #2F2F2F;
+    --bs-btn-hover-border-color: #2F2F2F;
+    --bs-btn-focus-shadow-rgb: 66, 70, 73;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #2F2F2F;
+    --bs-btn-active-border-color: #2F2F2F;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #424242;
+    --bs-btn-disabled-border-color: #424242;
+}
 /*dropdown menu*/
 #word-of-day{
     max-width:500px!important;
@@ -303,6 +335,10 @@ button:disabled i{
 .active>.page-link, .page-link.active {
     background-color: var(--dark-green)!important;
     border-color: var(--dark-green)!important;
+}
+
+#resultsContainer{
+    background:#fff!important;
 }
 
 /*change background color */
@@ -519,6 +555,7 @@ i.bi-lock-fill{
 .sub-activity-font {
     font-size:14px;
     font-weight:400;
+    font-style:italic;
 }
 
 .activity-tag-lesson, .activity-tag-practice,.activity-tag-journal, .activity-tag-reflection,.activity-tag-time, .activity-tag-optional{
