@@ -38,14 +38,14 @@ class PageNavController extends Controller
         Session::put('previous_explore', route('explore.home'));
 
         // get modules and which unlocked with pivot
-        /** @var ?User $user */
         $user = Auth::user();
         $modules = Module::orderBy('order', 'asc')->get();
         foreach ($modules as $module) {
-            $module->unlocked =  $module->canBeAccessedBy($user);
-            $module->completed =  $module->isCompletedBy($user);
-            $module->numDaysCompleted = $module->numberDaysCompletedBy($user);
-            $module->totalDays = $module->days->count();
+            $stats = $module->getStats($user);
+            $module->unlocked = $stats['unlocked'];
+            $module->completed = $stats['completed'];
+            $module->daysCompleted = $stats['daysCompleted'];
+            $module->totalDays = $stats['totalDays'];
         }
     
         return view("explore.home", compact('modules'));

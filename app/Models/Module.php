@@ -45,4 +45,19 @@ class Module extends Model
                     ->wherePivot('completed', true);
             })->count() : 0;
     }
+
+    public function getStats(?User $user)
+    {
+        $unlocked = $this->canBeAccessedBy($user);
+        $completed = $this->isCompletedBy($user);
+        $daysCompleted = $this->numberDaysCompletedBy($user);
+        $totalDays = $this->days->count();
+
+        return [
+            'unlocked' => $unlocked,
+            'completed' => $completed,
+            'daysCompleted' => $daysCompleted,
+            'totalDays' => $totalDays,
+        ];
+    }
 }
