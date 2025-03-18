@@ -53,30 +53,6 @@ if (!function_exists('lastActivityInDay')) {
     }
 }
 
-if (!function_exists('checkUserDay')) {
-    function checkUserDay($user_id, $day_id)
-    {
-        // check all activities within the day to see if they are all completed
-        $day = Day::findOrFail($day_id);
-        $activity_ids = $day->activities->pluck('id')->toArray();
-        $activity_progress = User::findOrFail($user_id)->load('progress_activities')->progress_activities;
-
-        foreach ($activity_ids as $activity_id) {
-            // if optional skip
-            $activity = Activity::findOrFail($activity_id);
-            if ($activity->optional) {
-                continue;
-            }
-            // if not completed return false
-            $status = $activity_progress->where('activity_id', $activity_id)->first()->status ?? 'locked';
-            if ($status != 'completed') {
-                return false;
-            }
-        }
-        return true;
-    }
-}
-
 if (!function_exists('unlockFirst')) {
     function unlockFirst($user_id)
     {
@@ -132,14 +108,48 @@ if (!function_exists('unlockFirst')) {
 }
 
 if (!function_exists('lockAll')) {
-    function lockAll($user_id)
-    {
-        foreach (Activity::all() as $activity) {
-            UserActivity::updateOrCreate([
-                "user_id" => $user_id,
-                "activity_id" => $activity->id,
-                "status" => 'locked'
-            ]);
+    function lockAll($user_id) {
+        // lock all activities in pivot table
+        foreach (Module::all() as $module) {
+            DB::table('user_module')->updateOrInsert(
+                [
+                    'user_id' => $user_id,
+                    'module_id' => $module->id
+                ],
+                [
+                    'unlocked' => false,
+                    'completed' => false,
+                    'updated_at' => now()
+                ]
+            );
+
+            foreach ($module->days as $day) {
+                DB::table('user_day')->updateOrInsert(
+                    [
+                        'user_id' => $user_id,
+                        'day_id' => $day->id
+                    ],
+                    [
+                        'unlocked' => false,
+                        'completed' => false,
+                        'updated_at' => now()
+                    ]
+                );
+
+                foreach ($day->activities as $activity) {
+                    DB::table('user_activity')->updateOrInsert(
+                        [
+                            'user_id' => $user_id,
+                            'activity_id' => $activity->id
+                        ],
+                        [
+                            'unlocked' => false,
+                            'completed' => false,
+                            'updated_at' => now()
+                        ]
+                    );
+                }
+            }
         }
     }
 }
@@ -147,13 +157,46 @@ if (!function_exists('lockAll')) {
 if (!function_exists('unlockAll')) {
     function unlockAll($user_id)
     {
-        foreach (Activity::all() as $activity) {
-            UserActivity::updateOrCreate([
-                "user_id" => $user_id,
-                "activity_id" => $activity->id,
-            ],[
-                "status" => 'unlocked'
-            ]);
+        foreach (Module::all() as $module) {
+            DB::table('user_module')->updateOrInsert(
+                [
+                    'user_id' => $user_id,
+                    'module_id' => $module->id
+                ],
+                [
+                    'unlocked' => true,
+                    'completed' => false,
+                    'updated_at' => now()
+                ]
+            );
+
+            foreach ($module->days as $day) {
+                DB::table('user_day')->updateOrInsert(
+                    [
+                        'user_id' => $user_id,
+                        'day_id' => $day->id
+                    ],
+                    [
+                        'unlocked' => true,
+                        'completed' => false,
+                        'updated_at' => now()
+                    ]
+                );
+
+                foreach ($day->activities as $activity) {
+                    DB::table('user_activity')->updateOrInsert(
+                        [
+                            'user_id' => $user_id,
+                            'activity_id' => $activity->id
+                        ],
+                        [
+                            'unlocked' => true,
+                            'completed' => false,
+                            'updated_at' => now()
+                        ]
+                    );
+                }
+            }
         }
     }
 }

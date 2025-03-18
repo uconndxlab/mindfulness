@@ -9,11 +9,10 @@ use App\Models\Activity;
 use App\Models\Module;
 use App\Models\QuizAnswers;
 use App\Models\Teacher;
-use App\Models\UserActivity;
+use App\Models\User;
 use App\Models\Faq;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -38,14 +37,17 @@ class PageNavController extends Controller
         Session::put('current_nav', ['route' => route('explore.home'), 'back' => 'Home']);
         Session::put('previous_explore', route('explore.home'));
 
-        //get modules and progress
+        // get modules and which unlocked with pivot
+        /** @var ?User $user */
+        $user = Auth::user();
         $modules = Module::orderBy('order', 'asc')->get();
-        $module_ids = $modules->pluck('id')->toArray();
-        $progress = getModuleProgress(Auth::id(), $module_ids);
-        
         foreach ($modules as $module) {
-            $module->progress = $progress[$module->id];
+            $module->unlocked =  $module->canBeAccessedBy($user);
+            $module->completed =  $module->isCompletedBy($user);
+            $module->numDaysCompleted = $module->numberDaysCompletedBy($user);
+            $module->totalDays = $module->days->count();
         }
+    
         return view("explore.home", compact('modules'));
     }
 

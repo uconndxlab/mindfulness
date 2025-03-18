@@ -24,7 +24,6 @@ class ResetUserProgress extends Seeder
         DB::statement('PRAGMA foreign_keys = ON;');
 
         foreach (User::all() as $user) {
-            // lockAll($user->id);
             unlockFirst($user->id);
             $user->current_activity = 1;
             $user->last_day_completed_at = null;

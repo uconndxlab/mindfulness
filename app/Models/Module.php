@@ -21,19 +21,28 @@ class Module extends Model
             ->withPivot('completed', 'unlocked');
     }
 
-    public function isCompletedBy(User $user)
+    public function isCompletedBy(?User $user)
     {
-        return $this->users()
+        return $user ? $this->users()
             ->where('user_id', $user->id)
             ->wherePivot('completed', true)
-            ->exists();
+            ->exists() : false;
     }
 
-    public function canBeAccessedBy(User $user)
+    public function canBeAccessedBy(?User $user)
     {
-        return $this->users()
+        return $user ? $this->users()
             ->where('user_id', $user->id)
             ->wherePivot('unlocked', true)
-            ->exists();
+            ->exists() : false;
+    }
+
+    public function numberDaysCompletedBy(?User $user)
+    {
+        return $user ? $this->days()
+            ->whereHas('users', function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->wherePivot('completed', true);
+            })->count() : 0;
     }
 }
