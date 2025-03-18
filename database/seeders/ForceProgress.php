@@ -16,24 +16,57 @@ class ForceProgress extends Seeder
      */
     public function run(): void
     {
-        $order = 25;
-        $email = '';
-        // find user and list of activities up to point
-        $user_id = User::where('email', $email)->first()->id;
-        $activity_ids = Activity::all()->pluck('order', 'id')->toArray();
+        $order = 3;
+        $email = 'zoro@op.com';
+        
+        // update user progress up to the point of order
+        $user = User::where('email', $email)->first();
+        $activities = Activity::where('order', '<=', $order)->get();
 
-        // clear users session
-        DB::table('sessions')->where('user_id', $user_id)->delete();
+        foreach ($activities as $activity) {
+            DB::table('user_activity')->updateOrInsert(
+                [
+                    'user_id' => $user->id,
+                    'activity_id' => $activity->id
+                ],
+                [
+                    'unlocked' => true,
+                    'completed' => true,
+                    'updated_at' => now()
+                ]
+            );
 
-        // update user progress to complete
-        foreach ($activity_ids as $activity_id => $activity_order) {
-            $status = $activity_order == $order ? 'unlocked' : ($activity_order < $order ? 'completed' : 'locked');
-            UserActivity::updateOrCreate([
-                'user_id' => $user_id,
-                'activity_id' => $activity_id
-            ], [
-                'status' => $status
-            ]);
+            // check day and module
+            $day = $activity->day;
+            $module = $day->module;
+
+            if (!$day->canbeAccessedBy($user)) {
+                DB::table('user_day')->updateOrInsert(
+                    [
+                        'user_id' => $user->id,
+                        'day_id' => $day->id
+                    ],
+                    [
+                        'unlocked' => true,
+                        'completed' => false,
+                        'updated_at' => now()
+                    ]
+                );
+            }
+
+            if (!$module->canBeAccessedBy($user)) {
+                DB::table('user_module')->updateOrInsert(
+                    [
+                        'user_id' => $user->id,
+                        'module_id' => $module->id
+                    ],
+                    [
+                        'unlocked' => true,
+                        'completed' => false,
+                        'updated_at' => now()
+                    ]
+                );
+            }
         }
     }
 }

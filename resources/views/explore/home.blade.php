@@ -15,7 +15,6 @@
                     <div class="h-100">
                         <div class="card p-2 module mb-2">
                             @php
-                                $status = $module->completed ? 'completed' : 'locked';
                                 $disabled = $module->unlocked ? '' : 'disabled';
                             @endphp
                             <a style="display:flex" id="moduleLink" class="stretched-link w-100 {{ $disabled }}" {!! $disabled ? '' : 'href='.route('explore.module', ['module_id' => $module->id]) !!}>

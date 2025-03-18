@@ -48,27 +48,27 @@ class Activity extends Model
         return $this->day->activities()->where('order', '>', $this->order)->first();
     }
 
-    public function isCompletedBy(User $user)
+    public function isCompletedBy(?User $user)
     {
-        return $this->users()
+        return $user ? $this->users()
             ->where('user_id', $user->id)
             ->wherePivot('completed', true)
-            ->exists();
+            ->exists() : false;
     }
     
-    public function canBeAccessedBy(User $user)
+    public function canBeAccessedBy(?User $user)
     {
-        return $this->users()
+        return $user ? $this->users()
             ->where('user_id', $user->id)
             ->wherePivot('unlocked', true)
-            ->exists();
+            ->exists() : false;
     }
 
-    public function isFavoritedBy(User $user)
+    public function isFavoritedBy(?User $user)
     {
-        return $this->users()
+        return $user ? $this->users()
             ->where('user_id', $user->id)
             ->wherePivot('favorited', true)
-            ->exists();
+            ->exists() : false;
     }
 }
