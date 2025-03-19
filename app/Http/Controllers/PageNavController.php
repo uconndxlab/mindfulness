@@ -153,7 +153,7 @@ class PageNavController extends Controller
 
     public function exploreActivity($activity_id, Request $request)
     {
-        $user = Auth::user()->first();
+        $user = Auth::user() ?? null;
         //find activity and check progress again
         $activity = Activity::findOrFail($activity_id) ?? null;
         
@@ -506,9 +506,12 @@ class PageNavController extends Controller
 
         //calculating progress
         $modules = Module::orderBy('order', 'asc')->get();
-        $progress = getModuleProgress(Auth::id(), $modules->pluck('id')->toArray());
         foreach ($modules as $module) {
-            $module->progress = $progress[$module->id];
+            $stats = $module->getStats(Auth::user());
+            $module->unlocked = $stats['unlocked'];
+            $module->completed = $stats['completed'];
+            $module->daysCompleted = $stats['daysCompleted'];
+            $module->totalDays = $stats['totalDays'];
         }
         return view("other.account", compact('page_info', 'modules'));
     }

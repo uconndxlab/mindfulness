@@ -28,8 +28,12 @@ if (!function_exists('updateConfig')) {
 }
 
 if (!function_exists('lastActivityInDay')) {
-    function lastActivityInDay(Activity $activity, User $user)
+    function lastActivityInDay(?Activity $activity, ?User $user)
     {
+        if (!$activity || !$user) {
+            return false;
+        }
+        
         $day = $activity->day;
         if ($activity->optional) {
             return false;
