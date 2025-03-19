@@ -53,31 +53,46 @@ class PageNavController extends Controller
 
     public function exploreModule($module_id, $accordion_day=null)
     {
+        $user = Auth::user();
         //find the module
         $module = Module::with('days.activities')->findOrFail($module_id);
+
+        // get user_module information
+        $stats = $module->getStats($user);
+        $module->unlocked = $stats['unlocked'];
+        $module->completed = $stats['completed'];
+        $module->daysCompleted = $stats['daysCompleted'];
+        $module->totalDays = $stats['totalDays'];
         
-        //check progress
-        $mod_progress = getModuleProgress(Auth::id(), [$module_id]);
-        $module->progress_days = [$mod_progress[$module_id]['completed'], $mod_progress[$module_id]['total']];
-        if (getModuleProgress(Auth::id(), [$module_id])[$module_id]['status'] == 'locked') {
-            return redirect()->back();
+        // check if module locked
+        if (!$module->unlocked) {
+            return redirect()->route('explore.home');
         }
         
         //get progress
-        $day_ids = $module->days()->pluck('id')->toArray();
-        $progress = getDayProgress(Auth::id(), $day_ids);
-        
-        //sorting the activities within each day
         foreach ($module->days as $day) {
-            $day->activities = $day->activities->sortBy(function ($activity) {
-                return [$activity->optional, $activity->order];
-            })->values();
-            
-            //assign the progress
-            $day->progress = $progress[$day->id];
+            $day->unlocked = $day->canBeAccessedBy($user);
+            $day->completed = $day->isCompletedBy($user);
+
+            // show accordion day, or last unlocked and incomplete
+            if ($accordion_day) {
+                // if accordion day is set, only one possible active day
+                if ($day->id == $accordion_day) {
+                    $day->active = true;
+                }
+            } else if ($day->unlocked && !$day->completed) {
+                // if accordion not set, show last unlocked and incomplete day
+                $day->active = true;
+            } else {
+                $day->active = false;
+            }
+
+            // get same statuses for days
+            foreach ($day->activities as $activity) {
+                $activity->unlocked = $activity->canBeAccessedBy($user);
+                $activity->completed = $activity->isCompletedBy($user);
+            }
         }
-        // $accordion_day = 1;
-        $override_accordion = $accordion_day ? 'day_'.$accordion_day : null;
 
         //set back route
         $page_info['back_label'] = " Back to Home";
@@ -87,7 +102,7 @@ class PageNavController extends Controller
         Session::put('current_nav', ['route' => route('explore.module', ['module_id' => $module_id]), 'back' => 'Part '.$module_id]);
         Session::put('previous_explore', route('explore.module', ['module_id' => $module_id]));
         
-        return view("explore.module", compact('module', 'page_info', 'override_accordion'));
+        return view("explore.module", compact('module', 'page_info', 'accordion_day'));
     }
 
     public function exploreModuleBonus(Request $request, $module_id) {
@@ -95,12 +110,13 @@ class PageNavController extends Controller
         return $this->exploreModule($module_id, $accordion_day);
     }
 
-    public function checkActivityLocked(Activity $activity) {
+    public function checkActivityLocked($activity_id) {
         // get user
         $user = Auth::user();
+        $activity = Activity::findOrFail($activity_id) ?? null;
         $locked = !($user->canAccessActivity($activity));
-
-        // check if locked
+        
+        // // check if locked
         if ($locked) {
             return response()->json(['locked' => true, 'modalContent' => [
                 'label' => 'Activity Locked: '.$activity->title,
@@ -139,8 +155,7 @@ class PageNavController extends Controller
     {
         $user = Auth::user()->first();
         //find activity and check progress again
-        $activity = Activity::findOrFail($activity_id)->first();
-        $check_activity = $this->checkActivityLocked($activity);
+        $activity = Activity::findOrFail($activity_id) ?? null;
         
         //favoriting
         $is_favorited = $user->isActivityFavorited($activity);

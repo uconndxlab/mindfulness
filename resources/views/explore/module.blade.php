@@ -13,25 +13,18 @@
     </div>
 
     <div class="">
-        <h5 class="mb-2">Progress: {{ $module->progress_days[0] }}/{{ $module->progress_days[1] }} days completed</h5>
+        <h5 class="mb-2">Progress: {{ $module->daysCompleted }}/{{ $module->totalDays }} days completed</h5>
         <div class="accordion accordion-flush mb-3" id="accordionDays">
             @foreach ($module->days as $index => $day)
                 @php
-                    $disabled = $day->progress['status'] == 'locked' ? 'disabled' : '';
-                    $show = false;
-                    if ($override_accordion) {
-                        $show = $override_accordion === 'day_'.$day->id;
-                    }
-                    else {
-                        $show = $day->progress['show'];
-                    }
+                    $disabled = $day->unlocked ? '' : 'disabled';
                 @endphp
 
                 <div class="accordion-item border mb-2" id="day_{{ $day->id }}">
                     <h2 class="accordion-header" id="heading_{{ $index }}">
-                        <button class="accordion-button {{ $show ? '' : 'collapsed' }} {{ $disabled }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="{{ $show ? 'true' : 'false' }}" aria-controls="collapse_{{ $index }}">
+                        <button class="accordion-button {{ $day->active ? '' : 'collapsed' }} {{ $disabled }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="{{ $day->active ? 'true' : 'false' }}" aria-controls="collapse_{{ $index }}">
                             <div class="d-flex w-100">                                
-                                @if ($day->progress['status'] == 'completed')
+                                @if ($day->completed)
                                     <i class="bi bi-check-square-fill"></i>
                                 @elseif($disabled)
                                     <i class="bi bi-lock-fill"></i>
@@ -48,34 +41,34 @@
                         </button>
                     </h2>
                     
-                    <div id="collapse_{{ $index }}" class="accordion-collapse collapse {{ $show ? 'show' : '' }}" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
+                    <div id="collapse_{{ $index }}" class="accordion-collapse collapse {{ $day->active ? 'show' : '' }}" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
                         <div class="accordion-body">
                             @if (!$disabled)
                                 @foreach ($day->activities as $activity)
                                     @php
-                                        $activity->status = $day->progress['activity_status'][$activity->id];
-                                        $disabled = $activity->status == 'locked' ? 'disabled' : '';
+                                        $disabled = $activity->unlocked ? '' : 'disabled';
                                     @endphp
                                     <div class="card p-2 module mb-2">
                                         <a id="moduleLink" style="padding-bottom:10px;" class="stretched-link w-100 activity-link {{ $disabled }}" data-id="{{ $activity->id }}" href="#">
                                             
                                             <div style="display:flex;">
-                                                @if ($activity->status == 'completed')
+                                                @if ($activity->completed)
                                                     <i style="font-size:16px;" class="bi bi-check-square-fill"></i>
                                                 @else
                                                     <i style="font-size:16px; visibility:hidden;" class="bi bi-square-fill"></i>
                                                 @endif
-                                            <div><p class="activity-font">{{ $activity->title }}</p>
-                                            @if ($activity->type)
-                                                <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>
-                                            @endif
-                                            @if ($activity->time)
-                                                <span class="sub-activity-font activity-tag-time">{{ $activity->time.' min' }}</span>
-                                            @endif
-                                            @if ($activity->optional)
-                                                <span class="sub-activity-font activity-tag-optional"></i>Bonus</span>
-                                            @endif
-                                            </div>
+                                                <div>
+                                                    <p class="activity-font">{{ $activity->title }}</p>
+                                                    @if ($activity->type)
+                                                        <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>
+                                                    @endif
+                                                    @if ($activity->time)
+                                                        <span class="sub-activity-font activity-tag-time">{{ $activity->time.' min' }}</span>
+                                                    @endif
+                                                    @if ($activity->optional)
+                                                        <span class="sub-activity-font activity-tag-optional"></i>Bonus</span>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </a>
                                         <i class="bi bi-arrow-right"></i>
@@ -93,7 +86,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         //scroll to bonus activity
-        var dayId = @json($override_accordion);
+        var dayId = @json($accordion_day);
         if (dayId) {
             console.log('override found');
             var dayElement = document.getElementById(dayId);
