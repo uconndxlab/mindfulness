@@ -195,4 +195,13 @@ class User extends Authenticatable implements MustVerifyEmail
             ?->pivot
             ->completed_at : null;
     }
+
+    public function currentActivity()
+    {
+        return $this->activities()
+            ->wherePivot('unlocked', true)
+            ->wherePivot('completed', false)
+            ->where('optional', false)
+            ->first();
+    }
 }

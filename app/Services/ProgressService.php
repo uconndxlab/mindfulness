@@ -103,6 +103,7 @@ class ProgressService
             'next_activity_unlocked' => false,
             'next_activity' => null,
         ];
+
         $user->activities()->syncWithoutDetaching([
             $activity->id => [
                 'unlocked' => true,
@@ -110,6 +111,7 @@ class ProgressService
         ]);
         $result['next_activity_unlocked'] = true;
         $result['next_activity'] = $activity;
+
         return $result;
     }
 

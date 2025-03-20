@@ -25,7 +25,6 @@ class ResetUserProgress extends Seeder
 
         foreach (User::all() as $user) {
             unlockFirst($user->id);
-            $user->current_activity = 1;
             $user->last_day_completed_at = null;
             $user->last_day_name = null;
             $user->block_next_day_act = null;

@@ -95,7 +95,7 @@
                                 </td>
                                 <td class="px-4 py-3">
                                     @php
-                                        $current_activity = Activity::find($user->current_activity);
+                                        $current_activity = $user->currentActivity();
                                     @endphp
                                     @if($current_activity)
                                         <span class="fw-bold text-primary">Part {{ $current_activity->day->module->id }},</span> 
