@@ -34,8 +34,8 @@
                 </div>
             @endif
             @php
-                $controlsList = ($activity->type != 'lesson' || $activity->status != 'completed') ? 'noplaybackrate' : '';
-                $allowSeek = $activity->status == 'completed' ? 'true' : 'false';
+                $controlsList = ($activity->type != 'lesson' || !$activity->completed) ? 'noplaybackrate' : '';
+                $allowSeek = $activity->completed ? 'true' : 'false';
                 $hasAudioOptions = isset($content->audio_options) && !empty($content->audio_options);
                 
                 if ($hasAudioOptions) {
@@ -85,7 +85,7 @@
             </a>
         @endif
         @php
-            $comp_late_btn_disp = ($activity->status == 'completed') || ($activity->final) || ($activity->no_skip) ? 'none' : 'block';
+            $comp_late_btn_disp = !$activity->skippable ? 'none' : 'block';
         @endphp
         <div class="d-flex justify-content-center">
             <button id="complete-later" class="btn btn-outline-primary rounded-pill px-4" type="button" style="display: {{ $comp_late_btn_disp }};">
@@ -115,7 +115,7 @@
     var completed = false;
 
     //CHECKING COMPLETION
-    const status = '{{ $activity->status }}';
+    const status = '{{ $activity->completed ? 'completed' : 'unlocked' }}';
     if (status == 'completed') {
         allowSeek = true;
         activityComplete(false);
@@ -175,7 +175,7 @@
         completed = true;
         //update users progress
         if (status == 'unlocked') {
-            axios.put('{{ route('user.update.progress') }}', {
+            axios.post('/activities/complete', {
                 activity_id: activity_id
             }, {
                 headers: {
@@ -183,27 +183,33 @@
                 }
             })
             .then(response => {
-                console.log(response.data.message);
-                // unlock redirect only after progress is processed
-                // showing modal on completed days
-                if (response.data.day_completed) {
-                    showModal({
-                        label: 'Day Completed',
-                        body: `{!! $activity->day->completion_message !!}`,
-                        media: '{{ Storage::url('content/'.($activity->day->media_path ? $activity->day->media_path : '')) }}',
-                        route: null
-                    });
+                const data = response.data;
+                if (data.success) {
+                    console.log('ProgressService: ' + data.message);
+
+                    // unlock redirect only after progress is processed
+                    // showing modal on completed days
+                    if (data.day_completed) {
+                        showModal({
+                            label: 'Day Completed',
+                            body: `{!! $activity->day->completion_message !!}`,
+                            media: '{{ Storage::url('content/'.($activity->day->media_path ? $activity->day->media_path : '')) }}',
+                            route: null
+                        });
+                    }
+
+                    //hiding complete button for images
+                    if (type == 'image') {
+                        const completeButton = document.getElementById('img_complete_activity');
+                        completeButton.classList.add('disabled');
+                        completeButton.style.display = 'none';
+                    }
+                    unlockRedirect(message);
                 }
-                //hiding complete button for images
-                if (type == 'image') {
-                    const completeButton = document.getElementById('img_complete_activity');
-                    completeButton.classList.add('disabled');
-                    completeButton.style.display = 'none';
-                }
-                unlockRedirect(message);
             })
             .catch(error => {
                 console.error('There was an error updating the progress:', error);
+                alert('Error: ' + error.message);
             });
         }
         else if (status == 'completed') {
@@ -230,7 +236,7 @@
     //FAVORITES
     //get favorite button, icon, isFavorited value
     const favButton = document.getElementById('favorite_btn');
-    let isFavorited = {{ $is_favorited ? 'true' : 'false' }};
+    let isFavorited = {{ $activity->favorited ? 'true' : 'false' }};
     const favIcon = document.getElementById('favorite_icon');
     if (isFavorited) {
         favIcon.className = 'bi bi-star-fill';
@@ -386,8 +392,8 @@
                 showModal({
                     label: 'Complete Activity Later?',
                     body: 'Click \'Continue\' to move on to the next activity. All progress on this activity will be lost. This activity must still be completed later in order to finish ' + day + '.',
-                    route: '{{ route('user.complete.later', ['activity_id' => $activity->id]) }}',
-                    method: 'GET',
+                    route: '{{ route('activities.skip', ['activity_id' => $activity->id]) }}',
+                    method: 'POST',
                     buttonLabel: 'Continue',
                     buttonClass: 'btn-danger',
                     onCancel: function() {

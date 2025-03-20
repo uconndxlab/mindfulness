@@ -156,9 +156,25 @@ class PageNavController extends Controller
         $user = Auth::user() ?? null;
         //find activity and check progress again
         $activity = Activity::findOrFail($activity_id) ?? null;
+
+        // check status
+        if (!$user->canAccessActivity($activity)) {
+            return redirect()->route('explore.home');
+        }
+        $activity->unlocked = true;
+        $activity->completed = $user->isActivityCompleted($activity);
+
+        // check if last activity in day (not skippable)
+        $activity->final = $activity->day->activities()
+            ->where('order', '>', $activity->order)
+            ->where('optional', false)
+            ->orderBy('order')
+            ->first() == null;
+        
+        $activity->skippable = $activity->skippable && !$activity->final && !$activity->completed;
         
         //favoriting
-        $is_favorited = $user->isActivityFavorited($activity);
+        $activity->favorited = $user->isActivityFavorited($activity);
 
         $page_info = [];
         
@@ -210,7 +226,7 @@ class PageNavController extends Controller
             $journal->answer = $temp_answer ? $temp_answer->note : '';
         }
         
-        return view("explore.activity", compact('activity', 'is_favorited', 'page_info', 'content', 'quiz', 'journal'));
+        return view("explore.activity", compact('activity', 'page_info', 'content', 'quiz', 'journal'));
     }
 
     public function exploreActivityBypass($activity_id) {

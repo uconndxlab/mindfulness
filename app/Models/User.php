@@ -95,12 +95,12 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     // activity progress functions
-    public function isActivityCompleted(Activity $activity)
+    public function isActivityCompleted(?Activity $activity)
     {
-        return $this->activities()
+        return $activity ? $this->activities()
             ->where('activity_id', $activity->id)
             ->wherePivot('completed', true)
-            ->exists();
+            ->exists() : false;
     }
 
     public function canAccessActivity(?Activity $activity)

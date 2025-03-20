@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\ContactFormController;
 use App\Http\Controllers\UserController;
 use App\Models\Email_Body;
@@ -101,6 +102,10 @@ Route::middleware('web')->group(function () {
         Route::get('/explore/activity/{activity_id}/fast', [PageNavController::class, 'exploreActivityBypass'])->name('explore.activity.bypass');
         Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
         Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
+
+        // activity completion
+        Route::post('/activities/complete', [ActivityController::class, 'complete'])->name('activities.complete');
+        Route::post('/activities/skip', [ActivityController::class, 'skip'])->name('activities.skip');
         
         //NAVIGATION
         //Page Navigation - the controller is not totally necessary
@@ -126,10 +131,6 @@ Route::middleware('web')->group(function () {
         //User updates
         Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
         Route::put('/user/update/namePass', [UserController::class, 'updateNamePass'])->name('user.update.namePass');
-        Route::put('/user/update/progress', [UserController::class,'completeActivity'])->name('user.update.progress');
-        //skipping
-        Route::get('/user/completeLater/{activity_id}', [UserController::class,'completeLater'])->name('user.complete.later');
-        Route::put('/user/update/unlockNext', [UserController::class,'unlockNext'])->name('user.update.unlockNext');
         
         //favorites
         Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->middleware('throttle:10,1')->name('favorite.toggle');
