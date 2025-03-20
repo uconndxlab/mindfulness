@@ -38,7 +38,7 @@ class PageNavController extends Controller
         Session::put('previous_explore', route('explore.home'));
 
         // get modules and which unlocked with pivot
-        $user = Auth::user();
+        $user = Auth::user() :: null;
         $modules = Module::orderBy('order', 'asc')->get();
         foreach ($modules as $module) {
             $stats = $module->getStats($user);
@@ -523,7 +523,7 @@ class PageNavController extends Controller
         //calculating progress
         $modules = Module::orderBy('order', 'asc')->get();
         foreach ($modules as $module) {
-            $stats = $module->getStats(Auth::user());
+            $stats = $module->getStats(Auth::user() ?? null);
             $module->unlocked = $stats['unlocked'];
             $module->completed = $stats['completed'];
             $module->daysCompleted = $stats['daysCompleted'];

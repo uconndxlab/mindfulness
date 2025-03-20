@@ -39,11 +39,15 @@ class Module extends Model
 
     public function numberDaysCompletedBy(?User $user)
     {
-        return $user ? $this->days()
-            ->whereHas('users', function ($query) use ($user) {
-                $query->where('user_id', $user->id)
-                    ->wherePivot('completed', true);
-            })->count() : 0;
+        if (!$user) {
+            return 0;
+        }
+
+        $days = $this->days;
+        $completedDays = $days->filter(function ($day) use ($user) {
+            return $day->isCompletedBy($user);
+        });
+        return $completedDays->count();
     }
 
     public function getStats(?User $user)
