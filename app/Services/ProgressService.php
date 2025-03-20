@@ -149,6 +149,11 @@ class ProgressService
         ]);
         $result['day_completed'] = true;
 
+        // completion warning for quick completion
+        $user->quick_progress_warning = true;
+        $user->last_day_completed_id = $day->id;
+        $user->save();
+
         // get next day within module
         $nextDay = $day->module->days()
             ->where('order', '>', $day->order)

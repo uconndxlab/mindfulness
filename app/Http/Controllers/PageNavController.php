@@ -126,14 +126,17 @@ class PageNavController extends Controller
             ]]);
         }
 
-        // check if activity is blocked by day completion
+        // check for quick progress warning
         $user = Auth::user();
-        $lastCompleteTime = $user->last_day_completed_at;
-        $last_day_name = $user->last_day_name;
-        $blockNextDayAct = $user->block_next_day_act;
-
-        // check if this activity is blocked
-        if ($blockNextDayAct && $blockNextDayAct == $activity->id && $lastCompleteTime) {
+        $explore_day = $activity->day;
+        
+        // check for progress warning, last day completed id, and if day to explore is not completed
+        if ($user->quick_progress_warning && $user->last_day_completed_id && !$user->isDayCompleted($explore_day)) {
+            // get time and name of day completion
+            $completedDay = Day::findOrFail($user->last_day_completed_id) ?? null;
+            $lastCompleteTime = $user->dayCompletedAt($completedDay);
+            $last_day_name = $completedDay->name;
+            
             // get local times
             $lastCompletionLocal = Carbon::parse($lastCompleteTime)->setTimezone($user->timezone ?? config('app.timezone'));
             $now = now()->setTimezone($user->timezone ?? config('app.timezone'));
@@ -234,9 +237,8 @@ class PageNavController extends Controller
     public function exploreActivityBypass($activity_id) {
         // user bypassed warning modal - remove warning information
         $user = Auth::user();
-        $user->last_day_completed_at = null;
-        $user->last_day_name = null;
-        $user->block_next_day_act = null;
+        $user->quick_progress_warning = false;
+        $user->last_day_completed_id = null;
         $user->save();
         return redirect()->route('explore.activity', ['activity_id' => $activity_id]);
     }

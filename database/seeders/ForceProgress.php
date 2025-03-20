@@ -20,11 +20,15 @@ class ForceProgress extends Seeder
      */
     public function run(): void
     {
-        $order = 9;
-        $email = 'zoro@op.com';
+        $order = 0;
+        $email = config('mail.test_email');
         
         // update user progress up to the point of order
         $user = User::where('email', $email)->first();
+        $user->quick_progress_warning = false;
+        $user->last_day_completed_id = null;
+        $user->save();
+
         $activities = Activity::where('order', '<=', $order)->get();
 
         // wipe existing progress

@@ -83,7 +83,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function days()
     {
         return $this->belongsToMany(Day::class, 'user_day')
-            ->withPivot('completed', 'unlocked')
+            ->withPivot('completed', 'unlocked', 'completed_at')
             ->orderBy('order');
     }
 
@@ -185,5 +185,14 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('module_id', $module->id)
             ->wherePivot('unlocked', true)
             ->exists();
+    }
+
+    public function dayCompletedAt(?Day $day)
+    {
+        return $day ? $this->days()
+            ->where('day_id', $day->id)
+            ->first()
+            ?->pivot
+            ->completed_at : null;
     }
 }

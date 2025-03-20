@@ -107,4 +107,7 @@ return [
     // custom config
     // min number days between sending emails
     'remind_email_day_limit' => env('APP_REMIND_EMAIL_DAY_LIMIT', 2),
+
+    // test email
+    'test_email' => env('TEST_USER_EMAIL'),
 ];

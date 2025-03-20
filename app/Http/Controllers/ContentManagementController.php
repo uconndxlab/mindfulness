@@ -86,7 +86,7 @@ class ContentManagementController extends Controller
 
     public function emailTesting(Request $request, $type) {
         try {
-            $email = env('TEST_USER_EMAIL');
+            $email = config('mail.test_email');
             $user = User::where('email', $email)->first();
 
             if ($request->type == 'reminder') {
