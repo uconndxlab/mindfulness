@@ -25,8 +25,7 @@ class ShowBonusModal
         $body = 'Congratulations on completing: <br><strong>'.$event->day->module->name.': '.$event->day->name.'</strong>!<br><br>You have unlocked bonus activities.';
         
         $route = route('explore.module.bonus', [
-            'module_id' => $event->day->module_id, 
-            'day' => $event->day->id
+            'day_id' => $event->day->id
         ]);
         
         $route_label = '<i class="bi bi-gift me-2"></i>View Bonus Activities';

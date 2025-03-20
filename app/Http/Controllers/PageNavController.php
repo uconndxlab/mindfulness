@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Day;
 use App\Models\Journal;
 use App\Models\Quiz;
 use App\Models\Note;
@@ -38,7 +39,7 @@ class PageNavController extends Controller
         Session::put('previous_explore', route('explore.home'));
 
         // get modules and which unlocked with pivot
-        $user = Auth::user() :: null;
+        $user = Auth::user() ?? null;
         $modules = Module::orderBy('order', 'asc')->get();
         foreach ($modules as $module) {
             $stats = $module->getStats($user);
@@ -105,8 +106,9 @@ class PageNavController extends Controller
         return view("explore.module", compact('module', 'page_info', 'accordion_day'));
     }
 
-    public function exploreModuleBonus(Request $request, $module_id) {
-        $accordion_day = $request->day ?? null;
+    public function exploreModuleBonus(Request $request) {
+        $accordion_day = $request->day_id ?? null;
+        $module_id = Day::findOrFail($accordion_day)->module_id ?? null;
         return $this->exploreModule($module_id, $accordion_day);
     }
 

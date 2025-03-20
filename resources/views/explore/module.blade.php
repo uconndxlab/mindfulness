@@ -89,11 +89,13 @@
         var dayId = @json($accordion_day);
         if (dayId) {
             console.log('override found');
-            var dayElement = document.getElementById(dayId);
+            var dayElement = document.getElementById('day_' + dayId);
             if (dayElement) {
+                console.log('day element found');
                 setTimeout(function() {
                     var bonusActivity = dayElement.querySelector('.activity-tag-optional');
                     if (bonusActivity) {
+                        console.log('bonus activity found');
                         var offset = 125;
                         var elementPosition = bonusActivity.getBoundingClientRect().top;
                         var offsetPosition = elementPosition + window.pageYOffset - offset;
