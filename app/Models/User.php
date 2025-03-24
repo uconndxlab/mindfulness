@@ -132,20 +132,33 @@ class User extends Authenticatable implements MustVerifyEmail
             ->wherePivot('favorited', true);
     }
 
-    public function toggleFavoriteActivity(Activity $activity)
+    public function toggleFavoriteActivity(?Activity $activity)
     {
-        $current_pivot = $this->activities()
+        if (!$activity) {
+            return false;
+        }
+
+        $exists = $this->activities()
             ->where('activity_id', $activity->id)
-            ->first();
+            ->exists();
         
-        if ($current_pivot) {
-            $status = !($current_pivot->pivot->favorited ?? false);
+        if ($exists) {
+            // get status
+            $status = $this->activities()
+                ->wherePivot('activity_id', $activity->id)
+                ->first()
+                ->pivot
+                ->favorited;
+
+            // update
+            $newStatus = !$status;
             $this->activities()->updateExistingPivot($activity->id, [
-                'favorited' => $status
+                'favorited' => $newStatus
             ]);
-            return $status;
+            return $newStatus;
         }
         else {
+            // make new pivot
             $this->activities()->attach($activity->id, [
                 'favorited' => true
             ]);

@@ -133,7 +133,7 @@ Route::middleware('web')->group(function () {
         Route::put('/user/update/namePass', [UserController::class, 'updateNamePass'])->name('user.update.namePass');
         
         //favorites
-        Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->middleware('throttle:10,1')->name('favorite.toggle');
+        Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->middleware('throttle:70,1')->name('favorite.toggle');
         
         //contact form - throttled in controller
         Route::post('/contact', [ContactFormController::class, 'submitForm'])->name('contact.submit');

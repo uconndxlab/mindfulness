@@ -244,6 +244,13 @@
 
     //FAVORITE HANDLING
     function toggleFavorite() {
+        // change first
+        const currentState = isFavorited;
+        console.log('Current state: ', currentState);
+        isFavorited = !isFavorited;
+        favIcon.className = isFavorited ? "bi bi-star-fill" : "bi bi-star";
+
+        // send request
         return new Promise((resolve, reject) => {
             axios.post('{{ route('favorite.toggle') }}', {
                 activity_id: activity_id
@@ -254,12 +261,13 @@
             })
             .then(response => {
                 console.log(response.data.message);
-                isFavorited = !isFavorited;
-                favIcon.className = isFavorited ? "bi bi-star-fill" : "bi bi-star";
                 resolve(true);
             })
             .catch(error => {
                 console.error('There was an error toggling favorite', error);
+                // revert change
+                isFavorited = currentState;
+                favIcon.className = isFavorited ? "bi bi-star-fill" : "bi bi-star";
                 reject(false);
             });
         });

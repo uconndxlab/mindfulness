@@ -59,7 +59,7 @@ class UserController extends Controller
     public function toggleFavorite(Request $request) {
         // get user
         $user = Auth::user();
-        $activity = Activity::findOrFail($request->activity_id)->first();
+        $activity = Activity::findOrFail($request->activity_id) ?? null;
 
         $status = $user->toggleFavoriteActivity($activity);
         if ($status) {
