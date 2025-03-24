@@ -25,7 +25,7 @@ class ResetUserProgress extends Seeder
 
         foreach (User::all() as $user) {
             unlockFirst($user->id);
-            $user->quick_progress_warning = null;
+            $user->quick_progress_warning = false;
             $user->last_day_completed_id = null;
             $user->save();
         }
