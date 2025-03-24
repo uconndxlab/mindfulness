@@ -54,46 +54,51 @@ class ProgressService
         ]);
         $result['activity_completed'] = true;
 
-        // unlock optional
-        $optional = $activity->day->activities()
-            ->where('order', $activity->order)
-            ->where('optional', true)
-            ->get();
-        if ($optional->count() > 0) {
-            $result['optional_unlocked'] = $optional->count() > 0;
-            // fire bonus event
-            event(new BonusUnlocked($activity->day));
-            foreach ($optional as $opt) {
-                $user->activities()->syncWithoutDetaching([
-                    $opt->id => [
-                        'unlocked' => true,
-                    ],
-                ]);
+        // if activity is not optional
+        if (!$activity->optional) {
+            // unlock optional
+            $optional = $activity->day->activities()
+                ->where('order', $activity->order)
+                ->where('id', '!=', $activity->id)
+                ->where('optional', true)
+                ->get();
+            if ($optional->count() > 0) {
+                $result['optional_unlocked'] = true;
+                // fire bonus event
+                event(new BonusUnlocked($activity->day));
+                foreach ($optional as $opt) {
+                    $user->activities()->syncWithoutDetaching([
+                        $opt->id => [
+                            'unlocked' => true,
+                        ],
+                    ]);
+                }
+            }
+
+            // find next activity in day
+            $nextAct = $activity->day->activities()
+                ->where('order', '>', $activity->order)
+                ->where('optional', false)
+                ->orderBy('order')
+                ->first();
+    
+            // it does not matter if this activity is completed or not
+            // completion of current day will still check for day completion
+            // no further day unlock necessary
+            // means skip check is arbitrary
+    
+            // if next act is completed, check day completion
+            if ($nextAct && !$nextAct->isCompletedBy($user)) {
+                // unlock next activity within day
+                $actResult = $this->unlockActivity($user, $nextAct);
+                $result = array_merge($result, $actResult);
+            } else {
+                // check day completion
+                $dayResult = $this->checkDayCompletion($user, $activity->day);
+                $result = array_merge($result, $dayResult);
             }
         }
 
-        // find next activity in day
-        $nextAct = $activity->day->activities()
-            ->where('order', '>', $activity->order)
-            ->where('optional', false)
-            ->orderBy('order')
-            ->first();
-
-        // it does not matter if this activity is completed or not
-        // completion of current day will still check for day completion
-        // no further day unlock necessary
-        // means skip check is arbitrary
-
-        // if next act is completed, check day completion
-        if ($nextAct && !$nextAct->isCompletedBy($user)) {
-            // unlock next activity within day
-            $actResult = $this->unlockActivity($user, $nextAct);
-            $result = array_merge($result, $actResult);
-        } else {
-            // check day completion
-            $dayResult = $this->checkDayCompletion($user, $activity->day);
-            $result = array_merge($result, $dayResult);
-        }
         return $result;
     }
 

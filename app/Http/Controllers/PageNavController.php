@@ -133,25 +133,36 @@ class PageNavController extends Controller
         // check for progress warning, last day completed id, and if day to explore is not completed
         if ($user->quick_progress_warning && $user->last_day_completed_id && !$user->isDayCompleted($explore_day)) {
             // get time and name of day completion
-            $completedDay = Day::findOrFail($user->last_day_completed_id) ?? null;
-            $lastCompleteTime = $user->dayCompletedAt($completedDay);
-            $last_day_name = $completedDay->name;
-            
-            // get local times
-            $lastCompletionLocal = Carbon::parse($lastCompleteTime)->setTimezone($user->timezone ?? config('app.timezone'));
-            $now = now()->setTimezone($user->timezone ?? config('app.timezone'));
+            /** @var ?Day $completedDay */
+            $completedDay = Day::find($user->last_day_completed_id) ?? null;
 
-            // if it is not yet the next day, return modal content (or less than two hours)
-            if ($lastCompletionLocal->isSameDay($now) || $now->diffInHours($lastCompletionLocal) < 2) {
-                return response()->json(['locked' => true, 'modalContent' => [
-                    'label' => 'You are progressing fast!',
-                    'body' => 'It appears you have already completed <strong>'.$last_day_name.'</strong> today. While your efforts are admirable, we recommend you take your time through this program and take it one day at a time.',
-                    'route' => route('explore.activity.bypass', ['activity_id' => $activity->id]),
-                    'method' => 'GET',
-                    'buttonLabel' => 'Continue to Activity',
-                    'buttonClass' => 'btn-danger'
-                ]]);
+            if ($completedDay) {
+                $lastCompleteTime = $user->dayCompletedAt($completedDay);
+                $last_day_name = $completedDay->name;
+
+                $userTimezone = $user->timezone ?? config('app.timezone');
+                
+                // get local times
+                $lastCompletionLocal = Carbon::parse($lastCompleteTime)->setTimezone($userTimezone);
+                $now = now()->setTimezone($userTimezone);
+    
+                // log the times
+                // \Log::info('Last Completion: '.$lastCompletionLocal);
+                // \Log::info('Now: '.$now);
+    
+                // if it is not yet the next day, return modal content (or less than two hours)
+                if ($lastCompletionLocal->isSameDay($now) || $now->diffInHours($lastCompletionLocal) < 2) {
+                    return response()->json(['locked' => true, 'modalContent' => [
+                        'label' => 'You are progressing fast!',
+                        'body' => 'It appears you have already completed <strong>'.$last_day_name.'</strong> today. While your efforts are admirable, we recommend you take your time through this program and take it one day at a time.',
+                        'route' => route('explore.activity.bypass', ['activity_id' => $activity->id]),
+                        'method' => 'GET',
+                        'buttonLabel' => 'Continue to Activity',
+                        'buttonClass' => 'btn-danger'
+                    ]]);
+                }
             }
+            
         }
         return response()->json(['locked' => false]);
     }
