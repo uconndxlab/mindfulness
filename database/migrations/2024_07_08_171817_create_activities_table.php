@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('time')->nullable();
             $table->string('completion_message')->nullable();
             $table->integer('order');
-            $table->boolean('skippable')->default(false);
+            $table->boolean('skippable')->default(true);
             $table->boolean('optional')->default(false);
             $table->timestamps();
         });
