@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('activity_id')->constrained('activities')->onDelete('cascade');
             $table->enum('status', ['completed', 'unlocked', 'locked'])->default('locked');
+            $table->boolean('favorited')->default(false);
             $table->timestamps();
 
             $table->unique(['user_id', 'activity_id']);

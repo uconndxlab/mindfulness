@@ -72,11 +72,9 @@
                 <x-journal :journal="$journal"/>
             </div>
         @endif
-        @if($activity->completion_message)
-            <div id="comp_message" class="mt-1" style="display: none;">
-                <p class="text-success">{!! $activity->completion_message !!}</p>
-            </div>
-        @endif
+        <div id="comp_message" class="mt-1" style="display: none;">
+            <p class="text-success">{!! $activity->completion_message ?? 'Congrats on completing '.$activity->day->name.'!' !!}</p>
+        </div>
     </div>
     <div class="manual-margin-top" id="redirect_div">
         @if (isset($page_info['redirect_route']))
@@ -192,7 +190,7 @@
                     if (data.day_completed) {
                         showModal({
                             label: 'Day Completed',
-                            body: `{!! $activity->day->completion_message !!}`,
+                            body: `{!! $activity->day->completion_message ?? 'Congrats on completing '.$activity->day->name.'!' !!}`,
                             media: '{{ Storage::url('content/'.($activity->day->media_path ? $activity->day->media_path : '')) }}',
                             route: null
                         });
@@ -225,11 +223,8 @@
         });
         compLateBtn.style.display = 'none';
         if (message) {
-            const hasMessage = {{ isset($activity->completion_message) ? 'true' : 'false' }};
-            if (hasMessage) {
-                const completionMessageDiv = document.getElementById('comp_message');
-                completionMessageDiv.style.display = 'block';
-            }
+            const completionMessageDiv = document.getElementById('comp_message');
+            completionMessageDiv.style.display = 'block';
         }
     }
 

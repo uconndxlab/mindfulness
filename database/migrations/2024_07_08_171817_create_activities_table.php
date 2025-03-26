@@ -17,12 +17,10 @@ return new class extends Migration
             $table->string('title');
             $table->enum('type', ['lesson', 'practice', 'reflection', 'journal'])->nullable();
             $table->integer('time')->nullable();
-            $table->string('completion_message')->default('Congrats on completing the activity!');
+            $table->string('completion_message')->nullable();
             $table->integer('order');
-            $table->boolean('final')->default(false);
-            $table->foreignId('next')->nullable()->constrained('activities')->onDelete('set null');
+            $table->boolean('skippable')->default(false);
             $table->boolean('optional')->default(false);
-            $table->boolean('deleted')->default(false);
             $table->timestamps();
         });
     }

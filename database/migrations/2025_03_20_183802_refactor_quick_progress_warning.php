@@ -13,8 +13,6 @@ return new class extends Migration
     {
         
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['last_day_completed_at', 'last_day_name']);
-
             $table->boolean('quick_progress_warning')->default(false);
             $table->integer('last_day_completed_id')->nullable();
         });
@@ -27,9 +25,6 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn(['quick_progress_warning', 'last_day_completed_id']);
-
-            $table->timestamp('last_day_completed_at')->nullable();
-            $table->string('last_day_name')->nullable();
         });
     }
 };

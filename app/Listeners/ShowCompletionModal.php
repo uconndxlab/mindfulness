@@ -23,7 +23,7 @@ class ShowCompletionModal
     public function handle(FinalActivityCompleted $event)
     {
         $label = 'Congrats on completing '.$event->day->name.'!';
-        $body = $event->day->completion_message;
+        $body = $event->day->completion_message ?? 'Congrats on completing '.$event->day->name.'!';
         $file = $event->day->media_path ?? '';
         $media = Storage::url('content/'.$file);
         session([
