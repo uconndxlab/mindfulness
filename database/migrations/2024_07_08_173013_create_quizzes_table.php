@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('activity_id')->constrained('activities')->onDelete('cascade');
             $table->json('question_options');
+            $table->integer('question_count')->default(0);
             $table->timestamps();
         });
     }

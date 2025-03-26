@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('quizzes', function (Blueprint $table) {
-            $table->integer('question_count')->default(0);
+        Schema::table('users', function (Blueprint $table) {
+            $table->boolean('quick_progress_warning')->default(false);
+            $table->integer('last_day_completed_id')->nullable();
         });
     }
 
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('quizzes', function (Blueprint $table) {
-            $table->dropColumn('question_count');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['quick_progress_warning', 'last_day_completed_id']);
         });
     }
 };
