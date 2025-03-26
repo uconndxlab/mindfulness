@@ -15,12 +15,11 @@
                     <div class="h-100">
                         <div class="card p-2 module mb-2">
                             @php
-                                $status = $module->progress['status'];
-                                $disabled = $module->progress['status'] == 'locked' ? 'disabled' : '';
+                                $disabled = $module->unlocked ? '' : 'disabled';
                             @endphp
-                            <a style="display:flex" id="moduleLink" class="stretched-link w-100 {{ $disabled }}" {!! !$disabled ? 'href='.route('explore.module', ['module_id' => $module->id]) : '' !!}>
-                                <img src="{{ Storage::url('content/Flower-'.$module->progress['completed'].'.svg') }}" alt="Icon" style="width:50px; height:50px; margin-right:10px;">
-                                {{ $module->name }} <br> {{$module->progress['completed']}}/{{$module->progress['total']}} days completed
+                            <a style="display:flex" id="moduleLink" class="stretched-link w-100 {{ $disabled }}" {!! $disabled ? '' : 'href='.route('explore.module', ['module_id' => $module->id]) !!}>
+                                <img src="{{ Storage::url('content/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon" style="width:50px; height:50px; margin-right:10px;">
+                                {{ $module->name }} <br> {{ $module->daysCompleted }}/{{ $module->totalDays }} days completed
                             </a>
                             <i class="bi bi-arrow-right"></i>
                         </div>

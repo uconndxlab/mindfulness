@@ -103,4 +103,11 @@ return [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
+
+    // custom config
+    // min number days between sending emails
+    'remind_email_day_limit' => env('APP_REMIND_EMAIL_DAY_LIMIT', 2),
+
+    // test email
+    'test_email' => env('TEST_USER_EMAIL'),
 ];

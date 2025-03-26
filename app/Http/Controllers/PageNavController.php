@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Day;
 use App\Models\Journal;
 use App\Models\Quiz;
 use App\Models\Note;
@@ -9,11 +10,10 @@ use App\Models\Activity;
 use App\Models\Module;
 use App\Models\QuizAnswers;
 use App\Models\Teacher;
-use App\Models\UserActivity;
+use App\Models\User;
 use App\Models\Faq;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -38,44 +38,62 @@ class PageNavController extends Controller
         Session::put('current_nav', ['route' => route('explore.home'), 'back' => 'Home']);
         Session::put('previous_explore', route('explore.home'));
 
-        //get modules and progress
+        // get modules and which unlocked with pivot
+        $user = Auth::user() ?? null;
         $modules = Module::orderBy('order', 'asc')->get();
-        $module_ids = $modules->pluck('id')->toArray();
-        $progress = getModuleProgress(Auth::id(), $module_ids);
-        
         foreach ($modules as $module) {
-            $module->progress = $progress[$module->id];
+            $stats = $module->getStats($user);
+            $module->unlocked = $stats['unlocked'];
+            $module->completed = $stats['completed'];
+            $module->daysCompleted = $stats['daysCompleted'];
+            $module->totalDays = $stats['totalDays'];
         }
+    
         return view("explore.home", compact('modules'));
     }
 
     public function exploreModule($module_id, $accordion_day=null)
     {
+        $user = Auth::user();
         //find the module
         $module = Module::with('days.activities')->findOrFail($module_id);
+
+        // get user_module information
+        $stats = $module->getStats($user);
+        $module->unlocked = $stats['unlocked'];
+        $module->completed = $stats['completed'];
+        $module->daysCompleted = $stats['daysCompleted'];
+        $module->totalDays = $stats['totalDays'];
         
-        //check progress
-        $mod_progress = getModuleProgress(Auth::id(), [$module_id]);
-        $module->progress_days = [$mod_progress[$module_id]['completed'], $mod_progress[$module_id]['total']];
-        if (getModuleProgress(Auth::id(), [$module_id])[$module_id]['status'] == 'locked') {
-            return redirect()->back();
+        // check if module locked
+        if (!$module->unlocked) {
+            return redirect()->route('explore.home');
         }
         
         //get progress
-        $day_ids = $module->days()->pluck('id')->toArray();
-        $progress = getDayProgress(Auth::id(), $day_ids);
-        
-        //sorting the activities within each day
         foreach ($module->days as $day) {
-            $day->activities = $day->activities->sortBy(function ($activity) {
-                return [$activity->optional, $activity->order];
-            })->values();
-            
-            //assign the progress
-            $day->progress = $progress[$day->id];
+            $day->unlocked = $day->canBeAccessedBy($user);
+            $day->completed = $day->isCompletedBy($user);
+
+            // show accordion day, or last unlocked and incomplete
+            if ($accordion_day) {
+                // if accordion day is set, only one possible active day
+                if ($day->id == $accordion_day) {
+                    $day->active = true;
+                }
+            } else if ($day->unlocked && !$day->completed) {
+                // if accordion not set, show last unlocked and incomplete day
+                $day->active = true;
+            } else {
+                $day->active = false;
+            }
+
+            // get same statuses for days
+            foreach ($day->activities as $activity) {
+                $activity->unlocked = $activity->canBeAccessedBy($user);
+                $activity->completed = $activity->isCompletedBy($user);
+            }
         }
-        // $accordion_day = 1;
-        $override_accordion = $accordion_day ? 'day_'.$accordion_day : null;
 
         //set back route
         $page_info['back_label'] = " Back to Home";
@@ -85,36 +103,22 @@ class PageNavController extends Controller
         Session::put('current_nav', ['route' => route('explore.module', ['module_id' => $module_id]), 'back' => 'Part '.$module_id]);
         Session::put('previous_explore', route('explore.module', ['module_id' => $module_id]));
         
-        return view("explore.module", compact('module', 'page_info', 'override_accordion'));
+        return view("explore.module", compact('module', 'page_info', 'accordion_day'));
     }
 
-    public function exploreModuleBonus(Request $request, $module_id) {
-        $accordion_day = $request->day ?? null;
+    public function exploreModuleBonus(Request $request) {
+        $accordion_day = $request->day_id ?? null;
+        $module_id = Day::findOrFail($accordion_day)->module_id ?? null;
         return $this->exploreModule($module_id, $accordion_day);
     }
 
-    public function checkActivityLocked($activity_id, $from_controller = false) {
-        //checking cache for progress
-        $cacheKey = 'user_' . Auth::id() . '_progress_activities';
-        $progress = Cache::get($cacheKey);
-        if (!$progress) {
-            $progress = Cache::remember($cacheKey, 30, function () {
-                return Auth::user()->load('progress_activities')->progress_activities;
-            });
-        }
-        $activity = Activity::findOrFail($activity_id);
-        $status = $progress->where('activity_id', $activity_id)->first()->status ?? 'locked';
-        //check if deleted
-        if ($activity->deleted == true) {
-            abort(404, "Page not found.");
-        }
-        //check status
-        $locked = $status === 'locked';
-        if ($from_controller) {
-            return [$locked, $status];
-        }
-
-        // check if locked
+    public function checkActivityLocked($activity_id) {
+        // get user
+        $user = Auth::user();
+        $activity = Activity::findOrFail($activity_id) ?? null;
+        $locked = !($user->canAccessActivity($activity));
+        
+        // // check if locked
         if ($locked) {
             return response()->json(['locked' => true, 'modalContent' => [
                 'label' => 'Activity Locked: '.$activity->title,
@@ -122,46 +126,69 @@ class PageNavController extends Controller
             ]]);
         }
 
-        // check if activity is blocked by day completion
+        // check for quick progress warning
         $user = Auth::user();
-        $lastCompleteTime = $user->last_day_completed_at;
-        $last_day_name = $user->last_day_name;
-        $blockNextDayAct = $user->block_next_day_act;
+        $explore_day = $activity->day;
+        
+        // check for progress warning, last day completed id, and if day to explore is not completed
+        if ($user->quick_progress_warning && $user->last_day_completed_id && !$user->isDayCompleted($explore_day)) {
+            // get time and name of day completion
+            /** @var ?Day $completedDay */
+            $completedDay = Day::find($user->last_day_completed_id) ?? null;
 
-        // check if this activity is blocked
-        if ($blockNextDayAct && $blockNextDayAct == $activity->id && $lastCompleteTime) {
-            // get local times
-            $lastCompletionLocal = Carbon::parse($lastCompleteTime)->setTimezone($user->timezone ?? config('app.timezone'));
-            $now = now()->setTimezone($user->timezone ?? config('app.timezone'));
+            if ($completedDay) {
+                $lastCompleteTime = $user->dayCompletedAt($completedDay);
+                $last_day_name = $completedDay->name;
 
-            // if it is not yet the next day, return modal content (or less than two hours)
-            if ($lastCompletionLocal->isSameDay($now) || $now->diffInHours($lastCompletionLocal) < 2) {
-                return response()->json(['locked' => true, 'modalContent' => [
-                    'label' => 'You are progressing fast!',
-                    'body' => 'It appears you have already completed <strong>'.$last_day_name.'</strong> today. While your efforts are admirable, we recommend you take your time through this program and take it one day at a time.',
-                    'route' => route('explore.activity.bypass', ['activity_id' => $activity_id]),
-                    'method' => 'GET',
-                    'buttonLabel' => 'Continue to Activity',
-                    'buttonClass' => 'btn-danger'
-                ]]);
+                $userTimezone = $user->timezone ?? config('app.timezone');
+                
+                // get local times
+                $lastCompletionLocal = Carbon::parse($lastCompleteTime)->setTimezone($userTimezone);
+                $now = now()->setTimezone($userTimezone);
+    
+                // if it is not yet the next day, return modal content (or less than two hours)
+                if ($lastCompletionLocal->isSameDay($now) || $lastCompletionLocal->diffInHours($now) < 2) {
+                    return response()->json(['locked' => true, 'modalContent' => [
+                        'label' => 'You are progressing fast!',
+                        'body' => 'It appears you have already completed <strong>'.$last_day_name.'</strong> today.'.
+                            ' While your efforts are admirable, we recommend you take your time'.
+                            ' through this program and take it one day at a time.',
+                        'route' => route('explore.activity.bypass', ['activity_id' => $activity->id]),
+                        'method' => 'GET',
+                        'buttonLabel' => 'Continue to Activity',
+                        'buttonClass' => 'btn-danger'
+                    ]]);
+                }
             }
+            
         }
         return response()->json(['locked' => false]);
     }
 
     public function exploreActivity($activity_id, Request $request)
     {
-        $user = Auth::user();
+        $user = Auth::user() ?? null;
         //find activity and check progress again
-        $activity = Activity::findOrFail($activity_id);
-        $check_activity = $this->checkActivityLocked($activity_id, true);
-        $activity->status = $check_activity[1];
-        if ($check_activity[0]) {
-            abort(404, "Page not found.");
+        $activity = Activity::findOrFail($activity_id) ?? null;
+
+        // check status
+        if (!$user->canAccessActivity($activity)) {
+            return redirect()->route('explore.home');
         }
+        $activity->unlocked = true;
+        $activity->completed = $user->isActivityCompleted($activity);
+
+        // check if last activity in day (not skippable)
+        $activity->final = $activity->day->activities()
+            ->where('order', '>', $activity->order)
+            ->where('optional', false)
+            ->orderBy('order')
+            ->first() == null;
+        
+        $activity->skippable = $activity->skippable && !$activity->final && !$activity->completed;
         
         //favoriting
-        $is_favorited = $user->favorites()->where('activity_id', $activity_id)->exists();
+        $activity->favorited = $user->isActivityFavorited($activity);
 
         $page_info = [];
         
@@ -172,21 +199,21 @@ class PageNavController extends Controller
         //NEXT/FINISH redirect
         //make sure that if doing next, the day is not changing
         if (!$request->library) {
-            if ($activity->next && Activity::find($activity->next)->day->id == $activity->day->id) {
+            $next = $activity->nextActivity();
+            // check if this is the last activity of the day
+            if (lastActivityInDay($activity, $user)) {
+                $page_info['redirect_label'] = "Complete ".$activity->day->name;
+                $page_info['redirect_route'] = $page_info['exit_route'];
+            }
+            else if ($next) {
                 $page_info['redirect_label'] = "Next Activity";
-                $page_info['redirect_route'] = route('explore.activity', ['activity_id' => $activity->next]);
+                $page_info['redirect_route'] = route('explore.activity', ['activity_id' => $next->id]);
             }
             else {
                 $page_info['redirect_label'] = "Back to Part ".$activity->day->module->id;
                 $page_info['redirect_route'] = $page_info['exit_route'];
             }
 
-            //check if this is the last activity of the day
-            $last_act = getDayProgress($user->id, [$activity->day->id])[$activity->day->id]['one_more'];
-            if ($last_act && $activity->status == 'unlocked') {
-                $page_info['redirect_label'] = "Complete ".$activity->day->name;
-                $page_info['redirect_route'] = $page_info['exit_route'];
-            }
         }
 
         //setting back route
@@ -213,15 +240,14 @@ class PageNavController extends Controller
             $journal->answer = $temp_answer ? $temp_answer->note : '';
         }
         
-        return view("explore.activity", compact('activity', 'is_favorited', 'page_info', 'content', 'quiz', 'journal'));
+        return view("explore.activity", compact('activity', 'page_info', 'content', 'quiz', 'journal'));
     }
 
     public function exploreActivityBypass($activity_id) {
         // user bypassed warning modal - remove warning information
         $user = Auth::user();
-        $user->last_day_completed_at = null;
-        $user->last_day_name = null;
-        $user->block_next_day_act = null;
+        $user->quick_progress_warning = false;
+        $user->last_day_completed_id = null;
         $user->save();
         return redirect()->route('explore.activity', ['activity_id' => $activity_id]);
     }
@@ -279,20 +305,10 @@ class PageNavController extends Controller
     }
 
     public function librarySearch(Request $request) {
-
-        //get query of unlocked activities
-        $user_id = Auth::id();
-        //query for activities - keep as query
-        $activity_ids = UserActivity::where('user_id', $user_id)
-            ->where('status', '!=', 'locked')
-            ->pluck('activity_id');
-
-        // make sure rand query matches query
-        $query = Activity::where('deleted', false)
-            ->whereIn('id', $activity_ids);
-        $rand_query = Activity::where('deleted', false)
-            ->whereIn('id', $activity_ids);
-        
+        // get users unlocked activities
+        $user = Auth::user();
+        $query = $user->unlockedActivities();
+        $rand_query = $user->unlockedActivities();
         
         //base param
         $empty_text = null;
@@ -301,9 +317,8 @@ class PageNavController extends Controller
                 $empty_text = 'Keep progressing to unlock more exercises...';
             }
             else if ($request->base_param == 'favorited') {
-                $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
-                $query->whereIn('id', $fav_ids);
-                $rand_query->whereIn('id', $fav_ids);
+                $query = $user->favoritedActivities();
+                $rand_query = $user->favoritedActivities();
                 $empty_text = '<span>Click the "<i class="bi bi-star"></i>" found in activities to add them to your favorites and view them here!</span>';
             }
         }
@@ -330,28 +345,28 @@ class PageNavController extends Controller
         //handle categories
         $categories = $request->input('category', []);
         if (!empty($categories)) {
-            $query->where(function($in_query) use ($categories) {
+            $query->where(function($q) use ($categories, $user) {
                 //filter based on the categories
                 foreach($categories as $category) {
                     $lower = strtolower($category);
                     if ($lower == 'favorited') {
-                        $fav_ids = Auth::user()->favorites()->with('activity')->pluck('activity_id');
-                        $in_query->orWhereIn('id', $fav_ids);
+                        $fav_ids = $user->favoritedActivities()->pluck('activity.id')->toArray();
+                        $q->orWhereIn('id', $fav_ids);
                     }
                     else if ($lower == 'practice') {
-                        $in_query->orWhere('type', 'practice');
+                        $q->orWhere('type', 'practice');
                     }
                     else if ($lower == 'lesson') {
-                        $in_query->orWhere('type', 'lesson');
+                        $q->orWhere('type', 'lesson');
                     }
                     else if ($lower == 'journal') {
-                        $in_query->orWhere('type', 'journal');
+                        $q->orWhere('type', 'journal');
                     }
                     else if ($lower == 'bonus') {
-                        $in_query->orWhere('optional', true);
+                        $q->orWhere('optional', true);
                     }
                     else if ($lower == 'reflection') {
-                        $in_query->orWhere('type', 'reflection');
+                        $q->orWhere('type', 'reflection');
                     }
                 }
             });
@@ -520,9 +535,12 @@ class PageNavController extends Controller
 
         //calculating progress
         $modules = Module::orderBy('order', 'asc')->get();
-        $progress = getModuleProgress(Auth::id(), $modules->pluck('id')->toArray());
         foreach ($modules as $module) {
-            $module->progress = $progress[$module->id];
+            $stats = $module->getStats(Auth::user() ?? null);
+            $module->unlocked = $stats['unlocked'];
+            $module->completed = $stats['completed'];
+            $module->daysCompleted = $stats['daysCompleted'];
+            $module->totalDays = $stats['totalDays'];
         }
         return view("other.account", compact('page_info', 'modules'));
     }

@@ -4,36 +4,43 @@ namespace Database\Seeders;
 
 use App\Models\Activity;
 use App\Models\User;
-use App\Models\UserActivity;
+use App\Services\ProgressService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ForceProgress extends Seeder
 {
+    protected $progressService;
+    public function __construct(ProgressService $progressService) {
+        $this->progressService = $progressService;
+    }
+    
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $order = 25;
-        $email = '';
-        // find user and list of activities up to point
-        $user_id = User::where('email', $email)->first()->id;
-        $activity_ids = Activity::all()->pluck('order', 'id')->toArray();
+        $order = 0;
+        $email = config('mail.test_email');
+        
+        // update user progress up to the point of order
+        $user = User::where('email', $email)->first();
+        $user->quick_progress_warning = false;
+        $user->last_day_completed_id = null;
+        $user->save();
 
-        // clear users session
-        DB::table('sessions')->where('user_id', $user_id)->delete();
+        $activities = Activity::where('order', '<=', $order)->get();
 
-        // update user progress to complete
-        foreach ($activity_ids as $activity_id => $activity_order) {
-            $status = $activity_order == $order ? 'unlocked' : ($activity_order < $order ? 'completed' : 'locked');
-            UserActivity::updateOrCreate([
-                'user_id' => $user_id,
-                'activity_id' => $activity_id
-            ], [
-                'status' => $status
-            ]);
+        // wipe existing progress
+        DB::table('user_activity')->where('user_id', $user->id)->delete();
+        DB::table('user_day')->where('user_id', $user->id)->delete();
+        DB::table('user_module')->where('user_id', $user->id)->delete();
+
+        // unlock first
+        unlockFirst($user->id);
+
+        foreach ($activities as $activity) {
+            $this->progressService->completeActivity($user, $activity);
         }
     }
 }

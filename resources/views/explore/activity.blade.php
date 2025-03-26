@@ -34,8 +34,8 @@
                 </div>
             @endif
             @php
-                $controlsList = ($activity->type != 'lesson' || $activity->status != 'completed') ? 'noplaybackrate' : '';
-                $allowSeek = $activity->status == 'completed' ? 'true' : 'false';
+                $controlsList = ($activity->type != 'lesson' || !$activity->completed) ? 'noplaybackrate' : '';
+                $allowSeek = $activity->completed ? 'true' : 'false';
                 $hasAudioOptions = isset($content->audio_options) && !empty($content->audio_options);
                 
                 if ($hasAudioOptions) {
@@ -72,11 +72,9 @@
                 <x-journal :journal="$journal"/>
             </div>
         @endif
-        @if($activity->completion_message)
-            <div id="comp_message" class="mt-1" style="display: none;">
-                <p class="text-success">{!! $activity->completion_message !!}</p>
-            </div>
-        @endif
+        <div id="comp_message" class="mt-1" style="display: none;">
+            <p class="text-success">{!! $activity->completion_message ?? 'Congrats on completing this activity!' !!}</p>
+        </div>
     </div>
     <div class="manual-margin-top" id="redirect_div">
         @if (isset($page_info['redirect_route']))
@@ -85,7 +83,7 @@
             </a>
         @endif
         @php
-            $comp_late_btn_disp = ($activity->status == 'completed') || ($activity->final) || ($activity->no_skip) ? 'none' : 'block';
+            $comp_late_btn_disp = !$activity->skippable ? 'none' : 'block';
         @endphp
         <div class="d-flex justify-content-center">
             <button id="complete-later" class="btn btn-outline-primary rounded-pill px-4" type="button" style="display: {{ $comp_late_btn_disp }};">
@@ -103,7 +101,7 @@
 
     const activity_id = {{ $activity->id }};
     const day = '{{ $activity->day->name }}';
-    const optional = {{ $activity->optional }};
+    const optional = {{ $activity->optional ? 'true' : 'false' }};
 
     //COMPLETION ITEMS
     const redirectDiv = document.getElementById('redirect_div');
@@ -115,7 +113,7 @@
     var completed = false;
 
     //CHECKING COMPLETION
-    const status = '{{ $activity->status }}';
+    const status = '{{ $activity->completed ? 'completed' : 'unlocked' }}';
     if (status == 'completed') {
         allowSeek = true;
         activityComplete(false);
@@ -175,7 +173,7 @@
         completed = true;
         //update users progress
         if (status == 'unlocked') {
-            axios.put('{{ route('user.update.progress') }}', {
+            axios.post('/activities/complete', {
                 activity_id: activity_id
             }, {
                 headers: {
@@ -183,27 +181,33 @@
                 }
             })
             .then(response => {
-                console.log(response.data.message);
-                // unlock redirect only after progress is processed
-                // showing modal on completed days
-                if (response.data.day_completed) {
-                    showModal({
-                        label: 'Day Completed',
-                        body: `{!! $activity->day->completion_message !!}`,
-                        media: '{{ Storage::url('content/'.($activity->day->media_path ? $activity->day->media_path : '')) }}',
-                        route: null
-                    });
+                const data = response.data;
+                if (data.success) {
+                    console.log('ProgressService: ' + data.message);
+
+                    // unlock redirect only after progress is processed
+                    // showing modal on completed days
+                    if (data.day_completed) {
+                        showModal({
+                            label: 'Day Completed',
+                            body: `{!! $activity->day->completion_message ?? 'Congrats on completing '.$activity->day->name.'!' !!}`,
+                            media: '{{ Storage::url('content/'.($activity->day->media_path ? $activity->day->media_path : '')) }}',
+                            route: null
+                        });
+                    }
+
+                    //hiding complete button for images
+                    if (type == 'image') {
+                        const completeButton = document.getElementById('img_complete_activity');
+                        completeButton.classList.add('disabled');
+                        completeButton.style.display = 'none';
+                    }
+                    unlockRedirect(message);
                 }
-                //hiding complete button for images
-                if (type == 'image') {
-                    const completeButton = document.getElementById('img_complete_activity');
-                    completeButton.classList.add('disabled');
-                    completeButton.style.display = 'none';
-                }
-                unlockRedirect(message);
             })
             .catch(error => {
                 console.error('There was an error updating the progress:', error);
+                alert('Error: ' + error.message);
             });
         }
         else if (status == 'completed') {
@@ -219,27 +223,31 @@
         });
         compLateBtn.style.display = 'none';
         if (message) {
-            const hasMessage = {{ isset($activity->completion_message) ? 'true' : 'false' }};
-            if (hasMessage) {
-                const completionMessageDiv = document.getElementById('comp_message');
-                completionMessageDiv.style.display = 'block';
-            }
+            const completionMessageDiv = document.getElementById('comp_message');
+            completionMessageDiv.style.display = 'block';
         }
     }
 
     //FAVORITES
     //get favorite button, icon, isFavorited value
     const favButton = document.getElementById('favorite_btn');
-    let isFavorited = {{ $is_favorited ? 'true' : 'false' }};
+    let isFavorited = {{ $activity->favorited ? 'true' : 'false' }};
     const favIcon = document.getElementById('favorite_icon');
     if (isFavorited) {
         favIcon.className = 'bi bi-star-fill';
     }
 
     //FAVORITE HANDLING
-    function addFavorite() {
+    function toggleFavorite() {
+        // change first
+        const currentState = isFavorited;
+        console.log('Current state: ', currentState);
+        isFavorited = !isFavorited;
+        favIcon.className = isFavorited ? "bi bi-star-fill" : "bi bi-star";
+
+        // send request
         return new Promise((resolve, reject) => {
-            axios.post('{{ route('favorites.create') }}', {
+            axios.post('{{ route('favorite.toggle') }}', {
                 activity_id: activity_id
             }, {
                 headers: {
@@ -251,48 +259,17 @@
                 resolve(true);
             })
             .catch(error => {
-                console.error('There was an error adding favorite', error);
+                console.error('There was an error toggling favorite', error);
+                // revert change
+                isFavorited = currentState;
+                favIcon.className = isFavorited ? "bi bi-star-fill" : "bi bi-star";
                 reject(false);
             });
         });
     }
-
-    function removeFavorite() {
-        return new Promise((resolve, reject) => {
-            axios.delete('/favorites/' + activity_id, {
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => {
-                console.log(response.data.message);
-                resolve(true);
-            })
-            .catch(error => {
-                console.error('There was an error removing favorite', error);
-                reject(false);
-            });
-        });
-    }
-
-    //FAVORITE LISTENER
-    favButton.addEventListener('click', () => {
-        if (isFavorited) {
-            removeFavorite().then(success => {
-                if (success) {
-                    isFavorited = false;
-                    favIcon.className = "bi bi-star";
-                }
-            });
-        }
-        else {
-            addFavorite().then(success => {
-                if (success) {
-                    isFavorited = true;
-                    favIcon.className = "bi bi-star-fill";
-                }
-            });
-        }
+    favButton.addEventListener('click', function() {
+        console.log('Toggling favorite');
+        toggleFavorite();
     });
     
     //ON CONTENT LOAD
@@ -418,8 +395,8 @@
                 showModal({
                     label: 'Complete Activity Later?',
                     body: 'Click \'Continue\' to move on to the next activity. All progress on this activity will be lost. This activity must still be completed later in order to finish ' + day + '.',
-                    route: '{{ route('user.complete.later', ['activity_id' => $activity->id]) }}',
-                    method: 'GET',
+                    route: '{{ route('activities.skip', ['activity_id' => $activity->id]) }}',
+                    method: 'POST',
                     buttonLabel: 'Continue',
                     buttonClass: 'btn-danger',
                     onCancel: function() {

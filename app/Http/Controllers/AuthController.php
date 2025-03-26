@@ -100,6 +100,7 @@ class AuthController extends Controller
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required',  'email', new ValidEmail(), 'max:255',  'unique:'.User::class],
                 'password'=> ['required', Password::min(8)->mixedCase()->numbers()],
+                'timezone' => ['string', 'nullable']
             ], [
                 'name.required' => 'Please enter a name.',
                 'name.max' => 'Name must be no longer than 255 characters.',
@@ -119,6 +120,7 @@ class AuthController extends Controller
                 'name' => $request->name,
                 'email'=> $request->email,
                 'password'=> Hash::make($request->password),
+                'timezone' => $request->timezone ?? config('app.timezone'),
                 'last_active_at' => Carbon::now()
             ]);
     

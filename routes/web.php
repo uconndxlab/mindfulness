@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\ContactFormController;
 use App\Http\Controllers\UserController;
 use App\Models\Email_Body;
@@ -94,13 +95,17 @@ Route::middleware('web')->group(function () {
         Route::get('/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
         Route::get('/explore/module/{module_id}', [PageNavController::class, 'exploreModule'])->name('explore.module');
         //using post instead for case with desired accordion open
-        Route::get('/explore/module/{module_id}/bonus', [PageNavController::class, 'exploreModuleBonus'])->name('explore.module.bonus');
+        Route::get('/explore/bonus/{day_id}', [PageNavController::class, 'exploreModuleBonus'])->name('explore.module.bonus');
         Route::get('/checkActivity/{activity_id}', [PageNavController::class, 'checkActivityLocked'])->name('check.activity');
         Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
         // use for when skipping warning modal
         Route::get('/explore/activity/{activity_id}/fast', [PageNavController::class, 'exploreActivityBypass'])->name('explore.activity.bypass');
         Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
         Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
+
+        // activity completion
+        Route::post('/activities/complete', [ActivityController::class, 'complete'])->name('activities.complete');
+        Route::post('/activities/skip', [ActivityController::class, 'skip'])->name('activities.skip');
         
         //NAVIGATION
         //Page Navigation - the controller is not totally necessary
@@ -126,14 +131,9 @@ Route::middleware('web')->group(function () {
         //User updates
         Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
         Route::put('/user/update/namePass', [UserController::class, 'updateNamePass'])->name('user.update.namePass');
-        Route::put('/user/update/progress', [UserController::class,'completeActivity'])->name('user.update.progress');
-        //skipping
-        Route::get('/user/completeLater/{activity_id}', [UserController::class,'completeLater'])->name('user.complete.later');
-        Route::put('/user/update/unlockNext', [UserController::class,'unlockNext'])->name('user.update.unlockNext');
         
         //favorites
-        Route::post('/favorites', [UserController::class, 'addFavorite'])->middleware('throttle:10,1')->name('favorites.create');
-        Route::delete('/favorites/{activity_id}', [UserController::class,'deleteFavorite'])->name('favorites.delete');
+        Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->middleware('throttle:70,1')->name('favorite.toggle');
         
         //contact form - throttled in controller
         Route::post('/contact', [ContactFormController::class, 'submitForm'])->name('contact.submit');

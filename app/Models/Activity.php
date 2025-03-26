@@ -10,9 +10,10 @@ class Activity extends Model
     use HasFactory;
 
     protected $table = 'activities';
-
+    
     protected $casts = [
-        'time' => 'array',
+        'optional' => 'boolean',
+        'skippable' => 'boolean',
     ];
 
     public function day()
@@ -20,6 +21,7 @@ class Activity extends Model
         return $this->belongsTo(Day::class);
     }
 
+    // activity type
     public function quiz()
     {
         return $this->hasOne(Quiz::class);
@@ -35,8 +37,38 @@ class Activity extends Model
         return $this->hasOne(Journal::class);
     }
 
-    public function user_progress()
+    // user progress functions
+    public function users()
     {
-        return $this->hasMany(UserActivity::class);
+        return $this->belongsToMany(User::class, 'user_activity')
+            ->withPivot('completed', 'unlocked', 'favorited');
+    }
+
+    public function nextActivity() {
+        return $this->day->activities()->where('order', '>', $this->order)->first();
+    }
+
+    public function isCompletedBy(?User $user)
+    {
+        return $user ? $this->users()
+            ->where('user_id', $user->id)
+            ->wherePivot('completed', true)
+            ->exists() : false;
+    }
+    
+    public function canBeAccessedBy(?User $user)
+    {
+        return $user ? $this->users()
+            ->where('user_id', $user->id)
+            ->wherePivot('unlocked', true)
+            ->exists() : false;
+    }
+
+    public function isFavoritedBy(?User $user)
+    {
+        return $user ? $this->users()
+            ->where('user_id', $user->id)
+            ->wherePivot('favorited', true)
+            ->exists() : false;
     }
 }

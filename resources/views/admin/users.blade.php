@@ -41,14 +41,14 @@
                         @foreach ($users as $index => $user)
                             @php
                                 $locked = $user->lock_access;
-                                $is_admin_disable = $user->role === "admin" ? 'disabled' : '';
+                                $is_admin_disable = $user->isAdmin() ? 'disabled' : '';
                             @endphp
                             <tr class="user-row" data-index="{{ $index }}" data-id="{{ $user->id }}" data-name="{{ $user->name }}" data-email="{{ $user->email }}">
                                 <td class="px-4 py-3 text-break">{{ $user->email }}</td>
                                 <td class="px-4 py-3 text-truncate" style="max-width: 200px;">{{ $user->name }}</td>
                                 <td class="px-4 py-3">{{ $user->formatted_time }}</td>
                                 <td class="px-4 py-3">
-                                    <span class="badge bg-{{ $user->role === 'admin' ? 'danger' : 'success' }}">
+                                    <span class="badge bg-{{ $user->isAdmin() ? 'danger' : 'success' }}">
                                         {{ ucfirst($user->role) }}
                                     </span>
                                 </td>
@@ -60,7 +60,7 @@
                                 </td>
                                 <td id="email_div_{{ $index }}" class="px-4 py-3 text-end">
                                     @php
-                                        $remind_limit = (int) getConfig('remind_email_day_limit', 0);
+                                        $remind_limit = (int) config('mail.remind_email_day_limit');
                                         $last_active = $user->last_active_at ? Carbon::parse($user->last_active_at) : null;
                                         $last_reminded = $user->last_reminded_at ? Carbon::parse($user->last_reminded_at) : null;
                                         $now = Carbon::now();
@@ -95,7 +95,7 @@
                                 </td>
                                 <td class="px-4 py-3">
                                     @php
-                                        $current_activity = Activity::find($user->current_activity);
+                                        $current_activity = $user->currentActivity();
                                     @endphp
                                     @if($current_activity)
                                         <span class="fw-bold text-primary">Part {{ $current_activity->day->module->id }},</span> 

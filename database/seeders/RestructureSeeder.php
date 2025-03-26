@@ -57,22 +57,10 @@ class RestructureSeeder extends Seeder
         $order = 1;
         //skipping next to avoid constraint error
         foreach ($activities as $activity) {
-            $exceptNext = collect($activity)->except(['next_fake'])->toArray();
+            $exceptNext = collect($activity)->toArray();
             $_ = Activity::create($exceptNext);
             if (!$_->optional) {
                 $order++;
-            }
-        }
-
-        //applying the next
-        $act = null;
-        foreach ($activities as $activity) {
-            $new = Activity::findOrFail($activity['id']);
-            $new->next = $activity['next_fake'];
-            $new->deleted = false;
-            $new->save();
-            if (!$new->optional) {
-                $act = $new;
             }
         }
     
@@ -88,12 +76,6 @@ class RestructureSeeder extends Seeder
                     'order' => $i > 5 ? $order-1 : $order++,
                     'optional' => $i > 5
                 ]);
-
-                if ($i <= 5) {
-                    $act->next = $new->id;
-                    $act->save();
-                    $act = $new;
-                }
             }
 
         });

@@ -8,20 +8,20 @@
         Progress
     </h4>
     @foreach ($modules as $module)
-    <div class="prior-note">
-        <div class="grey-note">
-            <h5 class="fw-bold d-flex justify-content-between">
-                <span>{{ $module->name }}</span>
-            </h5>
-            <small class="{{ $module->progress['status'] == 'completed' ? 'fw-bold' : '' }}">{{ $module->progress['completed'] }}/{{ $module->progress['total'] }} days completed</small>
+        <div class="prior-note">
+            <div class="grey-note">
+                <h5 class="fw-bold d-flex justify-content-between">
+                    <span>{{ $module->name }}</span>
+                </h5>
+                <small class="{{ $module->completed ? 'fw-bold' : '' }}">{{ $module->daysCompleted }}/{{ $module->totalDays }} days completed</small>
+            </div>
         </div>
-    </div>
     @endforeach
 
     @if (session('success'))
-    <div class="alert alert-success" role="alert">
-        {{ session('success') }}
-    </div>
+        <div class="alert alert-success" role="alert">
+            {{ session('success') }}
+        </div>
     @endif
     <form id="updateInfoForm" method="POST" action="{{ route('user.update.namePass') }}">
         @csrf

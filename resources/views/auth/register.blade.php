@@ -54,7 +54,9 @@
                 <label class="form-check-label" for="remember">Remember Me</label>
             </div>
         </div>
-            
+        
+        <input type="hidden" name="timezone" id="timezone">
+
         <div class="form-group text-center mb-3">
             <button type="submit" class="btn btn-primary">SIGN UP</button>
         </div>
@@ -63,3 +65,16 @@
     <a href="{{ route('login') }}" class="text-center text- mt-3">Return to Login</a>
 </div>
 @endsection
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let timezone;
+        
+        try {
+            timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            console.log("Timezone detected with Intl:", timezone);
+            document.getElementById('timezone').value = timezone;
+        } catch (e) {
+            console.error("Error detecting timezone with Intl:", e);
+        }
+    });
+</script>

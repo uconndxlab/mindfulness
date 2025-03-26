@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Events\FinalActivityCompleted;
 use App\Listeners\ShowCompletionModal;
+use App\Services\ProgressService;
 use Event;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(ProgressService::class, function ($app) {
+            return new ProgressService();
+        });
     }
 
     /**
