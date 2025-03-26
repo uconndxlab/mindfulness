@@ -24,9 +24,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'voiceId',
         'last_active_at',
-        'lock_access'
+        'lock_access',
+        'timezone'
     ];
 
     /**

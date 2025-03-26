@@ -20,7 +20,7 @@ return new class extends Migration
 
             // added columns
             $table->string('role')->default('user');
-            $table->string('timezone')->default('UTC');
+            $table->string('timezone')->default(config('app.timezone'));
             $table->timestamp('last_active_at')->nullable();
             $table->timestamp('last_reminded_at')->nullable();
             $table->boolean('lock_access')->default(false);

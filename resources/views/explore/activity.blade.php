@@ -73,7 +73,7 @@
             </div>
         @endif
         <div id="comp_message" class="mt-1" style="display: none;">
-            <p class="text-success">{!! $activity->completion_message ?? 'Congrats on completing '.$activity->day->name.'!' !!}</p>
+            <p class="text-success">{!! $activity->completion_message ?? 'Congrats on completing this activity!' !!}</p>
         </div>
     </div>
     <div class="manual-margin-top" id="redirect_div">

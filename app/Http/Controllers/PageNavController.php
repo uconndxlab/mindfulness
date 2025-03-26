@@ -146,15 +146,13 @@ class PageNavController extends Controller
                 $lastCompletionLocal = Carbon::parse($lastCompleteTime)->setTimezone($userTimezone);
                 $now = now()->setTimezone($userTimezone);
     
-                // log the times
-                // \Log::info('Last Completion: '.$lastCompletionLocal);
-                // \Log::info('Now: '.$now);
-    
                 // if it is not yet the next day, return modal content (or less than two hours)
-                if ($lastCompletionLocal->isSameDay($now) || $now->diffInHours($lastCompletionLocal) < 2) {
+                if ($lastCompletionLocal->isSameDay($now) || $lastCompletionLocal->diffInHours($now) < 2) {
                     return response()->json(['locked' => true, 'modalContent' => [
                         'label' => 'You are progressing fast!',
-                        'body' => 'It appears you have already completed <strong>'.$last_day_name.'</strong> today. While your efforts are admirable, we recommend you take your time through this program and take it one day at a time.',
+                        'body' => 'It appears you have already completed <strong>'.$last_day_name.'</strong> today.'.
+                            ' While your efforts are admirable, we recommend you take your time'.
+                            ' through this program and take it one day at a time.',
                         'route' => route('explore.activity.bypass', ['activity_id' => $activity->id]),
                         'method' => 'GET',
                         'buttonLabel' => 'Continue to Activity',
