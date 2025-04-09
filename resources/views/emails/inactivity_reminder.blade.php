@@ -9,7 +9,7 @@
     
     <div style="background-color: #ffffff; padding: 20px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
         <div style="margin-bottom: 20px;">
-            <img src="/icons/android-icon-72x72.png" 
+            <img src="{{ Storage::url(config('icons/android-icon-72x72.png')) }}" 
                  alt="{{ config('app.name') }}" 
                  style="width: 48px; height: 48; vertical-align: middle; margin-right: 10px;">
             <span style="font-size: 20px; font-weight: bold; color: #48745D; vertical-align: middle;">{{ config('app.name') }}</span>
