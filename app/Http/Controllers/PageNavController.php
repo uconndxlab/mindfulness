@@ -150,13 +150,14 @@ class PageNavController extends Controller
                 if ($lastCompletionLocal->isSameDay($now) || $lastCompletionLocal->diffInHours($now) < 2) {
                     return response()->json(['locked' => true, 'modalContent' => [
                         'label' => 'You are progressing fast!',
-                        'body' => 'It appears you have already completed <strong>'.$last_day_name.'</strong> today.'.
-                            ' While your efforts are admirable, we recommend you take your time'.
-                            ' through this program and take it one day at a time.',
+                        'body' => 'It appears you have already completed <strong>'.$last_day_name.'</strong> today. '.
+                            'While your efforts are admirable, we recommend you take your time through this program and take it one day at a time. '.
+                            'How about repeating your favorite activity?',
                         'route' => route('explore.activity.bypass', ['activity_id' => $activity->id]),
                         'method' => 'GET',
-                        'buttonLabel' => 'Continue to Activity',
-                        'buttonClass' => 'btn-danger'
+                        'buttonLabel' => 'No, go to the next module',
+                        'buttonClass' => 'btn-danger',
+                        'closeLabel' => 'Okay. Go back'
                     ]]);
                 }
             }
@@ -200,15 +201,17 @@ class PageNavController extends Controller
         //make sure that if doing next, the day is not changing
         if (!$request->library) {
             $next = $activity->nextActivity();
-            // check if this is the last activity of the day
-            if (lastActivityInDay($activity, $user)) {
+            // check if this activity will complete the day
+            if (lastActivityInDay($activity, $user) && !$activity->day->isCompletedBy($user)) {
                 $page_info['redirect_label'] = "Complete ".$activity->day->name;
                 $page_info['redirect_route'] = $page_info['exit_route'];
             }
+            // day is not completed, not completion activity, and there is next activity
             else if ($next) {
                 $page_info['redirect_label'] = "Next Activity";
                 $page_info['redirect_route'] = route('explore.activity', ['activity_id' => $next->id]);
             }
+            // day is not completed, not completion activty, and no next activity
             else {
                 $page_info['redirect_label'] = "Back to Part ".$activity->day->module->id;
                 $page_info['redirect_route'] = $page_info['exit_route'];

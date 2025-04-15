@@ -15,7 +15,7 @@
         <span style="text-align: center;">
             <img id="{{ isset($id) ? $id : '' }}" src="{{ Storage::url('content/'.$file) }}" alt="Image">
             <br>
-            <button id="img_complete_activity" class="btn btn-workbook mt-3" style="display: none;">GOT IT! WILL DO</button>
+            <button id="img_complete_activity" class="btn btn-workbook mt-3" style="display: none;">Got it! Will do.</button>
         </span>
     </div>
 @elseif ($type == 'feedback_audio')
