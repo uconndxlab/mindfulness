@@ -28,27 +28,28 @@ class SendInactivityReminderEmails extends Command
      */
     public function handle()
     {
-        //email after 7 days inactivity, then every 4 days after
-        $inactive_time = Carbon::now()->subDays(7);
-        $email_cooldown_time = Carbon::now()->subDays(4);
-        $inactive_users = User::where('last_active_at', '<', $inactive_time)
-                          ->where(function ($query) use ($email_cooldown_time) {
-                              $query->whereNull('last_reminded_at')
-                                    ->orWhere('last_reminded_at', '<', $email_cooldown_time);
-                          })
-                          ->get();
+        // email after 7 days inactivity with 7 day cooldown
+        $inactiveTime = Carbon::now()->subDays(7);
+        $emailCooldown = Carbon::now()->subDays(7);
+        $inactive_users = User::where('last_active_at', '<', $inactiveTime)
+            ->where(function ($query) use ($emailCooldown) {
+                $query->whereNull('last_reminder_send_at')
+                    ->orWhere('last_reminder_send_at', '<', $emailCooldown);
+            })
+            ->get();
 
         foreach ($inactive_users as $user) {
             //do not send email to locked accounts
             if ($user->lock_access) {
                 continue;
             }
-            Mail::to($user->email)->send(new \App\Mail\InactivityReminder($user));
-            $this->info('Reminder email sent to: ' . $user->email);
+            // send email
+            Mail::to($user->email)->queue(new \App\Mail\InactivityReminder($user));
 
             //update user email timestamp
             $user->last_reminded_at = Carbon::now();
             $user->save();
         }
+        $this->info("Inactivity emails sent to {$inactive_users->count()} users.");
     }
 }
