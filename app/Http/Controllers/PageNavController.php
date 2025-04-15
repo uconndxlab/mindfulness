@@ -331,7 +331,7 @@ class PageNavController extends Controller
         }
 
         // using query copy get random activity
-        $random_act = $rand_query->inRandomOrder()->first();
+        $random_act = $rand_query->where('type', 'practice')->get()->random();
         
         //handle search
         if ($request->has('search') && $request->search != '') {
