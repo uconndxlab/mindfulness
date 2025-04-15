@@ -38,18 +38,22 @@ class SendInactivityReminderEmails extends Command
             })
             ->get();
 
+        $count = 0;
         foreach ($inactive_users as $user) {
             //do not send email to locked accounts
             if ($user->lock_access) {
                 continue;
             }
             // send email
-            Mail::to($user->email)->queue(new \App\Mail\InactivityReminder($user));
+            Mail::to($user->email)->send(new \App\Mail\InactivityReminder($user));
 
             //update user email timestamp
             $user->last_reminded_at = Carbon::now();
             $user->save();
+            $count++;
         }
-        $this->info("Inactivity emails sent to {$inactive_users->count()} users.");
+        $message = "Inactivity emails sent to { $count } users.";
+        \Log::info($message);
+        $this->info($message);
     }
 }
