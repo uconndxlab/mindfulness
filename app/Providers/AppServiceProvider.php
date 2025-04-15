@@ -44,5 +44,9 @@ class AppServiceProvider extends ServiceProvider
 
             return $guard;
         });
+
+        if(config('app.env') === 'production') {
+            \URL::forceScheme('https');
+        }
     }
 }

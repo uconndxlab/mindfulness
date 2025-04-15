@@ -143,6 +143,17 @@
                 completeButton.parentElement.style.flexDirection = 'column';
                 completeButton.parentElement.style.alignItems = 'center';
             }
+            else if (type == 'video') {
+                // find video player in content main
+                const videoPlayer = document.getElementById('content_view');
+                if (videoPlayer) {
+                    console.log('video player found');
+                    videoPlayer.addEventListener('ended', activityComplete);
+                }
+                else {
+                    console.log('video player not found');
+                }
+            }
         }
         else {
             // audio
@@ -342,7 +353,7 @@
                 }
                 activityComplete();
             };
-            console.log('adding end listener');
+            console.log('adding media end listener');
             player.addEventListener('ended', endedListener);
         });
 

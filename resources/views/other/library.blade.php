@@ -562,8 +562,8 @@
             })
             .finally(() => {
                 throbber.style.display = 'none';
-                applyFilterButton.disabled = false;
-                clearFilterButton.disabled = false;
+                if (applyFilterButton) applyFilterButton.disabled = false;
+                if (clearFilterButton) clearFilterButton.disabled = false;
             });
         }
         //search on page load with filters
