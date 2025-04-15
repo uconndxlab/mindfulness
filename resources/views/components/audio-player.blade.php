@@ -27,10 +27,12 @@
         <small style="color:#bfbfbf">1.5</small>
     </div>
 @endif
+<script src="https://cdn.jsdelivr.net/npm/nosleep.js@0.12.0/dist/NoSleep.min.js"></script>
 <script>
 (function() {
     // get the id
     let id = '{{ $id }}';
+    const noSleep = new NoSleep();
     // init the audioplayer
     initAudioPlayer($("#player-"+id));
 
@@ -106,6 +108,9 @@
         // pause audio
         function pauseAudio() {
             audio[0].pause();
+            console.log("{{ $id }}: " + "noSleep disabled");
+            // enable screen sleep
+            noSleep.disable();
             player.removeClass("playing");
             icon.removeClass("bi-pause");
             player.addClass("paused");
@@ -118,6 +123,10 @@
                 $("audio")[index].pause();
             });
             $(".js-audio").removeClass("playing");
+
+            // disable screen sleep
+            console.log("{{ $id }}: " + "NoSleep enabled");
+            noSleep.enable();
             
             // play and change classes/icons
             audio[0].play();
@@ -139,6 +148,14 @@
         // needs to be able to pause without the button
         const originalPause = audio[0].pause;
         audio[0].pause = function() {
+            // check if playing
+            if (audio[0].paused) {
+                console.log("{{ $id }}: " + "already paused");
+                return;
+            }
+            // enable screen sleep
+            console.log("{{ $id }}: " + "NoSleep disabled");
+            noSleep.disable();
             originalPause.apply(this);
             player.removeClass("playing");
             icon.removeClass("bi-pause");
@@ -161,6 +178,10 @@
         });
 
         audio.on("ended", () => {
+            // enable screen sleep
+            console.log("{{ $id }}: " + "nosleep disabled");
+            noSleep.disable();
+
             player.removeClass("playing");
             icon.removeClass("bi-pause");
             icon.addClass("bi-play");
