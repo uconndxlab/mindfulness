@@ -29,12 +29,12 @@ class SendInactivityReminderEmails extends Command
     public function handle()
     {
         // email after 7 days inactivity with 7 day cooldown
-        $inactiveTime = Carbon::now()->subDays(7);
+        $threshold = Carbon::now()->subDays(7);
         $emailCooldown = Carbon::now()->subDays(7);
-        $inactive_users = User::where('last_active_at', '<', $inactiveTime)
-            ->where(function ($query) use ($emailCooldown) {
-                $query->whereNull('last_reminder_send_at')
-                    ->orWhere('last_reminder_send_at', '<', $emailCooldown);
+        $inactive_users = User::where('last_active_at', '<', $threshold)
+            ->where(function ($query) use ($threshold) {
+                $query->whereNull('last_reminded_at')
+                    ->orWhere('last_reminded_at', '<', $threshold);
             })
             ->get();
 
