@@ -109,6 +109,9 @@ if (modal) {
 }
 
 // handle session modal data
-if (window.sessionModalData) {
-    showModal(window.sessionModalData);
-} 
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.sessionModalData) {
+        showModal(window.sessionModalData);
+        window.sessionModalData = null; // clear data
+    }
+}); 
