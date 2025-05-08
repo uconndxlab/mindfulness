@@ -5,7 +5,6 @@
     @endphp
     <head>
         @include('layouts.partials.head')
-        <link href="{{ asset('css/main.css') }}" rel="stylesheet">
     </head>
     <body class="{{ !$is_app ? 'd-flex align-items-center py-4 bg-body-tertiary' : '' }}">
         @if($is_app)
