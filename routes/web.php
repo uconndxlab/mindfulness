@@ -166,7 +166,7 @@ Route::middleware('web')->group(function () {
             Route::get('/showReminderEmail/{user_id}', function (Request $request) {
                 $user = User::findOrFail($request->user_id)->first();
                 $body = Email_Body::where('type', 'reminder')->inRandomOrder()->first()->body;
-                return view('emails.inactivity_reminder', compact('user', 'body'));
+                return view('emails.inactivity-reminder', compact('user', 'body'));
             });
 
             Route::delete('/deleteUser/{user_id}', [UserController::class,'deleteUser'])->name('users.delete');

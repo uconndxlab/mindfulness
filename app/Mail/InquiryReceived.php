@@ -27,7 +27,7 @@ class InquiryReceived extends Mailable
 
     public function build()
     {
-        return $this->view('emails.inquiry_received')
+        return $this->view('emails.inquiry-received')
                     ->with(['inquiry' => $this->inquiry]);
     }
 
