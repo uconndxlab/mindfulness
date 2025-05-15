@@ -135,35 +135,13 @@ class User extends Authenticatable implements MustVerifyEmail
     public function toggleFavoriteActivity(?Activity $activity)
     {
         if (!$activity) {
-            return false;
+            return;
         }
 
-        $exists = $this->activities()
-            ->where('activity_id', $activity->id)
-            ->exists();
-        
-        if ($exists) {
-            // get status
-            $status = $this->activities()
-                ->wherePivot('activity_id', $activity->id)
-                ->first()
-                ->pivot
-                ->favorited;
-
-            // update
-            $newStatus = !$status;
-            $this->activities()->updateExistingPivot($activity->id, [
-                'favorited' => $newStatus
-            ]);
-            return $newStatus;
-        }
-        else {
-            // make new pivot
-            $this->activities()->attach($activity->id, [
-                'favorited' => true
-            ]);
-            return true;
-        }  
+        // should exist if unlocked?
+        $this->activities()->updateExistingPivot($activity->id, [
+            'favorited' => !$this->isActivityFavorited($activity)
+        ]);
     }
 
     // day progress functions
