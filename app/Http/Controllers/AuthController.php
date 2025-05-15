@@ -150,7 +150,7 @@ class AuthController extends Controller
             lockAll($user->id);
             unlockFirst($user->id);
     
-            //login, hit limiter, redirect
+            //login, hit limiter, redirect, event hits MustVerifyEmail which calls sendEmailVerificationNotification
             event(new Registered($user));
             $remember = $request->has('remember');
             Auth::attempt($request->only('email', 'password'), $remember);
