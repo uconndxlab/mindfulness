@@ -62,12 +62,23 @@ Route::middleware('web')->group(function () {
             if (!$user->hasVerifiedEmail()) {
                 $user->markEmailAsVerified();
             }
+            
+            // fire GA event - email verified
+            session()->flash('ga_event', [
+                'name' => 'email_verified',
+                'params' => [
+                    'event_category' => 'Authentication',
+                    'event_label' => 'Email Verified',
+                    'user_id' => $user->id,
+                    'email' => $user->email
+                ]
+            ]);
 
             // if user is already logged in
             if (Auth::user()->id == $user->id) {
                 return redirect('/welcome');
             }
-    
+
             // otherwise redirect to login
             return redirect('/login')->with('success', 'Email verified successfully. Please login.');
     
