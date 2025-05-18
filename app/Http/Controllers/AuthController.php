@@ -15,6 +15,7 @@ use Illuminate\Validation\Rules\Password;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -67,9 +68,7 @@ class AuthController extends Controller
                 'name' => 'login_success',
                 'params' => [
                     'event_category' => 'Authentication',
-                    'event_label' => 'Successful Login',
-                    'user_id' => Auth::id(),
-                    'email' => $request->email
+                    'event_label' => 'Successful Login'
                 ]
             ]);
             
@@ -81,8 +80,7 @@ class AuthController extends Controller
             'name' => 'login_failed',
             'params' => [
                 'event_category' => 'Authentication',
-                'event_label' => 'Failed Login',
-                'email' => $request->email
+                'event_label' => 'Failed Login'
             ]
         ]);
         
@@ -142,11 +140,6 @@ class AuthController extends Controller
                 $analytics_id = (string) Str::uuid();
             } while (User::where('analytics_id', $analytics_id)->exists());
             
-            // generate unique analytics_id
-            do {
-                $analytics_id = (string) Str::uuid();
-            } while (User::where('analytics_id', $analytics_id)->exists());
-            
             //create user
             $user = User::create([
                 'name' => $request->name,
@@ -172,9 +165,7 @@ class AuthController extends Controller
                 'name' => 'registration_success',
                 'params' => [
                     'event_category' => 'Authentication',
-                    'event_label' => 'Successful Registration',
-                    'user_id' => Auth::id(),
-                    'email' => $request->email
+                    'event_label' => 'Successful Registration'
                 ]
             ]);
             

@@ -67,9 +67,7 @@ Route::middleware('web')->group(function () {
                 'name' => 'email_verified',
                 'params' => [
                     'event_category' => 'Authentication',
-                    'event_label' => 'Email Verified',
-                    'user_id' => $user->id,
-                    'email' => $user->email
+                    'event_label' => 'Email Verified'
                 ]
             ]);
 

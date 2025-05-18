@@ -106,9 +106,7 @@ class ProgressService
             'params' => [
                 'event_category' => 'Progress',
                 'event_label' => 'Activity Completed',
-                'activity_name' => $activity->name,
-                'user_id' => $user->id,
-                'email' => $user->email,
+                'activity_name' => $activity->name
             ]
         ];
 
@@ -197,9 +195,7 @@ class ProgressService
             'params' => [
                 'event_category' => 'Progress',
                 'event_label' => 'Day Completed',
-                'day_name' => $day->name,
-                'user_id' => $user->id,
-                'email' => $user->email,
+                'day_name' => $day->name
             ]
         ];
 
@@ -296,9 +292,7 @@ class ProgressService
             'params' => [
                 'event_category' => 'Progress',
                 'event_label' => 'Module Completed',
-                'module_name' => $module->name,
-                'user_id' => $user->id,
-                'email' => $user->email,
+                'module_name' => $module->name
             ]
         ];
 

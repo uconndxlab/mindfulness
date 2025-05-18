@@ -47,7 +47,10 @@
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
 
-    gtag('config', '{{ config('services.google.analytics_id') }}');
+    // add the analytics id to the gtag
+    gtag('config', '{{ config('services.google.analytics_id') }}', {
+        'user_id': '{{ Auth::user()->analytics_id }}'
+    });
 </script>
 
 @yield('additional_head') 
