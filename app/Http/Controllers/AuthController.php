@@ -137,13 +137,24 @@ class AuthController extends Controller
         }
 
         try {
+            // generate unique analytics_id
+            do {
+                $analytics_id = (string) Str::uuid();
+            } while (User::where('analytics_id', $analytics_id)->exists());
+            
+            // generate unique analytics_id
+            do {
+                $analytics_id = (string) Str::uuid();
+            } while (User::where('analytics_id', $analytics_id)->exists());
+            
             //create user
             $user = User::create([
                 'name' => $request->name,
                 'email'=> $request->email,
                 'password'=> Hash::make($request->password),
                 'timezone' => $request->timezone ?? config('app.timezone'),
-                'last_active_at' => Carbon::now()
+                'last_active_at' => Carbon::now(),
+                'analytics_id' => $analytics_id
             ]);
     
             //unlocking first module/day/activity

@@ -28,7 +28,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'last_active_at',
         'lock_access',
-        'timezone'
+        'timezone',
+        'analytics_id'
     ];
 
     /**
@@ -154,6 +155,8 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->activities()->updateExistingPivot($activity->id, [
             'favorited' => !$this->isActivityFavorited($activity)
         ]);
+
+        return $this->isActivityFavorited($activity);
     }
 
     // day progress functions
