@@ -56,6 +56,12 @@ return [
             'throw' => false,
         ],
 
+        'scorm' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/scorm'),
+            'url' => env('APP_URL').'/storage/scorm',
+            'visibility' => 'public',
+        ],
     ],
 
     /*

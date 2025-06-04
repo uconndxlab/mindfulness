@@ -49,7 +49,7 @@
 
     // add the analytics id to the gtag
     gtag('config', '{{ config('services.google.analytics_id') }}', {
-        'user_id': '{{ Auth::user()->analytics_id }}'
+        'user_id': '{{ isset(Auth::user()->analytics_id) ? Auth::user()->analytics_id : null }}'
     });
 </script>
 

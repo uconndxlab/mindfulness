@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\ContactFormController;
+use App\Http\Controllers\ScormController;
+use App\Http\Controllers\ScormPackageController;
 use App\Http\Controllers\UserController;
 use App\Models\Email_Body;
 use App\Models\User;
@@ -146,6 +148,17 @@ Route::middleware('web')->group(function () {
         
         //NOTES - throttled in controller
         Route::resource('note', NoteController::class);
+
+        //SCORM
+        Route::middleware(['auth'])->group(function () {
+            Route::post('/scorm/initialize/{package}', [ScormController::class, 'initialize']);
+            Route::post('/scorm/commit/{session}', [ScormController::class, 'commit']);
+            Route::post('/scorm/terminate/{session}', [ScormController::class, 'terminate']);
+            Route::post('/scorm/setValue/{session}', [ScormController::class, 'setValue']);
+            Route::get('/scorm/getValue/{session}', [ScormController::class, 'getValue']);
+            Route::get('/scorm/upload', [ScormPackageController::class, 'upload'])->name('scorm.upload');
+            Route::post('/scorm/upload', [ScormPackageController::class, 'store'])->name('scorm.store');
+        });
         
         //ADMIN ONLY
         Route::middleware('admin')->group(function () {
