@@ -2,8 +2,7 @@
 
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\ContactFormController;
-use App\Http\Controllers\ScormController;
-use App\Http\Controllers\ScormPackageController;
+use App\Http\Controllers\XapiPackageController;
 use App\Http\Controllers\UserController;
 use App\Models\Email_Body;
 use App\Models\User;
@@ -149,15 +148,12 @@ Route::middleware('web')->group(function () {
         //NOTES - throttled in controller
         Route::resource('note', NoteController::class);
 
-        //SCORM
-        Route::middleware(['auth'])->group(function () {
-            Route::post('/scorm/initialize/{package}', [ScormController::class, 'initialize']);
-            Route::post('/scorm/commit/{session}', [ScormController::class, 'commit']);
-            Route::post('/scorm/terminate/{session}', [ScormController::class, 'terminate']);
-            Route::post('/scorm/setValue/{session}', [ScormController::class, 'setValue']);
-            Route::get('/scorm/getValue/{session}', [ScormController::class, 'getValue']);
-            Route::get('/scorm/upload', [ScormPackageController::class, 'upload'])->name('scorm.upload');
-            Route::post('/scorm/upload', [ScormPackageController::class, 'store'])->name('scorm.store');
+        // xAPI
+        // only admins can upload xapi packages
+        Route::middleware(['auth', 'admin'])->group(function () {
+            Route::get('/xapi/upload', [XapiPackageController::class, 'create'])->name('xapi.upload');
+            Route::post('/xapi/upload', [XapiPackageController::class, 'store'])->name('xapi.store');
+            Route::get('/xapi/package/{package}', [XapiPackageController::class, 'show'])->name('xapi.show');
         });
         
         //ADMIN ONLY

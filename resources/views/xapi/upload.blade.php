@@ -5,7 +5,19 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">Upload SCORM Package</div>
+                <div class="card-header">Upload xAPI Package</div>
+
+                @if (session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
 
                 <div class="card-body">
                     @if ($errors->any())
@@ -18,7 +30,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('scorm.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('xapi.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group mb-3">
                             <label for="title" class="form-label">Package Title</label>
@@ -34,14 +46,14 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="package" class="form-label">SCORM Package (ZIP)</label>
+                            <label for="package_file" class="form-label">xAPI Package (ZIP)</label>
                             <input type="file" 
-                                   class="form-control @error('package') is-invalid @enderror" 
-                                   name="package" 
-                                   id="package" 
+                                   class="form-control @error('package_file') is-invalid @enderror" 
+                                   name="package_file" 
+                                   id="package_file" 
                                    accept=".zip" 
                                    required>
-                            @error('package')
+                            @error('package_file')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

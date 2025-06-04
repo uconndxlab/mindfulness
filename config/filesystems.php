@@ -56,10 +56,10 @@ return [
             'throw' => false,
         ],
 
-        'scorm' => [
+        'xapi_content' => [
             'driver' => 'local',
-            'root' => storage_path('app/public/scorm'),
-            'url' => env('APP_URL').'/storage/scorm',
+            'root' => storage_path('app/public/xapi_content'),
+            'url' => env('APP_URL').'/storage/xapi_content',
             'visibility' => 'public',
         ],
     ],
