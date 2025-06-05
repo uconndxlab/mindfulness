@@ -51,6 +51,15 @@ class XapiPackageController extends Controller
     
     public function show(XapiPackage $package)
     {
+        $iframeSrc = $this->getIframeSrc($package);
+
+        return view('xapi.viewer', [
+            'package' => $package,
+            'iframeSrc' => $iframeSrc,
+        ]);
+    }
+
+    public function getIframeSrc(XapiPackage $package) {
         $user = auth()->user();
         
         // sanctum token
@@ -76,9 +85,7 @@ class XapiPackageController extends Controller
         // add query params
         $iframeSrc = $fullLaunchUrl.'?'.http_build_query($launchParams);
 
-        return view('xapi.viewer', [
-            'package' => $package,
-            'iframeSrc' => $iframeSrc,
-        ]);
+        return $iframeSrc;
     }
+
 }
