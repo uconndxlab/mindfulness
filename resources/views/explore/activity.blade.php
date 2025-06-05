@@ -33,33 +33,37 @@
                     <h5>{!! $content->instructions !!}</h5>
                 </div>
             @endif
-            @php
-                $controlsList = ($activity->type != 'lesson' || !$activity->completed) ? 'noplaybackrate' : '';
-                $allowSeek = $activity->completed ? 'true' : 'false';
-                $hasAudioOptions = isset($content->audio_options) && !empty($content->audio_options);
-                
-                if ($hasAudioOptions) {
-                    $defaultVoice = key($content->audio_options);
-                    $multipleVoices = count($content->audio_options) > 1;
-                }
-            @endphp
-            @if ($hasAudioOptions)
-                <!-- voice selection dropdown -->
-                <x-voice-selector :voices="$content->audio_options" :defaultVoice="$defaultVoice" :showDropdown="$multipleVoices"/>
+            @if ($content->type == 'xapi')
+                <x-xapi-viewer :package-id="intval($content->file_path)" />
+            @elseif ($content->type == 'audio' || $content->type == 'video' || $content->type == 'pdf' || $content->type == 'image')
+                @php
+                    $controlsList = ($activity->type != 'lesson' || !$activity->completed) ? 'noplaybackrate' : '';
+                    $allowSeek = $activity->completed ? 'true' : 'false';
+                    $hasAudioOptions = isset($content->audio_options) && !empty($content->audio_options);
+                    
+                    if ($hasAudioOptions) {
+                        $defaultVoice = key($content->audio_options);
+                        $multipleVoices = count($content->audio_options) > 1;
+                    }
+                @endphp
+                @if ($hasAudioOptions)
+                    <!-- voice selection dropdown -->
+                    <x-voice-selector :voices="$content->audio_options" :defaultVoice="$defaultVoice" :showDropdown="$multipleVoices"/>
 
-                <!-- audio content views -->
-                <div class="mt-4">
-                    @foreach ($content->audio_options as $voice => $file_path)
-                        <div id="audio_content" class="content-main" voice="{{ $voice }}" data-type="audio" style="display: none;">
-                            <x-audio-player :file="$file_path" :id="$voice" :controlsList="$controlsList" :allowSeek="$allowSeek"/>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <!-- default audio, video, image -->
-                <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: flex; justify-content: center; align-items: center; flex-direction:column;">
-                    <x-contentView id="content_view" id2="download_btn" voiceId="none" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}" allowSeek="{{ $allowSeek }}"/>
-                </div>
+                    <!-- audio content views -->
+                    <div class="mt-4">
+                        @foreach ($content->audio_options as $voice => $file_path)
+                            <div id="audio_content" class="content-main" voice="{{ $voice }}" data-type="audio" style="display: none;">
+                                <x-audio-player :file="$file_path" :id="$voice" :controlsList="$controlsList" :allowSeek="$allowSeek"/>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <!-- default audio, video, image -->
+                    <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: flex; justify-content: center; align-items: center; flex-direction:column;">
+                        <x-contentView id="content_view" id2="download_btn" voiceId="none" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}" allowSeek="{{ $allowSeek }}"/>
+                    </div>
+                @endif
             @endif
 
         <!-- other content types -->
