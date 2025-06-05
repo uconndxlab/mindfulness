@@ -153,47 +153,43 @@
                 completeButton.parentElement.style.alignItems = 'center';
             }
             else if (type == 'xapi') {
-                // poll for xAPI completion - completion must be init by activityComplete()
-                const packageId = {{ intval($content->file_path) }};
-                let pollCount = 0;
-                const maxPolls = 360; // 30 minutes maximum polling time
-                
-                // get auth token from iframe src
-                const iframe = document.querySelector('iframe');
-                const iframeSrc = iframe.src;
-                const authParam = new URL(iframeSrc).searchParams.get('auth');
-                
-                const pollInterval = setInterval(() => {
-                    // stop polling after maxPolls attempts
-                    if (pollCount >= maxPolls) {
-                        console.log('Stopping xAPI completion polling after 30 minutes');
-                        clearInterval(pollInterval);
-                        return;
-                    }
+                if (status == 'completed') {
+                    console.log('xAPI activity already completed');
+                }
+                else {
+                    // poll for xAPI completion - completion must be init by activityComplete()
+                    const packageId = {{ intval($content->file_path) }};
                     
-                    pollCount++;
-                    axios.get(`/api/xapi/completion/${packageId}`, {
-                        headers: {
-                            'Authorization': authParam
-                        }
-                    })
-                        .then(response => {
-                            if (response.data.completed) {
-                                console.log('xAPI activity completed');
-                                clearInterval(pollInterval);
-                                activityComplete();
+                    // get auth token from iframe src
+                    const iframe = document.querySelector('iframe');
+                    const iframeSrc = iframe.src;
+                    const authParam = new URL(iframeSrc).searchParams.get('auth');
+                    
+                    const pollInterval = setInterval(() => {
+                        console.log('polling for xAPI completion');
+                        axios.get(`/api/xapi/completion/${packageId}`, {
+                            headers: {
+                                'Authorization': authParam
                             }
                         })
-                        .catch(error => {
-                            console.error('Error checking xAPI completion:', error);
-                            clearInterval(pollInterval);
-                        });
-                }, 3000); // check every 3 seconds
-
-                // clear interval when leaving page
-                window.addEventListener('beforeunload', () => {
-                    clearInterval(pollInterval);
-                });
+                            .then(response => {
+                                if (response.data.completed) {
+                                    console.log('xAPI activity completed');
+                                    clearInterval(pollInterval);
+                                    activityComplete();
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error checking xAPI completion:', error);
+                                clearInterval(pollInterval);
+                            });
+                    }, 3000); // check every 3 seconds
+    
+                    // clear interval when leaving page
+                    window.addEventListener('beforeunload', () => {
+                        clearInterval(pollInterval);
+                    });
+                }
             }
             else if (type == 'video') {
                 // find video player in content main
