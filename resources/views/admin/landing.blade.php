@@ -15,7 +15,6 @@
 <span>
     <h2><strong>{{ $head }}</strong></h2>
     <div class="container mt-4">
-        <a class="btn btn-success border disabled" href="#" disabled>Edit Modules</a>
         <a class="btn btn-success border" href="{{ route('users.list') }}">Edit App Access</a>
     </div>
 </span>
