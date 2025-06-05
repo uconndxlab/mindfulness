@@ -34,7 +34,11 @@
                 </div>
             @endif
             @if ($content->type == 'xapi')
-                <x-xapi-viewer :package-id="intval($content->file_path)" />
+                <div class="content-main" data-type="xapi">
+                    <div id="content_view">
+                        <x-xapi-viewer :package-id="intval($content->file_path)" />
+                    </div>
+                </div>
             @elseif ($content->type == 'audio' || $content->type == 'video' || $content->type == 'pdf' || $content->type == 'image')
                 @php
                     $controlsList = ($activity->type != 'lesson' || !$activity->completed) ? 'noplaybackrate' : '';
@@ -131,6 +135,7 @@
         const content = document.getElementById('content_view');
         type = '{{ isset($content->type) ? $content->type : null }}';
         if (content) {
+            console.log('Type: ', type);
             if (type == 'pdf') {
                 const downloadButton = document.getElementById('download_btn');
                 downloadButton.addEventListener('click', activityComplete);
@@ -146,6 +151,49 @@
                 completeButton.parentElement.style.display = 'flex';
                 completeButton.parentElement.style.flexDirection = 'column';
                 completeButton.parentElement.style.alignItems = 'center';
+            }
+            else if (type == 'xapi') {
+                // poll for xAPI completion - completion must be init by activityComplete()
+                const packageId = {{ intval($content->file_path) }};
+                let pollCount = 0;
+                const maxPolls = 360; // 30 minutes maximum polling time
+                
+                // get auth token from iframe src
+                const iframe = document.querySelector('iframe');
+                const iframeSrc = iframe.src;
+                const authParam = new URL(iframeSrc).searchParams.get('auth');
+                
+                const pollInterval = setInterval(() => {
+                    // stop polling after maxPolls attempts
+                    if (pollCount >= maxPolls) {
+                        console.log('Stopping xAPI completion polling after 30 minutes');
+                        clearInterval(pollInterval);
+                        return;
+                    }
+                    
+                    pollCount++;
+                    axios.get(`/api/xapi/completion/${packageId}`, {
+                        headers: {
+                            'Authorization': authParam
+                        }
+                    })
+                        .then(response => {
+                            if (response.data.completed) {
+                                console.log('xAPI activity completed');
+                                clearInterval(pollInterval);
+                                activityComplete();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error checking xAPI completion:', error);
+                            clearInterval(pollInterval);
+                        });
+                }, 3000); // check every 3 seconds
+
+                // clear interval when leaving page
+                window.addEventListener('beforeunload', () => {
+                    clearInterval(pollInterval);
+                });
             }
             else if (type == 'video') {
                 // find video player in content main

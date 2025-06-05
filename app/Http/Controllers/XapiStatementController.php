@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\XapiPackage;
-use App\Models\XapiCompletion;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Sanctum\PersonalAccessToken;
 
@@ -45,14 +45,27 @@ class XapiStatementController extends Controller
             // check for completion verb to update completion
             if (in_array($verbId, $completionVerbs)) {
                 $xapiPackage = XapiPackage::where('xapi_activity_id', $activityIdFromStatement)->first();
-
-                // TODO: handle completion
-                \Log::info('XapiStatementController: completion verb detected', [
-                    'statement' => $statement
-                ]);
+                
+                if ($xapiPackage) {
+                    // store completion status in cache
+                    $cacheKey = 'xapi_completion_'.$xapiPackage->id.'_'.auth()->id();
+                    Cache::put($cacheKey, true, now()->addMinutes(30));
+                    \Log::info('XapiStatementController: completion stored in cache', [
+                        'package_id' => $xapiPackage->id,
+                        'user_id' => auth()->id()
+                    ]);
+                }
             }
         }
 
         return response()->noContent();
+    }
+
+    public function checkCompletion($packageId)
+    {
+        $cacheKey = 'xapi_completion_'.$packageId.'_'.auth()->id();
+        $isCompleted = Cache::get($cacheKey, false);
+        
+        return response()->json(['completed' => $isCompleted]);
     }
 }

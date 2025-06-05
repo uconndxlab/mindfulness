@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Content;
 
 class XapiPackage extends Model
 {
@@ -12,4 +13,14 @@ class XapiPackage extends Model
         'entry_point',
         'xapi_activity_id'
     ];
+
+    public function content()
+    {
+        return $this->belongsTo(Content::class, 'xapi_activity_id');
+    }
+
+    public function activity()
+    {
+        return $this->content->activity;
+    }
 }
