@@ -9,7 +9,7 @@
 
                 @if (session('success'))
                     <div class="alert alert-success">
-                        {{ session('success') }}
+                        {{ session('success') }} <a href="{{ route('xapi.show', ['package' => session('package')]) }}" class="btn-link">View Package</a>
                     </div>
                 @endif
 
