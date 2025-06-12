@@ -1003,4 +1003,6 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     padding-right: 0px !important;
 }
 
-
+.feedback-div .text-info {
+    color:var(--darker-green)!important;
+}
