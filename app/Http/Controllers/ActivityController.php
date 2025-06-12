@@ -34,17 +34,15 @@ class ActivityController extends Controller
         // check if already completed
         if ($user->isActivityCompleted($activity)) {
             // potential for debugging in case the next day did not unlock
-
-
             return response()->json(['success' => true, 'message' => 'Activity already completed'], 200);
         }
         
         // complete activity
         $result = $this->progressService->completeActivity($user, $activity);
-
+        
         // return full result as json
         $day_completed = false;
-
+        
         // build response
         $message = 'Activity completed';
         if (isset($result['optional_unlocked']) && $result['optional_unlocked']) {
@@ -70,7 +68,23 @@ class ActivityController extends Controller
             $message .= ', course completed';
         }
 
-        return response()->json(['success' => true, 'message' => $message, 'day_completed' => $day_completed], 200);
+        // get ga event
+        $ga_event = [
+            'activity' => null,
+            'day' => null,
+            'module' => null
+        ];
+        if (isset($result['ga_event_activity'])) {
+            $ga_event['activity'] = $result['ga_event_activity'];
+        }
+        if (isset($result['ga_event_day'])) {
+            $ga_event['day'] = $result['ga_event_day'];
+        }
+        if (isset($result['ga_event_module'])) {
+            $ga_event['module'] = $result['ga_event_module'];
+        }
+
+        return response()->json(['success' => true, 'message' => $message, 'day_completed' => $day_completed, 'ga_event' => $ga_event], 200);
     }
 
     // skip activity

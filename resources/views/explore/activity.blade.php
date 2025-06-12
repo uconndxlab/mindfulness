@@ -1,4 +1,4 @@
-@extends('layouts.main')
+@extends('layouts.app')
 
 @section('title', $activity->title)
 
@@ -205,6 +205,22 @@
                             media: '{{ Storage::url('content/'.($activity->day->media_path ? $activity->day->media_path : '')) }}',
                             route: null
                         });
+                    }
+
+                    // fire GA events
+                    if (data.ga_event) {
+                        if (data.ga_event.activity) {
+                            console.log('fireGAEvent activity');
+                            fireGAEvent(data.ga_event.activity);
+                        }
+                        if (data.ga_event.day) {
+                            console.log('fireGAEvent day');
+                            fireGAEvent(data.ga_event.day);
+                        }
+                        if (data.ga_event.module) {
+                            console.log('fireGAEvent module');
+                            fireGAEvent(data.ga_event.module);
+                        }
                     }
 
                     //hiding complete button for images

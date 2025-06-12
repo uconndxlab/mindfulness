@@ -61,8 +61,30 @@ class AuthController extends Controller
                 ]);
             }
             Auth::user()->update(['last_active_at' => Carbon::now()]);
+            
+            // fire GA event - login success
+            session()->flash('ga_event', [
+                'name' => 'login_success',
+                'params' => [
+                    'event_category' => 'Authentication',
+                    'event_label' => 'Successful Login',
+                    'user_id' => Auth::id(),
+                    'email' => $request->email
+                ]
+            ]);
+            
             return redirect()->intended('/home');
         }
+        
+        // fire GA event - login failed
+        session()->flash('ga_event', [
+            'name' => 'login_failed',
+            'params' => [
+                'event_category' => 'Authentication',
+                'event_label' => 'Failed Login',
+                'email' => $request->email
+            ]
+        ]);
         
         return back()->withErrors(['credentials' => 'Invalid credentials.'])->withInput();
     }
@@ -133,10 +155,22 @@ class AuthController extends Controller
             $remember = $request->has('remember');
             Auth::attempt($request->only('email', 'password'), $remember);
             RateLimiter::hit($key, $limit['decay']);
-            return redirect(route('welcome'));
+
+            // fire GA event - registration success
+            session()->flash('ga_event', [
+                'name' => 'registration_success',
+                'params' => [
+                    'event_category' => 'Authentication',
+                    'event_label' => 'Successful Registration',
+                    'user_id' => Auth::id(),
+                    'email' => $request->email
+                ]
+            ]);
+            
+            return redirect(route('verification.notice'));
         }
         catch (\Exception $e) {
-            dd($e);
+            return back()->withErrors(['error' => 'An error occurred. Please try again.']);
         }
     }
 
