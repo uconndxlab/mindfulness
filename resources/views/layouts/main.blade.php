@@ -1,28 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
     @php
-        $is_app = isset($layout_type) && $layout_type === 'app';
+        $type = isset($layout_type) ? $layout_type : 'auth';
     @endphp
     <head>
         @include('layouts.partials.head')
     </head>
-    <body class="{{ !$is_app ? 'd-flex align-items-center py-4 bg-body-tertiary' : '' }}">
-        @if($is_app)
+    <body class="{{ $type !== 'app'? 'd-flex align-items-center py-4 bg-body-tertiary' : '' }}">
+        @if($type === 'app')
             @include('layouts.partials.navigation')
         @endif
 
-        <main class="container @if($is_app) manual-margins @endif">
+        <main class="container @if($type === 'app') manual-margins @endif">
             <div class="row justify-content-center"> 
                 @yield('content')
             </div>
         </main>
 
-        @if($is_app)
+        @if($type === 'app' || $type === 'admin')
             @include('layouts.partials.modal')
         @endif
-
         @include('layouts.partials.scripts')
-
         @yield('additional_scripts')
     </body>
 </html> 
