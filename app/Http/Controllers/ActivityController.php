@@ -68,23 +68,7 @@ class ActivityController extends Controller
             $message .= ', course completed';
         }
 
-        // get ga event
-        $ga_event = [
-            'activity' => null,
-            'day' => null,
-            'module' => null
-        ];
-        if (isset($result['ga_event_activity'])) {
-            $ga_event['activity'] = $result['ga_event_activity'];
-        }
-        if (isset($result['ga_event_day'])) {
-            $ga_event['day'] = $result['ga_event_day'];
-        }
-        if (isset($result['ga_event_module'])) {
-            $ga_event['module'] = $result['ga_event_module'];
-        }
-
-        return response()->json(['success' => true, 'message' => $message, 'day_completed' => $day_completed, 'ga_event' => $ga_event], 200);
+        return response()->json(['success' => true, 'message' => $message, 'day_completed' => $day_completed], 200);
     }
 
     // skip activity

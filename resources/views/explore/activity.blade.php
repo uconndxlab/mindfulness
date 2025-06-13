@@ -207,22 +207,6 @@
                         });
                     }
 
-                    // fire GA events
-                    if (data.ga_event) {
-                        if (data.ga_event.activity) {
-                            console.log('fireGAEvent activity');
-                            fireGAEvent(data.ga_event.activity);
-                        }
-                        if (data.ga_event.day) {
-                            console.log('fireGAEvent day');
-                            fireGAEvent(data.ga_event.day);
-                        }
-                        if (data.ga_event.module) {
-                            console.log('fireGAEvent module');
-                            fireGAEvent(data.ga_event.module);
-                        }
-                    }
-
                     //hiding complete button for images
                     if (type == 'image') {
                         const completeButton = document.getElementById('img_complete_activity');

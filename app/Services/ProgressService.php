@@ -36,8 +36,7 @@ class ProgressService
         $result = [
             'activity_completed' => false,
             'optional_unlocked' => false,
-            'error' => null,
-            'ga_event_activity' => null
+            'error' => null
         ];
 
         // check user
@@ -100,18 +99,6 @@ class ProgressService
             }
         }
 
-        // add GA event to result
-        $result['ga_event_activity'] = [
-            'name' => 'activity_completed',
-            'params' => [
-                'event_category' => 'Progress',
-                'event_label' => 'Activity Completed',
-                'activity_name' => $activity->name,
-                'user_id' => $user->id,
-                'email' => $user->email,
-            ]
-        ];
-
         return $result;
     }
 
@@ -157,8 +144,7 @@ class ProgressService
     public function completeDay(User $user, Day $day) {
         // init result array
         $result = [
-            'day_completed' => false,
-            'ga_event_day' => null
+            'day_completed' => false
         ];
 
         // complete day
@@ -190,18 +176,6 @@ class ProgressService
             $moduleResult = $this->checkModuleCompletion($user, $day->module);
             $result = array_merge($result, $moduleResult);
         }
-
-        // add GA event to result
-        $result['ga_event_day'] = [
-            'name' => 'day_completed',
-            'params' => [
-                'event_category' => 'Progress',
-                'event_label' => 'Day Completed',
-                'day_name' => $day->name,
-                'user_id' => $user->id,
-                'email' => $user->email,
-            ]
-        ];
 
         return $result;
     }
@@ -255,8 +229,7 @@ class ProgressService
         // init result array
         $result = [
             'module_completed' => false,
-            'course_completed' => false,
-            'ga_event_module' => null
+            'course_completed' => false
         ];
 
         // complete module
@@ -289,18 +262,6 @@ class ProgressService
                 $result['course_completed'] = true;
             }
         }
-
-        // add GA event to result
-        $result['ga_event_module'] = [
-            'name' => 'module_completed',
-            'params' => [
-                'event_category' => 'Progress',
-                'event_label' => 'Module Completed',
-                'module_name' => $module->name,
-                'user_id' => $user->id,
-                'email' => $user->email,
-            ]
-        ];
 
         return $result;
     }
