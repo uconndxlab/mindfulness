@@ -142,8 +142,11 @@ Route::middleware('web')->group(function () {
         Route::resource('note', NoteController::class);
         
         //ADMIN ONLY
-        Route::middleware('admin')->group(function () {
-            //Content upload
+        Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+            Route::get('/dashboard', function () {
+                return view('admin.dashboard');
+            })->name('dashboard');
+
             Route::get('/adminlanding',[ContentManagementController::class,'adminLanding'])->name('admin.landing');
             Route::get('/usersList', [ContentManagementController::class,'usersList'])->name('users.list');
             Route::post('/changeAccess/{user_id}', [ContentManagementController::class,'changeAccess'])->name('users.access');

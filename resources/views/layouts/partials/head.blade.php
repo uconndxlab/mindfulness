@@ -12,7 +12,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-<link href="{{ asset('css/main.css') }}" rel="stylesheet">
+@vite(['resources/css/app.css', 'resources/js/app.js'])
 
 <!-- icons -->
 <link rel="icon" type="image/x-icon" href="{{ Storage::url('icons/favicon.ico')}}">
