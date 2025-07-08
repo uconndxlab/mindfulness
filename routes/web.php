@@ -151,7 +151,6 @@ Route::middleware('web')->group(function () {
             // TODO
             Route::post('/change-access', [AdminUserController::class, 'changeAccess'])->name('change-access');
             Route::post('/email-remind-user', [AdminUserController::class, 'emailRemindUser'])->name('email-remind-user');
-            Route::get('/email-testing/{type}', [AdminUserController::class, 'emailTesting'])->name('email-testing');
         });
     }); 
 });

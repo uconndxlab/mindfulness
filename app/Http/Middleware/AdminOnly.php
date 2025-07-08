@@ -16,8 +16,8 @@ class AdminOnly
     public function handle(Request $request, Closure $next): Response
     {
         //check if user is admin
-        if (!($request->user()->isAdmin())) {
-            abort(403, 'Unauthorized action.');
+        if (!($request->user() && $request->user()->isAdmin())) {
+            return redirect()->route('explore.home');
         }
         return $next($request);
     }
