@@ -5,12 +5,17 @@
 @endphp
 
 @section('content')
-    <div class="container-fluid col-md-3 col-lg-2 p-0 bg-light vh-100 position-fixed">
+    <div id="admin-sidebar" class="bg-light">
         <div class="position-sticky pt-3">
-            <a class="nav-link btn btn-nav admin-nav-exit" href="{{ route('account') }}">
-                <i class="bi bi-arrow-left"></i>
-                Exit
-            </a>
+            <div class="d-flex justify-content-between align-items-center px-3">
+                <a class="nav-link btn btn-nav admin-nav-exit" href="{{ route('account') }}">
+                    <i class="bi bi-arrow-left"></i>
+                    Exit
+                </a>
+                <button class="btn btn-light admin-nav-exit d-md-none" id="sidebar-close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
             <hr>
             <ul class="nav flex-column admin-nav">
                 <li class="nav-item">
@@ -46,7 +51,14 @@
             </ul>
         </div>
     </div>
-    <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 offset-md-3 offset-lg-2">
-        @yield('admin_content')
+    <div id="main-content">
+        <header class="d-md-none d-flex justify-content-between align-items-start p-2 border-bottom admin-mobile-header">
+            <button class="btn btn-light admin-nav-exit" id="sidebar-open">
+                <i class="bi bi-list"></i>
+            </button>
+        </header>
+        <div class="admin-content-wrapper">
+             @yield('admin_content')
+        </div>
     </div>
 @endsection
