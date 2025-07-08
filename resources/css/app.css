@@ -592,7 +592,7 @@ i.bi-lock-fill{
 
 .search-filters .accordion-body {
     padding:20px !important;
-}      
+}
 
 #headingFilter .accordion-button{
     background:#fff!important;
@@ -1126,4 +1126,37 @@ audio.feedback-audio::-webkit-media-controls-play-button{
   .admin-content-wrapper {
     padding: 1rem;
   }
+}
+
+/* nowrap on table cols */
+.table-nowrap th,
+.table-nowrap td {
+    white-space: nowrap !important;
+}
+
+/* sortable styling for cols */
+.sortable-header {
+    cursor: pointer;
+    position: relative;
+    padding-right: 1.5rem !important;
+}
+
+.sortable-header:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.sortable-header a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sortable-header .bi {
+    position: absolute;
+    right: 0.5rem;
+    opacity: 1;
+}
+
+.sortable-header .bi-arrow-down-up {
+    opacity: 0.2;
 }
