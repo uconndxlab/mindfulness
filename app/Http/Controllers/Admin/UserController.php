@@ -10,6 +10,11 @@ use Mail;
 
 class UserController extends Controller
 {
+    public function dashboard()
+    {
+        $registration_locked = getConfig('registration_locked', false);
+        return view('admin.dashboard', compact('registration_locked'));
+    }
     public function index()
     {
         return view('admin.users');

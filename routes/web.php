@@ -144,13 +144,11 @@ Route::middleware('web')->group(function () {
         
         //ADMIN ONLY
         Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
-            Route::get('/dashboard', function () {
-                return view('admin.dashboard');
-            })->name('dashboard');
-
-            Route::get('/users', [AdminUserController::class, 'index'])->name('users');
-            
+            Route::get('/dashboard', [AdminUserController::class, 'dashboard'])->name('dashboard');
             Route::post('/lock-registration-access', [AdminUserController::class, 'lockRegistrationAccess'])->name('lock-registration-access');
+            
+            Route::get('/users', [AdminUserController::class, 'index'])->name('users');
+            // TODO
             Route::post('/change-access', [AdminUserController::class, 'changeAccess'])->name('change-access');
             Route::post('/email-remind-user', [AdminUserController::class, 'emailRemindUser'])->name('email-remind-user');
             Route::get('/email-testing/{type}', [AdminUserController::class, 'emailTesting'])->name('email-testing');

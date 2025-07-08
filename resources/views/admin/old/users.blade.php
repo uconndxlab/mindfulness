@@ -1,26 +1,4 @@
-@extends('layouts.app')
-
-@section('title', $title)
-
-@section('content')
-@php
-    use Carbon\Carbon;
-    use App\Models\Activity;
-@endphp
 <div class="container-fluid py-4">
-    <div class="row mb-4 align-items-center">
-        <div class="col-12">
-            <h2 class="mb-3 fw-bold text-dark">Access Control</h2>
-            <div id="error-messages" class="alert alert-danger" style="display: none;"></div>
-            <div id="lock_div_reg" class="mb-4">
-                <button id="lock_button_reg" class="btn btn-{{ $registration_locked ? 'danger' : 'primary'}}">
-                    <i class="bi bi-{{ $registration_locked ? 'unlock' : 'lock'}}"></i>
-                    {{ $registration_locked ? 'UNLOCK REGISTRATION' : 'Lock Registration'}}
-                </button>
-            </div>
-        </div>
-    </div>
-
     <div class="card shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -113,57 +91,9 @@
         </div>
     </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const errDiv = document.getElementById('error-messages');
-
-        //handle un/locking registration
-        document.getElementById('lock_button_reg').addEventListener('click', function() {
-            registrationAccess();
-        });
-
-        function registrationAccess() {
-            errDiv.style.display = 'none';
-            return new Promise((resolve, reject) => {
-                axios.post('/registrationLock', {
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                .then(response => {
-                    console.log(response.data.success);
-                    const locked = response.data.status;
-                    const lockDiv = document.getElementById('lock_div_reg');
-                    if (locked) {
-                        lockDiv.innerHTML = `
-                            <button id="lock_button_reg" class="btn btn-danger">
-                                <i id="lock_icon_reg" class="bi bi-unlock"></i> UNLOCK REGISTRATION
-                            </button>
-                        `;
-                    } else {
-                        lockDiv.innerHTML = `
-                            <button id="lock_button_reg" class="btn btn-primary">
-                                <i id="lock_icon_reg" class="bi bi-lock"></i> Lock registration
-                            </button>
-                        `;
-                    }
-                    const lockButton = document.getElementById('lock_button_reg');
-                    lockButton.addEventListener('click', function() {
-                        registrationAccess();
-                    })
-                    resolve(true);
-                })
-                .catch(error => {
-                    console.error('Error changing access: ', error);
-                    //other errors
-                    const errorMessages = error.response?.data?.error_message || 'An unknown error occurred.';
-                    errDiv.textContent = errorMessages;
-                    errDiv.style.display = 'block';
-                    reject(false);
-                });
-            });
-        }
 
 
         document.querySelectorAll('.user-row').forEach(userRow => {
@@ -258,4 +188,3 @@
     });
 
 </script>
-@endsection
