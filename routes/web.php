@@ -1,19 +1,20 @@
 <?php
 
-use App\Http\Controllers\ActivityController;
-use App\Http\Controllers\ContactFormController;
-use App\Http\Controllers\UserController;
-use App\Models\Email_Body;
-use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+
+use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PageNavController;
-use App\Http\Controllers\NoteController;
-use App\Http\Controllers\ContentManagementController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
+use App\Http\Controllers\ContactFormController;
+use App\Http\Controllers\ContentManagementController;
+use App\Http\Controllers\NoteController;
+use App\Http\Controllers\PageNavController;
+use App\Http\Controllers\UserController;
+use App\Models\User;
+
 
 Route::middleware('web')->group(function () {
     //default
@@ -147,21 +148,12 @@ Route::middleware('web')->group(function () {
                 return view('admin.dashboard');
             })->name('dashboard');
 
-            Route::get('/adminlanding',[ContentManagementController::class,'adminLanding'])->name('admin.landing');
-            Route::get('/usersList', [ContentManagementController::class,'usersList'])->name('users.list');
-            Route::post('/changeAccess/{user_id}', [ContentManagementController::class,'changeAccess'])->name('users.access');
-            Route::post('/registrationLock', [ContentManagementController::class,'registrationAccess'])->name('registration.lock');
-            Route::post('/emailRemindUser/{user_id}', [ContentManagementController::class,'emailRemindUser'])->name('users.remind');
-            //email testing
-            Route::get('/sendTestMail/{type}', [ContentManagementController::class,'emailTesting'])->name('email.test');
-
-            Route::get('/showReminderEmail/{user_id}', function (Request $request) {
-                $user = User::findOrFail($request->user_id)->first();
-                $body = Email_Body::where('type', 'reminder')->inRandomOrder()->first()->body;
-                return view('emails.inactivity_reminder', compact('user', 'body'));
-            });
-
-            Route::delete('/deleteUser/{user_id}', [UserController::class,'deleteUser'])->name('users.delete');
+            Route::get('/users', [AdminUserController::class, 'index'])->name('users');
+            
+            Route::post('/lock-registration-access', [AdminUserController::class, 'lockRegistrationAccess'])->name('lock-registration-access');
+            Route::post('/change-access', [AdminUserController::class, 'changeAccess'])->name('change-access');
+            Route::post('/email-remind-user', [AdminUserController::class, 'emailRemindUser'])->name('email-remind-user');
+            Route::get('/email-testing/{type}', [AdminUserController::class, 'emailTesting'])->name('email-testing');
         });
     }); 
 });

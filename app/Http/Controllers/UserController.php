@@ -69,19 +69,4 @@ class UserController extends Controller
             return response()->json(['message' => 'Activity unfavorited'], 200);
         }
     }
-
-    public function deleteUser(Request $request, $user_id) {
-        // admin middleware protected function
-        try {
-            $user = User::findOrFail($user_id);
-            if ($user->isAdmin()) {
-                return redirect()->back()->with('error', 'Cannot delete admin account');
-            }
-            $user->delete();
-            return redirect()->back()->with('success', 'User deleted successfully');
-        }
-        catch (Exception $e) {
-            return redirect()->back()->with('error', 'Error deleting user');
-        }
-    }
 }
