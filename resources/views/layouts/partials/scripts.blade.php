@@ -1,4 +1,5 @@
 <!-- scripts -->
+@livewireScripts
 @if(session('modal_data'))
     <script>
         window.sessionModalData = @json(session('modal_data'));
