@@ -9,6 +9,7 @@ use Event;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ProgressService::class, function ($app) {
             return new ProgressService();
         });
+
+        Paginator::useBootstrapFive();
     }
 
     /**
