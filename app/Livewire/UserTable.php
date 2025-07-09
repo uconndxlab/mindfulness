@@ -25,7 +25,7 @@ class UserTable extends Component
         'last_active_at' => ['label' => 'Last Active', 'sortable' => true],
         'created_at' => ['label' => 'Joined', 'sortable' => true],
         'verified' => ['label' => 'Verified', 'sortable' => false],
-        'last_reminder_at' => ['label' => 'Last Reminder', 'sortable' => true],
+        'last_reminded_at' => ['label' => 'Last Reminder', 'sortable' => true],
         'access' => ['label' => 'Access', 'sortable' => false],
         'actions' => ['label' => 'Actions', 'sortable' => false],
     ];
@@ -45,7 +45,7 @@ class UserTable extends Component
     public function render()
     {
         // query
-        $usersQuery = User::select('id', 'name', 'email', 'role', 'created_at', 'lock_access', 'email_verified_at', 'last_active_at', 'last_reminder_at')
+        $usersQuery = User::select('id', 'name', 'email', 'role', 'created_at', 'lock_access', 'email_verified_at', 'last_active_at', 'last_reminded_at')
             ->orderBy($this->sortColumn, $this->sortDirection);
 
         // search - cannot query search because of current activity
@@ -105,7 +105,7 @@ class UserTable extends Component
             }
 
             Mail::to($user->email)->send(new \App\Mail\InactivityReminder($user));
-            $user->last_reminder_at = Carbon::now();
+            $user->last_reminded_at = Carbon::now();
             $user->save();
 
             session()->flash('message', 'Reminder email sent to ' . $user->email);

@@ -81,8 +81,8 @@
                                     </span>
                                 </td>
                                 @break
-                            @case('last_reminder_at')
-                                <td>{{ $user->last_reminder_at ? $user->last_reminder_at->diffForHumans() : 'Never' }}</td>
+                            @case('last_reminded_at')
+                                <td>{{ $user->last_reminded_at ? $user->last_reminded_at->diffForHumans() : 'Never' }}</td>
                                 @break
                             @case('access')
                                 <td class="text-center">

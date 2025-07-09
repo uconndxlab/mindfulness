@@ -225,7 +225,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $inactive_limit = (int) config('mail.remind_email_day_limit', 30);
         $email_limit = 7;
         $last_active = $this->last_active_at ? Carbon::parse($this->last_active_at) : null;
-        $last_reminded = $this->last_reminder_at ? Carbon::parse($this->last_reminder_at) : null;
+        $last_reminded = $this->last_reminded_at ? Carbon::parse($this->last_reminded_at) : null;
 
         if (($last_active && $last_active->diffInDays(Carbon::now()) < $inactive_limit) ||
             ($last_reminded && $last_reminded->diffInDays(Carbon::now()) < $email_limit)) {
