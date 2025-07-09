@@ -308,6 +308,12 @@ button:disabled i{
     padding: 0px 10px !important;
 }
 
+.btn-fit {
+    width: fit-content !important;
+    padding: 5px 10px !important;
+    height: fit-content !important;
+    margin: 2px 2px !important;
+}
 
 .lower-nav-full{
     background-color:white!important;

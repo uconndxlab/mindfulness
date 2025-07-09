@@ -1,4 +1,14 @@
 <div class="table-responsive">
+    @if (session()->has('message'))
+        <div class="alert alert-success">
+            {{ session('message') }}
+        </div>
+    @endif
+    @if (session()->has('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
     <table class="table table-striped table-nowrap">
         <thead>
             <tr>
@@ -47,7 +57,14 @@
                                 <td>{{ $user->created_at->format('M d, Y') }}</td>
                                 @break
                             @case('current_activity')
-                                <td>TODO</td>
+                                @if ($user->currentActivity())
+                                    <td>
+                                        {{ $user->currentActivity()->title }}<br>
+                                        <small>{{ $user->currentActivity()->day->name }}, {{ $user->currentActivity()->day->module->name }}</small>
+                                    </td>
+                                @else
+                                    <td>None</td>
+                                @endif
                                 @break
                             @case('last_active_at')
                                 <td>{{ $user->last_active_at ? $user->last_active_at->diffForHumans() : 'Never' }}</td>
@@ -71,7 +88,14 @@
                                 @break
                             @case('actions')
                                 <td>
-                                    TODO
+                                    <div class="btn-group" role="group" aria-label="User Actions">
+                                        <button wire:click="toggleAccess({{ $user->id }})" class="btn btn-sm btn-{{ $user->lock_access ? 'success' : 'danger' }} btn-fit" data-bs-toggle="tooltip" title="{{ $user->lock_access ? 'Unlock Access' : 'Lock Access' }}">
+                                            <i class="bi bi-{{ $user->lock_access ? 'unlock-fill' : 'lock-fill' }}"></i>
+                                        </button>
+                                        <button wire:click="sendReminder({{ $user->id }})" class="btn btn-sm btn-info {{ !$user->canSendReminder() ? 'disabled' : '' }} btn-fit" data-bs-toggle="tooltip" title="Send Reminder Email">
+                                            <i class="bi bi-envelope-fill"></i>
+                                        </button>
+                                    </div>
                                 </td>
                                 @break
                         @endswitch

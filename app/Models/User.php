@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -217,5 +218,20 @@ class User extends Authenticatable implements MustVerifyEmail
             ->wherePivot('completed', false)
             ->where('optional', false)
             ->first();
+    }
+
+    public function canSendReminder()
+    {
+        $inactive_limit = (int) config('mail.remind_email_day_limit', 30);
+        $email_limit = 7;
+        $last_active = $this->last_active_at ? Carbon::parse($this->last_active_at) : null;
+        $last_reminded = $this->last_reminder_at ? Carbon::parse($this->last_reminder_at) : null;
+
+        if (($last_active && $last_active->diffInDays(Carbon::now()) < $inactive_limit) ||
+            ($last_reminded && $last_reminded->diffInDays(Carbon::now()) < $email_limit)) {
+            return false;
+        }
+
+        return true;
     }
 }
