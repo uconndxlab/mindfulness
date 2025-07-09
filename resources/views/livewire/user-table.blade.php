@@ -1,4 +1,9 @@
 <div class="table-responsive">
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <input type="text" class="form-control" placeholder="Search..." wire:model.live="search">
+        </div>
+    </div>
     @if (session()->has('message'))
         <div class="alert alert-success">
             {{ session('message') }}

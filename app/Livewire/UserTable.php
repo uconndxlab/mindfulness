@@ -14,6 +14,7 @@ class UserTable extends Component
 
     public $sortColumn = 'id';
     public $sortDirection = 'asc';
+    public $search = '';
 
     public $columns = [
         'id' => ['label' => 'ID', 'sortable' => true],
@@ -43,9 +44,33 @@ class UserTable extends Component
 
     public function render()
     {
-        $users = User::select('id', 'name', 'email', 'role', 'created_at', 'lock_access', 'email_verified_at', 'last_active_at', 'last_reminder_at')
-            ->orderBy($this->sortColumn, $this->sortDirection)
-            ->paginate(10);
+        // query
+        $usersQuery = User::select('id', 'name', 'email', 'role', 'created_at', 'lock_access', 'email_verified_at', 'last_active_at', 'last_reminder_at')
+            ->orderBy($this->sortColumn, $this->sortDirection);
+
+        // search - cannot query search because of current activity
+        if (!empty($this->search)) {
+            $allUsers = $usersQuery->get();
+            $filteredUsers = $allUsers->filter(function ($user) {
+                $currentActivity = $user->currentActivity();
+                $activityTitle = $currentActivity ? $currentActivity->title : '';
+
+                return str_contains(strtolower($user->name), strtolower($this->search)) ||
+                    str_contains(strtolower($user->email), strtolower($this->search)) ||
+                    str_contains(strtolower($user->role), strtolower($this->search)) ||
+                    str_contains(strtolower($activityTitle), strtolower($this->search));
+            });
+            $users = new \Illuminate\Pagination\LengthAwarePaginator(
+                $filteredUsers->forPage($this->getPage(), 10),
+                $filteredUsers->count(),
+                10,
+                $this->getPage(),
+                ['path' => request()->url()]
+            );
+        } else {
+            $users = $usersQuery->paginate(10);
+        }
+
 
         return view('livewire.user-table', [
             'users' => $users

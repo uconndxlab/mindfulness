@@ -148,9 +148,6 @@ Route::middleware('web')->group(function () {
             Route::post('/lock-registration-access', [AdminUserController::class, 'lockRegistrationAccess'])->name('lock-registration-access');
             
             Route::get('/users', [AdminUserController::class, 'index'])->name('users');
-            // TODO
-            Route::post('/change-access', [AdminUserController::class, 'changeAccess'])->name('change-access');
-            Route::post('/email-remind-user', [AdminUserController::class, 'emailRemindUser'])->name('email-remind-user');
         });
     }); 
 });
