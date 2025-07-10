@@ -32,11 +32,13 @@ class UserTable extends Component
 
     public function sortBy($column)
     {
-        if ($this->sortColumn === $column) {
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            $this->sortColumn = $column;
-            $this->sortDirection = 'asc';
+        if (!isset($this->columns[$column]['sortable'])) {
+            if ($this->sortColumn === $column) {
+                $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                $this->sortColumn = $column;
+                $this->sortDirection = 'asc';
+            }
         }
 
         $this->resetPage();
