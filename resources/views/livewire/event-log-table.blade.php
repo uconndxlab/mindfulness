@@ -52,7 +52,26 @@
                                 @case('subject')
                                     <td>
                                         @if ($event->subject)
-                                            {{ class_basename($event->subject) }} #{{ $event->subject->id }}
+                                            @switch(class_basename($event->subject))
+                                                @case('User')
+                                                    <a href="{{ route('admin.users', ['search' => $event->subject->hh_id]) }}">
+                                                        {{ $event->subject->hh_id }}
+                                                    </a>
+                                                    @break
+                                                @case('Activity')
+                                                    <strong>{{ $event->subject->title }}</strong><br>
+                                                    <small>{{ $event->subject->day->name }}, {{ $event->subject->day->module->name }}</small>
+                                                    @break
+                                                @case('Day')
+                                                    <strong>{{ $event->subject->name }}</strong><br>
+                                                    <small>{{ $event->subject->module->name }}</small>
+                                                    @break
+                                                @case('Module')
+                                                    <strong>{{ $event->subject->name }}</strong>
+                                                    @break
+                                                @default
+                                                    {{ class_basename($event->subject) }} #{{ $event->subject->id }}
+                                            @endswitch
                                         @else
                                             -
                                         @endif
@@ -62,8 +81,17 @@
                                 @case('properties')
                                     <td>
                                         @if ($event->properties->isNotEmpty())
-                                            <pre
-                                                class="mb-0"><code>{{ json_encode($event->properties, JSON_PRETTY_PRINT) }}</code></pre>
+                                            <button class="btn btn-info btn-sm"
+                                                onclick="showModal({
+                                                    label: 'Event Details',
+                                                    body: document.getElementById('details-{{ $event->id }}').innerHTML,
+                                                    closeLabel: 'Close'
+                                                })">
+                                                <i class="bi bi-info-circle"></i>
+                                            </button>
+                                            <div id="details-{{ $event->id }}" class="d-none">
+                                                <x-json-properties-table :data="$event->properties" />
+                                            </div>
                                         @else
                                             -
                                         @endif
