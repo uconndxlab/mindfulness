@@ -42,7 +42,7 @@ class EventLogTable extends Component
         $query = EventLog::with([
             'causer:id,hh_id,name',
             'subject',
-        ])->orderBy($this->sortColumn, $this->sortDirection);
+        ])->orderBy($this->sortColumn, $this->sortDirection)->orderBy('id', $this->sortDirection);
 
         if (!empty($this->search)) {
             $query->where(function ($q) {
