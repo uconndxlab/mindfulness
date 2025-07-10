@@ -148,6 +148,7 @@ Route::middleware('web')->group(function () {
             Route::post('/lock-registration-access', [AdminUserController::class, 'lockRegistrationAccess'])->name('lock-registration-access');
             
             Route::get('/users', [AdminUserController::class, 'index'])->name('users');
+            Route::get('/events', [AdminUserController::class, 'events'])->name('events');
         });
     }); 
 });

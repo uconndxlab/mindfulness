@@ -20,6 +20,11 @@ class UserController extends Controller
         return view('admin.users');
     }
 
+    public function events()
+    {
+        return view('admin.events');
+    }
+
     public function lockRegistrationAccess(Request $request) {
         try {
             $locked = getConfig('registration_locked', false);

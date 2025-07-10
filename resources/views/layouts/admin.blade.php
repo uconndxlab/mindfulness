@@ -31,9 +31,9 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-graph-up me-2"></i>
-                        Analytics
+                    <a class="nav-link {{ request()->routeIs('admin.events') ? 'active' : '' }}" href="{{ route('admin.events') }}">
+                        <i class="bi bi-list-check me-2"></i>
+                        Event Log
                     </a>
                 </li>
                 <li class="nav-item">
