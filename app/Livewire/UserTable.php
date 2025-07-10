@@ -7,17 +7,19 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Url;
 
 class UserTable extends Component
 {
     use WithPagination;
 
-    public $sortColumn = 'id';
-    public $sortDirection = 'asc';
+    #[Url(except: '')]
     public $search = '';
+    public $sortColumn = 'created_at';
+    public $sortDirection = 'desc';
 
     public $columns = [
-        'id' => ['label' => 'ID', 'sortable' => true],
+        'hh_id' => ['label' => 'ID', 'sortable' => true],
         'name' => ['label' => 'Name', 'sortable' => true],
         'email' => ['label' => 'Email', 'sortable' => true],
         'role' => ['label' => 'Role', 'sortable' => false],
@@ -47,7 +49,7 @@ class UserTable extends Component
     public function render()
     {
         // query
-        $usersQuery = User::select('id', 'name', 'email', 'role', 'created_at', 'lock_access', 'email_verified_at', 'last_active_at', 'last_reminded_at')
+        $usersQuery = User::select('id', 'hh_id', 'name', 'email', 'role', 'created_at', 'lock_access', 'email_verified_at', 'last_active_at', 'last_reminded_at')
             ->orderBy($this->sortColumn, $this->sortDirection);
 
         // search - cannot query search because of current activity
@@ -58,6 +60,7 @@ class UserTable extends Component
                 $activityTitle = $currentActivity ? $currentActivity->title : '';
 
                 return str_contains(strtolower($user->name), strtolower($this->search)) ||
+                    str_contains(strtolower($user->hh_id), strtolower($this->search)) ||
                     str_contains(strtolower($user->email), strtolower($this->search)) ||
                     str_contains(strtolower($user->role), strtolower($this->search)) ||
                     str_contains(strtolower($activityTitle), strtolower($this->search));

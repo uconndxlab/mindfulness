@@ -41,8 +41,8 @@
                     <tr>
                         @foreach ($columns as $column => $details)
                             @switch($column)
-                                @case('id')
-                                    <th scope="row">{{ $user->id }}</th>
+                                @case('hh_id')
+                                    <th scope="row">{{ $user->hh_id }}</th>
                                     @break
                                 @case('name')
                                     <td>{{ $user->name }}</td>

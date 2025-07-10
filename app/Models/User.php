@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -27,7 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'last_active_at',
         'lock_access',
-        'timezone'
+        'timezone',
     ];
 
     /**
@@ -52,6 +53,28 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'last_active_at' => 'datetime',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        // fires in model creation
+        static::creating(function (User $user) {
+            if (empty($user->hh_id)) {
+                $user->hh_id = self::generateHhId();
+            }
+        });
+    }
+
+    public static function generateHhId(): string
+    {
+        $randomLength = 8;
+
+        do {
+            $random = Str::random(8);
+            $id = 'HH-'.$random;
+        } while (self::where('hh_id', $id)->exists());
+
+        return $id;
     }
 
     public function isAdmin(): bool {

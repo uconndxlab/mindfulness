@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::rename('activity_log', 'event_log');
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('hh_id')->unique()->nullable();
+        });
     }
 
     /**
@@ -19,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::rename('event_log', 'activity_log');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('hh_id');
+        });
     }
 };

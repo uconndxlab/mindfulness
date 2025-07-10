@@ -38,7 +38,7 @@
                                 @case('causer')
                                     <td>
                                         @if ($event->causer)
-                                            <a href="#">{{ $event->causer->id }}</a>
+                                            <a href="{{ route('admin.users', ['search' => $event->causer->hh_id]) }}">{{ $event->causer->hh_id }}</a>
                                         @else
                                             -
                                         @endif

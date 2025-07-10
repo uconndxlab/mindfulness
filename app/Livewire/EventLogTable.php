@@ -40,7 +40,7 @@ class EventLogTable extends Component
     public function render()
     {
         $query = EventLog::with([
-            'causer:id,name',
+            'causer:id,hh_id,name',
             'subject',
         ])->orderBy($this->sortColumn, $this->sortDirection);
 
@@ -48,10 +48,12 @@ class EventLogTable extends Component
             $query->where(function ($q) {
                 $q->where('description', 'like', '%' . $this->search . '%')
                     ->orWhere('event', 'like', '%' . $this->search . '%')
-                    // ->orWhereHas('subject', function ($q) {
-                    //     $q->where('title', 'like', '%' . $this->search . '%');
-                    // })
-                    ;
+                    ->orWhereHas('subject', function ($q) {
+                        $q->where('title', 'like', '%' . $this->search . '%');
+                    })
+                    ->orWhereHas('causer', function ($q) {
+                        $q->where('hh_id', 'like', '%' . $this->search . '%');
+                    });
             });
         }
 
