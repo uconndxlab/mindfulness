@@ -31,8 +31,25 @@ class ActivityController extends Controller
             return response()->json(['succcess' => false,'message' => 'Activity locked'], 403);
         }
 
+        $already_completed = $user->isActivityCompleted($activity);
+
+        // log activity completion
+        activity('activity')
+            ->event('activity_completed')
+            ->performedOn($activity)
+            ->causedBy($user)
+            ->withProperties([
+                'activity' => $activity->title,
+                'day' => $activity->day->name,
+                'module' => $activity->day->module->name,
+                'activity_type' => $activity->type,
+                'repeat_completion' => $already_completed,
+            ])
+            ->log('Activity completed');
+        // day and module completion logged in ProgressService
+
         // check if already completed
-        if ($user->isActivityCompleted($activity)) {
+        if ($already_completed) {
             // potential for debugging in case the next day did not unlock
             return response()->json(['success' => true, 'message' => 'Activity already completed'], 200);
         }

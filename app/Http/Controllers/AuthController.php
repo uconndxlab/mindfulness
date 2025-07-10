@@ -62,6 +62,12 @@ class AuthController extends Controller
             }
             Auth::user()->update(['last_active_at' => Carbon::now()]);
             
+            // log login
+            activity('auth')
+                ->event('login')
+                ->causedBy(Auth::user())
+                ->log('Authenticated');
+
             return redirect()->intended('/home');
         }
         
@@ -134,6 +140,12 @@ class AuthController extends Controller
             $remember = $request->has('remember');
             Auth::attempt($request->only('email', 'password'), $remember);
             RateLimiter::hit($key, $limit['decay']);
+
+            // log registration
+            activity('auth')
+                ->event('registration')
+                ->causedBy($user)
+                ->log('Registered');
 
             return redirect(route('verification.notice'));
         }

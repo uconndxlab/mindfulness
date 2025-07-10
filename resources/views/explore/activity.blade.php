@@ -116,7 +116,7 @@
     const status = '{{ $activity->completed ? 'completed' : 'unlocked' }}';
     if (status == 'completed') {
         allowSeek = true;
-        activityComplete(false);
+        unlockRedirect(false);
     }
 
     var type = null;
@@ -183,7 +183,7 @@
         console.log('activity completed');
         completed = true;
         //update users progress
-        if (status == 'unlocked') {
+        if (status == 'unlocked' || status == 'completed') {
             axios.post('/activities/complete', {
                 activity_id: activity_id
             }, {
@@ -220,9 +220,6 @@
                 console.error('There was an error updating the progress:', error);
                 alert('Error: ' + error.message);
             });
-        }
-        else if (status == 'completed') {
-            unlockRedirect(message);
         }
     }
 

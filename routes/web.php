@@ -69,6 +69,13 @@ Route::middleware('web')->group(function () {
                 return redirect('/welcome');
             }
 
+            // log email verification
+            activity('auth')
+                ->event('verification')
+                ->performedOn($user)
+                ->causedBy($user)
+                ->log('Verified');
+
             // otherwise redirect to login
             return redirect('/login')->with('success', 'Email verified successfully. Please login.');
     

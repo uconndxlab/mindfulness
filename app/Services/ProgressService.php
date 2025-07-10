@@ -53,6 +53,7 @@ class ProgressService
             ],
         ]);
         $result['activity_completed'] = true;
+        // activity completion logged in activity controller
 
         // if activity is not optional
         if (!$activity->optional) {
@@ -155,6 +156,16 @@ class ProgressService
             ],
         ]);
         $result['day_completed'] = true;
+        // log day completion
+        activity('day')
+            ->event('day_completed')
+            ->performedOn($day)
+            ->causedBy($user)
+            ->withProperties([
+                'day' => $day->name,
+                'module' => $day->module->name,
+            ])
+            ->log('Day completed');
 
         // completion warning for quick completion
         $user->quick_progress_warning = true;
@@ -240,6 +251,15 @@ class ProgressService
             ],
         ]);
         $result['module_completed'] = true;
+        // log module completion
+        activity('module')
+            ->event('module_completed')
+            ->performedOn($module)
+            ->causedBy($user)
+            ->withProperties([
+                'module' => $module->name,
+            ])
+            ->log('Module completed');
 
         // get next module
         $nextModule = Module::where('order', '>', $module->order)->orderBy('order')->first();
