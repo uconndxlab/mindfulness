@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -155,7 +156,8 @@ Route::middleware('web')->group(function () {
             Route::post('/lock-registration-access', [AdminUserController::class, 'lockRegistrationAccess'])->name('lock-registration-access');
             
             Route::get('/users', [AdminUserController::class, 'index'])->name('users');
-            Route::get('/events', [AdminUserController::class, 'events'])->name('events');
+            Route::get('/events', [AdminEventController::class, 'index'])->name('events');
+            Route::get('/events/export/csv', [AdminEventController::class, 'exportEvents'])->name('events.export');
         });
     }); 
 });

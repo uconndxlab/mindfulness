@@ -1,11 +1,14 @@
 <div class="container-fluid">
-    <div class="row mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="col-md-4">
-            <input type="text" class="form-control" placeholder="Search..." wire:model.live.debounce.300ms="search">
+            <input type="text" class="form-control" placeholder="Search..." wire:model.live.debounce.300ms="search"/>
+        </div>
+        <div>
+            <a href="{{ route('admin.events.export') }}" class="btn btn-info">Export to CSV</a>
         </div>
     </div>
     <div class="table-responsive">
-        <table class="table table-striped table-nowrap">
+        <table class="table table-striped table-nowrap table-bordered">
             <thead>
                 <tr>
                     @foreach ($columns as $column => $details)

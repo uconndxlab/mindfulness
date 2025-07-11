@@ -57,7 +57,7 @@ class EventLogTable extends Component
             });
         }
 
-        $events = $query->paginate(15);
+        $events = $query->paginate(10);
 
         return view('livewire.event-log-table', [
             'events' => $events,
