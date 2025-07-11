@@ -48,8 +48,10 @@ class EventLogTable extends Component
             $query->where(function ($q) {
                 $q->where('description', 'like', '%' . $this->search . '%')
                     ->orWhere('event', 'like', '%' . $this->search . '%')
+                    ->orWhere('log_name', 'like', '%' . $this->search . '%')
                     ->orWhereHas('subject', function ($q) {
                         $q->where('title', 'like', '%' . $this->search . '%');
+                        $q->orWhere('name', 'like', '%' . $this->search . '%');
                     })
                     ->orWhereHas('causer', function ($q) {
                         $q->where('hh_id', 'like', '%' . $this->search . '%');

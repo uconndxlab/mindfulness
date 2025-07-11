@@ -63,19 +63,18 @@ Route::middleware('web')->group(function () {
             // verify the user
             if (!$user->hasVerifiedEmail()) {
                 $user->markEmailAsVerified();
+                // log email verification
+                activity('auth')
+                    ->event('verification')
+                    ->causedBy($user)
+                    ->log('Verified');
             }
-
+            
             // if user is already logged in
             if (Auth::user()->id == $user->id) {
                 return redirect('/welcome');
             }
 
-            // log email verification
-            activity('auth')
-                ->event('verification')
-                ->performedOn($user)
-                ->causedBy($user)
-                ->log('Verified');
 
             // otherwise redirect to login
             return redirect('/login')->with('success', 'Email verified successfully. Please login.');
