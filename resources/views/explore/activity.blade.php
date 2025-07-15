@@ -100,6 +100,7 @@
     @endphp
 
     const activity_id = {{ $activity->id }};
+    const start_log_id = {{ $start_log_id }};
     const day = '{{ $activity->day->name }}';
     const optional = {{ $activity->optional ? 'true' : 'false' }};
 
@@ -185,7 +186,8 @@
         //update users progress
         if (status == 'unlocked' || status == 'completed') {
             axios.post('/activities/complete', {
-                activity_id: activity_id
+                activity_id: activity_id,
+                start_log_id: start_log_id
             }, {
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -282,6 +284,54 @@
     
     //ON CONTENT LOAD
     document.addEventListener('DOMContentLoaded', function() {
+        //LOGGING OF PAGE INTERACTIONS
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+        let lastFocusTimestamp = performance.now();
+        
+        const logInteraction = (eventType, duration) => {
+            const formData = new FormData();
+            formData.append("activity_id", activity_id);
+            formData.append("event_type", eventType);
+            formData.append("_token", csrfToken);
+
+            // get duration in seconds
+            if (duration) {
+                formData.append("duration", Math.round(duration / 1000));
+            }
+            if (eventType === 'exited') {
+                formData.append("start_log_id", start_log_id);
+            }
+            
+            // exited events use sendBeacon
+            if (eventType === 'exited') {
+                navigator.sendBeacon("{{ route('activities.log_interaction') }}", formData);
+            } else {
+                // other events use axios
+                axios.post("{{ route('activities.log_interaction') }}", formData)
+                    .catch(error => console.error(`Error logging ${eventType}:`, error));
+            }
+        };
+
+        // log focus
+        logInteraction('focused');
+
+        // log focus and unfocus events
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'hidden') {
+                const duration = performance.now() - lastFocusTimestamp;
+                logInteraction('unfocused', duration);
+            } else {
+                lastFocusTimestamp = performance.now();
+                logInteraction('focused');
+            }
+        });
+
+        // log exit
+        window.addEventListener("pagehide", () => {
+            const duration = performance.now() - lastFocusTimestamp;
+            logInteraction('exited', duration);
+        });
+
         //NOSEEK
         var mediaPlayers = document.querySelectorAll('.slide__audio-player, .video-player');
         mediaPlayers.forEach(function(player) {

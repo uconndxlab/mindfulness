@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Activity;
 use App\Models\User;
+use App\Models\EventLog;
 use App\Services\ProgressService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,7 @@ class ActivityController extends Controller
         /** @var ?User $user */
         $user = Auth::user() ?? null;
         $activity = Activity::findOrFail($request->activity_id) ?? null;
+        $start_log = EventLog::findOrFail($request->start_log_id) ?? null;
 
         if (!$user) {
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
@@ -33,7 +35,10 @@ class ActivityController extends Controller
 
         $already_completed = $user->isActivityCompleted($activity);
 
-        // log activity completion
+        // get time to complete and log activity
+        if ($start_log) {
+            $time_to_complete = $start_log->created_at->diffInSeconds(now());
+        }
         activity('activity')
             ->event('activity_completed')
             ->performedOn($activity)
@@ -44,6 +49,7 @@ class ActivityController extends Controller
                 'module' => $activity->day->module->name,
                 'activity_type' => $activity->type,
                 'repeat_completion' => $already_completed,
+                'duration_in_seconds' => $time_to_complete,
             ])
             ->log('Activity completed');
         // day and module completion logged in ProgressService
@@ -122,5 +128,45 @@ class ActivityController extends Controller
 
         // success
         return redirect(route('explore.activity', ['activity_id' => $nextAct->id]));
+    }
+
+    public function logInteraction(Request $request)
+    {
+        $validated = $request->validate([
+            'activity_id' => 'required|integer|exists:activities,id',
+            'event_type' => 'required|string|in:focused,unfocused,exited',
+            'start_log_id' => 'sometimes|integer|exists:activity_log,id',
+            'duration' => 'sometimes|integer',
+        ]);
+
+        $activity = Activity::with('day.module')->find($validated['activity_id']);
+        $user = Auth::user();
+        $properties = [
+            'activity' => $activity->title,
+            'day' => $activity->day->name,
+            'module' => $activity->day->module->name,
+            'activity_type' => $activity->type,
+        ];
+
+        if (isset($validated['duration'])) {
+            $properties['duration_in_seconds'] = $validated['duration'];
+        }
+
+        // if the event is exited, check start log for auth
+        if ($validated['event_type'] === 'exited' && isset($validated['start_log_id'])) {
+            $startLog = EventLog::find($validated['start_log_id']);
+            if (!$startLog || $startLog->causer_id !== $user->id) {
+                return response()->json(['status' => 'unauthorized'], 403);
+            }
+        }
+
+        activity('activity')
+            ->event('activity_' . $validated['event_type'])
+            ->performedOn($activity)
+            ->causedBy($user)
+            ->withProperties($properties)
+            ->log('Activity ' . $validated['event_type']);
+
+        return response()->json(['status' => 'success'], 200);
     }
 }

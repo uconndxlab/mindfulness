@@ -114,6 +114,7 @@ Route::middleware('web')->group(function () {
         // activity completion
         Route::post('/activities/complete', [ActivityController::class, 'complete'])->name('activities.complete');
         Route::post('/activities/skip', [ActivityController::class, 'skip'])->name('activities.skip');
+        Route::post('/activities/log-interaction', [ActivityController::class, 'logInteraction'])->name('activities.log_interaction');
         
         //NAVIGATION
         //Page Navigation - the controller is not totally necessary
