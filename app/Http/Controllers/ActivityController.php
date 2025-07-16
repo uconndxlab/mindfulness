@@ -135,7 +135,7 @@ class ActivityController extends Controller
         $validated = $request->validate([
             'activity_id' => 'required|integer|exists:activities,id',
             'event_type' => 'required|string|in:focused,unfocused,exited',
-            'start_log_id' => 'sometimes|integer|exists:activity_log,id',
+            'start_log_id' => 'sometimes|integer|exists:event_log,id',
             'duration' => 'sometimes|integer',
         ]);
 

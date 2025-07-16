@@ -100,7 +100,7 @@ class AuthController extends Controller
 
             return back()->withErrors(['error' => "Too many registration attempts. Please try again in {$timeLeft}."]);
         }
-
+        
         //validate inputs
         try {
             $request->validate([
@@ -120,7 +120,7 @@ class AuthController extends Controller
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
         }
-
+        
         try {
             //create user
             $user = User::create([
@@ -130,11 +130,11 @@ class AuthController extends Controller
                 'timezone' => $request->timezone ?? config('app.timezone'),
                 'last_active_at' => Carbon::now()
             ]);
-    
+            
             //unlocking first module/day/activity
             lockAll($user->id);
             unlockFirst($user->id);
-    
+            
             //login, hit limiter, redirect
             event(new Registered($user));
             $remember = $request->has('remember');
