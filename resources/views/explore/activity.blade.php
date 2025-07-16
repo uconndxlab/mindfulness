@@ -200,6 +200,8 @@
                     // redirect if set
                     if (data.redirect_url) {
                         window.location.href = data.redirect_url;
+                        // stop execution
+                        return;
                     }
 
                     // unlock redirect only after progress is processed

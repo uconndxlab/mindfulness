@@ -29,7 +29,12 @@
                         $value = $slider_info['default'] ?? 50;
                     @endphp
                     <div class="slider-container">
-                        <div id="slider_{{ $question['number'] }}"></div>
+                        <div class="text-center slider-loading" id="slider_loading_{{ $question['number'] }}">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <div id="slider_{{ $question['number'] }}" style="visibility: hidden;"></div>
                         <input type="hidden" name="answer_{{ $question['number'] }}" id="slider_input_{{ $question['number'] }}" value="{{ $value }}">
                     </div>
                 @endif
@@ -252,6 +257,7 @@
                 const sliderEl = document.getElementById('slider_' + questionNumber);
                 const sliderVal = document.getElementById('slider_input_' + questionNumber).value;
                 const hiddenInput = document.getElementById('slider_input_' + questionNumber);
+                const loadingEl = document.getElementById('slider_loading_' + questionNumber);
                 
                 const questionData = @json($quiz->question_options)['question_'+questionNumber];
                 const sliderData = questionData.options_feedback[0];
@@ -285,6 +291,11 @@
                     const value = Math.round(values[handle]);
                     hiddenInput.value = value;
                 });
+
+                if (loadingEl) {
+                    loadingEl.style.display = 'none';
+                }
+                sliderEl.style.visibility = 'visible';
             });
 
             //ALL/NONE ABOVE
