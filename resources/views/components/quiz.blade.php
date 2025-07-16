@@ -103,7 +103,7 @@
                 changeQuestion(questionNumber + 1);
             });
 
-            //POPULATE ANSWERS - TODO
+            //POPULATE ANSWERS
             function populateForm(answers) {
                 //loop through answers
                 for (const [key, value] of Object.entries(answers)) {
@@ -250,6 +250,7 @@
             quizForm.querySelectorAll('.quiz-div[data-type="slider"]').forEach(sliderDiv => {
                 const questionNumber = sliderDiv.getAttribute('data-number');
                 const sliderEl = document.getElementById('slider_' + questionNumber);
+                const sliderVal = document.getElementById('slider_input_' + questionNumber).value;
                 const hiddenInput = document.getElementById('slider_input_' + questionNumber);
                 
                 const questionData = @json($quiz->question_options)['question_'+questionNumber];
@@ -270,7 +271,7 @@
                 }
 
                 noUiSlider.create(sliderEl, {
-                    start: [sliderData.default ?? 50],
+                    start: [sliderVal],
                     connect: 'lower',
                     step: sliderData.step ?? 1,
                     range: {
