@@ -3,8 +3,6 @@
 @section('title', $page_info['title'])
 
 @section('content')
-<link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.8.0/nouislider.min.css" rel="stylesheet">
-
 <div class="col-lg-8">
     @php
         use Illuminate\Support\Facades\Request;
@@ -202,7 +200,6 @@
         </form>
     </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.8.0/nouislider.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         //init

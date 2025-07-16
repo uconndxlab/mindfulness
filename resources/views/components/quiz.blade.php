@@ -6,54 +6,71 @@
                 <div class="text-left quiz-question mb-3">
                     <h4>{{ $question['question'] }}</h4>
                 </div>
-                <!-- options -->
-                @foreach ($question['options_feedback'] as $index => $option)
-                    <div id="options_{{ $question['number'] }}" class="form-check type-{{ $question['type'] }} mb-2">
-                        <input class="form-check-input" name="answer_{{ $question['number'] }}[]" above-behavior="{{ $option['above'] }}" type="{{ $question['type'] }}" data-other="{{ $option['other'] }}" id="option_{{ $question['number'] }}_{{ $index }}" value="{{ $index }}">
-                        <label class="form-check-label" for="option_{{ $question['number'] }}_{{ $index }}">
-                            {{ $option['option'] }}
-                        </label>
-                        @if ($option['other'])
-                            <div class="other-div">
-                                <input type="text" id="other_{{ $question['number'] }}_{{ $index }}" class="form-control" name="other_answer_{{ $question['number'] }}_{{ $index }}" placeholder="Please describe more..." disabled>
-                            </div>
-                        @endif
+
+                @if ($question['type'] == 'checkbox' || $question['type'] == 'radio')
+                    <!-- options -->
+                    @foreach ($question['options_feedback'] as $index => $option)
+                        <div id="options_{{ $question['number'] }}" class="form-check type-{{ $question['type'] }} mb-2">
+                            <input class="form-check-input" name="answer_{{ $question['number'] }}[]" above-behavior="{{ $option['above'] }}" type="{{ $question['type'] }}" data-other="{{ $option['other'] }}" id="option_{{ $question['number'] }}_{{ $index }}" value="{{ $index }}">
+                            <label class="form-check-label" for="option_{{ $question['number'] }}_{{ $index }}">
+                                {{ $option['option'] }}
+                            </label>
+                            @if ($option['other'])
+                                <div class="other-div">
+                                    <input type="text" id="other_{{ $question['number'] }}_{{ $index }}" class="form-control" name="other_answer_{{ $question['number'] }}_{{ $index }}" placeholder="Please describe more..." disabled>
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                @elseif ($question['type'] == 'slider')
+                    <!-- slider -->
+                    @php
+                        $slider_info = $question['options_feedback'][0];
+                        $value = $slider_info['default'] ?? 50;
+                    @endphp
+                    <div class="slider-container">
+                        <div id="slider_{{ $question['number'] }}"></div>
+                        <input type="hidden" name="answer_{{ $question['number'] }}" id="slider_input_{{ $question['number'] }}" value="{{ $value }}">
                     </div>
-                @endforeach
+                @endif
+
 
                 <!-- feedback -->
-                @foreach ($question['options_feedback'] as $index => $option)
-                    @php
-                        if ($option['correct']) {
-                            $text_color = $option['correct'] == 1 ? 'text-success' : 'text-info';
-                        }
-                        else {
-                            $text_color = 'text-danger';
-                        }
-                    @endphp
-                    <div id="feedback_{{ $question['number'] }}_{{ $index }}" data-show="{{ $option['feedback'] ? 'true' : 'false' }}" class="feedback-div mt-4" style="display: none;">
-                        @if ($option['audio_path'])
-                            <x-contentView id="fbAudio_{{ $question['number'] }}_{{ $index }}" id2="pdf_download" type="feedback_audio" file="{{ $option['audio_path'] }}"/>
-                        @endif
-                        <div class="{{ $text_color }}">
-                            {!! $option['feedback'] !!}
+                @if ($question['type'] == 'radio' || $question['type'] == 'checkbox')
+                    @foreach ($question['options_feedback'] as $index => $option)
+                        @php
+                            if ($option['correct']) {
+                                $text_color = $option['correct'] == 1 ? 'text-success' : 'text-info';
+                            }
+                            else {
+                                $text_color = 'text-danger';
+                            }
+                        @endphp
+                        <div id="feedback_{{ $question['number'] }}_{{ $index }}" data-show="{{ $option['feedback'] ? 'true' : 'false' }}" class="feedback-div mt-4" style="display: none;">
+                            @if ($option['audio_path'])
+                                <x-contentView id="fbAudio_{{ $question['number'] }}_{{ $index }}" id2="pdf_download" type="feedback_audio" file="{{ $option['audio_path'] }}"/>
+                            @endif
+                            <div class="{{ $text_color }}">
+                                {!! $option['feedback'] !!}
+                            </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                @endif
             </div>
         @endforeach
         @php
             $display = $quiz->question_count > 1 ? 'block' : 'none';
             $last = $quiz->question_count <=1 ? 'block' : 'none';
+            $q1_slider = $quiz->question_options['question_1']['type'] == 'slider';
         @endphp
         <div class="d-flex justify-content-between">
             <button id="prev_q_button" type="button" class="btn-quiz" disabled style="display: {{ $display }};">
                 <i class="bi bi-arrow-left"></i> Previous 
             </button>
-            <button id="next_q_button" type="button" class="btn-quiz" disabled style="display: {{ $display }};">
+            <button id="next_q_button" type="button" class="btn-quiz" {{ $q1_slider ? '' : 'disabled' }} style="display: {{ $display }};">
                 Next <i class="bi bi-arrow-right "></i>
             </button>
-            <button type="submit" id="submitButton" class="btn btn-primary ms-auto" disabled style="display: {{ $last }};width:max-content!important;margin-top:20px!important;margin-top:20px;margin-bottom:0px;">
+            <button type="submit" id="submitButton" class="btn btn-primary ms-auto" {{ $q1_slider && $last ? '' : 'disabled' }} style="display: {{ $last }};width:max-content!important;margin-top:20px!important;margin-top:20px;margin-bottom:0px;">
                 Submit <i class="bi bi-arrow-right"></i>
             </button>
         </div>
@@ -86,7 +103,7 @@
                 changeQuestion(questionNumber + 1);
             });
 
-            //POPULATE ANSWERS
+            //POPULATE ANSWERS - TODO
             function populateForm(answers) {
                 //loop through answers
                 for (const [key, value] of Object.entries(answers)) {
@@ -124,6 +141,7 @@
                     //pause any audio
                     pauseAudios();
                     const currentNumber = parseInt(qDiv.getAttribute('data-number'));
+                    const questionType = qDiv.getAttribute('data-type');
                     const isLast = currentNumber === questionCount;
                     const isFirst = currentNumber === 1;
                     
@@ -141,17 +159,23 @@
                             if (isLast) {
                                 nextQBtn.style.display = 'none';
                                 submitBtn.style.display = 'block';
-                                nextQBtn.setAttribute('disabled', '');
+                                // slider cannot have next/submit disabled
+                                if (questionType != 'slider') {
+                                    nextQBtn.setAttribute('disabled', '');
+                                }
                             }
                             else {
                                 submitBtn.style.display = 'none';
                                 nextQBtn.style.display = 'block';
-                                submitBtn.setAttribute('disabled', '');
+                                if (questionType != 'slider') {
+                                    submitBtn.setAttribute('disabled', '');
+                                }
                             }
                         }
                         unlockNext(questionNumber);
                     }
                     else {
+                        console.log('hiding question ' + currentNumber);
                         qDiv.style.display = 'none';
                     }
                     
@@ -161,10 +185,22 @@
 
             //UNLOCK NEXT/SUBMIT
             function unlockNext(questionNumber) {
+                console.log('unlocking next for question ' + questionNumber);
                 //handle unlocking of next
                 const questionDiv = document.getElementById('question_'+questionNumber);
+                const questionType = questionDiv.getAttribute('data-type');
                 nextQBtn.setAttribute('disabled', '');
                 submitBtn.setAttribute('disabled', '');
+
+                if (questionType === 'slider') {
+                    if (questionNumber === questionCount) {
+                        submitBtn.removeAttribute('disabled');
+                    } else {
+                        nextQBtn.removeAttribute('disabled');
+                    }
+                    return;
+                }
+
                 //if we find one option is selected, remove the disable from next/submit
                 for (const check of questionDiv.querySelectorAll('.form-check-input')) {
                     console.log(check.id);
@@ -207,6 +243,46 @@
                     }
                     //autoplay??
                     checkBox(option, event.target.checked);
+                });
+            });
+
+            //SLIDER
+            quizForm.querySelectorAll('.quiz-div[data-type="slider"]').forEach(sliderDiv => {
+                const questionNumber = sliderDiv.getAttribute('data-number');
+                const sliderEl = document.getElementById('slider_' + questionNumber);
+                const hiddenInput = document.getElementById('slider_input_' + questionNumber);
+                
+                const questionData = @json($quiz->question_options)['question_'+questionNumber];
+                const sliderData = questionData.options_feedback[0];
+
+                let pipsConfig = undefined;
+                if (sliderData.pips) {
+                    pipsConfig = {
+                        mode: 'values',
+                        values: Object.keys(sliderData.pips).map(Number),
+                        density: 4,
+                        format: {
+                            to: function(value) {
+                                return sliderData.pips[value];
+                            }
+                        }
+                    };
+                }
+
+                noUiSlider.create(sliderEl, {
+                    start: [sliderData.default ?? 50],
+                    connect: 'lower',
+                    step: sliderData.step ?? 1,
+                    range: {
+                        'min': sliderData.min ?? 0,
+                        'max': sliderData.max ?? 100
+                    },
+                    pips: pipsConfig
+                });
+
+                sliderEl.noUiSlider.on('update', function (values, handle) {
+                    const value = Math.round(values[handle]);
+                    hiddenInput.value = value;
                 });
             });
 
@@ -260,7 +336,7 @@
                     });
                 }
                 //added in for other functionality on radio 
-                else {
+                else if (quizDiv.getAttribute('data-type') === 'radio') {
                     var allBoxes = quizDiv.querySelectorAll('.form-check-input');
                     allBoxes.forEach(option => {
                         option.addEventListener('click', function() {
