@@ -197,6 +197,10 @@
                 const data = response.data;
                 if (data.success) {
                     console.log('ProgressService: ' + data.message);
+                    // redirect if set
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                    }
 
                     // unlock redirect only after progress is processed
                     // showing modal on completed days
