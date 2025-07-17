@@ -15,7 +15,6 @@ use Illuminate\Validation\Rules\Password;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -123,11 +122,6 @@ class AuthController extends Controller
         }
         
         try {
-            // generate unique analytics_id
-            do {
-                $analytics_id = (string) Str::uuid();
-            } while (User::where('analytics_id', $analytics_id)->exists());
-            
             //create user
             $user = User::create([
                 'name' => $request->name,
@@ -135,7 +129,6 @@ class AuthController extends Controller
                 'password'=> Hash::make($request->password),
                 'timezone' => $request->timezone ?? config('app.timezone'),
                 'last_active_at' => Carbon::now(),
-                'analytics_id' => $analytics_id
             ]);
             
             //unlocking first module/day/activity

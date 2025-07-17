@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\Email_Body;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
@@ -10,7 +10,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\ContactFormController;
-use App\Http\Controllers\ContentManagementController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PageNavController;
 use App\Http\Controllers\UserController;
