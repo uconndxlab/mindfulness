@@ -1178,3 +1178,23 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     margin-bottom: 2.5rem;
     padding: 0 25px;
 }
+
+.noui-custom-pips .noUi-pips {
+    position: static;
+    height: 20px;
+}
+
+.noui-custom-pips .noUi-value {
+    white-space: nowrap;
+    position: absolute;
+    transform: translate(-50%, 10px);
+}
+
+/* shifting the first and last pips */
+.noui-custom-pips .noUi-pips .noUi-value[style*="left: 0%"] {
+    transform: translate(-25%, 10px);
+}
+
+.noui-custom-pips .noUi-pips .noUi-value[style*="left: 100%"] {
+    transform: translate(-75%, 10px);
+}

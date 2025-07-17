@@ -28,7 +28,7 @@
                         $slider_info = $question['options_feedback'][0];
                         $value = $slider_info['default'] ?? 50;
                     @endphp
-                    <div class="slider-container">
+                    <div class="slider-container noui-custom-pips">
                         <div class="text-center slider-loading" id="slider_loading_{{ $question['number'] }}">
                             <div class="spinner-border" role="status">
                                 <span class="visually-hidden">Loading...</span>
@@ -262,6 +262,11 @@
                 const questionData = @json($quiz->question_options)['question_'+questionNumber];
                 const sliderData = questionData.options_feedback[0];
 
+                // want to show first and last pips on mobile, but keep the ticks
+                const pipKeys = sliderData.pips ? Object.keys(sliderData.pips) : [];
+                const firstPipValue = pipKeys.length > 0 ? pipKeys[0] : null;
+                const lastPipValue = pipKeys.length > 0 ? pipKeys[pipKeys.length - 1] : null;
+
                 let pipsConfig = undefined;
                 if (sliderData.pips) {
                     pipsConfig = {
@@ -270,7 +275,15 @@
                         density: 4,
                         format: {
                             to: function(value) {
-                                return sliderData.pips[value];
+                                // on desktop, show all pips
+                                if (window.innerWidth >= 768) {
+                                    return sliderData.pips[value];
+                                }
+                                // on mobile, show first and last pips
+                                if (value == firstPipValue || value == lastPipValue) {
+                                    return sliderData.pips[value];
+                                }
+                                return "";
                             }
                         }
                     };
