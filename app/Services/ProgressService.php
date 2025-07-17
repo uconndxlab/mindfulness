@@ -57,25 +57,6 @@ class ProgressService
 
         // if activity is not optional
         if (!$activity->optional) {
-            // unlock optional
-            $optional = $activity->day->activities()
-                ->where('order', $activity->order)
-                ->where('id', '!=', $activity->id)
-                ->where('optional', true)
-                ->get();
-            if ($optional->count() > 0) {
-                $result['optional_unlocked'] = true;
-                // fire bonus event
-                event(new BonusUnlocked($activity->day));
-                foreach ($optional as $opt) {
-                    $user->activities()->syncWithoutDetaching([
-                        $opt->id => [
-                            'unlocked' => true,
-                        ],
-                    ]);
-                }
-            }
-
             // find next activity in day
             $nextAct = $activity->day->activities()
                 ->where('order', '>', $activity->order)
@@ -165,6 +146,23 @@ class ProgressService
                 'module' => $day->module->name,
             ])
             ->log('Day completed');
+        
+        // unlock optional
+        $optional = $day->activities()
+            ->where('optional', true)
+            ->get();
+        if ($optional->count() > 0) {
+            $result['optional_unlocked'] = true;
+            // fire bonus event
+            event(new BonusUnlocked($day));
+            foreach ($optional as $opt) {
+                $user->activities()->syncWithoutDetaching([
+                    $opt->id => [
+                        'unlocked' => true,
+                    ],
+                ]);
+            }
+        }
 
         // completion warning for quick completion
         $user->quick_progress_warning = true;
