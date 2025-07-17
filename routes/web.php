@@ -1,19 +1,21 @@
 <?php
 
-use App\Http\Controllers\ActivityController;
-use App\Http\Controllers\ContactFormController;
-use App\Http\Controllers\UserController;
-use App\Models\Email_Body;
-use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+
+use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PageNavController;
-use App\Http\Controllers\NoteController;
-use App\Http\Controllers\ContentManagementController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
+use App\Http\Controllers\ContactFormController;
+use App\Http\Controllers\ContentManagementController;
+use App\Http\Controllers\NoteController;
+use App\Http\Controllers\PageNavController;
+use App\Http\Controllers\UserController;
+use App\Models\User;
+
 
 Route::middleware('web')->group(function () {
     //default
@@ -60,17 +62,13 @@ Route::middleware('web')->group(function () {
             // verify the user
             if (!$user->hasVerifiedEmail()) {
                 $user->markEmailAsVerified();
+                // log email verification
+                activity('auth')
+                    ->event('verification')
+                    ->causedBy($user)
+                    ->log('Verified');
             }
-            
-            // fire GA event - email verified
-            session()->flash('ga_event', [
-                'name' => 'email_verified',
-                'params' => [
-                    'event_category' => 'Authentication',
-                    'event_label' => 'Email Verified'
-                ]
-            ]);
-
+          
             // if user is already logged in
             if (Auth::user()->id == $user->id) {
                 return redirect('/welcome');
@@ -112,6 +110,7 @@ Route::middleware('web')->group(function () {
         // activity completion
         Route::post('/activities/complete', [ActivityController::class, 'complete'])->name('activities.complete');
         Route::post('/activities/skip', [ActivityController::class, 'skip'])->name('activities.skip');
+        Route::post('/activities/log-interaction', [ActivityController::class, 'logInteraction'])->name('activities.log_interaction');
         
         //NAVIGATION
         //Page Navigation - the controller is not totally necessary
@@ -148,23 +147,13 @@ Route::middleware('web')->group(function () {
         Route::resource('note', NoteController::class);
         
         //ADMIN ONLY
-        Route::middleware('admin')->group(function () {
-            //Content upload
-            Route::get('/adminlanding',[ContentManagementController::class,'adminLanding'])->name('admin.landing');
-            Route::get('/usersList', [ContentManagementController::class,'usersList'])->name('users.list');
-            Route::post('/changeAccess/{user_id}', [ContentManagementController::class,'changeAccess'])->name('users.access');
-            Route::post('/registrationLock', [ContentManagementController::class,'registrationAccess'])->name('registration.lock');
-            Route::post('/emailRemindUser/{user_id}', [ContentManagementController::class,'emailRemindUser'])->name('users.remind');
-            //email testing
-            Route::get('/sendTestMail/{type}', [ContentManagementController::class,'emailTesting'])->name('email.test');
-
-            Route::get('/showReminderEmail/{user_id}', function (Request $request) {
-                $user = User::findOrFail($request->user_id)->first();
-                $body = Email_Body::where('type', 'reminder')->inRandomOrder()->first()->body;
-                return view('emails.inactivity-reminder', compact('user', 'body'));
-            });
-
-            Route::delete('/deleteUser/{user_id}', [UserController::class,'deleteUser'])->name('users.delete');
+        Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+            Route::get('/dashboard', [AdminUserController::class, 'dashboard'])->name('dashboard');
+            Route::post('/lock-registration-access', [AdminUserController::class, 'lockRegistrationAccess'])->name('lock-registration-access');
+            
+            Route::get('/users', [AdminUserController::class, 'index'])->name('users');
+            Route::get('/events', [AdminEventController::class, 'index'])->name('events');
+            Route::get('/events/export/csv', [AdminEventController::class, 'exportEvents'])->name('events.export');
         });
     }); 
 });

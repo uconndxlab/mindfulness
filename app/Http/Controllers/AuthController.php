@@ -62,28 +62,16 @@ class AuthController extends Controller
                 ]);
             }
             Auth::user()->update(['last_active_at' => Carbon::now()]);
-            
-            // fire GA event - login success
-            session()->flash('ga_event', [
-                'name' => 'login_success',
-                'params' => [
-                    'event_category' => 'Authentication',
-                    'event_label' => 'Successful Login'
-                ]
-            ]);
-            
+
+            // log login
+            activity('auth')
+                ->event('login')
+                ->causedBy(Auth::user())
+                ->log('Authenticated');
+
             return redirect()->intended('/home');
         }
-        
-        // fire GA event - login failed
-        session()->flash('ga_event', [
-            'name' => 'login_failed',
-            'params' => [
-                'event_category' => 'Authentication',
-                'event_label' => 'Failed Login'
-            ]
-        ]);
-        
+      
         return back()->withErrors(['credentials' => 'Invalid credentials.'])->withInput();
     }
 
@@ -113,7 +101,7 @@ class AuthController extends Controller
 
             return back()->withErrors(['error' => "Too many registration attempts. Please try again in {$timeLeft}."]);
         }
-
+        
         //validate inputs
         try {
             $request->validate([
@@ -133,7 +121,7 @@ class AuthController extends Controller
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
         }
-
+        
         try {
             // generate unique analytics_id
             do {
@@ -149,26 +137,23 @@ class AuthController extends Controller
                 'last_active_at' => Carbon::now(),
                 'analytics_id' => $analytics_id
             ]);
-    
+            
             //unlocking first module/day/activity
             lockAll($user->id);
             unlockFirst($user->id);
-    
+          
             //login, hit limiter, redirect, event hits MustVerifyEmail which calls sendEmailVerificationNotification
             event(new Registered($user));
             $remember = $request->has('remember');
             Auth::attempt($request->only('email', 'password'), $remember);
             RateLimiter::hit($key, $limit['decay']);
+          
+            // log registration
+            activity('auth')
+                ->event('registration')
+                ->causedBy($user)
+                ->log('Registered');
 
-            // fire GA event - registration success
-            session()->flash('ga_event', [
-                'name' => 'registration_success',
-                'params' => [
-                    'event_category' => 'Authentication',
-                    'event_label' => 'Successful Registration'
-                ]
-            ]);
-            
             return redirect(route('verification.notice'));
         }
         catch (\Exception $e) {

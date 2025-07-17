@@ -36,8 +36,7 @@ class ProgressService
         $result = [
             'activity_completed' => false,
             'optional_unlocked' => false,
-            'error' => null,
-            'ga_event_activity' => null
+            'error' => null
         ];
 
         // check user
@@ -54,6 +53,7 @@ class ProgressService
             ],
         ]);
         $result['activity_completed'] = true;
+        // activity completion logged in activity controller
 
         // if activity is not optional
         if (!$activity->optional) {
@@ -99,17 +99,6 @@ class ProgressService
                 $result = array_merge($result, $dayResult);
             }
         }
-
-        // add GA event to result
-        $result['ga_event_activity'] = [
-            'name' => 'activity_completed',
-            'params' => [
-                'event_category' => 'Progress',
-                'event_label' => 'Activity Completed',
-                'activity_name' => $activity->name
-            ]
-        ];
-
         return $result;
     }
 
@@ -155,8 +144,7 @@ class ProgressService
     public function completeDay(User $user, Day $day) {
         // init result array
         $result = [
-            'day_completed' => false,
-            'ga_event_day' => null
+            'day_completed' => false
         ];
 
         // complete day
@@ -167,6 +155,16 @@ class ProgressService
             ],
         ]);
         $result['day_completed'] = true;
+        // log day completion
+        activity('day')
+            ->event('day_completed')
+            ->performedOn($day)
+            ->causedBy($user)
+            ->withProperties([
+                'day' => $day->name,
+                'module' => $day->module->name,
+            ])
+            ->log('Day completed');
 
         // completion warning for quick completion
         $user->quick_progress_warning = true;
@@ -188,17 +186,6 @@ class ProgressService
             $moduleResult = $this->checkModuleCompletion($user, $day->module);
             $result = array_merge($result, $moduleResult);
         }
-
-        // add GA event to result
-        $result['ga_event_day'] = [
-            'name' => 'day_completed',
-            'params' => [
-                'event_category' => 'Progress',
-                'event_label' => 'Day Completed',
-                'day_name' => $day->name
-            ]
-        ];
-
         return $result;
     }
 
@@ -251,8 +238,7 @@ class ProgressService
         // init result array
         $result = [
             'module_completed' => false,
-            'course_completed' => false,
-            'ga_event_module' => null
+            'course_completed' => false
         ];
 
         // complete module
@@ -263,6 +249,15 @@ class ProgressService
             ],
         ]);
         $result['module_completed'] = true;
+        // log module completion
+        activity('module')
+            ->event('module_completed')
+            ->performedOn($module)
+            ->causedBy($user)
+            ->withProperties([
+                'module' => $module->name,
+            ])
+            ->log('Module completed');
 
         // get next module
         $nextModule = Module::where('order', '>', $module->order)->orderBy('order')->first();
@@ -285,17 +280,6 @@ class ProgressService
                 $result['course_completed'] = true;
             }
         }
-
-        // add GA event to result
-        $result['ga_event_module'] = [
-            'name' => 'module_completed',
-            'params' => [
-                'event_category' => 'Progress',
-                'event_label' => 'Module Completed',
-                'module_name' => $module->name
-            ]
-        ];
-
         return $result;
     }
 

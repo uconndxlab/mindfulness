@@ -242,8 +242,23 @@ class PageNavController extends Controller
             $temp_answer = $user->notes->where('activity_id', $activity->id)->first();
             $journal->answer = $temp_answer ? $temp_answer->note : '';
         }
+
+        // log activity start
+        $start_log = activity('activity')
+            ->event('activity_started')
+            ->performedOn($activity)
+            ->causedBy($user)
+            ->withProperties([
+                'activity' => $activity->title,
+                'day' => $activity->day->name,
+                'module' => $activity->day->module->name,
+                'activity_type' => $activity->type,
+                'already_completed' => $activity->completed,
+            ])
+            ->log('Activity started');
+        $start_log_id = $start_log->id;
         
-        return view("explore.activity", compact('activity', 'page_info', 'content', 'quiz', 'journal'));
+        return view("explore.activity", compact('activity', 'page_info', 'content', 'quiz', 'journal', 'start_log_id'));
     }
 
     public function exploreActivityBypass($activity_id) {

@@ -13,7 +13,7 @@
 @elseif ($type == 'image')
     <div style="display: flex; justify-content: center; align-items: center;">
         <span style="text-align: center;">
-            <img id="{{ isset($id) ? $id : '' }}" src="{{ Storage::url('content/'.$file) }}" alt="Image">
+            <img id="{{ isset($id) ? $id : '' }}" src="{{ Storage::url('content/'.$file) }}" alt="Image" style="max-width: 100%; max-height: 70vh;">
             <br>
             <button id="img_complete_activity" class="btn btn-workbook mt-3" style="display: none;">Got it! Will do.</button>
         </span>

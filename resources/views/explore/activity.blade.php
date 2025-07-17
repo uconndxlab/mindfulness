@@ -100,6 +100,7 @@
     @endphp
 
     const activity_id = {{ $activity->id }};
+    const start_log_id = {{ $start_log_id }};
     const day = '{{ $activity->day->name }}';
     const optional = {{ $activity->optional ? 'true' : 'false' }};
 
@@ -116,7 +117,7 @@
     const status = '{{ $activity->completed ? 'completed' : 'unlocked' }}';
     if (status == 'completed') {
         allowSeek = true;
-        activityComplete(false);
+        unlockRedirect(false);
     }
 
     var type = null;
@@ -183,9 +184,10 @@
         console.log('activity completed');
         completed = true;
         //update users progress
-        if (status == 'unlocked') {
+        if (status == 'unlocked' || status == 'completed') {
             axios.post('/activities/complete', {
-                activity_id: activity_id
+                activity_id: activity_id,
+                start_log_id: start_log_id
             }, {
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -195,6 +197,12 @@
                 const data = response.data;
                 if (data.success) {
                     console.log('ProgressService: ' + data.message);
+                    // redirect if set
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                        // stop execution
+                        return;
+                    }
 
                     // unlock redirect only after progress is processed
                     // showing modal on completed days
@@ -205,22 +213,6 @@
                             media: '{{ Storage::url('content/'.($activity->day->media_path ? $activity->day->media_path : '')) }}',
                             route: null
                         });
-                    }
-
-                    // fire GA events
-                    if (data.ga_event) {
-                        if (data.ga_event.activity) {
-                            console.log('fireGAEvent activity');
-                            fireGAEvent(data.ga_event.activity);
-                        }
-                        if (data.ga_event.day) {
-                            console.log('fireGAEvent day');
-                            fireGAEvent(data.ga_event.day);
-                        }
-                        if (data.ga_event.module) {
-                            console.log('fireGAEvent module');
-                            fireGAEvent(data.ga_event.module);
-                        }
                     }
 
                     //hiding complete button for images
@@ -236,9 +228,6 @@
                 console.error('There was an error updating the progress:', error);
                 alert('Error: ' + error.message);
             });
-        }
-        else if (status == 'completed') {
-            unlockRedirect(message);
         }
     }
 
@@ -301,6 +290,59 @@
     
     //ON CONTENT LOAD
     document.addEventListener('DOMContentLoaded', function() {
+        //LOGGING OF PAGE INTERACTIONS
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+        let lastFocusTimestamp = performance.now();
+        let exited = false;
+
+        const logInteraction = (eventType, duration) => {
+            if (exited) return;
+            console.log('Logging interaction: ', eventType);
+            const data = new FormData();
+            data.append("activity_id", activity_id);
+            data.append("event_type", eventType);
+            data.append("_token", '{{ csrf_token() }}');
+
+            // get duration in seconds
+            if (duration) {
+                data.append("duration", Math.round(duration / 1000));
+            }
+            if (eventType === 'exited') {
+                data.append("start_log_id", start_log_id);
+            }
+            
+            // exited events use sendBeacon
+            if (eventType === 'exited') {
+                exited = true;
+                navigator.sendBeacon("{{ route('activities.log_interaction') }}", data);
+            } else {
+                // other events use axios
+                axios.post("{{ route('activities.log_interaction') }}", data)
+                    .catch(error => console.error(`Error logging ${eventType}:`, error));
+            }
+        };
+
+        // log focus
+        logInteraction('focused');
+
+        // log focus and unfocus events
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'hidden') {
+                const duration = performance.now() - lastFocusTimestamp;
+                logInteraction('unfocused', duration);
+            } else {
+                lastFocusTimestamp = performance.now();
+                logInteraction('focused');
+            }
+        });
+
+        // log exit - works for refresh, but need to manually log for back button and redirect due to modals
+        window.addEventListener("pagehide", () => {
+            console.log('Page hidden');
+            const duration = performance.now() - lastFocusTimestamp;
+            logInteraction('exited', duration);
+        });
+
         //NOSEEK
         var mediaPlayers = document.querySelectorAll('.slide__audio-player, .video-player');
         mediaPlayers.forEach(function(player) {

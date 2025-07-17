@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Notifications\ResetPassword;
 use App\Notifications\VerifyEmail;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -29,7 +31,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_active_at',
         'lock_access',
         'timezone',
-        'analytics_id'
     ];
 
     /**
@@ -52,6 +53,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'last_active_at' => 'datetime',
         ];
     }
 
@@ -63,6 +65,27 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPassword($token));
+
+    protected static function booted(): void
+    {
+        // generate the hh_id
+        static::creating(function (User $user) {
+            if (empty($user->hh_id)) {
+                $user->hh_id = self::generateHhId();
+            }
+        });
+    }
+
+    public static function generateHhId(): string
+    {
+        $randomLength = 8;
+
+        do {
+            $random = Str::random(8);
+            $id = 'HH-'.$random;
+        } while (self::where('hh_id', $id)->exists());
+
+        return $id;
     }
 
     public function isAdmin(): bool {
@@ -209,5 +232,20 @@ class User extends Authenticatable implements MustVerifyEmail
             ->wherePivot('completed', false)
             ->where('optional', false)
             ->first();
+    }
+
+    public function canSendReminder()
+    {
+        $inactive_limit = (int) config('mail.remind_email_day_limit', 30);
+        $email_limit = 7;
+        $last_active = $this->last_active_at ? Carbon::parse($this->last_active_at) : null;
+        $last_reminded = $this->last_reminded_at ? Carbon::parse($this->last_reminded_at) : null;
+
+        if (($last_active && $last_active->diffInDays(Carbon::now()) < $inactive_limit) ||
+            ($last_reminded && $last_reminded->diffInDays(Carbon::now()) < $email_limit)) {
+            return false;
+        }
+
+        return true;
     }
 }
