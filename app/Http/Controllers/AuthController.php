@@ -15,6 +15,7 @@ use Illuminate\Validation\Rules\Password;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -61,7 +62,7 @@ class AuthController extends Controller
                 ]);
             }
             Auth::user()->update(['last_active_at' => Carbon::now()]);
-            
+
             // log login
             activity('auth')
                 ->event('login')
@@ -70,7 +71,7 @@ class AuthController extends Controller
 
             return redirect()->intended('/home');
         }
-        
+      
         return back()->withErrors(['credentials' => 'Invalid credentials.'])->withInput();
     }
 
@@ -122,25 +123,31 @@ class AuthController extends Controller
         }
         
         try {
+            // generate unique analytics_id
+            do {
+                $analytics_id = (string) Str::uuid();
+            } while (User::where('analytics_id', $analytics_id)->exists());
+            
             //create user
             $user = User::create([
                 'name' => $request->name,
                 'email'=> $request->email,
                 'password'=> Hash::make($request->password),
                 'timezone' => $request->timezone ?? config('app.timezone'),
-                'last_active_at' => Carbon::now()
+                'last_active_at' => Carbon::now(),
+                'analytics_id' => $analytics_id
             ]);
             
             //unlocking first module/day/activity
             lockAll($user->id);
             unlockFirst($user->id);
-            
-            //login, hit limiter, redirect
+          
+            //login, hit limiter, redirect, event hits MustVerifyEmail which calls sendEmailVerificationNotification
             event(new Registered($user));
             $remember = $request->has('remember');
             Auth::attempt($request->only('email', 'password'), $remember);
             RateLimiter::hit($key, $limit['decay']);
-
+          
             // log registration
             activity('auth')
                 ->event('registration')

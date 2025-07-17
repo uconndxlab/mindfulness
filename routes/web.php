@@ -47,7 +47,6 @@ Route::middleware('web')->group(function () {
         Route::post('/email/verification-notification', [AuthController::class, 'sendVerifyEmail'])->name('verification.send');
         Route::get('/check-verification', [AuthController::class, 'checkVerification'])->name('verification.check');
     });
-
     // verify email button in email
     Route::get('/email/verify/{id}/{hash}', function (Request $request) {
     
@@ -69,12 +68,11 @@ Route::middleware('web')->group(function () {
                     ->causedBy($user)
                     ->log('Verified');
             }
-            
+          
             // if user is already logged in
             if (Auth::user()->id == $user->id) {
                 return redirect('/welcome');
             }
-
 
             // otherwise redirect to login
             return redirect('/login')->with('success', 'Email verified successfully. Please login.');
@@ -85,8 +83,6 @@ Route::middleware('web')->group(function () {
     })->middleware('signed')->name('verification.verify');
     
     //FORGOT PASSWORD
-    // Auth::routes(['verify' => true]);
-    // Auth::routes();
     Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
     // throttled in controller
     Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');

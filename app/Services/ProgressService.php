@@ -99,7 +99,6 @@ class ProgressService
                 $result = array_merge($result, $dayResult);
             }
         }
-
         return $result;
     }
 
@@ -187,7 +186,6 @@ class ProgressService
             $moduleResult = $this->checkModuleCompletion($user, $day->module);
             $result = array_merge($result, $moduleResult);
         }
-
         return $result;
     }
 
@@ -282,7 +280,6 @@ class ProgressService
                 $result['course_completed'] = true;
             }
         }
-
         return $result;
     }
 

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Notifications\ResetPassword;
+use App\Notifications\VerifyEmail;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -55,9 +57,18 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new VerifyEmail);
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPassword($token));
+
     protected static function booted(): void
     {
-        // fires in model creation
+        // generate the hh_id
         static::creating(function (User $user) {
             if (empty($user->hh_id)) {
                 $user->hh_id = self::generateHhId();
@@ -160,35 +171,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function toggleFavoriteActivity(?Activity $activity)
     {
         if (!$activity) {
-            return false;
+            return;
         }
 
-        $exists = $this->activities()
-            ->where('activity_id', $activity->id)
-            ->exists();
-        
-        if ($exists) {
-            // get status
-            $status = $this->activities()
-                ->wherePivot('activity_id', $activity->id)
-                ->first()
-                ->pivot
-                ->favorited;
+        // should exist if unlocked?
+        $this->activities()->updateExistingPivot($activity->id, [
+            'favorited' => !$this->isActivityFavorited($activity)
+        ]);
 
-            // update
-            $newStatus = !$status;
-            $this->activities()->updateExistingPivot($activity->id, [
-                'favorited' => $newStatus
-            ]);
-            return $newStatus;
-        }
-        else {
-            // make new pivot
-            $this->activities()->attach($activity->id, [
-                'favorited' => true
-            ]);
-            return true;
-        }  
+        return $this->isActivityFavorited($activity);
     }
 
     // day progress functions
