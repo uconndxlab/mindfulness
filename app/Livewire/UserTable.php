@@ -34,7 +34,7 @@ class UserTable extends Component
 
     public function sortBy($column)
     {
-        if (!isset($this->columns[$column]['sortable'])) {
+        if (isset($this->columns[$column]['sortable']) && $this->columns[$column]['sortable']) {
             if ($this->sortColumn === $column) {
                 $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
             } else {
