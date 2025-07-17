@@ -117,7 +117,6 @@
     const status = '{{ $activity->completed ? 'completed' : 'unlocked' }}';
     if (status == 'completed') {
         allowSeek = true;
-        unlockRedirect(false);
     }
 
     var type = null;
@@ -221,7 +220,13 @@
                         completeButton.classList.add('disabled');
                         completeButton.style.display = 'none';
                     }
-                    unlockRedirect(message);
+
+                    // show redirect only if not already completed
+                    if (status == 'unlocked') {
+                        unlockRedirect(message);
+                    }
+                    // show completion message regardless
+                    showCompletionMessage();
                 }
             })
             .catch(error => {
@@ -232,16 +237,16 @@
     }
 
     //function for unlocking the redirection buttons
-    function unlockRedirect(message=true) {
+    function unlockRedirect() {
         redirectDiv.querySelectorAll('.redirect-btn').forEach(btn => {
             btn.style.display = 'block';
             btn.classList.remove('disabled');
         });
         compLateBtn.style.display = 'none';
-        if (message) {
-            const completionMessageDiv = document.getElementById('comp_message');
-            completionMessageDiv.style.display = 'block';
-        }
+    }
+    function showCompletionMessage() {
+        const completionMessageDiv = document.getElementById('comp_message');
+        completionMessageDiv.style.display = 'block';
     }
 
     //FAVORITES
