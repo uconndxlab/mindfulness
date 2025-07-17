@@ -54,10 +54,20 @@ class ActivityController extends Controller
             ->log('Activity completed');
         // day and module completion logged in ProgressService
 
+        // redirect url
+        $redirect_url = null;
+        // check if practice - redirect to the next activity (slider reflection usually)
+        if ($activity->type === 'practice') {
+            $next_activity = $activity->nextActivity();
+            if ($next_activity && $next_activity->type === 'reflection') {
+                $redirect_url = route('explore.activity', ['activity_id' => $next_activity->id]);
+            }
+        }
+
         // check if already completed
         if ($already_completed) {
             // potential for debugging in case the next day did not unlock
-            return response()->json(['success' => true, 'message' => 'Activity already completed'], 200);
+            return response()->json(['success' => true, 'message' => 'Activity already completed', 'redirect_url' => $redirect_url], 200);
         }
         
         // complete activity
@@ -91,7 +101,7 @@ class ActivityController extends Controller
             $message .= ', course completed';
         }
 
-        return response()->json(['success' => true, 'message' => $message, 'day_completed' => $day_completed], 200);
+        return response()->json(['success' => true, 'message' => $message, 'day_completed' => $day_completed, 'redirect_url' => $redirect_url], 200);
     }
 
     // skip activity
