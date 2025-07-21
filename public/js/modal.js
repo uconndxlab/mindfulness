@@ -16,7 +16,7 @@ function showModal(options = {}) {
         closeLabel = 'Close',
         onCancel = null
     } = options;
-    
+
     document.getElementById('appModalLabel').innerHTML = label;
     closeBtn.innerHTML = closeLabel;
 
@@ -56,18 +56,15 @@ function showModal(options = {}) {
     // CANCEL HANDLER
     //handling cancel - call function and dispose modal
     if (currentCancelHandler) {
-        // remove exisiting event listeners
         modal.removeEventListener('hidden.bs.modal', currentCancelHandler);
         closeBtn.removeEventListener('click', currentCancelHandler);
     }
 
-    // rewrite cancel function
     currentCancelHandler = () => {
-        if (onCancel) onCancel();
+        if (options.onCancel) options.onCancel();
         myModal.hide();
     };
 
-    // add new listeners
     modal.addEventListener('hidden.bs.modal', currentCancelHandler, { once: true });
 
     myModal.show();

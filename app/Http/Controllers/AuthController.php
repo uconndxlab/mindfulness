@@ -76,7 +76,7 @@ class AuthController extends Controller
 
             return redirect()->intended('/home');
         }
-        
+      
         return back()->withErrors(['credentials' => 'Invalid credentials.'])->withInput();
     }
 
@@ -106,7 +106,7 @@ class AuthController extends Controller
 
             return back()->withErrors(['error' => "Too many registration attempts. Please try again in {$timeLeft}."]);
         }
-
+        
         //validate inputs
         try {
             $request->validate([
@@ -126,7 +126,7 @@ class AuthController extends Controller
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
         }
-
+        
         try {
             //create user
             $user = User::create([
@@ -134,19 +134,19 @@ class AuthController extends Controller
                 'email'=> $request->input('email'),
                 'password'=> Hash::make(value: $request->input('password')),
                 'timezone' => $request->timezone ?? config('app.timezone'),
-                'last_active_at' => Carbon::now()
+                'last_active_at' => Carbon::now(),
             ]);
-    
+            
             //unlocking first module/day/activity
             lockAll($user->id);
             unlockFirst($user->id);
-    
-            //login, hit limiter, redirect
+          
+            //login, hit limiter, redirect, event hits MustVerifyEmail which calls sendEmailVerificationNotification
             event(new Registered($user));
             $remember = $request->has('remember');
             Auth::attempt($request->only('email', 'password'), $remember);
             RateLimiter::hit($key, $limit['decay']);
-
+          
             // log registration
             activity('auth')
                 ->event('registration')

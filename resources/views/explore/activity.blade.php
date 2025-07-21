@@ -117,7 +117,6 @@
     const status = '{{ $activity->completed ? 'completed' : 'unlocked' }}';
     if (status == 'completed') {
         allowSeek = true;
-        unlockRedirect(false);
     }
 
     var type = null;
@@ -197,6 +196,12 @@
                 const data = response.data;
                 if (data.success) {
                     console.log('ProgressService: ' + data.message);
+                    // redirect if set
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                        // stop execution
+                        return;
+                    }
 
                     // unlock redirect only after progress is processed
                     // showing modal on completed days
@@ -215,7 +220,13 @@
                         completeButton.classList.add('disabled');
                         completeButton.style.display = 'none';
                     }
-                    unlockRedirect(message);
+
+                    // show redirect only if not already completed
+                    if (status == 'unlocked') {
+                        unlockRedirect(message);
+                    }
+                    // show completion message regardless
+                    showCompletionMessage();
                 }
             })
             .catch(error => {
@@ -226,16 +237,16 @@
     }
 
     //function for unlocking the redirection buttons
-    function unlockRedirect(message=true) {
+    function unlockRedirect() {
         redirectDiv.querySelectorAll('.redirect-btn').forEach(btn => {
             btn.style.display = 'block';
             btn.classList.remove('disabled');
         });
         compLateBtn.style.display = 'none';
-        if (message) {
-            const completionMessageDiv = document.getElementById('comp_message');
-            completionMessageDiv.style.display = 'block';
-        }
+    }
+    function showCompletionMessage() {
+        const completionMessageDiv = document.getElementById('comp_message');
+        completionMessageDiv.style.display = 'block';
     }
 
     //FAVORITES
@@ -287,27 +298,31 @@
         //LOGGING OF PAGE INTERACTIONS
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
         let lastFocusTimestamp = performance.now();
-        
+        let exited = false;
+
         const logInteraction = (eventType, duration) => {
-            const formData = new FormData();
-            formData.append("activity_id", activity_id);
-            formData.append("event_type", eventType);
-            formData.append("_token", csrfToken);
+            if (exited) return;
+            console.log('Logging interaction: ', eventType);
+            const data = new FormData();
+            data.append("activity_id", activity_id);
+            data.append("event_type", eventType);
+            data.append("_token", '{{ csrf_token() }}');
 
             // get duration in seconds
             if (duration) {
-                formData.append("duration", Math.round(duration / 1000));
+                data.append("duration", Math.round(duration / 1000));
             }
             if (eventType === 'exited') {
-                formData.append("start_log_id", start_log_id);
+                data.append("start_log_id", start_log_id);
             }
             
             // exited events use sendBeacon
             if (eventType === 'exited') {
-                navigator.sendBeacon("{{ route('activities.log_interaction') }}", formData);
+                exited = true;
+                navigator.sendBeacon("{{ route('activities.log_interaction') }}", data);
             } else {
                 // other events use axios
-                axios.post("{{ route('activities.log_interaction') }}", formData)
+                axios.post("{{ route('activities.log_interaction') }}", data)
                     .catch(error => console.error(`Error logging ${eventType}:`, error));
             }
         };
@@ -326,8 +341,9 @@
             }
         });
 
-        // log exit
+        // log exit - works for refresh, but need to manually log for back button and redirect due to modals
         window.addEventListener("pagehide", () => {
+            console.log('Page hidden');
             const duration = performance.now() - lastFocusTimestamp;
             logInteraction('exited', duration);
         });
