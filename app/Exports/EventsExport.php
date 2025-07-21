@@ -22,16 +22,15 @@ class EventsExport implements FromCollection, WithHeadings, WithMapping
     {
         return [
             'ID',
-            'Log Name',
+            'User ID',
             'Description',
-            'Causer Type',
-            'Causer ID',
-            'Event',
             'Subject Type',
             'Subject ID/Name',
+            'Timestamp',
+            'Local Timestamp',
+            'Log Name',
+            'Event',
             'Properties',
-            'Created At',
-            'Updated At',
         ];
     }
 
@@ -51,16 +50,15 @@ class EventsExport implements FromCollection, WithHeadings, WithMapping
 
         return [
             $event->id,
-            $event->log_name,
-            $event->description,
-            Str::afterLast($event->causer_type, '\\'),
             $event->causer->hh_id,
-            $event->event,
+            $event->description,
             $subjectType,
             $subjectName,
-            $event->properties,
             $event->created_at,
-            $event->updated_at,
+            $event->local_timestamp,
+            $event->log_name,
+            $event->event,
+            $event->properties,
         ];
     }
 } 
