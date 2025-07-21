@@ -49,7 +49,7 @@ class ActivityController extends Controller
                 'module' => $activity->day->module->name,
                 'activity_type' => $activity->type,
                 'repeat_completion' => $already_completed,
-                'duration_in_seconds' => $time_to_complete,
+                'time_to_complete' => $time_to_complete,
             ])
             ->log('Activity completed');
         // day and module completion logged in ProgressService
@@ -144,7 +144,7 @@ class ActivityController extends Controller
     {
         $validated = $request->validate([
             'activity_id' => 'required|integer|exists:activities,id',
-            'event_type' => 'required|string|in:focused,unfocused,exited',
+            'event_type' => 'required|string|in:refocused,unfocused,exited',
             'start_log_id' => 'sometimes|integer|exists:event_log,id',
             'duration' => 'sometimes|integer',
         ]);
@@ -159,7 +159,7 @@ class ActivityController extends Controller
         ];
 
         if (isset($validated['duration'])) {
-            $properties['duration_in_seconds'] = $validated['duration'];
+            $properties['focus_duration_in_seconds'] = $validated['duration'];
         }
 
         // if the event is exited, check start log for auth
