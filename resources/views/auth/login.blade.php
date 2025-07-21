@@ -58,6 +58,8 @@
             </div>
         </div>
 
+        <input type="hidden" name="timezone" id="timezone">
+
         <div class="form-group text-center">
             <button type="submit" class="btn btn-primary">LOG IN</button>
         </div>
@@ -72,4 +74,10 @@
         </div>
     @endif
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        document.getElementById('timezone').value = timezone;
+    });
+</script>
 @endsection
