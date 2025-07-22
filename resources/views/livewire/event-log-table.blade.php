@@ -35,7 +35,15 @@
                         @foreach ($columns as $column => $details)
                             @switch($column)
                                 @case('created_at')
-                                    <td>{{ $event->created_at->format('M d, Y h:i A') }}</td>
+                                    <td>{{ $event->created_at->format('Y-m-d H:i:s') }}</td>
+                                @break
+
+                                @case('local_timestamp')
+                                    @if($event->local_timestamp)
+                                        <td>{{ $event->local_timestamp->format('Y-m-d H:i:s') }}</td>
+                                    @else
+                                        <td>-</td>
+                                    @endif
                                 @break
 
                                 @case('causer')

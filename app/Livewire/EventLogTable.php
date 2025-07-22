@@ -3,8 +3,6 @@
 namespace App\Livewire;
 
 use App\Models\EventLog;
-use App\Models\User;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -17,7 +15,8 @@ class EventLogTable extends Component
     public $search = '';
 
     public $columns = [
-        'created_at' => ['label' => 'Timestamp', 'sortable' => true],
+        'created_at' => ['label' => 'UTC Timestamp', 'sortable' => true],
+        'local_timestamp' => ['label' => 'Local Timestamp', 'sortable' => true],
         'causer' => ['label' => 'User', 'sortable' => false],
         'description' => ['label' => 'Action', 'sortable' => true],
         'subject' => ['label' => 'Subject', 'sortable' => false],

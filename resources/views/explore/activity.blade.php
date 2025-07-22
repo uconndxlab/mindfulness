@@ -327,9 +327,6 @@
             }
         };
 
-        // log focus
-        logInteraction('focused');
-
         // log focus and unfocus events
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === 'hidden') {
@@ -337,7 +334,7 @@
                 logInteraction('unfocused', duration);
             } else {
                 lastFocusTimestamp = performance.now();
-                logInteraction('focused');
+                logInteraction('refocused');
             }
         });
 
