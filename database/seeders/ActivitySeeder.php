@@ -25,8 +25,11 @@ class ActivitySeeder extends Seeder
                     'day_id' => $activity->day_id,
                     'title' => $activity->title,
                     'type' => $activity->type,
+                    'time' => $activity->time,
+                    'completion_message' => $activity->completion_message,
                     'order' => $activity->order,
-                    'optional' => $activity->optional,
+                    'skippable' => $activity->skippable ?? true,
+                    'optional' => $activity->optional ?? false,
                 ]
             );
         }
