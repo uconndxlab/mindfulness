@@ -26,7 +26,13 @@ class FaqSeeder extends Seeder
                 '<a href="tel:'.Config::get('mail.contact_phone').'" class="text-decoration-none">'.formatPhone(Config::get('mail.contact_phone')).'</a>', 
                 $item['answer']
             );
-            Faq::create($item);
+            Faq::updateOrCreate(
+                ['id' => $item['id']],
+                [
+                    'question' => $item['question'],
+                    'answer' => $item['answer'],
+                ]
+            );
         }
     }
 }

@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\User;
 use App\Models\Role;
 
-class ChangeRole extends Command
+class ChangeUserRole extends Command
 {
     /**
      * The name and signature of the console command.

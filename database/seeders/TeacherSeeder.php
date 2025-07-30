@@ -15,7 +15,14 @@ class TeacherSeeder extends Seeder
     {
         $faqs = json_decode(file_get_contents(database_path('data/teachers.json')), true);
         foreach ($faqs as $item) {
-            Teacher::create($item);
+            Teacher::updateOrCreate(
+                ['id' => $item['id']],
+                [
+                    'name' => $item['name'],
+                    'bio' => $item['bio'],
+                    'profile_picture' => $item['profile_picture'],
+                ]
+            );
         }
     }
 }
