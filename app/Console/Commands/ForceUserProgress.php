@@ -15,7 +15,7 @@ class ForceUserProgress extends Command
      *
      * @var string
      */
-    protected $signature = 'users:force-progress {email} {--order=0}';
+    protected $signature = 'user:force-progress {email} {--order=0}';
 
     /**
      * The console command description.

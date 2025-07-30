@@ -26,7 +26,7 @@ class ActivitySeeder extends Seeder
                     'title' => $activity->title,
                     'type' => $activity->type,
                     'time' => $activity->time,
-                    'completion_message' => $activity->completion_message,
+                    'completion_message' => $activity->completion_message ?? "Congratulations on completing this activity!",
                     'order' => $activity->order,
                     'skippable' => $activity->skippable ?? true,
                     'optional' => $activity->optional ?? false,

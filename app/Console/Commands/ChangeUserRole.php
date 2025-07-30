@@ -13,7 +13,7 @@ class ChangeUserRole extends Command
      *
      * @var string
      */
-    protected $signature = 'users:role {email} {role}';
+    protected $signature = 'user:role {email} {role}';
 
     /**
      * The console command description.
