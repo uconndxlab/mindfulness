@@ -3,12 +3,15 @@
 namespace App\Providers;
 
 use App\Events\FinalActivityCompleted;
+use App\Http\Middleware\AdminOnly;
 use App\Listeners\ShowCompletionModal;
 use App\Services\ProgressService;
 use Event;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ProgressService::class, function ($app) {
             return new ProgressService();
         });
+
+        Paginator::useBootstrapFive();
     }
 
     /**
@@ -27,6 +32,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Livewire::addPersistentMiddleware([
+            AdminOnly::class,
+        ]);
+        
         Event::listen(
             FinalActivityCompleted::class,
             [ShowCompletionModal::class, 'handle']

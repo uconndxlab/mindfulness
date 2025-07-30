@@ -5,6 +5,6 @@
 @endphp
 
 @section('content')
-    @yield('auth_content')
+    @yield('content')
 @endsection
 

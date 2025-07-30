@@ -31,6 +31,7 @@ class AuthController extends Controller
         $request->validate([
             'email' => ['required', 'email'],
             'password' => 'required',
+            'timezone' => ['string', 'nullable'],
         ], [
             'email.required' => "Email address is required.",
             'email.email' => "Not a valid email address.",
@@ -60,32 +61,22 @@ class AuthController extends Controller
                     'credentials' => 'Your account is locked. If you have any questions, feel free to contact us at <a href="mailto:'.config('mail.contact_email').'">'.config('mail.contact_email').'</a>.',
                 ]);
             }
-            Auth::user()->update(['last_active_at' => Carbon::now()]);
-            
-            // fire GA event - login success
-            session()->flash('ga_event', [
-                'name' => 'login_success',
-                'params' => [
-                    'event_category' => 'Authentication',
-                    'event_label' => 'Successful Login',
-                    'user_id' => Auth::id(),
-                    'email' => $request->email
-                ]
+
+            // update active and timezone
+            Auth::user()->update([
+                'last_active_at' => Carbon::now(),
+                'timezone' => $request->input('timezone') ?? config('app.timezone')
             ]);
             
+            // log login
+            activity('auth')
+                ->event('login')
+                ->causedBy(Auth::user())
+                ->log('Authenticated');
+
             return redirect()->intended('/home');
         }
-        
-        // fire GA event - login failed
-        session()->flash('ga_event', [
-            'name' => 'login_failed',
-            'params' => [
-                'event_category' => 'Authentication',
-                'event_label' => 'Failed Login',
-                'email' => $request->email
-            ]
-        ]);
-        
+      
         return back()->withErrors(['credentials' => 'Invalid credentials.'])->withInput();
     }
 
@@ -115,7 +106,7 @@ class AuthController extends Controller
 
             return back()->withErrors(['error' => "Too many registration attempts. Please try again in {$timeLeft}."]);
         }
-
+        
         //validate inputs
         try {
             $request->validate([
@@ -135,38 +126,33 @@ class AuthController extends Controller
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
         }
-
+        
         try {
             //create user
             $user = User::create([
-                'name' => $request->name,
-                'email'=> $request->email,
-                'password'=> Hash::make($request->password),
+                'name' => $request->input('name'),
+                'email'=> $request->input('email'),
+                'password'=> Hash::make(value: $request->input('password')),
                 'timezone' => $request->timezone ?? config('app.timezone'),
-                'last_active_at' => Carbon::now()
+                'last_active_at' => Carbon::now(),
             ]);
-    
+            
             //unlocking first module/day/activity
             lockAll($user->id);
             unlockFirst($user->id);
-    
-            //login, hit limiter, redirect
+          
+            //login, hit limiter, redirect, event hits MustVerifyEmail which calls sendEmailVerificationNotification
             event(new Registered($user));
             $remember = $request->has('remember');
             Auth::attempt($request->only('email', 'password'), $remember);
             RateLimiter::hit($key, $limit['decay']);
+          
+            // log registration
+            activity('auth')
+                ->event('registration')
+                ->causedBy($user)
+                ->log('Registered');
 
-            // fire GA event - registration success
-            session()->flash('ga_event', [
-                'name' => 'registration_success',
-                'params' => [
-                    'event_category' => 'Authentication',
-                    'event_label' => 'Successful Registration',
-                    'user_id' => Auth::id(),
-                    'email' => $request->email
-                ]
-            ]);
-            
             return redirect(route('verification.notice'));
         }
         catch (\Exception $e) {

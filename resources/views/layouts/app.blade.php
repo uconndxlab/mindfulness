@@ -5,5 +5,5 @@
 @endphp
 
 @section('content')
-    @yield('app_content')
+    @yield('content')
 @endsection

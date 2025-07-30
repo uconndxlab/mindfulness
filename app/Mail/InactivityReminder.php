@@ -41,7 +41,7 @@ class InactivityReminder extends Mailable
     public function build()
     {
 
-        return $this->view('emails.inactivity_reminder')
+        return $this->view('emails.inactivity-reminder')
                     ->with(['user' => $this->user, 'body' => $this->body]);
     }
 
