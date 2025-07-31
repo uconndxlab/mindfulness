@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\User;
 
-class BackfillUserHhIds extends Command
+class BackfillUsersHhIds extends Command
 {
     /**
      * The name and signature of the console command.
