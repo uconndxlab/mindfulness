@@ -6,14 +6,14 @@ use Illuminate\Console\Command;
 use App\Models\User;
 use App\Models\Role;
 
-class ChangeRole extends Command
+class ChangeUserRole extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'users:role {email} {role}';
+    protected $signature = 'user:role {email} {role}';
 
     /**
      * The console command description.

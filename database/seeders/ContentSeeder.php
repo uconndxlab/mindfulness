@@ -25,7 +25,15 @@ class ContentSeeder extends Seeder
                 $item['audio_options'] = json_encode($item['audio_options']);
             }
 
-            Content::create($item);
+            Content::updateOrCreate(
+                ['id' => $item['id']],
+                [
+                    'activity_id' => $item['activity_id'],
+                    'type' => $item['type'],
+                    'file_path' => $item['file_path'],
+                    'audio_options' => $item['audio_options'] ?? null,
+                ]
+            );
         }
     }
 }

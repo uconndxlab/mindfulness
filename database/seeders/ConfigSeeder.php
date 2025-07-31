@@ -14,8 +14,6 @@ class ConfigSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('config')->truncate();
-
         Config::updateOrCreate(
             ['key' => 'first_activity_id'],
             ['value' => '1']

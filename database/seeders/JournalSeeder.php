@@ -16,7 +16,13 @@ class JournalSeeder extends Seeder
         $journals = json_decode(file_get_contents(database_path('data/journals.json')), true);
         
         foreach ($journals as $item) {
-            Journal::create($item);
+            Journal::updateOrCreate(
+                ['id' => $item['id']],
+                [
+                    'activity_id' => $item['activity_id'],
+                    'prompts' => $item['prompts'],
+                ]
+            );
         }
     }
 }

@@ -24,7 +24,14 @@ class QuizSeeder extends Seeder
             if (isset($quiz['question_options'])) {
                 $quiz['question_options'] = json_encode($quiz['question_options']);
             }
-            Quiz::create($quiz);
+            Quiz::updateOrCreate(
+                ['id' => $quiz['id']],
+                [
+                    'activity_id' => $quiz['activity_id'],
+                    'question_count' => $quiz['question_count'],
+                    'question_options' => $quiz['question_options'],
+                ]
+            );
         }
     }
 }

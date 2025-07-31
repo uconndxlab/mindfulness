@@ -16,12 +16,24 @@ class EmailSeeder extends Seeder
     {
         $subjects = json_decode(file_get_contents(database_path('data/mail/subjects.json')), true);
         foreach ($subjects as $item) {
-            Email_Subject::create($item);
+            Email_Subject::updateOrCreate(
+                ['id' => $item['id']],
+                [
+                    'type' => $item['type'],
+                    'subject' => $item['subject'],
+                ]
+            );
         }
 
         $bodies = json_decode(file_get_contents(database_path('data/mail/bodies.json')), true);
         foreach ($bodies as $item) {
-            Email_Body::create($item);
+            Email_Body::updateOrCreate(
+                ['id' => $item['id']],
+                [
+                    'type' => $item['type'],
+                    'body' => $item['body'],
+                ]
+            );
         }
     }
 }
