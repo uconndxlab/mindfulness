@@ -113,17 +113,23 @@ class ActivityController extends Controller
         $user = Auth::user() ?? null;
         $activity = Activity::findOrFail($request->activity_id) ?? null;
 
+        // block skip on example activities
+        if (!$activity->type) {
+            // send user to 403 page
+            abort(403, 'Example activities cannot be skipped');
+        }
+
         if (!$user) {
-            return response()->json(['success' => false, 'message' => 'User not found'], 404);
+            abort(404, 'User not found');
         }
 
         // check if unlocked
         if (!$user->canAccessActivity($activity)) {
-            return response()->json(['success' => false, 'message' => 'Activity locked', 'id' => $activity->id], 403);
+            abort(403, 'Activity locked');
         }
         // check if skippable
         if (!$activity->skippable) {
-            return response()->json(['success' => false, 'message' => 'Activity not skippable'], 403);
+            abort(403, 'Activity not skippable');
         }
 
         // unlock next activity
@@ -136,7 +142,7 @@ class ActivityController extends Controller
             $this->progressService->unlockActivity($user, $nextAct);
         }
         else {
-            return response()->json(['success' => false, 'message' => 'No next activity found'], 404);
+            abort(404, 'No next activity found');
         }
 
         // success

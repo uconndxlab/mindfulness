@@ -172,10 +172,6 @@
     else if (hasJournal) {
         console.log('Type: journal');
     }
-    else {
-        //if no content - complete activity
-        activityComplete();
-    }
 
     //COMPLETION
     function activityComplete(message=true) {
