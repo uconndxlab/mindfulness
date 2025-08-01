@@ -42,7 +42,7 @@ class SyncFiles extends Command
             $remotePath = $syncMap[$target]['remote'];
 
             // build command
-            $command = $this->buildWinScpCommand($config, $direction, $localPath, $remotePath);
+            $command = $this->buildWinScpCommand($config, $direction, $localPath, $remotePath, $target);
 
             if ($this->getOutput()->isVerbose()) {
                 $this->info("Running command: " . $command);
@@ -62,7 +62,7 @@ class SyncFiles extends Command
         return self::SUCCESS;
     }
 
-    private function buildWinScpCommand(array $config, string $direction, string $localPath, string $remotePath): string
+    private function buildWinScpCommand(array $config, string $direction, string $localPath, string $remotePath, string $target): string
     {
         $winscpPath = sprintf('"%s"', $config['winscp_path']);
         $privateKey = sprintf('"%s"', $config['key']);
@@ -78,6 +78,11 @@ class SyncFiles extends Command
         $switches = [];
         // delete files that are not present in the copied directory
         $switches[] = '-delete';
+
+        // add mirror to replace files in the data directory
+        if ($target === 'data') {
+            $switches[] = '-mirror';
+        }
 
         if ($this->option('dry-run')) {
             $switches[] = '-preview';
