@@ -202,9 +202,12 @@
                     // unlock redirect only after progress is processed
                     // showing modal on completed days
                     if (data.day_completed) {
+                        @php
+                            $markdownMessage = \Illuminate\Support\Str::markdown($activity->day->completion_message ?? 'Congrats on completing ' . $activity->day->name . '!');
+                        @endphp
                         showModal({
                             label: 'Day Completed',
-                            body: `{!! $activity->day->completion_message ?? 'Congrats on completing '.$activity->day->name.'!' !!}`,
+                            body: @json($markdownMessage),
                             media: '{{ Storage::url('flowers/'.($activity->day->media_path ? $activity->day->media_path : '')) }}',
                             route: null
                         });
