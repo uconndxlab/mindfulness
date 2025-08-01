@@ -59,7 +59,10 @@ class ActivityController extends Controller
         // check if practice - redirect to the next activity (slider reflection usually)
         if ($activity->type === 'practice') {
             $next_activity = $activity->nextActivity();
-            if ($next_activity && $next_activity->type === 'reflection') {
+            if ($next_activity
+                && $next_activity->type === 'reflection'
+                && $next_activity->quiz
+                && $next_activity->quiz->type === 'slider') {
                 $redirect_url = route('explore.activity', ['activity_id' => $next_activity->id]);
             }
         }

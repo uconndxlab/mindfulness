@@ -8,7 +8,7 @@
         <h1 class="display fw-bold mb-1">Part {{ $module->order }} - {{ $module->name }}</h1>
         <p>{{ $module->description }}</p>
         @if ($module->workbook_path)
-            <x-pdf-viewer fpath="{{ Storage::url('content/'.$module->workbook_path) }}" wbName="{{ $module->name }}" />
+            <x-pdf-viewer fpath="{{ Storage::url('workbooks/'.$module->workbook_path) }}" wbName="{{ $module->name }}" />
         @endif
     </div>
 

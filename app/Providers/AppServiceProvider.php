@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Livewire\Livewire;
+use League\CommonMark\CommonMarkConverter;
+use Illuminate\Support\Facades\Blade;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +27,13 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Paginator::useBootstrapFive();
+
+        $this->app->singleton(CommonMarkConverter::class, function ($app) {
+            return new CommonMarkConverter([
+                'html_input' => 'strip',
+                'allow_unsafe_links' => false,
+            ]);
+        });
     }
 
     /**
@@ -57,5 +66,9 @@ class AppServiceProvider extends ServiceProvider
         if(config('app.env') === 'production') {
             \URL::forceScheme('https');
         }
+
+        Blade::directive('markdown', function ($expression) {
+            return "<?php echo app(League\CommonMark\CommonMarkConverter::class)->convert($expression); ?>";
+        });
     }
 }

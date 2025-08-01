@@ -10,6 +10,7 @@
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.5",
+        "league/commonmark": "^2.7",
         "livewire/livewire": "^3.6",
         "maatwebsite/excel": "3.1.64",
         "nesbot/carbon": "^3.3",

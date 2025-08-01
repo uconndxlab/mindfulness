@@ -209,7 +209,7 @@
                         showModal({
                             label: 'Day Completed',
                             body: `{!! $activity->day->completion_message ?? 'Congrats on completing '.$activity->day->name.'!' !!}`,
-                            media: '{{ Storage::url('content/'.($activity->day->media_path ? $activity->day->media_path : '')) }}',
+                            media: '{{ Storage::url('flowers/'.($activity->day->media_path ? $activity->day->media_path : '')) }}',
                             route: null
                         });
                     }
@@ -246,7 +246,9 @@
     }
     function showCompletionMessage() {
         const completionMessageDiv = document.getElementById('comp_message');
-        completionMessageDiv.style.display = 'block';
+        if (completionMessageDiv) {
+            completionMessageDiv.style.display = 'block';
+        }
     }
 
     //FAVORITES

@@ -18,7 +18,7 @@
                                 $disabled = $module->unlocked ? '' : 'disabled';
                             @endphp
                             <a style="display:flex" id="moduleLink" class="stretched-link w-100 {{ $disabled }}" {!! $disabled ? '' : 'href='.route('explore.module', ['module_id' => $module->id]) !!}>
-                                <img src="{{ Storage::url('content/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon" style="width:50px; height:50px; margin-right:10px;">
+                                <img src="{{ Storage::url('flowers/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon" style="width:50px; height:50px; margin-right:10px;">
                                 Part {{ $module->order }} - {{ $module->name }} <br> {{ $module->daysCompleted }}/{{ $module->totalDays }} days completed
                             </a>
                             <i class="bi bi-arrow-right"></i>
