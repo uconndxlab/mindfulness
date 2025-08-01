@@ -11,7 +11,7 @@
         <div class="prior-note">
             <div class="grey-note">
                 <h5 class="fw-bold d-flex justify-content-between">
-                    <span>{{ $module->name }}</span>
+                    <span>Part {{ $module->order }} - {{ $module->name }}</span>
                 </h5>
                 <small class="{{ $module->completed ? 'fw-bold' : '' }}">{{ $module->daysCompleted }}/{{ $module->totalDays }} days completed</small>
             </div>
