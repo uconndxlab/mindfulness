@@ -30,7 +30,7 @@
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
             @if (isset($content->instructions))
                 <div class="text-left mb-3">
-                    <h5>{!! $content->instructions !!}</h5>
+                    <h5>@markdown($content->instructions)</h5>
                 </div>
             @endif
             @php

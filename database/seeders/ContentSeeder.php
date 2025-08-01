@@ -32,6 +32,7 @@ class ContentSeeder extends Seeder
                     'type' => $item['type'],
                     'file_path' => $item['file_path'],
                     'audio_options' => $item['audio_options'] ?? null,
+                    'instructions' => $item['instructions'] ?? null,
                 ]
             );
         }

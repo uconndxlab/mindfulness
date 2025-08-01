@@ -187,7 +187,7 @@ class PageNavController extends Controller
             ->first() == null;
         
         $activity->skippable = $activity->skippable && !$activity->final && !$activity->completed && isset($activity->type);
-        
+
         //favoriting
         $activity->favorited = $user->isActivityFavorited($activity);
 
