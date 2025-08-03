@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Events\FinalActivityCompleted;
 use App\Http\Middleware\AdminOnly;
 use App\Listeners\ShowCompletionModal;
+use App\Models\Module;
+use App\Observers\ModuleObserver;
 use App\Services\ProgressService;
 use Event;
 use Illuminate\Auth\SessionGuard;
@@ -41,6 +43,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Module::observe(ModuleObserver::class);
+
         Livewire::addPersistentMiddleware([
             AdminOnly::class,
         ]);
