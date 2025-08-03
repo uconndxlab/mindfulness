@@ -37,15 +37,9 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link disabled" href="#">
-                        <i class="bi bi-envelope me-2"></i>
-                        Email Log?
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#">
-                        <i class="bi bi-envelope me-2"></i>
-                        Inquiries?
+                    <a class="nav-link" href="/admin/cms">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        CMS
                     </a>
                 </li>
             </ul>
