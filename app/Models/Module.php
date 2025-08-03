@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Module extends Model
 {
     use HasFactory;
+    
+    protected $fillable = ['name', 'description', 'workbook_path', 'order'];
 
     public function days()
     {
