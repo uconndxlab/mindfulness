@@ -66,4 +66,11 @@ class Module extends Model
             'totalDays' => $totalDays,
         ];
     }
+    
+    public static function setNewOrder(array $order): void
+    {
+        foreach ($order as $i => $id) {
+            static::find($id)->update(['order' => $i + 1]);
+        }
+    }
 }
