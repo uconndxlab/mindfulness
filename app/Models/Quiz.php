@@ -9,12 +9,6 @@ class Quiz extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'activity_id',
-        'question_count',
-        'question_options'
-    ];
-
     protected $casts = [
         'question_options' => 'json',
         'options_feedback' => 'json',
