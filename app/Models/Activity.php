@@ -10,6 +10,17 @@ class Activity extends Model
     use HasFactory;
 
     protected $table = 'activities';
+
+    protected $fillable = [
+        'day_id',
+        'title',
+        'type',
+        'order',
+        'time',
+        'completion_message',
+        'optional',
+        'skippable',
+    ];
     
     protected $casts = [
         'optional' => 'boolean',

@@ -230,7 +230,7 @@ class PageNavController extends Controller
         $quiz = $activity->quiz;
         $journal = $activity->journal;
         if ($quiz) {
-            $quiz->question_options = json_decode($quiz->question_options, true);
+            $quiz->question_options = $quiz->question_options;
             $temp_answers = $user->quiz_answers($quiz->id)->first();
             $quiz->answers = $temp_answers ? json_decode($temp_answers->answers) : [];
         }
