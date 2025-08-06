@@ -4,18 +4,15 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DayResource;
 use App\Filament\Resources\ModuleResource\Pages;
-use App\Filament\Resources\ModuleResource\RelationManagers;
 use App\Models\Module;
+use App\Services\ModuleOrderService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
 
 class ModuleResource extends Resource
 {
@@ -41,13 +38,29 @@ class ModuleResource extends Resource
                 Forms\Components\TextInput::make('order')
                     ->required()
                     ->numeric()
-                    ->default(fn () => Module::max('order') + 1)
-                    ->unique(
-                        table: Module::class,
-                        column: 'order',
-                        ignoreRecord: true
-                    )
-                    ->disabledOn('edit'),
+                    ->default(fn () => ModuleOrderService::getNextOrder())
+                    ->rules(['required', 'numeric', 'min:1'])
+                    ->live(debounce: 500)
+                    ->afterStateUpdated(function ($state, $set, $get, $record) {
+                        if (!$state) {
+                            return $set('order_confirmation', false);
+                        }
+                        // check if order already exists
+                        $recordId = $record ? $record->id : null;
+                        if (ModuleOrderService::orderExists($state, $recordId)) {
+                            $set('order_confirmation', true);
+                        } else {
+                            $set('order_confirmation', false);
+                        }
+                    }),
+                Forms\Components\Toggle::make('order_confirmation')
+                    ->live()
+                    ->label('I understand this will reorder existing modules')
+                    ->visible(fn ($get) => $get('order_confirmation') === true)
+                    ->required(fn ($get) => $get('order_confirmation') === true)
+                    ->helperText('This order already exists. Confirming will insert this module, and shift all subsequent modules.')
+                    ->default(false)
+                    ->dehydrated(false),
             ]);
     }
 
@@ -76,7 +89,16 @@ class ModuleResource extends Resource
                     ->options(fn () => Module::pluck('name', 'id'))
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()->slideOver(),
+                Tables\Actions\CreateAction::make()
+                    ->slideOver()
+                    ->mutateFormDataUsing(function (array $data): array {
+                        // need to insert if order already exists
+                        if (isset($data['order']) && ModuleOrderService::orderExists($data['order'])) {
+                            ModuleOrderService::insertAtOrder($data['order']);
+                        }
+                        unset($data['order_confirmation']);
+                        return $data;
+                    }),
             ])
             ->actions([
                 Tables\Actions\Action::make('view_days')
@@ -85,7 +107,19 @@ class ModuleResource extends Resource
                     ->url(fn (Module $record): string => DayResource::getUrl('index', ['tableFilters[module][value]' => $record->id]))
                     ->color('info'),
 
-                Tables\Actions\EditAction::make()->slideOver(),
+                Tables\Actions\EditAction::make()
+                    ->slideOver()
+                    ->mutateFormDataUsing(function (array $data, Module $record): array {
+                        $originalOrder = $record->order;
+                        $newOrder = $data['order'];
+
+                        // need to insert if order has changed and new order already exists
+                        if ($originalOrder !== $newOrder && ModuleOrderService::orderExists($newOrder, $record->id)) {
+                            ModuleOrderService::insertAtOrder($newOrder, $record->id);
+                        }
+                        unset($data['order_confirmation']);
+                        return $data;
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -96,9 +130,7 @@ class ModuleResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
