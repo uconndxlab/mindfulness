@@ -34,8 +34,9 @@
                 </div>
             @endif
             @php
-                $controlsList = ($activity->type != 'lesson' || !$activity->completed) ? 'noplaybackrate' : '';
-                $allowSeek = $activity->completed ? 'true' : 'false';
+                $allowSeek = $activity->completed;
+                $allowPlaybackRate = $activity->type == 'practice' && $activity->completed;
+
                 $hasAudioOptions = isset($content->audio_options) && !empty($content->audio_options);
                 
                 if ($hasAudioOptions) {
@@ -43,22 +44,23 @@
                     $multipleVoices = count($content->audio_options) > 1;
                 }
             @endphp
+            
+            <!-- voice selection dropdown -->
             @if ($hasAudioOptions)
-                <!-- voice selection dropdown -->
                 <x-voice-selector :voices="$content->audio_options" :defaultVoice="$defaultVoice" :showDropdown="$multipleVoices"/>
 
                 <!-- audio content views -->
                 <div class="mt-4">
                     @foreach ($content->audio_options as $voice => $file_path)
                         <div id="audio_content" class="content-main" voice="{{ $voice }}" data-type="audio" style="display: none;">
-                            <x-audio-player :file="$file_path" :id="$voice" :controlsList="$controlsList" :allowSeek="$allowSeek"/>
+                            <x-audio-player :file="$file_path" :id="$voice" :allowSeek="$allowSeek" :allowPlaybackRate="$allowPlaybackRate"/>
                         </div>
                     @endforeach
                 </div>
             @else
-                <!-- default audio, video, image -->
+                <!-- default video, image -->
                 <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: flex; justify-content: center; align-items: center; flex-direction:column;">
-                    <x-contentView id="content_view" id2="download_btn" voiceId="none" type="{{ $content->type }}" file="{{ $content->file_path }}" controlsList="{{ $controlsList }}" allowSeek="{{ $allowSeek }}"/>
+                    <x-contentView id="content_view" id2="download_btn" voiceId="none" type="{{ $content->type }}" file="{{ $content->file_path }}" allowSeek="{{ $allowSeek }}"/>
                 </div>
             @endif
 
@@ -234,6 +236,8 @@
             });
         }
     }
+    // ensure globally accessible for components
+    window.activityComplete = activityComplete;
 
     //function for unlocking the redirection buttons
     function unlockRedirect() {

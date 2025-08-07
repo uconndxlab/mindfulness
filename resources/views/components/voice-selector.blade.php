@@ -22,6 +22,7 @@
     // show the options
     document.getElementById('audio-options-div').style.display = 'block';
     console.log('audio options shown');
+    
     function selectVoice(voice) {
         // update dropdown text
         document.getElementById('voice_dropdown_button').textContent = voice;
@@ -29,16 +30,25 @@
         // update hidden input
         document.getElementById('voice_select').value = voice;
         
-        // show/hide the audio
+        // pause all audio players
+        pauseAllAudioPlayers();
+        
+        // show/hide the audio content
         document.querySelectorAll('.content-main[voice]').forEach(div => {
             div.style.display = div.getAttribute('voice') === voice ? 'block' : 'none';
-            div.querySelectorAll('audio').forEach(audio => {
-                audio.pause();
-            });
+        });
+        
+        console.log(`Switched to voice: ${voice}`);
+    }
+    
+    function pauseAllAudioPlayers() {
+        // pause all audio players
+        document.querySelectorAll('.slide__audio-player').forEach(audio => {
+            audio.pause();
         });
     }
 
-    // show initial voice
+    // initialize voice selector
     document.addEventListener('DOMContentLoaded', function() {
         selectVoice('{{ $defaultVoice }}');
     });
