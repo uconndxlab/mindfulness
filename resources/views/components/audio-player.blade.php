@@ -58,20 +58,63 @@
 
     $slider.on('drag change', function(e) {
         const audioDom = player.find('audio')[0];
-        const maxDuration = audioDom.duration || 0;
-        const value = e.handle && typeof e.handle.value !== 'undefined' ? e.handle.value : 0;
-        if (Number.isFinite(maxDuration) && maxDuration > 0) {
-            audioDom.currentTime = (value * maxDuration) / 100;
+        const sliderEl = $(this);
+
+        // derive slider value robustly across roundSlider event shapes
+        const resolveValue = () => {
+            if (e && typeof e.value === 'number') return e.value;
+            if (e && e.handle && typeof e.handle.value === 'number') return e.handle.value;
+            const apiValue = sliderEl.roundSlider('getValue');
+            if (typeof apiValue === 'number') return apiValue;
+            if (apiValue && typeof apiValue.value === 'number') return apiValue.value;
+            const parsed = parseFloat(apiValue);
+            return Number.isFinite(parsed) ? parsed : 0;
+        };
+
+        const setUiForTime = (time, duration) => {
+            const percent = duration > 0 ? (time / duration) * 100 : 0;
+            // ensure both the handle and the range snap
+            sliderEl.roundSlider('setValue', percent);
             // snap progress ring immediately
             const circle = player.find('#seekbar');
             const getCircle = circle.get(0);
             if (getCircle && typeof getCircle.getTotalLength === 'function') {
                 const totalLength = getCircle.getTotalLength();
-                const calc = totalLength - (audioDom.currentTime / maxDuration) * totalLength;
+                const calc = totalLength - (time / duration) * totalLength;
                 circle.attr('stroke-dashoffset', calc);
             }
+        };
+
+        const desiredPercent = resolveValue();
+        const proceed = () => {
+            const duration = audioDom.duration || 0;
+            if (!Number.isFinite(duration) || duration <= 0) return;
+
+            let targetTime = (desiredPercent * duration) / 100;
+
+            // prevent seeking ahead if not allowed
+            if (!allowSeek && typeof watchedTime !== 'undefined' && targetTime > watchedTime) {
+                targetTime = watchedTime;
+            }
+
+            audioDom.currentTime = targetTime;
+            setUiForTime(targetTime, duration);
+        };
+
+        // what for loaded metadata - mobile issue with seeking before metadata is loaded
+        if (!Number.isFinite(audioDom.duration) || !audioDom.duration) {
+            const onLoaded = () => {
+                audioDom.removeEventListener('loadedmetadata', onLoaded);
+                proceed();
+            };
+            audioDom.addEventListener('loadedmetadata', onLoaded, { once: true });
+            // kick a load in case the browser deferred it
+            try { audioDom.load(); } catch (_) {}
+        } else {
+            proceed();
         }
-        $(this).addClass('active');
+
+        sliderEl.addClass('active');
     });
 
     initAudioPlayer(player);
@@ -172,6 +215,9 @@
             icon.addClass("bi-play");
             circle.attr("stroke-dashoffset", totalLength);
 
+            // reset slider back to 0 when finished
+            player.find('.audio__slider').roundSlider('setValue', 0);
+
             // notify page-level completion handler if available
             if (typeof window.activityComplete === 'function') {
                 try { window.activityComplete(); } catch (e) { /* noop */ }
@@ -184,6 +230,14 @@
             if (currentTime > watchedTime && !allowSeek) {
                 audio[0].currentTime = watchedTime;
                 e.preventDefault();
+                // snap UI back to the last allowed time
+                const maxduration = audio[0].duration || 0;
+                if (Number.isFinite(maxduration) && maxduration > 0) {
+                    const percent = (watchedTime / maxduration) * 100;
+                    player.find('.audio__slider').roundSlider('setValue', percent);
+                    const calc = totalLength - (watchedTime / maxduration) * totalLength;
+                    circle.attr('stroke-dashoffset', calc);
+                }
             }
         });
     }
