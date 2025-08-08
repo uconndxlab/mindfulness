@@ -719,7 +719,7 @@ color:#000!important;
 }
 
 .rs-animation .rs-transition {
-	transition: all .5s linear 0s
+	transition: all 0s linear 0s
 }
 
 .rs-bar {

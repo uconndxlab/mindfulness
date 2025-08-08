@@ -74,7 +74,7 @@
                 <x-journal :journal="$journal"/>
             </div>
         @endif
-        <div id="comp_message" class="mt-3" style="display: none; clear: both;">
+        <div id="comp_message" class="mt-2" style="display: none;">
             <p class="text-success">{!! $activity->completion_message ?? 'Congrats on completing this activity!' !!}</p>
         </div>
     </div>

@@ -8,18 +8,18 @@
         <button class="play-pause">
             <i id="icon" class="bi bi-play"></i>
         </button>
-        @if ($allowPlaybackRate)
-            <div class="mt-4" style="margin-left:auto;margin-right:auto">
-                <label for="audioRange-{{ $id }}" class="form-label">Audio Speed: <span id="speed-value-{{ $id }}">1</span></label>
-                <input type="range" class="form-range audioRange" min="0.5" max="1.5" step="0.05" id="audioRange-{{ $id }}" value="1">
-            </div>
-            <div class="d-flex justify-content-between" style="margin-left:auto;margin-right:auto">
-                <small style="color:#bfbfbf">0.5</small>
-                <small style="color:#bfbfbf">1</small>
-                <small style="color:#bfbfbf">1.5</small>
-            </div>
-        @endif
     </div>
+    @if ($allowPlaybackRate)
+        <div class="mt-4" style="margin-left:auto;margin-right:auto">
+            <label for="audioRange-{{ $id }}" class="form-label">Audio Speed: <span id="speed-value-{{ $id }}">1</span></label>
+            <input type="range" class="form-range audioRange" min="0.5" max="1.5" step="0.05" id="audioRange-{{ $id }}" value="1">
+        </div>
+        <div class="d-flex justify-content-between" style="margin-left:auto;margin-right:auto">
+            <small style="color:#bfbfbf">0.5</small>
+            <small style="color:#bfbfbf">1</small>
+            <small style="color:#bfbfbf">1.5</small>
+        </div>
+    @endif
 </div>
 <script src="https://cdn.jsdelivr.net/npm/nosleep.js@0.12.0/dist/NoSleep.min.js"></script>
 <script>
@@ -29,8 +29,10 @@
     const allowPlaybackRate = @json((bool) $allowPlaybackRate);
     const noSleep = new NoSleep();
     const player = $("#player-" + id);
+    let watchedTime = 0; // shared across handlers
 
-    // initialize playback rate UI
+    // initialize playback rate UI + pending seek support
+    let pendingSeekPercent = null; // used when user seeks before metadata is ready
     if (allowPlaybackRate) {
         const audioEl = document.getElementById("audio-" + id);
         const playbackRateValue = document.getElementById("speed-value-" + id);
@@ -86,6 +88,7 @@
         };
 
         const desiredPercent = resolveValue();
+        pendingSeekPercent = desiredPercent; // remember requested seek
         const proceed = () => {
             const duration = audioDom.duration || 0;
             if (!Number.isFinite(duration) || duration <= 0) return;
@@ -101,17 +104,19 @@
             setUiForTime(targetTime, duration);
         };
 
-        // what for loaded metadata - mobile issue with seeking before metadata is loaded
+        // wait for loaded metadata - mobile issue with seeking before metadata is loaded
         if (!Number.isFinite(audioDom.duration) || !audioDom.duration) {
             const onLoaded = () => {
                 audioDom.removeEventListener('loadedmetadata', onLoaded);
                 proceed();
+                pendingSeekPercent = null;
             };
             audioDom.addEventListener('loadedmetadata', onLoaded, { once: true });
             // kick a load in case the browser deferred it
             try { audioDom.load(); } catch (_) {}
         } else {
             proceed();
+            pendingSeekPercent = null;
         }
 
         sliderEl.addClass('active');
@@ -121,7 +126,6 @@
 
     function initAudioPlayer(player) {
         console.log("Initializing audio player " + "{{ $id }}");
-        let watchedTime = 0;
         let audio = player.find("audio"),
             play = player.find(".play-pause"),
             icon = player.find("#icon"),
@@ -167,6 +171,12 @@
 
         play.on("click", () => {
             if (audio[0].paused) {
+                // apply any pending seek before play
+                if (pendingSeekPercent !== null && Number.isFinite(audio[0].duration) && audio[0].duration > 0) {
+                    const targetTime = (pendingSeekPercent * audio[0].duration) / 100;
+                    audio[0].currentTime = targetTime;
+                    pendingSeekPercent = null;
+                }
                 playAudio();
             } else {
                 pauseAudio();
