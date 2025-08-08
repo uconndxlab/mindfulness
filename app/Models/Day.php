@@ -16,7 +16,7 @@ class Day extends Model
 
     public function activities()
     {
-        return $this->hasMany(Activity::class)->orderBy('order');
+        return $this->hasMany(Activity::class);
     }
 
     public function finalActivity()

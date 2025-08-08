@@ -13,7 +13,7 @@ class Module extends Model
 
     public function days()
     {
-        return $this->hasMany(Day::class)->orderBy('order');
+        return $this->hasMany(Day::class);
     }
 
     // user progress functions
@@ -72,5 +72,10 @@ class Module extends Model
         foreach ($order as $i => $id) {
             static::find($id)->update(['order' => $i + 1]);
         }
+    }
+
+    public function lastActivity()
+    {
+        return $this->days()->orderBy('order', 'desc')->first()->activities()->where('optional', false)->orderBy('order', 'desc')->first();
     }
 }

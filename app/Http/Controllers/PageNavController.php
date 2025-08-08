@@ -56,7 +56,12 @@ class PageNavController extends Controller
     {
         $user = Auth::user();
         //find the module
+        // order days and activities by order
         $module = Module::with('days.activities')->findOrFail($module_id);
+        $module->days = $module->days->sortBy('order');
+        foreach ($module->days as $day) {
+            $day->activities = $day->activities->sortBy('order');
+        }
 
         // get user_module information
         $stats = $module->getStats($user);
