@@ -30,6 +30,7 @@
     const noSleep = new NoSleep();
     const player = $("#player-" + id);
     let watchedTime = 0; // shared across handlers
+    let isWaitingForMetadata = false;
 
     // initialize playback rate UI + pending seek support
     let pendingSeekPercent = null; // used when user seeks before metadata is ready
@@ -106,12 +107,32 @@
 
         // wait for loaded metadata - mobile issue with seeking before metadata is loaded
         if (!Number.isFinite(audioDom.duration) || !audioDom.duration) {
-            const onLoaded = () => {
-                audioDom.removeEventListener('loadedmetadata', onLoaded);
-                proceed();
-                pendingSeekPercent = null;
-            };
-            audioDom.addEventListener('loadedmetadata', onLoaded, { once: true });
+            // only attach one listener
+            if (!isWaitingForMetadata) {
+                isWaitingForMetadata = true;
+                const onLoaded = () => {
+                    // use the LATEST desired percent
+                    const currentDesiredPercent = pendingSeekPercent;
+                    isWaitingForMetadata = false; // reset before processing
+                    audioDom.removeEventListener('loadedmetadata', onLoaded);
+                    if (currentDesiredPercent !== null) {
+                        const duration = audioDom.duration || 0;
+                        if (Number.isFinite(duration) && duration > 0) {
+                            let targetTime = (currentDesiredPercent * duration) / 100;
+                            if (!allowSeek && typeof watchedTime !== 'undefined' && targetTime > watchedTime) {
+                                targetTime = watchedTime;
+                            }
+                            audioDom.currentTime = targetTime;
+                            setUiForTime(targetTime, duration);
+                        }
+                    }
+                    // only clear if we handled it
+                    if (pendingSeekPercent === currentDesiredPercent) {
+                        pendingSeekPercent = null;
+                    }
+                };
+                audioDom.addEventListener('loadedmetadata', onLoaded, { once: true });
+            }
             // kick a load in case the browser deferred it
             try { audioDom.load(); } catch (_) {}
         } else {
@@ -171,12 +192,6 @@
 
         play.on("click", () => {
             if (audio[0].paused) {
-                // apply any pending seek before play
-                if (pendingSeekPercent !== null && Number.isFinite(audio[0].duration) && audio[0].duration > 0) {
-                    const targetTime = (pendingSeekPercent * audio[0].duration) / 100;
-                    audio[0].currentTime = targetTime;
-                    pendingSeekPercent = null;
-                }
                 playAudio();
             } else {
                 pauseAudio();
