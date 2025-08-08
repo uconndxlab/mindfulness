@@ -29,11 +29,50 @@
     const allowPlaybackRate = @json((bool) $allowPlaybackRate);
     const noSleep = new NoSleep();
     const player = $("#player-" + id);
-    let watchedTime = 0; // shared across handlers
-    let isWaitingForMetadata = false;
+    let watchedTime = 0;
+    let hasBeenPlayed = false;
 
-    // initialize playback rate UI + pending seek support
-    let pendingSeekPercent = null; // used when user seeks before metadata is ready
+    // function to update ui based on time/duration
+    const updatePlayerUI = (currentTime, duration) => {
+        const sliderEl = player.find('.audio__slider');
+        const circle = player.find('#seekbar');
+        const getCircle = circle.get(0);
+        const totalLength = getCircle.getTotalLength();
+
+        if (!Number.isFinite(duration) || duration <= 0) {
+            sliderEl.roundSlider('setValue', 0);
+            circle.attr('stroke-dashoffset', totalLength);
+        } else {
+            const percent = (currentTime / duration) * 100;
+            sliderEl.roundSlider('setValue', percent);
+
+            const calc = totalLength - (currentTime / duration) * totalLength;
+            circle.attr('stroke-dashoffset', calc);
+        }
+
+        // handle element visibility and interactivity
+        const sliderApi = sliderEl.data('roundSlider');
+        if (sliderApi) {
+            // show the handle if played once
+            const canShowHandle = hasBeenPlayed;
+            const handle = sliderEl.find('.rs-handle');
+            if (handle.length) {
+                if (canShowHandle) {
+                    handle.removeClass('hidden-handle').addClass('visible-handle');
+                } else {
+                    handle.removeClass('visible-handle').addClass('hidden-handle');
+                }
+            }
+
+            // seeking is only possible if the handle is visible
+            // if user can seek, remove readOnly on slider
+            const canUserSeek = canShowHandle && Number.isFinite(duration) && duration > 0;
+            sliderApi.option('readOnly', !canUserSeek);
+        }
+    };
+
+
+    // initialize playback rate UI
     if (allowPlaybackRate) {
         const audioEl = document.getElementById("audio-" + id);
         const playbackRateValue = document.getElementById("speed-value-" + id);
@@ -56,97 +95,46 @@
         handleSize: "+15",
         handleShape: "round",
         sliderType: "min-range",
-        step: 0.1
+        step: 0.1,
+        readOnly: true // readOnly until audio starts playing
     });
 
     $slider.on('drag change', function(e) {
         const audioDom = player.find('audio')[0];
         const sliderEl = $(this);
 
-        // derive slider value robustly across roundSlider event shapes
-        const resolveValue = () => {
-            if (e && typeof e.value === 'number') return e.value;
-            if (e && e.handle && typeof e.handle.value === 'number') return e.handle.value;
-            const apiValue = sliderEl.roundSlider('getValue');
-            if (typeof apiValue === 'number') return apiValue;
-            if (apiValue && typeof apiValue.value === 'number') return apiValue.value;
-            const parsed = parseFloat(apiValue);
-            return Number.isFinite(parsed) ? parsed : 0;
-        };
-
-        const setUiForTime = (time, duration) => {
-            const percent = duration > 0 ? (time / duration) * 100 : 0;
-            // ensure both the handle and the range snap
-            sliderEl.roundSlider('setValue', percent);
-            // snap progress ring immediately
-            const circle = player.find('#seekbar');
-            const getCircle = circle.get(0);
-            if (getCircle && typeof getCircle.getTotalLength === 'function') {
-                const totalLength = getCircle.getTotalLength();
-                const calc = totalLength - (time / duration) * totalLength;
-                circle.attr('stroke-dashoffset', calc);
-            }
-        };
-
-        const desiredPercent = resolveValue();
-        pendingSeekPercent = desiredPercent; // remember requested seek
-        const proceed = () => {
-            const duration = audioDom.duration || 0;
-            if (!Number.isFinite(duration) || duration <= 0) return;
-
-            let targetTime = (desiredPercent * duration) / 100;
-
-            // prevent seeking ahead if not allowed
-            if (!allowSeek && typeof watchedTime !== 'undefined' && targetTime > watchedTime) {
-                targetTime = watchedTime;
-            }
-
-            audioDom.currentTime = targetTime;
-            setUiForTime(targetTime, duration);
-        };
-
-        // wait for loaded metadata - mobile issue with seeking before metadata is loaded
-        if (!Number.isFinite(audioDom.duration) || !audioDom.duration) {
-            // only attach one listener
-            if (!isWaitingForMetadata) {
-                isWaitingForMetadata = true;
-                const onLoaded = () => {
-                    // use the LATEST desired percent
-                    const currentDesiredPercent = pendingSeekPercent;
-                    isWaitingForMetadata = false; // reset before processing
-                    audioDom.removeEventListener('loadedmetadata', onLoaded);
-                    if (currentDesiredPercent !== null) {
-                        const duration = audioDom.duration || 0;
-                        if (Number.isFinite(duration) && duration > 0) {
-                            let targetTime = (currentDesiredPercent * duration) / 100;
-                            if (!allowSeek && typeof watchedTime !== 'undefined' && targetTime > watchedTime) {
-                                targetTime = watchedTime;
-                            }
-                            audioDom.currentTime = targetTime;
-                            setUiForTime(targetTime, duration);
-                        }
-                    }
-                    // only clear if we handled it
-                    if (pendingSeekPercent === currentDesiredPercent) {
-                        pendingSeekPercent = null;
-                    }
-                };
-                audioDom.addEventListener('loadedmetadata', onLoaded, { once: true });
-            }
-            // kick a load in case the browser deferred it
-            try { audioDom.load(); } catch (_) {}
-        } else {
-            proceed();
-            pendingSeekPercent = null;
+        // should not fire, but safeguard against drag/change events when readOnly
+        if (sliderEl.data('roundSlider').option('readOnly')) {
+            console.log(`[Player ${id}] Slider interaction blocked: readOnly is true.`);
+            return;
         }
 
-        sliderEl.addClass('active');
+        // derive slider value robustly across roundSlider event shapes
+        const desiredPercent = (e && typeof e.value === 'number') ? e.value : 0;
+
+        const duration = audioDom.duration || 0;
+        if (!Number.isFinite(duration) || duration <= 0) {
+            console.warn(`[Player ${id}] Cannot seek: duration is invalid or zero (${duration}).`);
+            return;
+        }
+
+        let targetTime = (desiredPercent * duration) / 100;
+
+        // check for if watchedTime is < targetTime
+        // allowSeek is false, so limiting seek by watchedTime
+        if (!allowSeek && typeof watchedTime !== 'undefined' && targetTime > watchedTime) {
+            targetTime = watchedTime;
+            // snap ui to watchedTime if forced
+            updatePlayerUI(targetTime, duration);
+        }
+
+        audioDom.currentTime = targetTime;
     });
+
 
     initAudioPlayer(player);
 
     function initAudioPlayer(player) {
-        console.log("Initializing audio player " + "{{ $id }}");
         let audio = player.find("audio"),
             play = player.find(".play-pause"),
             icon = player.find("#icon"),
@@ -159,35 +147,37 @@
             "stroke-dashoffset": totalLength
         });
 
-        // pause audio
+        // helper function for pausing audio - overwritten below
         function pauseAudio() {
             audio[0].pause();
-            console.log("{{ $id }}: " + "noSleep disabled");
-            // enable screen sleep
-            noSleep.disable();
-            player.removeClass("playing");
-            icon.removeClass("bi-pause");
-            player.addClass("paused");
-            icon.addClass("bi-play");
         }
+
         // play audio
         function playAudio() {
-            console.log("Playing audio " + "{{ $id }}");
-            $("audio").each((index, el) => {
-                $("audio")[index].pause();
-            });
-            $(".js-audio").removeClass("playing");
+            if (!hasBeenPlayed) {
+                hasBeenPlayed = true;
+            }
 
-            // disable screen sleep
-            console.log("{{ $id }}: " + "NoSleep enabled");
+            // pause all other audio players
+            $("audio").each((index, el) => {
+                if (el !== audio[0] && !el.paused) {
+                    el.pause();
+                }
+            });
+            $(".js-audio").not(player).removeClass("playing");
+
             noSleep.enable();
-            
-            // play and change classes/icons
-            audio[0].play();
-            player.removeClass("paused");
-            icon.removeClass("bi-play");
-            player.addClass("playing");
-            icon.addClass("bi-pause");
+
+            audio[0].play().then(() => {
+                player.removeClass("paused");
+                icon.removeClass("bi-play");
+                player.addClass("playing");
+                icon.addClass("bi-pause");
+                updatePlayerUI(audio[0].currentTime, audio[0].duration);
+            }).catch(error => {
+                console.error(`[Player ${id}] Audio play() failed:`, error);
+                pauseAudio();
+            });
         }
 
         play.on("click", () => {
@@ -198,50 +188,39 @@
             }
         });
 
-        // overwrite pause function - method replacement
-        // needs to be able to pause without the button
+        // overwriting native pause - catches all pause events
         const originalPause = audio[0].pause;
         audio[0].pause = function() {
-            // check if playing
-            if (audio[0].paused) {
-                console.log("{{ $id }}: " + "already paused");
-                return;
-            }
-            // enable screen sleep
-            console.log("{{ $id }}: " + "NoSleep disabled");
+            if (audio[0].paused) return;
             noSleep.disable();
             originalPause.apply(this);
             player.removeClass("playing");
             icon.removeClass("bi-pause");
             player.addClass("paused");
             icon.addClass("bi-play");
+            updatePlayerUI(audio[0].currentTime, audio[0].duration);
         };
 
         audio.on("timeupdate", () => {
             let currentTime = audio[0].currentTime,
-                maxduration = audio[0].duration,
-                calc = totalLength - (currentTime / maxduration) * totalLength;
-            circle.attr("stroke-dashoffset", calc);
-            let value = ((currentTime / maxduration) * 100);
-            player.find('.audio__slider').roundSlider('setValue', value);
-            //updating watch time to allow user to seek back to the last watched time
+                maxduration = audio[0].duration;
+
+            updatePlayerUI(currentTime, maxduration);
+
             if (currentTime > watchedTime) {
                 watchedTime = currentTime;
             }
         });
 
         audio.on("ended", () => {
-            // enable screen sleep
-            console.log("{{ $id }}: " + "nosleep disabled");
             noSleep.disable();
 
             player.removeClass("playing");
             icon.removeClass("bi-pause");
             icon.addClass("bi-play");
-            circle.attr("stroke-dashoffset", totalLength);
 
-            // reset slider back to 0 when finished
-            player.find('.audio__slider').roundSlider('setValue', 0);
+            // reset ui to 0
+            updatePlayerUI(0, 0);
 
             // notify page-level completion handler if available
             if (typeof window.activityComplete === 'function') {
@@ -249,22 +228,15 @@
             }
         });
 
-        audio.on("seeking", (e) => {
-            //blocking the user from seeking forward beyond watchedtime
-            let currentTime = audio[0].currentTime;
-            if (currentTime > watchedTime && !allowSeek) {
-                audio[0].currentTime = watchedTime;
-                e.preventDefault();
-                // snap UI back to the last allowed time
-                const maxduration = audio[0].duration || 0;
-                if (Number.isFinite(maxduration) && maxduration > 0) {
-                    const percent = (watchedTime / maxduration) * 100;
-                    player.find('.audio__slider').roundSlider('setValue', percent);
-                    const calc = totalLength - (watchedTime / maxduration) * totalLength;
-                    circle.attr('stroke-dashoffset', calc);
-                }
-            }
+        // update ui after seek to ensure it is synced
+        audio.on("seeked", () => {
+            updatePlayerUI(audio[0].currentTime, audio[0].duration);
         });
+        audio.on("loadedmetadata", () => {
+            updatePlayerUI(audio[0].currentTime, audio[0].duration);
+        });
+
+        updatePlayerUI(0, 0);
     }
 })();
 </script>

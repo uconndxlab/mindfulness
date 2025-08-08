@@ -802,7 +802,7 @@ color:#000!important;
 
 .rs-handle.rs-move {
 	cursor: move;
-    margin:-13px 0px 0px -7px!important;
+    margin:-13px 0px 0px -7px;
 }
 
 .rs-readonly .rs-handle.rs-move {
@@ -950,6 +950,19 @@ color:#000!important;
     background: var(--dark-green);
     opacity: 0.5;
 }
+
+/* styles to handle visibility of the audio handle
+    want it hidden before audio plays
+*/
+.rs-handle.visible-handle {
+    visibility: visible !important;
+}
+
+.rs-handle.hidden-handle {
+    visibility: hidden !important;
+}
+
+/* end audio player */
 
 #prev_q_button, #next_q_button{
     color:#000!important;
