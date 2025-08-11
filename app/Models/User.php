@@ -62,6 +62,12 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function sendEmailVerificationNotification()
     {
+        // TODO - remove this
+        if (env('APP_ENV') === 'local') {
+            $this->markEmailAsVerified();
+            return;
+        }
+        
         $this->notify(new VerifyEmail);
     }
 
