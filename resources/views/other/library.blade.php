@@ -107,7 +107,10 @@
                                                     </h2>
                                                     <div id="collapseTime" class="accordion-collapse collapse" aria-labelledby="headingTime">
                                                         <div class="accordion-body">
-                                                            <div id="time_range_slider"></div>
+                                                            <div style="position:relative;">
+                                                                <div id="slider_value_bubble" style="position:absolute;left:50%;top:-30px;transform:translateX(-50%);background:var(--dark-green);color:#fff;padding:2px 8px;border-radius:12px;font-size:14px;display:none;z-index:10;pointer-events:none;transition:left 0.2s;">0 min</div>
+                                                                <div id="time_range_slider"></div>
+                                                            </div>
                                                             <div class="d-flex justify-content-between">
                                                                 <span id="start_time_label">0 min</span>
                                                                 <span id="end_time_label">30 min</span>
@@ -370,19 +373,32 @@
             });
             var startLabel = document.getElementById('start_time_label');
             var endLabel = document.getElementById('end_time_label');
+            var bubble = document.getElementById('slider_value_bubble');
 
             //SLIDER CHANGE
-            slider.noUiSlider.on('update', function (values) {
+            slider.noUiSlider.on('update', function (values, handle) {
                 //update labels
                 startLabel.textContent = values[0];
                 endLabel.textContent = values[1];
-                
+
+                // Show bubble above the active handle
+                var sliderRect = slider.getBoundingClientRect();
+                var handles = slider.querySelectorAll('.noUi-handle');
+                var activeHandle = handles[handle];
+                if (activeHandle && bubble) {
+                    var handleRect = activeHandle.getBoundingClientRect();
+                    var left = handleRect.left + handleRect.width/2 - sliderRect.left;
+                    bubble.style.left = left + 'px';
+                    bubble.textContent = values[handle];
+                    bubble.style.display = 'block';
+                }
+
                 //convert the # mins to #
                 const timeToMinutes = (time) => {
                     const [mins, _] = time.split(' ').map(Number);
                     return mins;
                 };
-                
+
                 //update hidden input
                 startConverted = timeToMinutes(values[0]);
                 endConverted = timeToMinutes(values[1]);
@@ -402,7 +418,12 @@
                     }
                 }
             });
-            
+
+            // Hide bubble when not dragging
+            slider.noUiSlider.on('end', function () {
+                if (bubble) bubble.style.display = 'none';
+            });
+
             //init labels
             slider.noUiSlider.set([parseInt(startVal), parseInt(endVal)]);
         }
