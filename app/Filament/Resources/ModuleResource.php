@@ -71,7 +71,8 @@ class ModuleResource extends Resource
                     ->label('View Days')
                     ->icon('heroicon-o-list-bullet')
                     ->url(fn (Module $record): string => DayResource::getUrl('index', ['tableFilters[module][value]' => $record->id]))
-                    ->color('info'),
+                    ->color('info')
+                    ->visible(false), // disable for now
                 Tables\Actions\EditAction::make()->slideOver(),
             ])
             ->bulkActions([
