@@ -1211,3 +1211,9 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 .noui-custom-pips .noUi-pips .noUi-value[style*="left: 100%"] {
     transform: translate(-75%, 10px);
 }
+
+/* markdown text-success fix */
+.text-success p {
+    padding: 0px !important;
+    margin-bottom: 0px !important;
+}
