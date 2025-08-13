@@ -34,7 +34,10 @@
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </div>
-                        <div id="slider_{{ $question['number'] }}" style="visibility: hidden;"></div>
+                        <div style="position:relative;">
+                            <div id="quiz_slider_bubble_{{ $question['number'] }}" style="position:absolute;left:50%;top:-30px;transform:translateX(-50%);background:var(--dark-green);color:#fff;padding:2px 8px;border-radius:12px;font-size:14px;display:none;z-index:10;pointer-events:none;transition:left 0.2s;">{{ $value }}</div>
+                            <div id="slider_{{ $question['number'] }}" style="visibility: hidden;"></div>
+                        </div>
                         <input type="hidden" name="answer_{{ $question['number'] }}" id="slider_input_{{ $question['number'] }}" value="{{ $value }}">
                     </div>
                 @endif
@@ -258,7 +261,8 @@
                 const sliderVal = document.getElementById('slider_input_' + questionNumber).value;
                 const hiddenInput = document.getElementById('slider_input_' + questionNumber);
                 const loadingEl = document.getElementById('slider_loading_' + questionNumber);
-                
+                const bubble = document.getElementById('quiz_slider_bubble_' + questionNumber);
+
                 const questionData = @json($quiz->question_options)['question_'+questionNumber];
                 const sliderData = questionData.options_feedback[0];
 
@@ -303,6 +307,22 @@
                 sliderEl.noUiSlider.on('update', function (values, handle) {
                     const value = Math.round(values[handle]);
                     hiddenInput.value = value;
+                    // Show bubble above the active handle
+                    var sliderRect = sliderEl.getBoundingClientRect();
+                    var handles = sliderEl.querySelectorAll('.noUi-handle');
+                    var activeHandle = handles[handle];
+                    if (activeHandle && bubble) {
+                        var handleRect = activeHandle.getBoundingClientRect();
+                        var left = handleRect.left + handleRect.width/2 - sliderRect.left;
+                        bubble.style.left = left + 'px';
+                        bubble.textContent = value + '%';
+                        bubble.style.display = 'block';
+                    }
+                });
+
+                // Hide bubble when not dragging
+                sliderEl.noUiSlider.on('end', function () {
+                    if (bubble) bubble.style.display = 'none';
                 });
 
                 if (loadingEl) {
