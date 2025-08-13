@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'registration.lock' => CheckRegistrationLock::class,
             'email.rate.limiter' => \App\Http\Middleware\EmailRateLimiter::class,
         ]);
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
