@@ -53,7 +53,7 @@ class ForceUserProgress extends Command
         $user->last_day_completed_id = null;
         $user->save();
 
-        $activities = Activity::where('order', '<=', $order)->get();
+        $activities = Activity::where('order', '<=', $order)->orderBy('order')->get();
 
         // wipe existing progress
         DB::table('user_activity')->where('user_id', $user->id)->delete();

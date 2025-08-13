@@ -45,7 +45,7 @@ class Activity extends Model
     }
 
     public function nextActivity() {
-        return $this->day->activities()->where('order', '>', $this->order)->first();
+        return $this->day->activities()->where('order', '>', $this->order)->orderBy('order')->first();
     }
 
     public function isCompletedBy(?User $user)

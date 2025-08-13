@@ -59,7 +59,6 @@ class ActivityController extends Controller
         // redirection on slider questions
         $next_activity = $activity->nextActivity();
         $last_activity_in_module = $activity->day->module->lastActivity();
-        \Log::info($last_activity_in_module);
         // slider questions follow practice, or are last activity in module
         if ($next_activity
             && ($activity->type === 'practice' || $next_activity->id === $last_activity_in_module->id)
