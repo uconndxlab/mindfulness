@@ -69,7 +69,7 @@ Route::middleware('web')->group(function () {
             }
           
             // if user is already logged in
-            if (Auth::user()->id == $user->id) {
+            if (Auth::check() && Auth::id() == $user->id) {
                 return redirect('/welcome');
             }
 
@@ -142,8 +142,8 @@ Route::middleware('web')->group(function () {
         //contact form - throttled in controller
         Route::post('/contact', [ContactFormController::class, 'submitForm'])->name('contact.submit');
         
-        //NOTES - throttled in controller
-        Route::resource('note', NoteController::class);
+        //NOTES - throttled in controller + guard API spam
+        Route::resource('note', NoteController::class)->middleware('throttle:30,1');
         
         //ADMIN ONLY
         Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {

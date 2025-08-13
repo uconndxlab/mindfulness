@@ -5,6 +5,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const page = document.body?.dataset?.page;
     const imports = [];
 
+    // Global UI behavior - not on auth pages
+    if (page !== 'auth') {
+        // page id is auth for all auth pages
+        imports.push(import('./misc'));
+        imports.push(import('./components/modal'));
+    }
+
     // Page-based (when entire page is dedicated)
     // if (page === 'module') imports.push(import('./pages/module'));
 

@@ -1,6 +1,6 @@
 @if (!isset($notes) || $notes->isEmpty())
     <div class="text-left muted">
-        {!! $empty_text ?? 'No matching notes found.' !!}
+        @markdown(is_string($empty_text ?? null) ? $empty_text : 'No matching notes found.')
     </div>
 @else
     @foreach ($notes as $index => $note)
@@ -10,7 +10,7 @@
                     @if ($note->topic === 'no-topic')
                         <span>No Topic</span>
                     @else
-                        <span>{!! ucfirst($note->topic) !!}</span>
+                        @markdown(ucfirst(strip_tags($note->topic)))
                     @endif
                 </h5>
                 <small>{{ $note->formatted_date }}</small>

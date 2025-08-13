@@ -29,7 +29,7 @@
             <input id="email" type="email" class="form-control @error('email') is-invalid @enderror @error('credentials') is-invalid @enderror" name="email" value="{{ old('email') }}">
             @error('email')
                 <span class="invalid-feedback" role="alert">
-                    <strong>{!! $message !!}</strong>
+                    <strong>{{ $message }}</strong>
                 </span>
             @enderror
         </div>
@@ -44,7 +44,7 @@
             @enderror
             @error('credentials')
                 <span class="invalid-feedback" role="alert">
-                    <strong>{!! $message !!}</strong>
+                    <strong>{{ $message }}</strong>
                 </span>
             @enderror
         </div>

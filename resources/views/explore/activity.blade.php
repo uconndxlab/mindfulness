@@ -75,7 +75,7 @@
             </div>
         @endif
         <div id="comp_message" class="mt-2" style="display: none;">
-            <p class="text-success">{!! $activity->completion_message ?? 'Congrats on completing this activity!' !!}</p>
+            <div class="text-success">@markdown(is_string($activity->completion_message ?? null) ? $activity->completion_message : 'Congrats on completing this activity!')</div>
         </div>
     </div>
     <div class="manual-margin-top" id="redirect_div">

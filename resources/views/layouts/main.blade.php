@@ -6,7 +6,7 @@
     <head>
         @include('layouts.partials.head')
     </head>
-    <body class="{{ $type === 'auth'? 'd-flex align-items-center py-4 bg-body-tertiary' : '' }}">
+    <body class="{{ $type === 'auth'? 'd-flex align-items-center py-4 bg-body-tertiary' : '' }}" data-page="@yield('page_id')">
         @if($type === 'app')
             @include('layouts.partials.navigation')
         @endif
