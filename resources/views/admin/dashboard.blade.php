@@ -8,8 +8,7 @@
             <span id="lock_text_reg">{{ $registration_locked ? 'UNLOCK REGISTRATION' : 'Lock Registration'}}</span>
         </button>
     </div>
-
-    <script>
+    <script >
         document.getElementById('lock_button_reg').addEventListener('click', function() {
             const button = this;
             const icon = document.getElementById('lock_icon_reg');

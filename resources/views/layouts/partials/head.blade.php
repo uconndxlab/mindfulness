@@ -8,11 +8,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>@yield('title')</title>
 
-<!-- css -->
+<!-- css/js via Vite -->
 @vite(['resources/css/app.css', 'resources/js/app.js'])
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.8.0/nouislider.min.css" rel="stylesheet">
 
 <!-- icons -->
 <link rel="icon" type="image/x-icon" href="{{ Storage::url('icons/favicon.ico')}}">
@@ -35,11 +32,5 @@
 <meta name="msapplication-TileImage" content="{{ Storage::url('icons/ms-icon-144x144.png') }}">
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
-
-<!-- scripts -->
-<script nonce="{{ $cspNonce ?? '' }}" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
-<script nonce="{{ $cspNonce ?? '' }}" src="https://cdnjs.cloudflare.com/ajax/libs/roundSlider/1.3/roundslider.js"></script>
-<script nonce="{{ $cspNonce ?? '' }}" src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-<script nonce="{{ $cspNonce ?? '' }}" src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.8.0/nouislider.min.js"></script>
 
 @yield('additional_head') 

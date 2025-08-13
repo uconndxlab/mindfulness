@@ -21,7 +21,6 @@
         </div>
     @endif
 </div>
-<script src="https://cdn.jsdelivr.net/npm/nosleep.js@0.12.0/dist/NoSleep.min.js"></script>
 <script>
 (function() {
     const id = '{{ $id }}';

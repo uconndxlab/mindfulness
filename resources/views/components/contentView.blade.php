@@ -42,7 +42,6 @@
             </div>
         </div>
     </div>
-
     <script>
     $(document).ready(function() {
         $(".js-audio").each(function() {

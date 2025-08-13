@@ -125,47 +125,6 @@
         </section>
     </div>
 </div>
-<style>
-    .teacher-image-container {
-        position: relative;
-        padding-top: 75%;
-        overflow: hidden;
-    }
-
-    .teacher-image {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    @media (max-width: 767.98px) {
-        .teacher-image-container {
-            max-width: 200px;
-            margin: 1rem auto;
-        }
-    }
-
-    @media (min-width: 768px) {
-        .teacher-image-container {
-            height: 100%;
-            padding-top: 0;
-        }
-
-        .teacher-image {
-            position: static;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .card .row {
-            height: 100%;
-        }
-    }
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         //prevent submission of empty form

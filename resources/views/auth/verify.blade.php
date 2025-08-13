@@ -27,7 +27,6 @@
             <button type="submit" class="btn btn-primary">Resend Verification Email</button>
         </form>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script>
         function checkVerification() {
             console.log('Checking verification status...');

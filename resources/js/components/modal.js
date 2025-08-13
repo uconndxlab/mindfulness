@@ -1,10 +1,10 @@
 function bindModalHandlers() {
     const modal = document.getElementById('appModal');
-    if (!modal || !window.bootstrap) return;
+    if (!window.bootstrap) return;
 
     const closeBtn = document.getElementById('closeBtn');
     const { Modal } = window.bootstrap;
-    const myModal = new Modal(modal);
+    const myModal = modal ? new Modal(modal) : null;
 
     let currentCancelHandler = null;
 
@@ -20,6 +20,8 @@ function bindModalHandlers() {
             closeLabel = 'Close',
             onCancel = null,
         } = options;
+
+        if (!modal || !myModal) return;
 
         document.getElementById('appModalLabel').innerHTML = label;
         closeBtn.innerHTML = closeLabel;
@@ -84,12 +86,25 @@ function bindModalHandlers() {
         window.scrollTo({ top: parseInt(scrollY || '0') * -1, behavior: 'instant' });
     }
 
-    // Handle modal background scrolling
-    modal.addEventListener('shown.bs.modal', function () {
+    // Handle modal background scrolling for app modal (if present)
+    if (modal) {
+        modal.addEventListener('shown.bs.modal', function () {
+            modalFreezeBackground();
+        });
+        modal.addEventListener('hidden.bs.modal', function () {
+            modalRestoreBackground();
+        });
+    }
+
+    // Also handle ANY Bootstrap modal globally (e.g., #pdfModal)
+    document.addEventListener('shown.bs.modal', function () {
         modalFreezeBackground();
     });
-    modal.addEventListener('hidden.bs.modal', function () {
-        modalRestoreBackground();
+    document.addEventListener('hidden.bs.modal', function () {
+        // Only restore if there are no other open modals
+        if (!document.querySelector('.modal.show')) {
+            modalRestoreBackground();
+        }
     });
 
     // Expose globally for other modules that call showModal()
