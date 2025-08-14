@@ -9,6 +9,13 @@ class Inquiry extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'message' => 'encrypted',
+        'name' => 'encrypted',
+        'email' => 'encrypted',
+        'subject' => 'encrypted',
+    ];
+
     protected $fillable = [
         'name',
         'email',

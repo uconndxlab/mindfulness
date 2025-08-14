@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Page-based (when entire page is dedicated)
-    // if (page === 'module') imports.push(import('./pages/module'));
+    if (page === 'help') imports.push(import('./pages/help'));
 
     // Component-based (when component is embedded within another page)
     if (document.getElementById('journalForm')) imports.push(import('./components/journal'));
