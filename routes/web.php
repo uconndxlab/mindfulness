@@ -9,7 +9,6 @@ use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
-use App\Http\Controllers\ContactFormController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PageNavController;
 use App\Http\Controllers\UserController;
@@ -106,10 +105,10 @@ Route::middleware('web')->group(function () {
         Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
         Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
 
-        // activity completion
-        Route::post('/activities/complete', [ActivityController::class, 'complete'])->name('activities.complete');
-        Route::post('/activities/skip', [ActivityController::class, 'skip'])->name('activities.skip');
-        Route::post('/activities/log-interaction', [ActivityController::class, 'logInteraction'])->name('activities.log_interaction');
+        // activity completion (add light rate-limiting)
+        Route::post('/activities/complete', [ActivityController::class, 'complete'])->middleware('throttle:30,1')->name('activities.complete');
+        Route::post('/activities/skip', [ActivityController::class, 'skip'])->middleware('throttle:30,1')->name('activities.skip');
+        Route::post('/activities/log-interaction', [ActivityController::class, 'logInteraction'])->middleware('throttle:60,1')->name('activities.log_interaction');
         
         //NAVIGATION
         //Page Navigation - the controller is not totally necessary
@@ -137,9 +136,6 @@ Route::middleware('web')->group(function () {
         
         //favorites
         Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->middleware('throttle:70,1')->name('favorite.toggle');
-        
-        //contact form - throttled in controller
-        Route::post('/contact', [ContactFormController::class, 'submitForm'])->name('contact.submit');
         
         //NOTES - throttled in controller + guard API spam
         Route::resource('note', NoteController::class)->middleware('throttle:30,1');

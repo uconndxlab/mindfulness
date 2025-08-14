@@ -40,19 +40,12 @@ class AuthController extends Controller
 
         //check if user exists first
         $credentials = $request->only('email', 'password');
-        // $user = User::where('email', $credentials['email'])->first();
-        // if (!$user) { 
-        //     return back()->withErrors(['email' => 'We can\'t find a user with that email address.']);
-        // }
-
-        if (Auth::attempt($credentials)) {
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-        }
         
         //check auth and remember
         $remember = $request->has('remember');
         if (Auth::attempt($credentials, $remember)) {
+            $request->session()->regenerate();
+            $request->session()->regenerateToken();
             //if user is locked
             if (Auth::user()->lock_access) {
                 //log user out
@@ -82,6 +75,7 @@ class AuthController extends Controller
 
     public function logout(Request $request) {
         $request->session()->invalidate();
+        $request->session()->regenerate();
         $request->session()->regenerateToken();
         Cache::forget('user_'.Auth::id().'_progress_activities');
         Auth::logout();
