@@ -9,7 +9,13 @@
 <title>@yield('title')</title>
 
 <!-- css/js via Vite -->
+@php $nonce = request()->attributes->get('csp_nonce'); @endphp
 @vite(['resources/css/app.css', 'resources/js/app.js'])
+@if($nonce)
+    @livewireStyles(['nonce' => $nonce])
+@else
+    @livewireStyles
+@endif
 
 <!-- icons -->
 <link rel="icon" type="image/x-icon" href="{{ Storage::url('icons/favicon.ico')}}">

@@ -12,6 +12,12 @@ window.bootstrap = bootstrap;
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
+// Ensure CSRF header is sent on all same-origin requests (in addition to Axios XSRF cookie support)
+const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+if (csrfMeta) {
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfMeta.getAttribute('content');
+}
+
 // Load plugins that depend on jQuery after jQuery is on window to avoid ReferenceError in dev
 // Using dynamic imports defers execution until after the above global assignments
 Promise.resolve()

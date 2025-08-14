@@ -15,6 +15,11 @@ class SecurityHeaders
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Generate a per-request CSP nonce and share with views
+        $nonce = base64_encode(random_bytes(16));
+        $request->attributes->set('csp_nonce', $nonce);
+        view()->share('cspNonce', $nonce);
+
         /** @var Response $response */
         $response = $next($request);
 
@@ -50,8 +55,9 @@ class SecurityHeaders
         $allowedWorkerHosts = $isProd ? [] : $devHosts;
         $allowedConnectHosts = $isProd ? [] : $devHosts;
 
-        $scriptSrc = array_merge(["'self'"], $allowedScriptHosts);
-        $styleSrc = array_merge(["'self'"], $allowedStyleHosts);
+        // allow nonce for Livewire inline styles and scripts, and unsafe-eval for Livewire/Alpine expressions
+        $scriptSrc = array_merge(["'self'", "'nonce-{$nonce}'", "'unsafe-eval'"], $allowedScriptHosts);
+        $styleSrc = array_merge(["'self'", "'nonce-{$nonce}'"], $allowedStyleHosts);
         $imgSrc = ["'self'", 'data:'];
         $fontSrc = array_merge(["'self'", 'data:'], $allowedFontHosts);
         $connectSrc = array_merge(["'self'"], $allowedConnectHosts, $isProd ? [] : ['ws:', 'wss:']);

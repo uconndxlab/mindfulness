@@ -20,7 +20,9 @@
         @if($type === 'app' || $type === 'admin')
             @include('layouts.partials.modal')
         @endif
-        @include('layouts.partials.scripts')
-        @yield('additional_scripts')
+
+        {{-- Standard Livewire scripts with CSP nonce --}}
+        @php $nonce = request()->attributes->get('csp_nonce'); @endphp
+        @livewireScripts(['nonce' => $nonce])
     </body>
 </html> 

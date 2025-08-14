@@ -134,7 +134,6 @@ Route::middleware('web')->group(function () {
         
         //User updates
         Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
-        Route::put('/user/update/namePass', [UserController::class, 'updateNamePass'])->name('user.update.namePass');
         
         //favorites
         Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->middleware('throttle:70,1')->name('favorite.toggle');
