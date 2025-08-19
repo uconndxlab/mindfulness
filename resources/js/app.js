@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (page === 'help') imports.push(import('./pages/help'));
     if (page === 'auth-login-register') imports.push(import('./pages/auth-login-register'));
     if (page === 'auth-verify') imports.push(import('./pages/auth-verify'));
+    if (page === 'module') imports.push(import('./pages/module'));
 
     // Component-based (when component is embedded within another page)
     if (document.getElementById('journalForm')) imports.push(import('./components/journal'));

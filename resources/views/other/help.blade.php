@@ -5,19 +5,19 @@
 
 @section('content')
 <div class="col-md-8">
-    <nav id="navbar-help" class="navbar navbar-expand-lg navbar-light sticky-top" id="navbar-help" style="background-color:white">
+    <nav id="navbar-help" class="navbar navbar-expand-lg navbar-light sticky-top help-nav" id="navbar-help">
         <div class="tabs">
-            <ul class="navbar-nav" style="flex-direction:row">
-                <li class="nav-item" style="padding:0px 20px">
+            <ul class="navbar-nav">
+                <li class="nav-item">
                     <a id="tutorial-link" class="nav-link" href="#tutorial">Tutorial</a>
                 </li>
-                <li class="nav-item" style="padding:0px 20px">
+                <li class="nav-item">
                     <a class="nav-link" href="#info">Info</a>
                 </li>
-                <li class="nav-item" style="padding:0px 20px">
+                <li class="nav-item">
                     <a class="nav-link" href="#FAQ">FAQ</a>
                 </li>
-                <li class="nav-item" style="padding:0px 20px">
+                <li class="nav-item">
                     <a class="nav-link" href="#contactUs">Contact</a>
                 </li>
             </ul>
@@ -26,12 +26,8 @@
     <div data-bs-spy="scroll" data-bs-target="#navbar-help" data-bs-smooth-scroll="true" class="scrollspy-example pt-3 pb-3 rounded-2" tabindex="0">
         <section id="tutorial">
             <h4 class="text-center fw-bold mt-4">Tutorial</h4>
-            <div class="container">
-                <div style="max-width: 270px; margin: auto;">
-                    <div class="ratio" style="--bs-aspect-ratio: 177.77%;">
-                        <x-contentView id="welcome_video" type="video" file="Healing Hearts App Tutorial 12 5.mp4" controlsList="noplaybackrate nodownload noseek"/>
-                    </div>
-                </div>
+            <div class="container tutorial-container">
+                <x-contentView id="welcome_video" type="video" file="Healing Hearts App Tutorial 12 5.mp4" controlsList="noplaybackrate nodownload noseek"/>
             </div>
         </section>
         <section id="info">
@@ -60,7 +56,7 @@
                                             <p class="card-text d-none d-md-block">{{ $teacher->bio }}</p>
                                             <div class="card-text d-md-none">
                                                 <div class="short-bio">{{ Str::limit($teacher->bio, 150) }}</div>
-                                                <div class="full-bio" style="display: none;">{{ $teacher->bio }}</div>
+                                                <div class="full-bio d-none">{{ $teacher->bio }}</div>
                                             </div>
                                             <button class="btn btn-link read-more p-0 d-md-none" data-teacher-index="{{ $loop->index }}">Read More</button>
                                         </div>
@@ -84,7 +80,7 @@
                             </button>
                         </h2>
                         <div id="collapseFAQ_{{ $index }}" class="accordion-collapse collapse" aria-labelledby="headingFAQ_{{ $index }}">
-                            <div style="padding: 10px 20px !important;" class="accordion-body">
+                            <div class="accordion-body faq-body">
                                 {!! $faq->answer !!}
                             </div>
                         </div>

@@ -15,7 +15,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div id="pdfModalBody" class="modal-body">
-                <div id="pdfContainer" data-pdf-url="{{ $fpath }}" style="width: 100%; overflow: auto; border: 1px solid #ccc;"></div>
+                <div id="pdfContainer" class="pdf-container" data-pdf-url="{{ $fpath }}"></div>
             </div>
         </div>
     </div>

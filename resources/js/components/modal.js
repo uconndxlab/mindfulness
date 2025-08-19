@@ -29,15 +29,15 @@ function bindModalHandlers() {
         if (body) {
             const modalBody = document.getElementById('appModalBody');
             modalBody.innerHTML = body;
-            modalBody.style.display = 'block';
+            modalBody.classList.remove('d-none');
         }
 
         const modalMedia = document.getElementById('appModalImg');
         if (media) {
             modalMedia.src = media;
-            modalMedia.style.display = 'block';
+            modalMedia.classList.remove('d-none');
         } else {
-            modalMedia.style.display = 'none';
+            modalMedia.classList.add('d-none');
         }
 
         const modalForm = document.getElementById('modalForm');
@@ -48,11 +48,11 @@ function bindModalHandlers() {
             modalForm.action = route;
             methodInput.value = method;
             additionalBtn.innerHTML = buttonLabel;
-            additionalBtn.style.display = 'inline-block';
+            additionalBtn.classList.remove('d-none');
             additionalBtn.className = 'btn';
             additionalBtn.classList.add(buttonClass);
         } else {
-            additionalBtn.style.display = 'none';
+            additionalBtn.classList.add('d-none');
         }
 
         // Cancel handler

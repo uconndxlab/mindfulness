@@ -47,9 +47,9 @@ function initHelpPage() {
             const fullBio = cardBody?.querySelector('.full-bio');
             const teacherIndex = this.getAttribute('data-teacher-index');
 
-            if (shortBio && fullBio && shortBio.style.display !== 'none') {
-                shortBio.style.display = 'none';
-                fullBio.style.display = 'block';
+            if (shortBio && fullBio && !shortBio.classList.contains('d-none')) {
+                shortBio.classList.add('d-none');
+                fullBio.classList.remove('d-none');
                 this.textContent = 'Read Less';
                 const teacherName = document.querySelector(`#teacher-name-${teacherIndex}`);
                 if (teacherName) {
@@ -59,8 +59,8 @@ function initHelpPage() {
                     window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                 }
             } else if (shortBio && fullBio) {
-                shortBio.style.display = 'block';
-                fullBio.style.display = 'none';
+                shortBio.classList.remove('d-none');
+                fullBio.classList.add('d-none');
                 this.textContent = 'Read More';
                 const teacherElement = this.closest('.card')?.querySelector('.teacher-image-container');
                 if (teacherElement) {

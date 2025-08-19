@@ -412,11 +412,10 @@ button:disabled i{
     border-color: var(--dark-green)!important;
 }
 
-/*change background color */
+/* change background color */
 body:has(div.dark-background){
-    background-color:var(--dark-green);
+    background-color:var(--dark-green)!important;
     color:#fff!important;
-
 }
 
 .dark-background .btn-primary{
@@ -1261,4 +1260,45 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     .card .row {
         height: 100%;
     }
+}
+
+/* pdf viewer */
+.pdf-container {
+    width: 100%;
+    overflow: auto;
+    border: 1px solid #ccc;
+}
+
+/* module link */
+.module-link {
+    display:flex;
+}
+.module-link img {
+    width:50px;
+    height:50px;
+    margin-right:10px;
+}
+
+/* help page */
+.help-nav {
+    background-color:white;
+}
+.help-nav.navbar-nav {
+    flex-direction:row;
+}
+.help-nav .nav-item {
+    padding:0px 10px;
+}
+
+.tutorial-container {
+    max-width: 270px;
+    margin: auto;
+}
+.tutorial-container video {
+    width: 100%;
+    height: auto;
+}
+
+.faq-body {
+    padding: 10px 20px !important;
 }
