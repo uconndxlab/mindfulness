@@ -1,6 +1,7 @@
 @extends('layouts.auth')
 
 @section('title', 'Log In')
+@section('page_id', 'auth-login-register')
 
 @section('content')
 <div class="col-md-6">
@@ -74,10 +75,4 @@
         </div>
     @endif
 </div>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        document.getElementById('timezone').value = timezone;
-    });
-</script>
 @endsection

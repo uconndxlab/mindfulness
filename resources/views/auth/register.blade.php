@@ -1,6 +1,7 @@
 @extends('layouts.auth')
 
 @section('title', 'New User')
+@section('page_id', 'auth-login-register')
 
 @section('content')
 <div class="col-md-6">
@@ -65,16 +66,3 @@
     <a href="{{ route('login') }}" class="text-center text- mt-3">Return to Login</a>
 </div>
 @endsection
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        let timezone;
-        
-        try {
-            timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            console.log("Timezone detected with Intl:", timezone);
-            document.getElementById('timezone').value = timezone;
-        } catch (e) {
-            console.error("Error detecting timezone with Intl:", e);
-        }
-    });
-</script>
