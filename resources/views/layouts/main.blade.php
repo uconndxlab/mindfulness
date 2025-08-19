@@ -22,7 +22,6 @@
         @endif
 
         {{-- Standard Livewire scripts with CSP nonce --}}
-        @php $nonce = request()->attributes->get('csp_nonce'); @endphp
-        @livewireScripts(['nonce' => $nonce])
+        @livewireScripts(['nonce' => $cspNonce ?? ''])
     </body>
 </html> 

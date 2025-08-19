@@ -20,9 +20,6 @@ class SecurityHeaders
         $request->attributes->set('csp_nonce', $nonce);
         view()->share('cspNonce', $nonce);
 
-        \Log::info("Generated nonce: " . $nonce);
-        \Log::info("Formatted nonce: 'nonce-{$nonce}'");
-
         /** @var Response $response */
         $response = $next($request);
 
