@@ -35,7 +35,7 @@
                             </div>
                         </div>
                         <div style="position:relative;">
-                            <div id="quiz_slider_bubble_{{ $question['number'] }}" style="position:absolute;left:50%;top:-30px;transform:translateX(-50%);background:var(--dark-green);color:#fff;padding:2px 8px;border-radius:12px;font-size:14px;display:none;z-index:10;pointer-events:none;transition:left 0.2s;">{{ $value }}</div>
+                            <div id="quiz_slider_bubble_{{ $question['number'] }}" class="d-none" style="position:absolute;left:50%;top:-30px;transform:translateX(-50%);background:var(--dark-green);color:#fff;padding:2px 8px;border-radius:12px;font-size:14px;z-index:10;pointer-events:none;transition:left 0.2s;">{{ $value }}</div>
                             <div id="slider_{{ $question['number'] }}" style="visibility: hidden;"></div>
                         </div>
                         <input type="hidden" name="answer_{{ $question['number'] }}" id="slider_input_{{ $question['number'] }}" value="{{ $value }}">
@@ -54,7 +54,7 @@
                                 $text_color = 'text-danger';
                             }
                         @endphp
-                        <div id="feedback_{{ $question['number'] }}_{{ $index }}" data-show="{{ $option['feedback'] ? 'true' : 'false' }}" class="feedback-div mt-4" style="display: none;">
+                        <div id="feedback_{{ $question['number'] }}_{{ $index }}" data-show="{{ !empty($option['feedback']) ? 'true' : 'false' }}" class="feedback-div mt-4 d-none">
                             @if ($option['audio_path'])
                                 <x-contentView id="fbAudio_{{ $question['number'] }}_{{ $index }}" id2="pdf_download" type="feedback_audio" file="{{ $option['audio_path'] }}"/>
                             @endif
@@ -155,7 +155,7 @@
                     
                     //handle hiding questions
                     if (currentNumber === questionNumber) {
-                        qDiv.style.display = 'block';
+                        qDiv.classList.remove('d-none');
                         if (questionCount > 1) {
                             //handle prev
                             if (isFirst) {
@@ -165,16 +165,16 @@
                                 prevQBtn.removeAttribute('disabled');
                             }
                             if (isLast) {
-                                nextQBtn.style.display = 'none';
-                                submitBtn.style.display = 'block';
+                                nextQBtn.classList.add('d-none');
+                                submitBtn.classList.remove('d-none');
                                 // slider cannot have next/submit disabled
                                 if (questionType != 'slider') {
                                     nextQBtn.setAttribute('disabled', '');
                                 }
                             }
                             else {
-                                submitBtn.style.display = 'none';
-                                nextQBtn.style.display = 'block';
+                                submitBtn.classList.add('d-none');
+                                nextQBtn.classList.remove('d-none');
                                 if (questionType != 'slider') {
                                     submitBtn.setAttribute('disabled', '');
                                 }
@@ -184,7 +184,7 @@
                     }
                     else {
                         console.log('hiding question ' + currentNumber);
-                        qDiv.style.display = 'none';
+                        qDiv.classList.add('d-none');
                     }
                     
                 });
@@ -237,7 +237,7 @@
                     if (event.target.checked) {
                         quizForm.querySelectorAll('.feedback-div').forEach(fbDiv => {
                             //hide all other feedback
-                            fbDiv.style.display = 'none';
+                            fbDiv.classList.add('d-none');
                             //pause any audio
                             fbDiv.querySelectorAll('audio').forEach(audio => {
                                 audio.pause();
@@ -316,17 +316,17 @@
                         var left = handleRect.left + handleRect.width/2 - sliderRect.left;
                         bubble.style.left = left + 'px';
                         bubble.textContent = value + '%';
-                        bubble.style.display = 'block';
+                        bubble.classList.remove('d-none');
                     }
                 });
 
                 // Hide bubble when not dragging
                 sliderEl.noUiSlider.on('end', function () {
-                    if (bubble) bubble.style.display = 'none';
+                    if (bubble) bubble.classList.add('d-none');
                 });
 
                 if (loadingEl) {
-                    loadingEl.style.display = 'none';
+                    loadingEl.classList.add('d-none');
                 }
                 sliderEl.style.visibility = 'visible';
             });

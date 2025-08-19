@@ -22,7 +22,7 @@
                         <span class="dots">
                             ...
                         </span>
-                        <span class="more-text" style="display: none">
+                        <span class="more-text d-none">
                             {{ substr($note->note, 75) }}
                         </span>
                     </p>

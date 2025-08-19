@@ -50,8 +50,8 @@ function initJournal() {
             })
             .then(response => {
                 console.log('Note submitted!');
-                noteSuccessDiv.style.display = 'block';
-                errDiv.style.display = 'none';
+                noteSuccessDiv.classList.remove('d-none');
+                errDiv.classList.add('d-none');
                 if (hasActivity && window.activityComplete) {
                     window.activityComplete();
                 }
@@ -69,16 +69,16 @@ function initJournal() {
                 if (error.response?.data?.errors) {
                     if (error.response.data.errors.note) {
                         noteErrDiv.textContent = error.response.data.errors.note.join(' ');
-                        noteErrDiv.style.display = 'block';
+                        noteErrDiv.classList.remove('d-none');
                     }
                     if (error.response.data.errors.topic) {
                         wordErrDiv.textContent = error.response.data.errors.topic.join(' ');
-                        wordErrDiv.style.display = 'block';
+                        wordErrDiv.classList.remove('d-none');
                     }
                 } else {
                     const errorMessages = error.response?.data?.error_message || 'An unknown error occurred.';
                     errDiv.textContent = errorMessages;
-                    errDiv.style.display = 'block';
+                    errDiv.classList.remove('d-none');
                 }
                 reject(false);
             });
@@ -111,7 +111,7 @@ function initJournal() {
             if (msg.id != 'success-message') {
                 msg.textContent = '';
             }
-            msg.style.display = 'none';
+            msg.classList.add('d-none');
         });
     }
 }

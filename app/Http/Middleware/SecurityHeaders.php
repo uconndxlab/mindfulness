@@ -164,7 +164,7 @@ class SecurityHeaders
     private function getScriptSrc(string $nonce, array $viteHosts, bool $isProd): array
     {
         // 'unsafe-eval' is required for Livewire (required for Alpine.js expressions)
-        $sources = ["'self'", "'nonce-{$nonce}", "'unsafe-eval'"];
+        $sources = ["'self'", "'nonce-{$nonce}'", "'unsafe-eval'"];
         
         // vite hosts included in development
         if (!$isProd) {
@@ -179,8 +179,8 @@ class SecurityHeaders
      */
     private function getStyleSrc(string $nonce, array $viteHosts, bool $isProd): array
     {
-        $sources = ["'self'", "'nonce-{$nonce}"];
-        // 'unsafe-inline' if need dynamic styling
+        $sources = ["'self'", "'nonce-{$nonce}'"];
+        // 'unsafe-inline' if need dynamic styling - does not work with nonce
         
         // vite hosts included in development
         if (!$isProd) {
@@ -248,9 +248,7 @@ class SecurityHeaders
      */
     private function getWorkerSrc(array $viteHosts, bool $isProd): array
     {
-        $sources = ["'self'"];
-        // removed blob, if issues can be added back
-        // $sources = ["'self'", 'blob:'];
+        $sources = ["'self'", 'blob:'];
         
         // add vite hosts in dev
         if (!$isProd) {

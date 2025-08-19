@@ -9,7 +9,7 @@
             {{ session('success') }}
         </div>
     @endif
-    <div id="error-messages" class="alert alert-danger" style="display: none;"></div>
+    <div id="error-messages" class="alert alert-danger d-none"></div>
     <div class="text-left">
         <div class="d-flex justify-content-between align-items-center">
             <h1 class="display fw-bold">{{ $activity->title }}
@@ -52,14 +52,14 @@
                 <!-- audio content views -->
                 <div class="mt-4">
                     @foreach ($content->audio_options as $voice => $file_path)
-                        <div id="audio_content" class="content-main" voice="{{ $voice }}" data-type="audio" style="display: none;">
+                        <div id="audio_content" class="content-main d-none" voice="{{ $voice }}" data-type="audio">
                             <x-audio-player :file="$file_path" :id="$voice" :allowSeek="$allowSeek" :allowPlaybackRate="$allowPlaybackRate"/>
                         </div>
                     @endforeach
                 </div>
             @else
                 <!-- default video, image -->
-                <div id="content_main" class="content-main" data-type="{{ $content->type }}" style="display: flex; justify-content: center; align-items: center; flex-direction:column;">
+                <div id="content_main" class="content-main d-flex justify-content-center align-items-center flex-column" data-type="{{ $content->type }}">
                     <x-contentView id="content_view" id2="download_btn" voiceId="none" type="{{ $content->type }}" file="{{ $content->file_path }}" allowSeek="{{ $allowSeek }}"/>
                 </div>
             @endif
@@ -74,13 +74,13 @@
                 <x-journal :journal="$journal"/>
             </div>
         @endif
-        <div id="comp_message" class="mt-2" style="display: none;">
+        <div id="comp_message" class="mt-2 d-none">
             <div class="text-success">@markdown(is_string($activity->completion_message ?? null) ? $activity->completion_message : 'Congrats on completing this activity!')</div>
         </div>
     </div>
     <div class="manual-margin-top" id="redirect_div">
         @if (isset($page_info['redirect_route']))
-            <a id="redirect_button" class="btn btn-primary btn-tertiary redirect-btn disabled" href="{{ $page_info['redirect_route'] }}" style="display: none;">
+            <a id="redirect_button" class="btn btn-primary btn-tertiary redirect-btn disabled d-none" href="{{ $page_info['redirect_route'] }}">
                 {{ $page_info['redirect_label'] }}
             </a>
         @endif
@@ -139,7 +139,7 @@
                 completeButton.classList.remove('disabled');
                 completeButton.addEventListener('click', activityComplete);
                 //show and center
-                completeButton.style.display = 'block';
+                completeButton.classList.remove('d-none');
                 completeButton.parentElement.style.display = 'flex';
                 completeButton.parentElement.style.flexDirection = 'column';
                 completeButton.parentElement.style.alignItems = 'center';
@@ -218,7 +218,7 @@
                     if (type == 'image') {
                         const completeButton = document.getElementById('img_complete_activity');
                         completeButton.classList.add('disabled');
-                        completeButton.style.display = 'none';
+                        completeButton.classList.add('d-none');
                     }
 
                     // show redirect only if not already completed
@@ -241,15 +241,15 @@
     //function for unlocking the redirection buttons
     function unlockRedirect() {
         redirectDiv.querySelectorAll('.redirect-btn').forEach(btn => {
-            btn.style.display = 'block';
+            btn.classList.remove('d-none');
             btn.classList.remove('disabled');
         });
-        compLateBtn.style.display = 'none';
+        compLateBtn.classList.add('d-none');
     }
     function showCompletionMessage() {
         const completionMessageDiv = document.getElementById('comp_message');
         if (completionMessageDiv) {
-            completionMessageDiv.style.display = 'block';
+            completionMessageDiv.classList.remove('d-none');
         }
     }
 
@@ -487,7 +487,7 @@
     const errorDiv = document.getElementById('error-messages');
     function showError(errorMessage) {
         errorDiv.textContent = errorMessage;
-        errorDiv.style.display = 'block';
+        errorDiv.classList.remove('d-none');
     }
 
     // SECRET SKIP

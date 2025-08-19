@@ -20,7 +20,7 @@
 </div>
 <script>
     // show the options
-    document.getElementById('audio-options-div').style.display = 'block';
+    document.getElementById('audio-options-div').classList.remove('d-none');
     console.log('audio options shown');
     
     function selectVoice(voice) {

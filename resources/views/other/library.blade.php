@@ -84,7 +84,7 @@
                 </div>
             </div>
         
-            <div id="filterResultDiv" style="display: none;">
+            <div id="filterResultDiv" class="d-none">
                 <div class="row search-filters">
                     @if (isset($categories) && !$is_favorites)
                         <div class="col-lg-4">
@@ -108,7 +108,7 @@
                                                     <div id="collapseTime" class="accordion-collapse collapse" aria-labelledby="headingTime">
                                                         <div class="accordion-body">
                                                             <div style="position:relative;">
-                                                                <div id="slider_value_bubble" style="position:absolute;left:50%;top:-30px;transform:translateX(-50%);background:var(--dark-green);color:#fff;padding:2px 8px;border-radius:12px;font-size:14px;display:none;z-index:10;pointer-events:none;transition:left 0.2s;">0 min</div>
+                                                                <div id="slider_value_bubble" class="d-none"style="position:absolute;left:50%;top:-30px;transform:translateX(-50%);background:var(--dark-green);color:#fff;padding:2px 8px;border-radius:12px;font-size:14px;z-index:10;pointer-events:none;transition:left 0.2s;">0 min</div>
                                                                 <div id="time_range_slider"></div>
                                                             </div>
                                                             <div class="d-flex justify-content-between">
@@ -191,7 +191,7 @@
                         </div>
                     @endif
                     <div class="col-lg-8 mx-auto position-relative">
-                        <div id="throbber" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
+                        <div id="throbber" class="d-none" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
                             <div class="spinner-border text-secondary" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
@@ -390,7 +390,7 @@
                     var left = handleRect.left + handleRect.width/2 - sliderRect.left;
                     bubble.style.left = left + 'px';
                     bubble.textContent = values[handle];
-                    bubble.style.display = 'block';
+                    bubble.classList.remove('d-none');
                 }
 
                 //convert the # mins to #
@@ -421,7 +421,7 @@
 
             // Hide bubble when not dragging
             slider.noUiSlider.on('end', function () {
-                if (bubble) bubble.style.display = 'none';
+                if (bubble) bubble.classList.add('d-none');
             });
 
             //init labels
@@ -508,9 +508,9 @@
         function search(filters=false, first=false, isSearch=false, applyFilters=false) {
             // hide past results and show throbber
             const resultsContainer = document.getElementById('resultsContainer');
-            resultsContainer.style.display = 'none';
+            resultsContainer.classList.add('d-none');
             const throbber = document.getElementById('throbber');
-            throbber.style.display = 'block';
+            throbber.classList.remove('d-none');
 
             const clearFilterButton = document.getElementById('clear_filter_button');
             if (clearFilterButton) {
@@ -553,8 +553,8 @@
                 console.log('AJAX success');
                 //render component into container, hide throbber, show results
                 resultsContainer.innerHTML = data.html;
-                throbber.style.display = 'none';
-                resultsContainer.style.display = 'block';
+                throbber.classList.add('d-none');
+                resultsContainer.classList.remove('d-none');
 
                 // highlight effect on load/search/filters - not if empty
                 if ((applyFilters || isSearch) && !data.empty) {
@@ -565,8 +565,8 @@
                 //if first render of page, show the filters and results - originally hidden
                 if (first) {
                     // close the page throbber
-                    document.getElementById('search_page_throbber').style.display = 'none';
-                    document.getElementById('filterResultDiv').style.display = 'block';
+                    document.getElementById('search_page_throbber').classList.add('d-none');
+                    document.getElementById('filterResultDiv').classList.remove('d-none');
                 }
                 if (journalPage) {
                     //init the read more buttons on the note results
@@ -575,11 +575,11 @@
                 attachPaginationSearch();
             })
             .catch(error => {
-                throbber.style.display = 'none';
+                throbber.classList.add('d-none');
                 console.error('Error performing search', error);
             })
             .finally(() => {
-                throbber.style.display = 'none';
+                throbber.classList.add('d-none');
                 if (applyFilterButton) applyFilterButton.disabled = false;
                 if (clearFilterButton) clearFilterButton.disabled = false;
             });
@@ -680,10 +680,10 @@
                 readMoreBtn.addEventListener('click', function() {
                     if (moreText.style.display === 'none') {
                         moreText.style.display = 'inline';
-                        dots.style.display = 'none';
+                        dots.classList.add('d-none');
                         readMoreBtn.textContent = 'Read Less';
                     } else {
-                        moreText.style.display = 'none';
+                        moreText.classList.add('d-none');
                         dots.style.display = 'inline';
                         readMoreBtn.textContent = 'Read More...';
                     }

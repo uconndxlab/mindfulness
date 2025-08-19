@@ -2,13 +2,13 @@
     <form id="journalForm" method="POST" class="pt-3" data-has-activity="{{ isset($journal->activity) ? 'true' : 'false' }}" data-activity-id="{{ $journal->activity ? $journal->activity->id : '' }}">
         <p>***Please do not write any sensitive information here.***</p>
         @csrf
-        <div id="success-message" class="alert alert-success note-err-message" style="display: none;">
+        <div id="success-message" class="alert alert-success note-err-message d-none">
             Journal saved!
             @if (isset($journal->activity))
                 <a href="{{ route('journal.library', ['activity' => $journal->activity_id]) }}">Click here to view past journals<i class="bi bi-arrow-right"></i></a>
             @endif
         </div>
-        <div id="error-messages" class="alert alert-danger" style="display: none;"></div>
+        <div id="error-messages" class="alert alert-danger d-none"></div>
         @if ($journal->prompts)
             <div class="text-left mb-3">
                 <h4>@markdown($journal->prompts)</h4>
@@ -32,10 +32,10 @@
                 </ul>
                 <input type="hidden" name="topic" id="topic" value="no-topic">
             </div>
-            <div id="error-messages-word" class="text-danger note-err-message" style="display: none;"></div>
+            <div id="error-messages-word" class="text-danger note-err-message d-none"></div>
         @endif
         <textarea class="form-control" id="note" name="note" rows="5">{{ $journal->answer }}</textarea>
-        <div id="error-messages-note" class="text-danger note-err-message" style="display: none;"></div>
+        <div id="error-messages-note" class="text-danger note-err-message d-none"></div>
         <div class="d-flex justify-content-between">
             <button type="submit" id="submitButton" class="btn-quiz ms-auto" {{ $journal->answer ? '' : 'disabled'}}>
                 Save Journal <i class="bi bi-arrow-right"></i>
