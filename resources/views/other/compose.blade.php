@@ -33,7 +33,7 @@
         }
     @endphp
 
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-light top-nav">
         <div class="tabs">
             <ul class="navbar-nav" style="flex-direction:row">
                 <li class="nav-item" style="padding:0px 20px">

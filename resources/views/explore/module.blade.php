@@ -29,13 +29,11 @@
                             @elseif($disabled)
                                 <i class="bi bi-lock-fill"></i>
                             @else
-                                <i style="visibility:hidden;" class="bi bi-square-fill"></i>
+                                <i class="bi bi-square-fill"></i>
                             @endif
                             <div class="flex-grow-1 pe-4">
                                 <div class="text-dark fw-bold">{{ $day->name }}</div>
                                 <div class="text-dark fw-normal">{{ $day->description }}</div>
-                            </div>
-                            <div class="d-flex align-items-center gap-2" style="min-width: 60px">
                             </div>
                         </div>
                     </button>
@@ -49,13 +47,12 @@
                                     $disabled = $activity->unlocked ? '' : 'disabled';
                                 @endphp
                                 <div class="card p-2 module mb-2">
-                                    <a id="moduleLink" style="padding-bottom:10px;" class="stretched-link w-100 activity-link {{ $disabled }}" data-id="{{ $activity->id }}" href="#">
-                                        
-                                        <div style="display:flex;">
+                                    <a id="moduleLink" class="stretched-link w-100 activity-link {{ $disabled }} pb-1" data-id="{{ $activity->id }}" href="#">
+                                        <div class="d-flex">
                                             @if ($activity->completed)
-                                                <i style="font-size:16px;" class="bi bi-check-square-fill"></i>
+                                                <i class="bi bi-check-square-fill"></i>
                                             @else
-                                                <i style="font-size:16px; visibility:hidden;" class="bi bi-square-fill"></i>
+                                                <i class="bi bi-square-fill"></i>
                                             @endif
                                             <div>
                                                 <p class="activity-font">{{ $activity->title }}</p>

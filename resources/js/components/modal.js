@@ -94,6 +94,25 @@ function bindModalHandlers() {
         modal.addEventListener('hidden.bs.modal', function () {
             modalRestoreBackground();
         });
+        
+        // accessibility issue: remove focus before hiding modal
+        modal.addEventListener('hide.bs.modal', function () {
+            // remove focus from element in modal
+            if (document.activeElement && modal.contains(document.activeElement)) {
+                document.activeElement.blur();
+            }
+        });
+        
+        // mousedown on backdrop
+        modal.addEventListener('mousedown', function (event) {
+            // if clicking directly on the modal backdrop (not on modal content)
+            if (event.target === modal) {
+                // remove focus from element in modal
+                if (document.activeElement && modal.contains(document.activeElement)) {
+                    document.activeElement.blur();
+                }
+            }
+        });
     }
 
     // Also handle ANY Bootstrap modal globally (e.g., #pdfModal)
@@ -104,6 +123,25 @@ function bindModalHandlers() {
         // Only restore if there are no other open modals
         if (!document.querySelector('.modal.show')) {
             modalRestoreBackground();
+        }
+    });
+    
+    // accessibility issue: remove focus before hiding modal
+    document.addEventListener('hide.bs.modal', function (event) {
+        // remove focus from element in modal
+        if (document.activeElement && event.target.contains(document.activeElement)) {
+            document.activeElement.blur();
+        }
+    });
+    
+    // mousedown for modal backdrop
+    document.addEventListener('mousedown', function (event) {
+        // check if clicking on a modal backdrop
+        if (event.target.classList.contains('modal') && event.target.classList.contains('fade')) {
+            // remove focus from element in modal
+            if (document.activeElement && event.target.contains(document.activeElement)) {
+                document.activeElement.blur();
+            }
         }
     });
 

@@ -1280,13 +1280,16 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 }
 
 /* help page */
-.help-nav {
+.top-nav {
     background-color:white;
 }
-.help-nav.navbar-nav {
+.top-nav .nav-item {
+    padding:0px 20px;
+}
+.top-nav.navbar-nav {
     flex-direction:row;
 }
-.help-nav .nav-item {
+.top-nav .nav-item {
     padding:0px 10px;
 }
 
