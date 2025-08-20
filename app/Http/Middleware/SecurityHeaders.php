@@ -99,6 +99,7 @@ class SecurityHeaders
             'font-src' => $this->getFontSrc($viteHosts, $isProd),
             'connect-src' => $this->getConnectSrc($viteHosts, $isProd),
             'worker-src' => $this->getWorkerSrc($viteHosts, $isProd),
+            'media-src' => $this->getMediaSrc($isProd),
             'object-src' => ["'none'"],
             'base-uri' => ["'self'"],
             'frame-ancestors' => ["'none'"],
@@ -180,6 +181,7 @@ class SecurityHeaders
     private function getStyleSrc(string $nonce, array $viteHosts, bool $isProd): array
     {
         $sources = ["'self'", "'nonce-{$nonce}'"];
+        // $sources[] = 'unsafe-inline';
         // 'unsafe-inline' if need dynamic styling - does not work with nonce
         
         // vite hosts included in development
@@ -195,9 +197,9 @@ class SecurityHeaders
      */
     private function getImgSrc(bool $isProd): array
     {
-        $sources = ["'self'"];
+        $sources = ["'self'", 'data:'];
         // removed data and blob, if issues can be added back
-        // $sources = ["'self'", 'data:', 'blob:'];
+        // $sources[] = 'blob:';
 
         // image CDNS in prod
         if ($isProd) {
@@ -214,7 +216,7 @@ class SecurityHeaders
     {
         $sources = ["'self'"];
         // removed data, if issues can be added back
-        // $sources = ["'self'", 'data:'];
+        // $sources[] = 'data:';
         
         // add vite hosts
         if (!$isProd) {
@@ -253,6 +255,22 @@ class SecurityHeaders
         // add vite hosts in dev
         if (!$isProd) {
             $sources = array_merge($sources, $viteHosts);
+        }
+
+        return $sources;
+    }
+
+    /**
+     * Get media-src directive
+     */
+    private function getMediaSrc(bool $isProd): array
+    {
+        $sources = ["'self'", 'data:'];
+        // data: URLs for inline media (if needed)
+        // $sources[] = 'data:';
+        
+        if ($isProd) {
+            // can add media CDN hosts here
         }
 
         return $sources;

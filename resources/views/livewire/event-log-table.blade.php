@@ -4,7 +4,7 @@
             <input type="text" class="form-control" placeholder="Search..." wire:model.live.debounce.300ms="search"/>
         </div>
         <div>
-            <a href="{{ route('admin.events.export') }}" class="btn btn-info btn-sm" style="margin: 0 !important;">Export to CSV</a>
+            <a href="{{ route('admin.events.export') }}" class="btn btn-info btn-sm m-0">Export to CSV</a>
         </div>
     </div>
     <div class="table-responsive">
