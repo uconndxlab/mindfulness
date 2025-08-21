@@ -78,24 +78,6 @@ a {
     transition: none !important;
 }
 
-/* noUiSlider bubble */
-.slider-bubble {
-    position: absolute;
-    transform: translateX(-50%);
-    background: var(--dark-green);
-    color: #fff;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 14px;
-    z-index: 10;
-    pointer-events: none;
-    transition: transform 0.2s ease;
-}
-.noUi-handle .slider-bubble {
-    left: 50%;
-    top: -50px;
-}
-
 /*forms*/
 .form-control {
     border-radius:100px!important;
@@ -1044,9 +1026,29 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 
 /* margins/padding for slider container in refleciton question */
 .slider-container {
-    margin-top: 1.5rem;
+    margin-top: 2.5rem;
     margin-bottom: 2.5rem;
     padding: 0 25px;
+}
+
+/* noUiSlider bubble */
+.slider-bubble {
+    position: absolute;
+    top: -35px;
+    transform: translateX(-50%);
+    background: var(--dark-green);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 14px;
+    z-index: 10;
+    pointer-events: none;
+    transition: transform 0.2s ease;
+}
+
+.noUi-handle .slider-bubble {
+    left: 50%;
+    top: -50px;
 }
 
 .noui-custom-pips .noUi-pips {

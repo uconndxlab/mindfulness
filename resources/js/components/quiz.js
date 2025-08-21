@@ -167,13 +167,19 @@ function initQuiz() {
                 },
                 pips: pipsConfig
             });
+            let isUserInteracting = false;
+            
+            sliderEl.noUiSlider.on('start', function () {
+                isUserInteracting = true;
+            });
+            
             sliderEl.noUiSlider.on('update', function (values, handle) {
                 const value = Math.round(values[handle]);
                 hiddenInput.value = value;
                 const sliderRect = sliderEl.getBoundingClientRect();
                 const handles = sliderEl.querySelectorAll('.noUi-handle');
                 const activeHandle = handles[handle];
-                if (activeHandle && bubble) {
+                if (activeHandle && bubble && isUserInteracting) {
                     const handleRect = activeHandle.getBoundingClientRect();
                     const left = handleRect.left + handleRect.width/2 - sliderRect.left;
                     // TODO
@@ -182,7 +188,10 @@ function initQuiz() {
                     bubble.classList.remove('d-none');
                 }
             });
-            sliderEl.noUiSlider.on('end', function () { if (bubble) bubble.classList.add('d-none'); });
+            sliderEl.noUiSlider.on('end', function () { 
+                isUserInteracting = false;
+                if (bubble) bubble.classList.add('d-none'); 
+            });
         }
         if (loadingEl) loadingEl.classList.add('d-none');
         // TODO

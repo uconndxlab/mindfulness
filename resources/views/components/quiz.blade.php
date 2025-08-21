@@ -35,7 +35,7 @@
                             </div>
                         </div>
                         <div class="position-relative">
-                            <div id="quiz_slider_bubble_{{ $question['number'] }}" class="d-none position-absolute top-0 start-50 translate-middle bg-dark-green text-white p-1 rounded-1 fs-6 z-10 pointer-events-none transition-left duration-200">{{ $value }}</div>
+                            <div id="quiz_slider_bubble_{{ $question['number'] }}" class="slider-bubble d-none">{{ $value }}</div>
                             <div id="slider_{{ $question['number'] }}" class="d-none"></div>
                         </div>
                         <input type="hidden" name="answer_{{ $question['number'] }}" id="slider_input_{{ $question['number'] }}" value="{{ $value }}">
