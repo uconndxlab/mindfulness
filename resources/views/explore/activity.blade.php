@@ -88,7 +88,7 @@
             $comp_late_btn_disp = !$activity->skippable ? 'none' : 'block';
         @endphp
         <div class="d-flex justify-content-center">
-            <button id="complete-later" class="btn btn-outline-primary rounded-pill px-4" type="button" style="display: {{ $comp_late_btn_disp }};">
+            <button id="complete-later" class="btn btn-outline-primary rounded-pill px-4 {{ !$activity->skippable ? 'd-none' : '' }}" type="button">
                 <i class="bi bi-bookmark me-2"></i>
                 I will do this later
             </button>

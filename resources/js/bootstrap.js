@@ -1,6 +1,3 @@
-import $ from 'jquery';
-window.$ = window.jQuery = $;
-
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import noUiSlider from 'nouislider';
 import axios from 'axios';
@@ -18,11 +15,9 @@ if (csrfMeta) {
     window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfMeta.getAttribute('content');
 }
 
-// Load plugins that depend on jQuery after jQuery is on window to avoid ReferenceError in dev
 // Using dynamic imports defers execution until after the above global assignments
 Promise.resolve()
-    .then(() => import('jquery-ui-dist/jquery-ui.js'))
-    .then(() => import('round-slider/dist/roundslider.min.js'))
+    .then(() => import('nosleep.js'))
     .catch((e) => {
-        console.error('Failed to load jQuery plugins', e);
+        console.error('Failed to load plugins', e);
     });

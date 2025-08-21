@@ -11,8 +11,8 @@
         </span>
     </div>
 @elseif ($type == 'image')
-    <div style="display: flex; justify-content: center; align-items: center;">
-        <span style="text-align: center;">
+    <div class="d-flex justify-content-center align-items-center">
+        <span class="text-center">
             <img id="{{ isset($id) ? $id : '' }}" src="{{ Storage::url('content/'.$file) }}" alt="Image" style="max-width: 100%; max-height: 70vh;">
             <br>
             <button id="img_complete_activity" class="btn btn-workbook mt-3 d-none">Got it! Will do.</button>
@@ -26,7 +26,7 @@
                 <button class="play-pause" type="button">
                     <i id="icon" class="bi bi-play"></i>
                 </button>
-                <div class="d-flex" style="margin-top:3px;margin-left:10px"><small id="current-time"></small><small>/</small><small id="max-time"></small></div>
+                <div class="d-flex mt-2 ms-2"><small id="current-time"></small><small>/</small><small id="max-time"></small></div>
             </div>
             <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -42,122 +42,4 @@
             </div>
         </div>
     </div>
-    <script>
-    $(document).ready(function() {
-        $(".js-audio").each(function() {
-        initAudioPlayer($(this));
-    });
-
-    // playback speed dropdown
-    $('.dropdown-item').on('click', function(event) {
-        event.preventDefault();  
-        
-        const speed = parseFloat($(this).attr('data-speed'));  
-        const audio = $(this).closest('.js-audio').find('audio')[0];  
-        
-        if (audio) {
-            audio.playbackRate = speed;
-            console.log("Playback speed set to:", speed);
-            
-            $(this).closest('.dropdown').find('.dropdown-toggle').text(`Audio Speed: ${speed}x`);
-        } else {
-            console.error("Audio element not found!");
-        }
-        });
-    });
-
-function initAudioPlayer(player) {
-    let audio = player.find("audio")[0];  
-    let play = player.find(".play-pause");  
-    let icon = player.find("#icon"); 
-    let isPlaying = false;
-
-    // Use onloadmetadata to get max duration
-    audio.onloadedmetadata = function() {
-        if (audio.duration) {
-            player.find("#max-time").html(formatTime(audio.duration));  
-        }
-    };
-
-    // Listen for play
-    audio.addEventListener('play', function() {
-        if (!isPlaying) {
-            player.removeClass("paused").addClass("playing");
-            icon.removeClass("bi-play").addClass("bi-pause");
-            isPlaying = true;  // Mark as playing
-        }
-    });
-
-    // Listen for pause
-    audio.addEventListener('pause', function() {
-        if (isPlaying) {
-            player.removeClass("playing").addClass("paused");
-            icon.removeClass("bi-pause").addClass("bi-play");
-            isPlaying = false;  // Mark as paused
-        }
-    });
-
-    // Pause/Play on click
-    play.on("click", function() {
-        if (audio.paused) {
-            playAudio(player, icon, audio, isPlaying);
-        } else {
-            pauseAudio(player, icon, audio, isPlaying);
-        }
-    });
-
-    // Update current time on every time update
-    audio.ontimeupdate = function() {
-        player.find("#current-time").html(formatTime(audio.currentTime));
-    };
-
-    // When audio ends, reset player state to paused
-    audio.onended = function() {
-        pauseAudio(player, icon, audio, isPlaying);
-    };
-
-    if (!audio.paused) {
-        setTimeout(function() {
-            audio.dispatchEvent(new Event('play'));
-        }, 50);
-    }
-}
-
-// Play audio and update icon/state
-function playAudio(player, icon, audio, isPlaying) {
-    if (isPlaying) return;
-
-    $("audio").each(function() {
-        this.pause();
-    });
-
-    $(".js-audio").removeClass("playing").addClass("paused");
-    $(".play-pause").each(function() {
-        $(this).find("#icon").removeClass("bi-pause").addClass("bi-play");
-    });
-
-    audio.play();
-    player.removeClass("paused").addClass("playing");
-    icon.removeClass("bi-play").addClass("bi-pause");
-    isPlaying = true;
-}
-
-// Pause audio and update icon/state
-function pauseAudio(player, icon, audio, isPlaying) {
-    if (!isPlaying) return;
-
-    audio.pause();
-    player.removeClass("playing").addClass("paused");
-    icon.removeClass("bi-pause").addClass("bi-play");
-    isPlaying = false;
-}
-
-// Format time
-function formatTime(timeInSeconds) {
-    let minutes = Math.floor(timeInSeconds / 60);
-    let seconds = Math.floor(timeInSeconds % 60);
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-}
-
-    </script>
 @endif

@@ -17,13 +17,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (page === 'auth-login-register') imports.push(import('./pages/auth-login-register'));
     if (page === 'auth-verify') imports.push(import('./pages/auth-verify'));
     if (page === 'module') imports.push(import('./pages/module'));
+    if (page === 'activity') imports.push(import('./pages/activity'));
 
     // Component-based (when component is embedded within another page)
-    if (document.getElementById('journalForm')) imports.push(import('./components/journal'));
     if (document.getElementById('admin-sidebar')) imports.push(import('./components/admin-sidebar'));
-    if (document.getElementById('pdf-viewer')) imports.push(import('./components/pdf-viewer'));
+    if (document.getElementById('audio-options-div')) imports.push(import('./components/voice-selector'));
+    if (document.getElementById('journalForm')) imports.push(import('./components/journal'));
     if (document.getElementById('lock_button_reg')) imports.push(import('./components/registration-lock'));
-
+    if (document.getElementById('pdf-viewer')) imports.push(import('./components/pdf-viewer'));
+    if (document.querySelector('.slide__audio.js-audio')) imports.push(import('./components/audio-player'));
+    
     try {
         await Promise.all(imports);
     } catch (e) {
