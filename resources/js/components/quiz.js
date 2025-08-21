@@ -182,7 +182,6 @@ function initQuiz() {
                 if (activeHandle && bubble && isUserInteracting) {
                     const handleRect = activeHandle.getBoundingClientRect();
                     const left = handleRect.left + handleRect.width/2 - sliderRect.left;
-                    // TODO
                     bubble.style.left = left + 'px';
                     bubble.textContent = value + '%';
                     bubble.classList.remove('d-none');
@@ -194,7 +193,6 @@ function initQuiz() {
             });
         }
         if (loadingEl) loadingEl.classList.add('d-none');
-        // TODO
         sliderEl.classList.remove('d-none');
     });
 

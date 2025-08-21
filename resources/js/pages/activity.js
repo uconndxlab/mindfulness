@@ -157,150 +157,144 @@ function initActivityPage() {
     })();
 
     // Logging interactions
-    document.addEventListener('DOMContentLoaded', function() {
-        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
-        let lastFocusTimestamp = performance.now();
-        let exited = false;
+    const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+    const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+    let lastFocusTimestamp = performance.now();
+    let exited = false;
 
-        function logInteraction(eventType, duration) {
-            if (exited) return;
-            console.log('Logging interaction: ', eventType);
-            const data = new FormData();
-            data.append('activity_id', String(activityId));
-            data.append('event_type', eventType);
-            data.append('_token', csrfToken);
-            if (duration) data.append('duration', String(Math.round(duration / 1000)));
-            if (eventType === 'exited') data.append('start_log_id', String(startLogId));
+    function logInteraction(eventType, duration) {
+        if (exited) return;
+        console.log('Logging interaction: ', eventType);
+        const data = new FormData();
+        data.append('activity_id', String(activityId));
+        data.append('event_type', eventType);
+        data.append('_token', csrfToken);
+        if (duration) data.append('duration', String(Math.round(duration / 1000)));
+        if (eventType === 'exited') data.append('start_log_id', String(startLogId));
 
-            if (eventType === 'exited') {
-                exited = true;
-                navigator.sendBeacon(logInteractionRoute, data);
-            } else {
-                window.axios.post(logInteractionRoute, data)
-                    .catch(error => console.error(`Error logging ${eventType}:`, error));
-            }
+        if (eventType === 'exited') {
+            exited = true;
+            navigator.sendBeacon(logInteractionRoute, data);
+        } else {
+            window.axios.post(logInteractionRoute, data)
+                .catch(error => console.error(`Error logging ${eventType}:`, error));
         }
+    }
 
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden') {
-                const duration = performance.now() - lastFocusTimestamp;
-                logInteraction('unfocused', duration);
-            } else {
-                lastFocusTimestamp = performance.now();
-                logInteraction('refocused');
-            }
-        });
-
-        window.addEventListener('pagehide', () => {
-            console.log('Page hidden');
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
             const duration = performance.now() - lastFocusTimestamp;
-            logInteraction('exited', duration);
-        });
-
-        // No-seek enforcement for audio/video
-        const mediaPlayers = document.querySelectorAll('.slide__audio-player, .video-player');
-        mediaPlayers.forEach((player) => {
-            const timeTracking = { watchedTime: allowSeek ? (player.duration || 0) : 0, currentTime: 0 };
-            let isSeeking = false;
-            let endedListener;
-            const MAX_DELTA = 1;
-
-            player.addEventListener('timeupdate', function () {
-                if (!isSeeking && !player.seeking || allowSeek) {
-                    const delta = player.currentTime - timeTracking.watchedTime;
-                    if (delta <= MAX_DELTA && delta >= 0) {
-                        timeTracking.watchedTime = player.currentTime;
-                    } else {
-                        timeTracking.currentTime = player.currentTime;
-                    }
-                }
-            });
-
-            player.addEventListener('seeking', function () {
-                isSeeking = true;
-                const delta = player.currentTime - timeTracking.watchedTime;
-                if (delta > 0) {
-                    if (endedListener) player.removeEventListener('ended', endedListener);
-                    player.pause();
-                    player.currentTime = timeTracking.watchedTime;
-                    player.play().catch(() => {});
-                }
-            });
-
-            player.addEventListener('seeked', function () {
-                isSeeking = false;
-            });
-
-            endedListener = function () {
-                console.log('Media ended');
-                if (timeTracking.watchedTime < player.duration) {
-                    console.log('Blocked seek spam');
-                }
-                activityComplete();
-            };
-            console.log('adding media end listener');
-            player.addEventListener('ended', endedListener);
-        });
-
-        // Page unload warning for progress
-        let showBrowserModal = true;
-        window.addEventListener('beforeunload', function(e) {
-            if (!completed && showBrowserModal) {
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        });
-
-        const backButton = document.getElementById('backButton');
-        if (backButton) {
-            console.log('back button found');
-            backButton.addEventListener('click', function(event) {
-                event.preventDefault();
-                showBrowserModal = false;
-                console.log('will not show other modal');
-                if (!completed && window.showModal) {
-                    window.showModal({
-                        label: 'Leave activity?',
-                        body: 'Leaving will erase your progress on this activity. Are you sure you want to leave?',
-                        route: this.href,
-                        method: 'GET',
-                        buttonLabel: 'Leave Activity',
-                        buttonClass: 'btn-danger',
-                        closeLabel: 'Stay',
-                        onCancel: function() {
-                            console.log('cancelled in leave');
-                            showBrowserModal = true;
-                        }
-                    });
-                } else {
-                    window.location.href = this.href;
-                }
-            });
-        }
-
-        if (compLateBtn) {
-            compLateBtn.addEventListener('click', function(event) {
-                event.preventDefault();
-                console.log('Complete later');
-                showBrowserModal = false;
-                if (window.showModal) {
-                    window.showModal({
-                        label: 'Complete Activity Later?',
-                        body: `Click 'Continue' to move on to the next activity. All progress on this activity will be lost. This activity must still be completed later in order to finish ${dayName}.`,
-                        route: skipRoute,
-                        method: 'POST',
-                        buttonLabel: 'Continue',
-                        buttonClass: 'btn-danger',
-                        onCancel: function() {
-                            console.log('cancelled in complete later');
-                            showBrowserModal = true;
-                        }
-                    });
-                }
-            });
+            logInteraction('unfocused', duration);
+        } else {
+            lastFocusTimestamp = performance.now();
+            logInteraction('refocused');
         }
     });
+
+    window.addEventListener('pagehide', () => {
+        console.log('Page hidden');
+        const duration = performance.now() - lastFocusTimestamp;
+        logInteraction('exited', duration);
+    });
+
+    // No-seek enforcement for audio/video
+    const mediaPlayers = document.querySelectorAll('.slide__audio-player, .video-player');
+    mediaPlayers.forEach((player) => {
+        const timeTracking = { watchedTime: allowSeek ? (player.duration || 0) : 0, currentTime: 0 };
+        let isSeeking = false;
+        let endedListener;
+        const MAX_DELTA = 1;
+
+        player.addEventListener('timeupdate', function () {
+            if (!isSeeking && !player.seeking || allowSeek) {
+                const delta = player.currentTime - timeTracking.watchedTime;
+                if (delta <= MAX_DELTA && delta >= 0) {
+                    timeTracking.watchedTime = player.currentTime;
+                } else {
+                    timeTracking.currentTime = player.currentTime;
+                }
+            }
+        });
+
+        player.addEventListener('seeking', function () {
+            isSeeking = true;
+            const delta = player.currentTime - timeTracking.watchedTime;
+            if (delta > 0) {
+                if (endedListener) player.removeEventListener('ended', endedListener);
+                player.pause();
+                player.currentTime = timeTracking.watchedTime;
+                player.play().catch(() => {});
+            }
+        });
+
+        player.addEventListener('seeked', function () {
+            isSeeking = false;
+        });
+
+        endedListener = function () {
+            console.log('Media ended');
+            if (timeTracking.watchedTime < player.duration) {
+                console.log('Blocked seek spam');
+            }
+            activityComplete();
+        };
+        console.log('adding media end listener');
+        player.addEventListener('ended', endedListener);
+    });
+
+    // Page unload warning for progress
+    let showBrowserModal = true;
+    window.addEventListener('beforeunload', function(e) {
+        if (!completed && showBrowserModal) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
+    const backButton = document.getElementById('backButton');
+    if (backButton) {
+        backButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            showBrowserModal = false;
+            if (!completed && window.showModal) {
+                window.showModal({
+                    label: 'Leave activity?',
+                    body: 'Leaving will erase your progress on this activity. Are you sure you want to leave?',
+                    route: this.href,
+                    method: 'GET',
+                    buttonLabel: 'Leave Activity',
+                    buttonClass: 'btn-danger',
+                    closeLabel: 'Stay',
+                    onCancel: function() {
+                        console.log('cancelled in leave');
+                        showBrowserModal = true;
+                    }
+                });
+            } else {
+                window.location.href = this.href;
+            }
+        });
+    }
+
+    if (compLateBtn) {
+        compLateBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            showBrowserModal = false;
+            if (window.showModal) {
+                window.showModal({
+                    label: 'Complete Activity Later?',
+                    body: `Click 'Continue' to move on to the next activity. All progress on this activity will be lost. This activity must still be completed later in order to finish ${dayName}.`,
+                    route: skipRoute,
+                    method: 'POST',
+                    buttonLabel: 'Continue',
+                    buttonClass: 'btn-danger',
+                    onCancel: function() {
+                        showBrowserModal = true;
+                    }
+                });
+            }
+        });
+    }
 
     // Error display
     const errorDiv = document.getElementById('error-messages');

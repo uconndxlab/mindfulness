@@ -1044,6 +1044,7 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     z-index: 10;
     pointer-events: none;
     transition: transform 0.2s ease;
+    cursor: pointer !important;
 }
 
 .noUi-handle .slider-bubble {
@@ -1051,9 +1052,17 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     top: -50px;
 }
 
+.noUi-handle {
+    cursor: pointer !important;
+}
+
 .noui-custom-pips .noUi-pips {
     position: static;
     height: 20px;
+}
+
+.noUi-connects {
+    cursor: pointer !important;
 }
 
 .noui-custom-pips .noUi-value {
