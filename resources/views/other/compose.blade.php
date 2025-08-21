@@ -33,13 +33,13 @@
         }
     @endphp
 
-    <nav class="navbar navbar-expand-lg navbar-light top-nav">
+    <nav class="navbar navbar-expand navbar-light top-nav">
         <div class="tabs">
-            <ul class="navbar-nav" style="flex-direction:row">
-                <li class="nav-item" style="padding:0px 20px">
+            <ul class="navbar-nav">
+                <li class="nav-item">
                     <a class="nav-link {{ $top_nav[0] ? 'active disabled' : ''}}" href="{{ $top_nav[0] ? '' : $tn_left_route }}">{{ $tn_left_name }}</a>
                 </li>
-                <li class="nav-item" style="padding:0px 20px">
+                <li class="nav-item">
                     <a class="nav-link {{ $top_nav[1] ? 'active disabled' : ''}}" href="{{ $top_nav[1] ? '' : $tn_right_route }}">{{ $tn_right_name }}</a>
                 </li>
             </ul>

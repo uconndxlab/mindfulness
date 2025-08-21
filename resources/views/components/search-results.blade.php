@@ -1,6 +1,6 @@
 @if (!isset($activities) || $activities->isEmpty())
     @if (isset($random))
-        <div class="text-left muted" style="margin-top:10px; margin-bottom:10px;padding-bottom:10px;">
+        <div class="text-left muted mb-2 pb-2">
         <p><strong>
         0 results found
         </strong></p>
@@ -15,7 +15,7 @@
         </div>
         <div class="card module p-2 mb-2">
             <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $random->id, 'library' => true]) }}">
-                <p class="activity-font"style="margin-bottom:0px!important;">{{ $random->title }}</p> 
+                <p class="activity-font mb-0">{{ $random->title }}</p> 
                 <p class="sub-activity-font">{{ $random->day->name.', '.$random->day->module->name}}</p>
                 @if ($random->type)
                     <span class="sub-activity-font activity-tag-{{ $random->type }}">{{ ucfirst($random->type) }}</span>
@@ -31,7 +31,7 @@
         </div>
     @elseif (isset($empty_text))
         <div class="text-left muted">
-            {!! $empty_text !!}
+            @markdown(is_string($empty_text ?? null) ? $empty_text : '')
         </div>
     @endif
 @else
@@ -41,7 +41,7 @@
                 @foreach ($activities as $activity)
                     <div class="card module p-2 mb-2">
                         <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id, 'library' => true]) }}">
-                            <p class="activity-font"style="margin-bottom:0px!important;">{{ $activity->title }}</p> 
+                            <p class="activity-font mb-0">{{ $activity->title }}</p> 
                             <p class="sub-activity-font">{{ $activity->day->name.', '.$activity->day->module->name}}</p>
                             @if ($activity->type)
                                 <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>

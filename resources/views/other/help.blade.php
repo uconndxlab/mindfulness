@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="col-md-8">
-    <nav id="navbar-help" class="navbar navbar-expand-lg navbar-light sticky-top top-nav" id="navbar-help">
+    <nav id="navbar-help" class="navbar navbar-expand navbar-light sticky-top top-nav" id="navbar-help">
         <div class="tabs">
             <ul class="navbar-nav">
                 <li class="nav-item">

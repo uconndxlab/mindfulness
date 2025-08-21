@@ -102,7 +102,7 @@ Route::middleware('web')->group(function () {
         Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
         // use for when skipping warning modal
         Route::get('/explore/activity/{activity_id}/fast', [PageNavController::class, 'exploreActivityBypass'])->name('explore.activity.bypass');
-        Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
+        Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->middleware('throttle:30,1')->name('quiz.submit');
         Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
 
         // activity completion (add light rate-limiting)
