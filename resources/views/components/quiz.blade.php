@@ -1,8 +1,8 @@
 @if (isset($quiz))
-    <form id="quizForm" method="POST" class="pt-3">
+    <form id="quizForm" method="POST" class="pt-3" data-quiz-id="{{ $quiz->id }}" data-question-count="{{ $quiz->question_count }}" data-answers='@json($quiz->answers)'>
         @csrf
         @foreach ($quiz->question_options as $key => $question)
-            <div id="question_{{ $question['number'] }}" class="quiz-div" data-number="{{ $question['number'] }}" data-type="{{ $question['type'] }}" style="display: {{ $question['number'] == 1 ? 'block' : 'none'}};">
+            <div id="question_{{ $question['number'] }}" class="quiz-div {{ $question['number'] == 1 ? '' : 'd-none'}}" data-number="{{ $question['number'] }}" data-type="{{ $question['type'] }}" @if ($question['type'] == 'slider') data-question-json='@json($question)' @endif>
                 <div class="text-left quiz-question mb-3">
                     <h4>{{ $question['question'] }}</h4>
                 </div>
@@ -34,9 +34,9 @@
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </div>
-                        <div style="position:relative;">
-                            <div id="quiz_slider_bubble_{{ $question['number'] }}" class="d-none" style="position:absolute;left:50%;top:-30px;transform:translateX(-50%);background:var(--dark-green);color:#fff;padding:2px 8px;border-radius:12px;font-size:14px;z-index:10;pointer-events:none;transition:left 0.2s;">{{ $value }}</div>
-                            <div id="slider_{{ $question['number'] }}" style="visibility: hidden;"></div>
+                        <div class="position-relative">
+                            <div id="quiz_slider_bubble_{{ $question['number'] }}" class="d-none position-absolute top-0 start-50 translate-middle bg-dark-green text-white p-1 rounded-1 fs-6 z-10 pointer-events-none transition-left duration-200">{{ $value }}</div>
+                            <div id="slider_{{ $question['number'] }}" class="d-none"></div>
                         </div>
                         <input type="hidden" name="answer_{{ $question['number'] }}" id="slider_input_{{ $question['number'] }}" value="{{ $value }}">
                     </div>
@@ -59,7 +59,7 @@
                                 <x-contentView id="fbAudio_{{ $question['number'] }}_{{ $index }}" id2="pdf_download" type="feedback_audio" file="{{ $option['audio_path'] }}"/>
                             @endif
                             <div class="{{ $text_color }}">
-                                {!! $option['feedback'] !!}
+                                @markdown(is_string($option['feedback'] ?? null) ? $option['feedback'] : '')
                             </div>
                         </div>
                     @endforeach
@@ -67,371 +67,20 @@
             </div>
         @endforeach
         @php
-            $display = $quiz->question_count > 1 ? 'block' : 'none';
-            $last = $quiz->question_count <=1 ? 'block' : 'none';
+            $display = $quiz->question_count > 1 ? '' : 'd-none';
+            $last = $quiz->question_count <=1 ? '' : 'd-none';
             $q1_slider = $quiz->question_options['question_1']['type'] == 'slider';
         @endphp
-        <div class="d-flex justify-content-between">
-            <button id="prev_q_button" type="button" class="btn-quiz" disabled style="display: {{ $display }};">
+        <div class="d-flex justify-content-between quiz-nav-container">
+            <button id="prev_q_button" type="button" class="btn-quiz {{ $display }}" disabled>
                 <i class="bi bi-arrow-left"></i> Previous 
             </button>
-            <button id="next_q_button" type="button" class="btn-quiz" {{ $q1_slider ? '' : 'disabled' }} style="display: {{ $display }};">
+            <button id="next_q_button" type="button" class="btn-quiz {{ $display }}" {{ $q1_slider ? '' : 'disabled' }}>
                 Next <i class="bi bi-arrow-right "></i>
             </button>
-            <button type="submit" id="submitButton" class="btn btn-primary ms-auto" {{ $q1_slider && $last ? '' : 'disabled' }} style="display: {{ $last }};width:max-content!important;margin-top:20px!important;margin-top:20px;margin-bottom:0px;">
+            <button type="submit" id="submitButton" class="btn btn-primary ms-auto {{ $last }} mt-2 mb-0" {{ $q1_slider && $last ? '' : 'disabled' }}>
                 Submit <i class="bi bi-arrow-right"></i>
             </button>
         </div>
     </form>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Initializing quiz...');
-            var questionNumber = 1;
-            const quizId = {{ $quiz->id }}
-            const questionCount = {{ $quiz->question_count }};
-            //for tracking user interaction
-            var answerSet = new Set();
-            const answers = @json($quiz->answers);
-    
-            const quizForm = document.getElementById('quizForm');
-            const prevQBtn = document.getElementById('prev_q_button');
-            const nextQBtn = document.getElementById('next_q_button');
-            const submitBtn = document.getElementById('submitButton');
-
-            quizForm.addEventListener('submit', function(event) {
-                event.preventDefault(); 
-                console.log('submitting');
-                submitAnswers();
-            });
-    
-            prevQBtn.addEventListener('click', function () {
-                changeQuestion(questionNumber - 1);
-            });
-            nextQBtn.addEventListener('click', function () {
-                changeQuestion(questionNumber + 1);
-            });
-
-            //POPULATE ANSWERS
-            function populateForm(answers) {
-                //loop through answers
-                for (const [key, value] of Object.entries(answers)) {
-                    //handle text
-                    if (typeof value === 'string') {
-                        let inputElement = document.querySelector(`[name="${key}"]`);
-                        inputElement.value = value;
-                    }
-                    //handle check and radio
-                    else if (typeof value === 'object') {
-                        document.querySelectorAll(`[name="${key}[]"]`).forEach(checkbox => {
-                            //also handles unlocking other
-                            checkBox(checkbox, value.includes(checkbox.value))
-                        });
-                    }
-                }
-            }
-            populateForm(answers);
-
-            //pause audios
-            function pauseAudios() {
-                document.querySelectorAll('audio').forEach(audio => {
-                    audio.pause();
-                });
-            }
-            
-            //QUESTION CHANGE
-            function changeQuestion(q_no) {
-                console.log('Question No.: ' + q_no);
-                questionNumber = q_no;
-                
-                //get all questions
-                const quizDivs = quizForm.querySelectorAll('.quiz-div');
-                quizDivs.forEach(qDiv => {
-                    //pause any audio
-                    pauseAudios();
-                    const currentNumber = parseInt(qDiv.getAttribute('data-number'));
-                    const questionType = qDiv.getAttribute('data-type');
-                    const isLast = currentNumber === questionCount;
-                    const isFirst = currentNumber === 1;
-                    
-                    //handle hiding questions
-                    if (currentNumber === questionNumber) {
-                        qDiv.classList.remove('d-none');
-                        if (questionCount > 1) {
-                            //handle prev
-                            if (isFirst) {
-                                prevQBtn.setAttribute('disabled', '');
-                            }
-                            else {
-                                prevQBtn.removeAttribute('disabled');
-                            }
-                            if (isLast) {
-                                nextQBtn.classList.add('d-none');
-                                submitBtn.classList.remove('d-none');
-                                // slider cannot have next/submit disabled
-                                if (questionType != 'slider') {
-                                    nextQBtn.setAttribute('disabled', '');
-                                }
-                            }
-                            else {
-                                submitBtn.classList.add('d-none');
-                                nextQBtn.classList.remove('d-none');
-                                if (questionType != 'slider') {
-                                    submitBtn.setAttribute('disabled', '');
-                                }
-                            }
-                        }
-                        unlockNext(questionNumber);
-                    }
-                    else {
-                        console.log('hiding question ' + currentNumber);
-                        qDiv.classList.add('d-none');
-                    }
-                    
-                });
-            }
-            changeQuestion(questionNumber);
-
-            //UNLOCK NEXT/SUBMIT
-            function unlockNext(questionNumber) {
-                console.log('unlocking next for question ' + questionNumber);
-                //handle unlocking of next
-                const questionDiv = document.getElementById('question_'+questionNumber);
-                const questionType = questionDiv.getAttribute('data-type');
-                nextQBtn.setAttribute('disabled', '');
-                submitBtn.setAttribute('disabled', '');
-
-                if (questionType === 'slider') {
-                    if (questionNumber === questionCount) {
-                        submitBtn.removeAttribute('disabled');
-                    } else {
-                        nextQBtn.removeAttribute('disabled');
-                    }
-                    return;
-                }
-
-                //if we find one option is selected, remove the disable from next/submit
-                for (const check of questionDiv.querySelectorAll('.form-check-input')) {
-                    console.log(check.id);
-                    if (check.checked) {
-                        if (questionNumber === questionCount) {
-                            submitBtn.removeAttribute('disabled');
-                        }
-                        else if (questionNumber < questionCount) {
-                            nextQBtn.removeAttribute('disabled');
-                        }
-                        break;
-                    }
-                }
-            }
-
-            //SHOWING FEEDBACK
-            quizForm.querySelectorAll('.form-check-input').forEach(option => {
-                option.addEventListener('change', function(event) {
-                    //build id and get question div
-                    const splitId = event.target.id.split('_');
-                    const questionId = splitId[1];
-                    const optionId = splitId[2];
-                    const feedbackDiv = document.getElementById('feedback_' + questionId + '_' + optionId);
-                    // check if feedback exists
-                    const hasFeedback = feedbackDiv.getAttribute('data-show') === 'true';
-                    if (event.target.checked) {
-                        quizForm.querySelectorAll('.feedback-div').forEach(fbDiv => {
-                            //hide all other feedback
-                            fbDiv.classList.add('d-none');
-                            //pause any audio
-                            fbDiv.querySelectorAll('audio').forEach(audio => {
-                                audio.pause();
-                                audio.currentTime = 0;
-                            });
-                        });
-                    }
-                    //show/hide feedback
-                    if (hasFeedback) {
-                        feedbackDiv.style.display = event.target.checked ? 'block' : 'none';
-                    }
-                    //autoplay??
-                    checkBox(option, event.target.checked);
-                });
-            });
-
-            //SLIDER
-            quizForm.querySelectorAll('.quiz-div[data-type="slider"]').forEach(sliderDiv => {
-                const questionNumber = sliderDiv.getAttribute('data-number');
-                const sliderEl = document.getElementById('slider_' + questionNumber);
-                const sliderVal = document.getElementById('slider_input_' + questionNumber).value;
-                const hiddenInput = document.getElementById('slider_input_' + questionNumber);
-                const loadingEl = document.getElementById('slider_loading_' + questionNumber);
-                const bubble = document.getElementById('quiz_slider_bubble_' + questionNumber);
-
-                const questionData = @json($quiz->question_options)['question_'+questionNumber];
-                const sliderData = questionData.options_feedback[0];
-
-                // want to show first and last pips on mobile, but keep the ticks
-                const pipKeys = sliderData.pips ? Object.keys(sliderData.pips) : [];
-                const firstPipValue = pipKeys.length > 0 ? pipKeys[0] : null;
-                const lastPipValue = pipKeys.length > 0 ? pipKeys[pipKeys.length - 1] : null;
-
-                let pipsConfig = undefined;
-                if (sliderData.pips) {
-                    pipsConfig = {
-                        mode: 'values',
-                        values: Object.keys(sliderData.pips).map(Number),
-                        density: 4,
-                        format: {
-                            to: function(value) {
-                                // on desktop, show all pips
-                                if (window.innerWidth >= 768) {
-                                    return sliderData.pips[value];
-                                }
-                                // on mobile, show first and last pips
-                                if (value == firstPipValue || value == lastPipValue) {
-                                    return sliderData.pips[value];
-                                }
-                                return "";
-                            }
-                        }
-                    };
-                }
-
-                noUiSlider.create(sliderEl, {
-                    start: [sliderVal],
-                    connect: 'lower',
-                    step: sliderData.step ?? 1,
-                    range: {
-                        'min': sliderData.min ?? 0,
-                        'max': sliderData.max ?? 100
-                    },
-                    pips: pipsConfig
-                });
-
-                sliderEl.noUiSlider.on('update', function (values, handle) {
-                    const value = Math.round(values[handle]);
-                    hiddenInput.value = value;
-                    // Show bubble above the active handle
-                    var sliderRect = sliderEl.getBoundingClientRect();
-                    var handles = sliderEl.querySelectorAll('.noUi-handle');
-                    var activeHandle = handles[handle];
-                    if (activeHandle && bubble) {
-                        var handleRect = activeHandle.getBoundingClientRect();
-                        var left = handleRect.left + handleRect.width/2 - sliderRect.left;
-                        bubble.style.left = left + 'px';
-                        bubble.textContent = value + '%';
-                        bubble.classList.remove('d-none');
-                    }
-                });
-
-                // Hide bubble when not dragging
-                sliderEl.noUiSlider.on('end', function () {
-                    if (bubble) bubble.classList.add('d-none');
-                });
-
-                if (loadingEl) {
-                    loadingEl.classList.add('d-none');
-                }
-                sliderEl.style.visibility = 'visible';
-            });
-
-            //ALL/NONE ABOVE
-            //get all question divs
-            quizForm.querySelectorAll('.quiz-div').forEach(quizDiv => {
-                //select the ones with the checkbox answers
-                if (quizDiv.getAttribute('data-type') === 'checkbox') {
-                    //find all options within the question
-                    var allBoxes = quizDiv.querySelectorAll('.form-check-input');
-                    allBoxes.forEach(option => {
-                        const behavior = option.getAttribute('above-behavior');
-                        
-                        option.addEventListener('click', function(event) {
-                            const targetCheck = event.target.checked;
-                            //handle unlocking of next
-                            unlockNext(parseInt(quizDiv.getAttribute('data-number')));
-                            //checked
-                            if (targetCheck) {
-                                //none above
-                                if (behavior == 'none') {
-                                    allBoxes.forEach(box => {
-                                        if (box != option) {
-                                            checkBox(box, false);
-                                        }
-                                    });
-                                }
-                                else {
-                                    allBoxes.forEach(box => {
-                                        //all above
-                                        if (behavior === 'all') {
-                                            checkBox(box, true);
-                                        }
-                                        //uncheck none above on all other checks
-                                        if (box.getAttribute('above-behavior') === 'none') {
-                                            checkBox(box, false);
-                                        }
-                                    });
-                                }
-                            }
-                            //unchecked - any but none of the above
-                            else if (behavior != 'none') {
-                                allBoxes.forEach(box => {
-                                    //uncheck all of above
-                                    if (box.getAttribute('above-behavior') === 'all') {
-                                        checkBox(box, false);
-                                    }
-                                });
-                            }
-                        });
-                    });
-                }
-                //added in for other functionality on radio 
-                else if (quizDiv.getAttribute('data-type') === 'radio') {
-                    var allBoxes = quizDiv.querySelectorAll('.form-check-input');
-                    allBoxes.forEach(option => {
-                        option.addEventListener('click', function() {
-                            //handle unlocking of next
-                            unlockNext(parseInt(quizDiv.getAttribute('data-number')));
-                            allBoxes.forEach(box => {
-                                checkBox(box, box.checked);
-                            });
-                        });
-                    });
-                }
-            });
-
-
-            //OTHER
-            function checkBox(box, checked) {
-                box.checked = checked;
-                const splitId = box.id.split('_');
-                const questionId = splitId[1];
-                const optionId = splitId[2];
-                //handle other
-                if (box.getAttribute('data-other')) {
-                    const other = document.getElementById('other_'+questionId+'_'+optionId);
-                    box.checked ? other.removeAttribute('disabled') : other.setAttribute('disabled', '');
-                }
-            }
-
-            //SUBMISSION
-            function submitAnswers() {
-                const formData = new FormData(document.getElementById('quizForm'));
-                return new Promise((resolve, reject) => {
-                    axios.post('/quiz/' + quizId, formData, {
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        }
-                    })
-                    .then(response => {
-                        console.log('Answers submitted!');
-                        activityComplete();
-                        resolve(true);
-                    })
-                    .catch(error => {
-                        console.error('Error submitting answers: ', error);
-                        //display error
-                        const errorMessages = error.response?.data?.error_message || 'An unknown error occurred.';
-                        showError(errorMessages);
-                        reject(false);
-                    });
-                });
-            }
-        });
-    </script>
 @endif

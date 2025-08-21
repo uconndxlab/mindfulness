@@ -17,8 +17,6 @@
     "dependencies": {
         "bootstrap": "^5.3.7",
         "bootstrap-icons": "^1.13.1",
-        "jquery": "^3.7.1",
-        "jquery-ui-dist": "^1.13.3",
         "nosleep.js": "^0.12.0",
         "nouislider": "^15.8.1",
         "pdfjs-dist": "^5.4.54"

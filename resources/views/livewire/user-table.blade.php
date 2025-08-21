@@ -49,7 +49,7 @@
                                     @break
                                 @case('email')
                                     <td>
-                                        <a href="mailto:{{ $user->email }}">{{ $user->email }}</a>
+                                        <span title="{{ $user->email }}">{{ $user->email }}</span>
                                     </td>
                                     @break
                                 @case('role')

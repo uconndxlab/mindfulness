@@ -192,6 +192,10 @@ textarea.form-control {
     border-radius:100%;
 }
 
+.quiz-nav-container #submitButton {
+    width:max-content!important;
+}
+
 .btn-outline-primary {
     color: var(--dark-green) !important;
     background-color: white;

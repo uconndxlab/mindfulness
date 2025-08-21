@@ -22,10 +22,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Component-based (when component is embedded within another page)
     if (document.getElementById('admin-sidebar')) imports.push(import('./components/admin-sidebar'));
     if (document.getElementById('audio-options-div')) imports.push(import('./components/voice-selector'));
+    if (document.querySelector('.feedback-audio.js-audio')) imports.push(import('./components/feedback-audio'));
     if (document.getElementById('journalForm')) imports.push(import('./components/journal'));
     if (document.getElementById('lock_button_reg')) imports.push(import('./components/registration-lock'));
     if (document.getElementById('pdf-viewer')) imports.push(import('./components/pdf-viewer'));
     if (document.querySelector('.slide__audio.js-audio')) imports.push(import('./components/audio-player'));
+    if (document.getElementById('quizForm')) imports.push(import('./components/quiz'));
     
     try {
         await Promise.all(imports);

@@ -298,8 +298,13 @@ class PageNavController extends Controller
             ]);
             return response()->json(['success_message' => 'Quiz answers updated successfully.'], 200);
         }
-        catch (\Exception $e) {
-            return response()->json(['error_message' => 'Failed to submit quiz answers.', 'error' => $e], 500);
+        catch (\Throwable $e) {
+            \Log::error('Quiz submission failed', [
+                'user_id' => Auth::id(),
+                'quiz_id' => $request->quiz_id ?? null,
+                'message' => $e->getMessage(),
+            ]);
+            return response()->json(['error_message' => 'Failed to submit quiz answers.'], 500);
         }
     }
         

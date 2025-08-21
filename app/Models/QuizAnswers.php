@@ -9,6 +9,10 @@ class QuizAnswers extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'answers' => 'encrypted:array',
+    ];
+
     protected $table = 'quiz_answers';
 
     protected $fillable = [

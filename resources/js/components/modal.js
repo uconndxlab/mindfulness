@@ -148,6 +148,21 @@ function bindModalHandlers() {
     // Expose globally for other modules that call showModal()
     window.showModal = showModal;
 
+    // replace inline modal click triggers with data-attribute driven modal triggers
+    document.addEventListener('click', function (e) {
+        const trigger = e.target.closest('[data-open-modal]');
+        if (!trigger) return;
+        e.preventDefault();
+        const label = trigger.getAttribute('data-modal-label') || 'Dialog';
+        const bodyFrom = trigger.getAttribute('data-modal-body-from');
+        let body = null;
+        if (bodyFrom) {
+            const src = document.querySelector(bodyFrom);
+            if (src) body = src.innerHTML;
+        }
+        showModal({ label, body });
+    });
+
     // Handle session modal data if present via meta tag (set in scripts.blade.php)
     const meta = document.querySelector('meta[name="session-modal-data"]');
     if (meta) {
