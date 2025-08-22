@@ -34,4 +34,11 @@
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
+@if(session('modal_data'))
+    <meta name="session-modal-data" content="{{ json_encode(session('modal_data')) }}">
+    @php
+        session()->forget('modal_data');
+    @endphp
+@endif
+
 @yield('additional_head') 

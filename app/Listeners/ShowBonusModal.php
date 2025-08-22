@@ -22,7 +22,7 @@ class ShowBonusModal
     public function handle(BonusUnlocked $event)
     {
         $label = 'Bonus activities unlocked! 🎉';
-        $body = 'Congratulations on completing: <br><strong>'.$event->day->module->name.': '.$event->day->name.'</strong>!<br><br>You have unlocked bonus activities.';
+        $body = (string) app(\League\CommonMark\CommonMarkConverter::class)->convert('Congratulations on completing: **'.$event->day->module->name.': '.$event->day->name.'**! You have unlocked bonus activities.');
         
         $route = route('explore.module.bonus', [
             'day_id' => $event->day->id

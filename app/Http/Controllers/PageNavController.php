@@ -221,7 +221,6 @@ class PageNavController extends Controller
                 $page_info['redirect_label'] = "Back to Part ".$activity->day->module->id;
                 $page_info['redirect_route'] = $page_info['exit_route'];
             }
-
         }
 
         //setting back route

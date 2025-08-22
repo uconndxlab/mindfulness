@@ -42,7 +42,7 @@ Route::middleware('web')->group(function () {
             }
             return view('auth.verify');
         })->name('verification.notice');
-        Route::post('/email/verification-notification', [AuthController::class, 'sendVerifyEmail'])->name('verification.send'); // throttled in controller
+        Route::post('/email/verification-notification', [AuthController::class, 'sendVerifyEmail'])->middleware('throttle:4,1')->name('verification.send'); // throttled in controller too
         Route::get('/check-verification', [AuthController::class, 'checkVerification'])->name('verification.check');
     });
     // verify email button in email
