@@ -42,7 +42,7 @@ Route::middleware('web')->group(function () {
             }
             return view('auth.verify');
         })->name('verification.notice');
-        Route::post('/email/verification-notification', [AuthController::class, 'sendVerifyEmail'])->name('verification.send');
+        Route::post('/email/verification-notification', [AuthController::class, 'sendVerifyEmail'])->name('verification.send'); // throttled in controller
         Route::get('/check-verification', [AuthController::class, 'checkVerification'])->name('verification.check');
     });
     // verify email button in email
@@ -89,9 +89,9 @@ Route::middleware('web')->group(function () {
     
     
     //AUTH protected routes
-    Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock'])->group(function () {
+    Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock', 'session.policy'])->group(function () {
         //logout
-        Route::post('/logout', [AuthController::class,'logout'])->name('logout');
+        Route::post('/logout', [AuthController::class,'logout'])->middleware('throttle:20,1')->name('logout');
 
         //NEW EXPLORE
         Route::get('/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
@@ -135,7 +135,7 @@ Route::middleware('web')->group(function () {
         Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
         
         //favorites
-        Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->middleware('throttle:70,1')->name('favorite.toggle');
+        Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->middleware('throttle:30,1')->name('favorite.toggle');
         
         //NOTES - throttled in controller + guard API spam
         Route::resource('note', NoteController::class)->middleware('throttle:30,1');
@@ -143,7 +143,7 @@ Route::middleware('web')->group(function () {
         //ADMIN ONLY
         Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
             Route::get('/dashboard', [AdminUserController::class, 'dashboard'])->name('dashboard');
-            Route::post('/lock-registration-access', [AdminUserController::class, 'lockRegistrationAccess'])->name('lock-registration-access');
+            Route::post('/lock-registration-access', [AdminUserController::class, 'lockRegistrationAccess'])->middleware('throttle:10,1')->name('lock-registration-access');
             
             Route::get('/users', [AdminUserController::class, 'index'])->name('users');
             Route::get('/events', [AdminEventController::class, 'index'])->name('events');

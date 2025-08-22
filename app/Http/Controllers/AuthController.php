@@ -105,7 +105,7 @@ class AuthController extends Controller
         try {
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['required',  'email', new ValidEmail(), 'max:255',  'unique:'.User::class],
+                'email' => ['required', 'email:rfc,dns', 'max:255',  'unique:'.User::class],
                 'password'=> ['required', Password::min(8)->mixedCase()->numbers()],
                 'timezone' => ['string', 'nullable']
             ], [
@@ -135,10 +135,11 @@ class AuthController extends Controller
             lockAll($user->id);
             unlockFirst($user->id);
           
-            //login, hit limiter, redirect, event hits MustVerifyEmail which calls sendEmailVerificationNotification
+            //login, redirect, event hits MustVerifyEmail which calls sendEmailVerificationNotification
             event(new Registered($user));
-            $remember = $request->has('remember');
-            Auth::attempt($request->only('email', 'password'), $remember);
+            Auth::login($user, $request->boolean('remember'));
+            $request->session()->regenerate();
+            $request->session()->regenerateToken();
             RateLimiter::hit($key, $limit['decay']);
           
             // log registration

@@ -72,7 +72,10 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Blade::directive('markdown', function ($expression) {
-            return '<?php echo "<div class=\"markdown\">" . app(\League\CommonMark\CommonMarkConverter::class)->convert(' . $expression . ') . "</div>"; ?>';
+            return '<?php 
+                $content = is_string(' . $expression . ') ? ' . $expression . ' : "";
+                echo "<div class=\"markdown\">" . app(\League\CommonMark\CommonMarkConverter::class)->convert($content) . "</div>"; 
+            ?>';
         });
     }
 }

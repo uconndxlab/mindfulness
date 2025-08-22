@@ -75,6 +75,12 @@ class AccountUpdateForm extends Component
                 $user->save();
             });
 
+            // if password changed, rotate current session ID and CSRF token
+            if ($passwordChanging) {
+                request()->session()->regenerate();
+                request()->session()->regenerateToken();
+            }
+
             // Clear sensitive fields and show success
             $this->reset(['password', 'oldPass']);
             $this->formKey = uniqid();

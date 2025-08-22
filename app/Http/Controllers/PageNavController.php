@@ -509,8 +509,11 @@ class PageNavController extends Controller
 
     public function journalSearch (Request $request) {
         //get user
-        $id = Auth::id();
-        $query = Note::where('user_id', $id);
+        $user = Auth::user();
+        if (!$user) {
+            return;
+        }
+        $query = Note::where('user_id', $user->id);
 
         //check if empty
         $empty = !$query->exists();
