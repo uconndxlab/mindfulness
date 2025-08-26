@@ -1,8 +1,31 @@
 import * as pdfjsLib from 'pdfjs-dist/build/pdf.mjs';
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.mjs?worker&url';
 
-// Configure worker via URL so Vite handles it in dev and prod
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+// Configure worker based on environment
+function getWorkerSrc() {
+    if (import.meta.env.DEV) {
+        // In development, try to use the worker directly via import
+        try {
+            return new URL('pdfjs-dist/build/pdf.worker.mjs', import.meta.url).href;
+        } catch (e) {
+            console.warn('Failed to load worker via URL in dev:', e);
+        }
+    }
+    
+    // Production: look for worker in build assets
+    // Vite should copy/bundle the worker file to the build directory
+    return '/build/assets/pdf.worker.js';
+}
+
+// Set worker source with comprehensive error handling
+try {
+    const workerSrc = getWorkerSrc();
+    console.log('Setting PDF.js worker source to:', workerSrc);
+    pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+} catch (error) {
+    console.error('Failed to configure PDF.js worker:', error);
+    // Let PDF.js handle worker creation internally (may show warnings but should work)
+    pdfjsLib.GlobalWorkerOptions.workerSrc = null;
+}
 
 function renderPdfInto(container, pdfUrl) {
     return pdfjsLib.getDocument(pdfUrl).promise.then(async (pdfDoc) => {
