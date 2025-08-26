@@ -1,30 +1,32 @@
 import * as pdfjsLib from 'pdfjs-dist/build/pdf.mjs';
 
-// Configure worker based on environment
-function getWorkerSrc() {
+const getWorkerSrc = () => {
     if (import.meta.env.DEV) {
-        // In development, try to use the worker directly via import
-        try {
-            return new URL('pdfjs-dist/build/pdf.worker.mjs', import.meta.url).href;
-        } catch (e) {
-            console.warn('Failed to load worker via URL in dev:', e);
-        }
+        // dev - use worker from node_modules
+        return new URL('pdfjs-dist/build/pdf.worker.mjs', import.meta.url).href;
     }
     
-    // Production: look for worker in build assets
-    // Vite should copy/bundle the worker file to the build directory
+    // prod - use copied worker file
     return '/build/assets/pdf.worker.js';
-}
+};
 
-// Set worker source with comprehensive error handling
-try {
-    const workerSrc = getWorkerSrc();
-    console.log('Setting PDF.js worker source to:', workerSrc);
-    pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
-} catch (error) {
-    console.error('Failed to configure PDF.js worker:', error);
-    // Let PDF.js handle worker creation internally (may show warnings but should work)
-    pdfjsLib.GlobalWorkerOptions.workerSrc = null;
+// set worker source
+pdfjsLib.GlobalWorkerOptions.workerSrc = getWorkerSrc();
+
+function showPdfError(container, message) {
+    const template = document.getElementById('pdfErrorTemplate');
+    if (!template) {
+        container.innerHTML = `<div class="alert alert-danger" role="alert">${message}</div>`;
+        return;
+    }
+    const errorElement = template.content.cloneNode(true);
+    
+    const messageElement = errorElement.querySelector('.pdf-error-message');
+    if (messageElement) {
+        messageElement.textContent = message;
+    }
+    container.innerHTML = '';
+    container.appendChild(errorElement);
 }
 
 function renderPdfInto(container, pdfUrl) {
@@ -47,6 +49,23 @@ function renderPdfInto(container, pdfUrl) {
             const renderContext = { canvasContext: context, viewport };
             await page.render(renderContext).promise;
         }
+    }).catch((error) => {
+        console.error('PDF rendering error:', error);
+        
+        let errorMessage = 'Unable to display PDF document.';
+        
+        if (error.message.includes('Setting up fake worker failed') || 
+            error.message.includes('worker') || 
+            error.message.includes('setup')) {
+            errorMessage = 'PDF viewer is temporarily unavailable. Please try refreshing the page.';
+        } else if (error.message.includes('Invalid PDF')) {
+            errorMessage = 'The PDF file appears to be corrupted or invalid.';
+        } else if (error.message.includes('Missing PDF')) {
+            errorMessage = 'The requested PDF file could not be found.';
+        }
+        
+        showPdfError(container, errorMessage);
+        throw error;
     });
 }
 
@@ -55,10 +74,13 @@ function initPdfViewer() {
     if (!container) return;
 
     const pdfUrl = container.getAttribute('data-pdf-url');
-    if (!pdfUrl) return;
+    if (!pdfUrl) {
+        showPdfError(container, 'No PDF file specified.');
+        return;
+    }
 
     renderPdfInto(container, pdfUrl).catch((e) => {
-        console.error('Error loading PDF:', e);
+        showPdfError(container, 'Unable to display PDF document.');
     });
 }
 

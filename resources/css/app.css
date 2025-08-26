@@ -1169,3 +1169,44 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 .faq-body {
     padding: 10px 20px !important;
 }
+
+/* PDF Viewer Error Styles */
+.pdf-error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    padding: 2rem;
+    background-color: var(--light-grey);
+    border: 2px dashed var(--dark-grey);
+    border-radius: 8px;
+    text-align: center;
+    color: #6c757d;
+}
+
+.pdf-error-content {
+    max-width: 400px;
+}
+
+.pdf-error-icon {
+    margin-bottom: 1rem;
+}
+
+.pdf-error-icon i {
+    font-size: 3rem;
+    color: #dc3545;
+}
+
+.pdf-error-title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    color: #495057;
+    font-weight: 600;
+}
+
+.pdf-error-message {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}

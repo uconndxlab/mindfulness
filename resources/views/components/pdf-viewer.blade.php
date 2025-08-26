@@ -16,6 +16,17 @@
             </div>
             <div id="pdfModalBody" class="modal-body">
                 <div id="pdfContainer" class="pdf-container" data-pdf-url="{{ $fpath }}"></div>
+                <template id="pdfErrorTemplate">
+                    <div class="pdf-error-container">
+                        <div class="pdf-error-content">
+                            <div class="pdf-error-icon">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <h3 class="pdf-error-title">PDF Loading Error</h3>
+                            <p class="pdf-error-message"></p>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
