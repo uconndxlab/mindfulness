@@ -15,7 +15,6 @@ function initActivityPage() {
 
     const redirectDiv = document.getElementById('redirect_div');
     const compLateBtn = document.getElementById('complete-later');
-    let allowSeek = status === 'completed';
     let completed = false;
     let type = null;
 
@@ -142,12 +141,12 @@ function initActivityPage() {
                     }
                 }
             } else {
-                // audio content path
-                const audioContent = document.getElementById('audio_content');
-                if (audioContent) {
-                    const audioPlayer = audioContent.querySelector('.slide__audio-player');
-                    if (audioPlayer) audioPlayer.addEventListener('ended', activityComplete);
-                }
+                // handle all audio players (both in audio_content and main content area)
+                const audioPlayers = document.querySelectorAll('.slide__audio-player');
+                audioPlayers.forEach(player => {
+                    console.log('Adding completion listener to audio player');
+                    player.addEventListener('ended', activityComplete);
+                });
             }
         } else if (hasQuiz) {
             console.log('Type: quiz');
@@ -195,51 +194,6 @@ function initActivityPage() {
         console.log('Page hidden');
         const duration = performance.now() - lastFocusTimestamp;
         logInteraction('exited', duration);
-    });
-
-    // No-seek enforcement for audio/video
-    const mediaPlayers = document.querySelectorAll('.slide__audio-player, .video-player');
-    mediaPlayers.forEach((player) => {
-        const timeTracking = { watchedTime: allowSeek ? (player.duration || 0) : 0, currentTime: 0 };
-        let isSeeking = false;
-        let endedListener;
-        const MAX_DELTA = 1;
-
-        player.addEventListener('timeupdate', function () {
-            if (!isSeeking && !player.seeking || allowSeek) {
-                const delta = player.currentTime - timeTracking.watchedTime;
-                if (delta <= MAX_DELTA && delta >= 0) {
-                    timeTracking.watchedTime = player.currentTime;
-                } else {
-                    timeTracking.currentTime = player.currentTime;
-                }
-            }
-        });
-
-        player.addEventListener('seeking', function () {
-            isSeeking = true;
-            const delta = player.currentTime - timeTracking.watchedTime;
-            if (delta > 0) {
-                if (endedListener) player.removeEventListener('ended', endedListener);
-                player.pause();
-                player.currentTime = timeTracking.watchedTime;
-                player.play().catch(() => {});
-            }
-        });
-
-        player.addEventListener('seeked', function () {
-            isSeeking = false;
-        });
-
-        endedListener = function () {
-            console.log('Media ended');
-            if (timeTracking.watchedTime < player.duration) {
-                console.log('Blocked seek spam');
-            }
-            activityComplete();
-        };
-        console.log('adding media end listener');
-        player.addEventListener('ended', endedListener);
     });
 
     // Page unload warning for progress

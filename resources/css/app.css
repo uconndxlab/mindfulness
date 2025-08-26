@@ -706,14 +706,23 @@ color:#000!important;
     visibility: hidden;
 }
 
+.slide__audio #watched-progress {
+	stroke: var(--dark-green);
+	stroke-width: 4;
+    visibility: hidden;
+    opacity: 0.7;
+}
+
 /* handling state classes */
-.slide__audio #seekbar,.slide__audio #track {
+.slide__audio #seekbar,.slide__audio #track,.slide__audio #watched-progress {
     pointer-events: none;
 }
 .slide__audio.playing #seekbar,
+.slide__audio.playing #watched-progress,
 .slide__audio.playing.allow-seek #track,
 .slide__audio.playing #audio-handle,
 .slide__audio.played #seekbar,
+.slide__audio.played #watched-progress,
 .slide__audio.played.allow-seek #track,
 .slide__audio.played #audio-handle { 
     pointer-events: auto; cursor: pointer; visibility: visible;

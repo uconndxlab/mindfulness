@@ -31,6 +31,7 @@ async function initSlideAudioPlayers() {
 
         const circle = playerEl.querySelector('#seekbar');
         const circlePath = circle ? circle : null;
+        const watchedPath = playerEl.querySelector('#watched-progress');
         const svgEl = playerEl.querySelector('svg#circle');
 
         // Initialize progress arc defaults so stroke-dashoffset works
@@ -43,6 +44,13 @@ async function initSlideAudioPlayers() {
             if (totalLength > 0) {
                 ringRadiusFromLength = totalLength / (2 * Math.PI);
             }
+        }
+        
+        // initialize watched progress arc
+        if (watchedPath && watchedPath.getTotalLength) {
+            const watchedLength = watchedPath.getTotalLength();
+            watchedPath.setAttribute('stroke-dasharray', String(watchedLength));
+            watchedPath.setAttribute('stroke-dashoffset', String(watchedLength));
         }
 
         // svg handle
@@ -90,7 +98,7 @@ async function initSlideAudioPlayers() {
             if (!circlePath) return;
             const hasDuration = Number.isFinite(duration) && duration > 0;
 
-            // Update progress arc
+            // update current position arc (seekbar)
             if (!hasDuration) {
                 if (totalLength) circlePath.setAttribute('stroke-dashoffset', String(totalLength));
             } else {
@@ -115,6 +123,17 @@ async function initSlideAudioPlayers() {
                         handleCircle.setAttribute('cy', String(cy));
                     }
                 }
+            }
+
+            // update watched progress arc
+            if (watchedPath && hasDuration) {
+                const watchedPercent = Math.max(0, Math.min(100, (watchedTime / duration) * 100));
+                const watchedLength = watchedPath.getTotalLength ? watchedPath.getTotalLength() : totalLength;
+                const watchedDash = watchedLength ? (watchedLength - (watchedPercent / 100) * watchedLength) : 0;
+                watchedPath.setAttribute('stroke-dashoffset', String(watchedDash));
+            } else if (watchedPath) {
+                const watchedLength = watchedPath.getTotalLength ? watchedPath.getTotalLength() : totalLength;
+                if (watchedLength) watchedPath.setAttribute('stroke-dashoffset', String(watchedLength));
             }
         }
 
@@ -153,11 +172,15 @@ async function initSlideAudioPlayers() {
                 if (!Number.isFinite(duration) || duration <= 0) return;
                 const desiredPercent = percentFromClientPoint(e.clientX, e.clientY);
                 let targetTime = (desiredPercent * duration) / 100;
+                
                 if (!allowSeek && typeof watchedTime !== 'undefined' && targetTime > watchedTime) {
+                    // stop user time change if they are within 0.15 seconds of the watched time limit
+                    if (Math.abs(audioEl.currentTime - watchedTime) < 0.25) {
+                        return;
+                    }
                     targetTime = watchedTime;
                 }
                 audioEl.currentTime = Math.max(0, Math.min(duration, targetTime));
-                // Immediately reflect in UI for responsiveness
                 updatePlayerUI(audioEl.currentTime, duration);
             }
 
@@ -241,7 +264,11 @@ async function initSlideAudioPlayers() {
             const currentTime = audioEl.currentTime;
             const duration = audioEl.duration;
             updatePlayerUI(currentTime, duration);
-            if (currentTime > watchedTime) watchedTime = currentTime;
+            
+            // updating watched time for seeking enforcement
+            if (!audioEl.seeking && currentTime > watchedTime) {
+                watchedTime = currentTime;
+            }
         });
 
         audioEl.addEventListener('ended', () => {
@@ -249,15 +276,35 @@ async function initSlideAudioPlayers() {
             playerEl.classList.remove('playing');
             const icon = playerEl.querySelector('#icon');
             if (icon) { icon.classList.remove('bi-pause'); icon.classList.add('bi-play'); }
+            
             // reset ui
             updatePlayerUI(0, 0);
-            if (typeof window.activityComplete === 'function') {
-                try { window.activityComplete(); } catch (_) {}
-            }
         });
 
+        audioEl.addEventListener('seeking', () => {
+            // only limit when allowSeek is false
+            if (allowSeek) return;
+            
+            // limit user if they try to seek beyond their watched progress
+            if (audioEl.currentTime > watchedTime) {
+                const wasPlaying = !audioEl.paused;
+                audioEl.pause();
+                audioEl.currentTime = watchedTime;
+                if (wasPlaying) {
+                    audioEl.play().catch(() => {});
+                }
+            }
+        });
+        
         audioEl.addEventListener('seeked', () => updatePlayerUI(audioEl.currentTime, audioEl.duration));
-        audioEl.addEventListener('loadedmetadata', () => updatePlayerUI(audioEl.currentTime, audioEl.duration));
+        
+        audioEl.addEventListener('loadedmetadata', () => {
+            // if seeking allowed, user can seek anywhere
+            if (allowSeek && audioEl.duration) {
+                watchedTime = audioEl.duration;
+            }
+            updatePlayerUI(audioEl.currentTime, audioEl.duration);
+        });
 
         updatePlayerUI(0, 0);
     });
