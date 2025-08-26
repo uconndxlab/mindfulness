@@ -1,6 +1,6 @@
 @if (!isset($notes) || $notes->isEmpty())
     <div class="text-left muted">
-        @markdown(is_string($empty_text ?? null) ? $empty_text : 'No matching notes found.')
+        <span>Continue progressing to find a Journal activity, or write your first journal in the <a href="/journal">Journal</a> tab.</span>
     </div>
 @else
     @foreach ($notes as $index => $note)

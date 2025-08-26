@@ -29,10 +29,20 @@
             </a>
             <i class="bi bi-arrow-right"></i>
         </div>
-    @elseif (isset($empty_text))
-        <div class="text-left muted">
-            @markdown(is_string($empty_text ?? null) ? $empty_text : '')
-        </div>
+    @elseif (isset($empty_page))
+        @if ($empty_page == 'main')
+            <div class="text-left muted">
+                <p>Keep progressing to unlock more exercises...</p>
+            </div>
+        @elseif ($empty_page == 'favorited')
+            <div class="text-left muted">
+                <span>Click the "<i class="bi bi-star"></i>" found in activities to add them to your favorites and view them here!</span>
+            </div>
+        @else
+            <div class="text-left muted">
+                <p>No results found.</p>
+            </div>
+        @endif
     @endif
 @else
     <div class="row mb-3 justify-content-center">

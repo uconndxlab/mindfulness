@@ -155,7 +155,7 @@ class PageNavController extends Controller
                 if ($lastCompletionLocal->isSameDay($now) || $lastCompletionLocal->diffInHours($now) < 2) {
                     return response()->json(['locked' => true, 'modalContent' => [
                         'label' => 'You are progressing fast!',
-                        'body' => 'It appears you have already completed <strong>'.$last_day_name.'</strong> today. '.
+                        'body' => 'It appears you have already completed **'.$last_day_name.'** today. '.
                             'While your efforts are admirable, we recommend you take your time through this program and take it one day at a time. '.
                             'How about repeating your favorite activity?',
                         'route' => route('explore.activity.bypass', ['activity_id' => $activity->id]),
@@ -338,22 +338,22 @@ class PageNavController extends Controller
         $rand_query = $user->unlockedActivities();
         
         //base param
-        $empty_text = null;
+        $empty_page = null;
         if ($request->base_param) {
             if ($request->base_param == 'main') {
-                $empty_text = 'Keep progressing to unlock more exercises...';
+                $empty_page = 'main';
             }
             else if ($request->base_param == 'favorited') {
                 $query = $user->favoritedActivities();
                 $rand_query = $user->favoritedActivities();
-                $empty_text = '<span>Click the "<i class="bi bi-star"></i>" found in activities to add them to your favorites and view them here!</span>';
+                $empty_page = 'favorited';
             }
         }
 
         //check if empty
         $empty = !$query->exists();
         if ($empty) {
-            $view = view('components.search-results', ['empty_text' => $empty_text])->render();
+            $view = view('components.search-results', ['empty_page' => $empty_page])->render();
             return response()->json(['html' => $view, 'empty' => true]);
         }
 
@@ -517,7 +517,7 @@ class PageNavController extends Controller
         //check if empty
         $empty = !$query->exists();
         if ($empty) {
-            $view = view('components.journal-search-results', ['empty_text' => '<span>Continue progressing to find a Journal activity, or write your first journal in the <a href="/journal">Journal</a> tab.</span>'])->render();
+            $view = view('components.journal-search-results')->render();
             return response()->json(['html' => $view]);
         }
 
