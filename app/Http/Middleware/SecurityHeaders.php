@@ -8,6 +8,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SecurityHeaders
 {
+    // keep track of routes that use livewire and conditionally add 'unsafe-eval'
+    private const LIVEWIRE_ROUTES = [
+        'admin.users',
+        'admin.events', 
+        'account',
+        'help'
+    ];
+
     /**
      * Handle an incoming request.
      *
@@ -29,7 +37,7 @@ class SecurityHeaders
         $this->setSecurityHeaders($response, $isProd);
         
         // CSP
-        $this->setContentSecurityPolicy($response, $nonce, $isProd);
+        $this->setContentSecurityPolicy($response, $request, $nonce, $isProd);
         
         // Additional security headers for production
         if ($isProd) {
@@ -86,14 +94,14 @@ class SecurityHeaders
     /**
      * Set Content Security Policy
      */
-    private function setContentSecurityPolicy(Response $response, string $nonce, bool $isProd): void
+    private function setContentSecurityPolicy(Response $response, Request $request, string $nonce, bool $isProd): void
     {
         $viteHosts = $this->getViteHosts($isProd);
         
         // CSP directives
         $directives = [
             'default-src' => ["'self'"],
-            'script-src' => $this->getScriptSrc($nonce, $viteHosts, $isProd),
+            'script-src' => $this->getScriptSrc($request, $nonce, $viteHosts, $isProd),
             'style-src' => $this->getStyleSrc($nonce, $viteHosts, $isProd),
             'img-src' => $this->getImgSrc($isProd),
             'font-src' => $this->getFontSrc($viteHosts, $isProd),
@@ -162,10 +170,16 @@ class SecurityHeaders
     /**
      * Get script-src directive
      */
-    private function getScriptSrc(string $nonce, array $viteHosts, bool $isProd): array
+    private function getScriptSrc(Request $request, string $nonce, array $viteHosts, bool $isProd): array
     {
         // 'unsafe-eval' is required for Livewire (required for Alpine.js expressions)
-        $sources = ["'self'", "'nonce-{$nonce}'", "'unsafe-eval'"];
+        $sources = ["'self'"];
+
+        // 'unsafe-eval' and nonce for livewire (required for Alpine.js)
+        if (in_array($request->route()->getName(), self::LIVEWIRE_ROUTES)) {
+            $sources[] = "'unsafe-eval'";
+            $sources[] = "'nonce-{$nonce}'";
+        }
         
         // vite hosts included in development
         if (!$isProd) {
@@ -198,7 +212,7 @@ class SecurityHeaders
     private function getImgSrc(bool $isProd): array
     {
         $sources = ["'self'", 'data:'];
-        // removed data and blob, if issues can be added back
+        // removed blob, if issues can be added back
         // $sources[] = 'blob:';
 
         // image CDNS in prod
