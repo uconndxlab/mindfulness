@@ -278,6 +278,7 @@ async function initSlideAudioPlayers() {
             if (icon) { icon.classList.remove('bi-pause'); icon.classList.add('bi-play'); }
             
             // reset ui
+            watchedTime = 0;
             updatePlayerUI(0, 0);
         });
 
