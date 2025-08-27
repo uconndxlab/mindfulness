@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Events\BonusUnlocked;
+use App\Events\DayCompleted;
 use App\Models\Activity;
 use App\Models\Day;
 use App\Models\Module;
@@ -136,6 +136,8 @@ class ProgressService
             ],
         ]);
         $result['day_completed'] = true;
+        // fire day completion event
+        event(new DayCompleted($day->id));
         // log day completion
         activity('day')
             ->event('day_completed')
@@ -153,8 +155,6 @@ class ProgressService
             ->get();
         if ($optional->count() > 0) {
             $result['optional_unlocked'] = true;
-            // fire bonus event
-            event(new BonusUnlocked($day));
             foreach ($optional as $opt) {
                 $user->activities()->syncWithoutDetaching([
                     $opt->id => [

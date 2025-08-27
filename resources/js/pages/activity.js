@@ -10,8 +10,6 @@ function initActivityPage() {
     const favoriteToggleRoute = root.getAttribute('data-favorite-toggle-route') || '/favorite/toggle';
     const logInteractionRoute = root.getAttribute('data-log-interaction-route') || '/activities/log-interaction';
     const skipRoute = root.getAttribute('data-skip-route') || `/activities/${activityId}/skip`;
-    const dayCompletionMessage = root.getAttribute('data-day-completion-message') || '';
-    const dayCompletionMedia = root.getAttribute('data-day-completion-media') || '';
 
     const redirectDiv = document.getElementById('redirect_div');
     const compLateBtn = document.getElementById('complete-later');
@@ -48,14 +46,6 @@ function initActivityPage() {
                     if (data.redirect_url) {
                         window.location.href = data.redirect_url;
                         return;
-                    }
-                    if (data.day_completed && window.showModal) {
-                        window.showModal({
-                            label: 'Day Completed',
-                            body: (data.day_completion_message || dayCompletionMessage || ''),
-                            media: (data.day_completion_media || dayCompletionMedia || null),
-                            route: null
-                        });
                     }
                     if (type === 'image') {
                         const completeButton = document.getElementById('img_complete_activity');

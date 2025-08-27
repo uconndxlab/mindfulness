@@ -2,9 +2,7 @@
 
 namespace App\Providers;
 
-use App\Events\FinalActivityCompleted;
 use App\Http\Middleware\AdminOnly;
-use App\Listeners\ShowCompletionModal;
 use App\Models\Module;
 use App\Observers\ModuleObserver;
 use App\Services\ProgressService;
@@ -48,11 +46,6 @@ class AppServiceProvider extends ServiceProvider
         Livewire::addPersistentMiddleware([
             AdminOnly::class,
         ]);
-        
-        Event::listen(
-            FinalActivityCompleted::class,
-            [ShowCompletionModal::class, 'handle']
-        );
 
         Auth::extend('custom-session', function ($app, $name, array $config) {
             $provider = Auth::createUserProvider($config['provider']);

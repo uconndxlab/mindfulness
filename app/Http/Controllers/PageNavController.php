@@ -155,9 +155,9 @@ class PageNavController extends Controller
                 if ($lastCompletionLocal->isSameDay($now) || $lastCompletionLocal->diffInHours($now) < 2) {
                     return response()->json(['locked' => true, 'modalContent' => [
                         'label' => 'You are progressing fast!',
-                        'body' => 'It appears you have already completed **'.$last_day_name.'** today. '.
+                        'body' => (string) app(\League\CommonMark\CommonMarkConverter::class)->convert('It appears you have already completed **'.$last_day_name.'** today. '.
                             'While your efforts are admirable, we recommend you take your time through this program and take it one day at a time. '.
-                            'How about repeating your favorite activity?',
+                            'How about repeating your favorite activity?'),
                         'route' => route('explore.activity.bypass', ['activity_id' => $activity->id]),
                         'method' => 'GET',
                         'buttonLabel' => 'No, go to the next module',

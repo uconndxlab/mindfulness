@@ -913,6 +913,7 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     border-radius: 4px;
 }
 
+/* modal */
 @media (min-width: 768px) {
     .modal-xl {
         max-width: 80%;
@@ -933,6 +934,15 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     overflow: hidden;
     padding-right: 0px !important;
 }
+
+.modal-content img {
+    max-width: 300px;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+/* end modal */
 
 .feedback-div .text-info {
     color:var(--darker-green)!important;
