@@ -36,12 +36,6 @@
                         Event Log
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/cms">
-                        <i class="bi bi-pencil-square me-2"></i>
-                        CMS
-                    </a>
-                </li>
             </ul>
         </div>
     </div>

@@ -106,8 +106,8 @@ class SecurityHeaders
             'default-src' => ["'self'"],
             'script-src' => $this->getScriptSrc($request, $nonce, $viteHosts, $isProd),
             'style-src' => $this->getStyleSrc($request, $nonce, $viteHosts, $isProd),
-            'img-src' => $this->getImgSrc($request, $isProd),
-            'font-src' => $this->getFontSrc($request, $viteHosts, $isProd),
+            'img-src' => $this->getImgSrc($isProd),
+            'font-src' => $this->getFontSrc($viteHosts, $isProd),
             'connect-src' => $this->getConnectSrc($viteHosts, $isProd),
             'worker-src' => $this->getWorkerSrc($viteHosts, $isProd),
             'media-src' => $this->getMediaSrc($isProd),
@@ -185,12 +185,6 @@ class SecurityHeaders
             $sources[] = "'unsafe-eval'";
             $sources[] = "'nonce-{$nonce}'";
         }
-
-        // Filament disabled - no special handling needed
-        // if (str_contains($routeName, 'filament.admin-cms') || str_starts_with($request->getPathInfo(), '/admin/cms')) {
-        //     $sources[] = "'unsafe-eval'";       // required for alipine.js
-        //     $sources[] = "'unsafe-inline'";     // nonce does not work here
-        // }
         
         // vite hosts included in development
         if (!$isProd) {
@@ -209,15 +203,10 @@ class SecurityHeaders
 
         $routeName = $request->route()?->getName() ?? '';
 
-        // Filament disabled - always use nonce for better security
-        $sources[] = "'nonce-{$nonce}'";
-        
-        // if (str_contains($routeName, 'filament.admin-cms') || str_starts_with($request->getPathInfo(), '/admin/cms')) {
-        //     // nonce does not work here
-        //     $sources[] = "'unsafe-inline'";
-        //     // Add Bunny Fonts for Filament
-        //     $sources[] = 'fonts.bunny.net';
-        // }
+        // nonce for livewire (required for Alpine.js)
+        if (in_array($routeName, self::LIVEWIRE_ROUTES)) {
+            $sources[] = "'nonce-{$nonce}'";
+        }
         
         // vite hosts included in development
         if (!$isProd) {
@@ -230,17 +219,11 @@ class SecurityHeaders
     /**
      * Get img-src directive
      */
-    private function getImgSrc(Request $request, bool $isProd): array
+    private function getImgSrc(bool $isProd): array
     {
         $sources = ["'self'", 'data:'];
-
-        // Filament disabled - no external image services needed
-        // $routeName = $request->route()?->getName() ?? '';
-        // if (str_contains($routeName, 'filament.admin-cms') || str_starts_with($request->getPathInfo(), '/admin/cms')) {
-        //     // Allow UI Avatars service used by Filament
-        //     $sources[] = 'ui-avatars.com';
-        //     $sources[] = 'https://ui-avatars.com';
-        // }
+        // removed blob, if issues can be added back
+        // $sources[] = 'blob:';
 
         // image CDNS in prod
         if ($isProd) {
@@ -253,19 +236,11 @@ class SecurityHeaders
     /**
      * Get font-src directive
      */
-    private function getFontSrc(Request $request, array $viteHosts, bool $isProd): array
+    private function getFontSrc(array $viteHosts, bool $isProd): array
     {
         $sources = ["'self'"];
         // removed data, if issues can be added back
         // $sources[] = 'data:';
-        
-        // Filament disabled - no external font services needed
-        // $routeName = $request->route()?->getName() ?? '';
-        // if (str_contains($routeName, 'filament.admin-cms') || str_starts_with($request->getPathInfo(), '/admin/cms')) {
-        //     // Allow Bunny Fonts for Filament
-        //     $sources[] = 'fonts.bunny.net';
-        //     $sources[] = 'https://fonts.bunny.net';
-        // }
         
         // add vite hosts
         if (!$isProd) {
