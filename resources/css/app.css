@@ -1041,9 +1041,10 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 }
 
 /* noUiSlider bubble */
-.slider-bubble {
+.slider-container div .slider-bubble {
     position: absolute;
-    top: -35px;
+    left:50%;
+    top: -30px;
     transform: translateX(-50%);
     background: var(--dark-green);
     color: #fff;
@@ -1052,7 +1053,7 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     font-size: 14px;
     z-index: 10;
     pointer-events: none;
-    transition: transform 0.2s ease;
+    transition: left 0.1s;
     cursor: pointer !important;
 }
 
