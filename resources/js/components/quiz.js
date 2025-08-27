@@ -182,7 +182,7 @@ function initQuiz() {
                 if (activeHandle && bubble && isUserInteracting) {
                     const handleRect = activeHandle.getBoundingClientRect();
                     const left = handleRect.left + handleRect.width/2 - sliderRect.left;
-                    bubble.style.left = left + 'px';
+                    bubble.style.transform = `translateX(${left}px) translateX(-50%)`;
                     bubble.textContent = value + '%';
                     bubble.classList.remove('d-none');
                 }

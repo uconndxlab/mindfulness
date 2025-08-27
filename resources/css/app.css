@@ -1043,7 +1043,6 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 /* noUiSlider bubble */
 .slider-container div .slider-bubble {
     position: absolute;
-    left:50%;
     top: -30px;
     transform: translateX(-50%);
     background: var(--dark-green);
@@ -1053,7 +1052,7 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     font-size: 14px;
     z-index: 10;
     pointer-events: none;
-    transition: left 0.1s;
+    transition: transform 0.15s ease-out;
     cursor: pointer !important;
 }
 
