@@ -1,0 +1,218 @@
+import QuizRadioQuestion from './questions/QuizRadioQuestion.js';
+import QuizCheckboxQuestion from './questions/QuizCheckboxQuestion.js';
+import QuizSliderQuestion from './questions/QuizSliderQuestion.js';
+
+/**
+ * QuizController - handle quiz logic and navigation
+ * Question components handle their own logic
+ */
+class QuizController {
+    constructor() {
+        this.quizForm = document.getElementById('quizForm');
+        if (!this.quizForm) return;
+
+        console.log('Initializing quiz...');
+        
+        this.questionNumber = 1;
+        this.quizId = parseInt(this.quizForm.getAttribute('data-quiz-id') || '0', 10);
+        this.questionCount = parseInt(this.quizForm.getAttribute('data-question-count') || '1', 10);
+        this.answerSet = new Set();
+        const answersJson = this.quizForm.getAttribute('data-answers');
+        this.answers = answersJson ? JSON.parse(answersJson) : {};
+
+        // nav buttons
+        this.prevQBtn = document.getElementById('prev_q_button');
+        this.nextQBtn = document.getElementById('next_q_button');
+        this.submitBtn = document.getElementById('submitButton');
+        
+        // Map to store question components
+        this.questionComponents = new Map();
+
+        this.init();
+    }
+
+    init() {
+        // init submission handler
+        this.quizForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            console.log('submitting');
+            this.submitAnswers();
+        });
+
+        // init nav buttons
+        if (this.prevQBtn) this.prevQBtn.addEventListener('click', () => { this.changeQuestion(this.questionNumber - 1); });
+        if (this.nextQBtn) this.nextQBtn.addEventListener('click', () => { this.changeQuestion(this.questionNumber + 1); });
+
+        // init question components
+        this.initializeQuestionComponents();
+        
+        // load answers and show initial question
+        this.populateForm(this.answers);
+        this.changeQuestion(this.questionNumber);
+    }
+
+    initializeQuestionComponents() {
+        const questionDivs = this.quizForm.querySelectorAll('.quiz-div');
+        
+        questionDivs.forEach(questionDiv => {
+            const questionNumber = parseInt(questionDiv.getAttribute('data-number'));
+            const questionType = questionDiv.getAttribute('data-type');
+            
+            let questionComponent;
+            
+            // init component based on type
+            if (questionType === 'radio') {
+                questionComponent = new QuizRadioQuestion(
+                    questionDiv, 
+                    questionNumber, 
+                    (qNum, isAnswered) => this.onQuestionAnswerChange(qNum, isAnswered)
+                );
+            } else if (questionType === 'checkbox') {
+                questionComponent = new QuizCheckboxQuestion(
+                    questionDiv, 
+                    questionNumber, 
+                    (qNum, isAnswered) => this.onQuestionAnswerChange(qNum, isAnswered)
+                );
+            } else if (questionType === 'slider') {
+                questionComponent = new QuizSliderQuestion(
+                    questionDiv, 
+                    questionNumber, 
+                    (qNum, isAnswered) => this.onQuestionAnswerChange(qNum, isAnswered)
+                );
+            }
+            
+            if (questionComponent) {
+                // add to map
+                this.questionComponents.set(questionNumber, questionComponent);
+                console.log(`Initialized ${questionType} question ${questionNumber}`);
+            }
+        });
+    }
+
+    // populate the components with the answers
+    populateForm(answers) {
+        // answer format = { "1": [{"1": null}, {"6": "other text"}], "2": [{"3": null}], "3": [92], "4": [0] }
+        console.log(`Populating form with answers: ${answers}`);
+        for (const [questionNumber, answerArray] of Object.entries(answers)) {
+            const questionComponent = this.questionComponents.get(parseInt(questionNumber));
+            
+            if (questionComponent && Array.isArray(answerArray)) {
+                // component knows how to handle its own answer array
+                questionComponent.setValue(answerArray);
+            }
+        }
+    }
+
+    // callback for answer change
+    onQuestionAnswerChange(questionNumber, isAnswered) {
+        console.log(`Question ${questionNumber} answer changed. Answered: ${isAnswered}`);
+        
+        // update nav buttons if on current question - should always be the case
+        if (questionNumber === this.questionNumber) {
+            // nav checks for answer again anyway
+            this.updateNavigationButtons();
+        }
+    }
+
+    // check if current question is answered
+    isCurrentQuestionAnswered() {
+        const questionComponent = this.questionComponents.get(this.questionNumber);
+        return questionComponent ? questionComponent.isAnswered() : false;
+    }
+
+    // update nav based on current question state
+    updateNavigationButtons() {
+        const isAnswered = this.isCurrentQuestionAnswered();
+        const isFirstQuestion = this.questionNumber === 1;
+        const isLastQuestion = this.questionNumber === this.questionCount;
+
+        if (isFirstQuestion) {
+            this.prevQBtn?.classList.add('invisible');
+            this.prevQBtn?.setAttribute('disabled', '');
+        }
+        else {
+            this.prevQBtn?.removeAttribute('disabled', '');
+            this.prevQBtn?.classList.remove('invisible');
+        }
+
+        if (isLastQuestion) {
+            this.nextQBtn?.classList.add('d-none');
+            this.submitBtn?.classList.remove('d-none');
+        }
+        else {
+            this.submitBtn?.classList.add('d-none');
+            this.nextQBtn?.classList.remove('d-none');
+        }
+
+        const endBtn = isLastQuestion ? this.submitBtn : this.nextQBtn;
+        if (isAnswered) {
+            endBtn?.removeAttribute('disabled');
+        }
+        else {
+            endBtn?.setAttribute('disabled', '');
+        }
+    }
+    
+    changeQuestion(q_no) {
+        console.log('Question No.: ' + q_no);
+        this.questionNumber = q_no;
+
+        // iterate through question count
+        for (let currentNumber = 1; currentNumber <= this.questionCount; currentNumber++) {
+            const qDiv = document.getElementById('question_' + currentNumber);
+            if (window.pauseAllAudio) window.pauseAllAudio();
+
+            // show current question, hide others
+            if (currentNumber === this.questionNumber) {
+                qDiv.classList.remove('d-none');
+            } else {
+                qDiv.classList.add('d-none');
+            }
+        }
+
+        // update nav buttons
+        this.updateNavigationButtons();
+    }
+
+    submitAnswers() {
+        const newFormatAnswers = this.collectAnswers();
+        if (this.submitBtn) {
+            this.submitBtn.blur();
+        }
+        
+        // create formdata
+        const formData = new FormData();
+        formData.append('quiz_id', this.quizId);
+        formData.append('answers', JSON.stringify(newFormatAnswers));
+        
+        return new Promise((resolve, reject) => {
+            window.axios.post('/quiz/' + this.quizId, formData)
+                .then(response => {
+                    console.log('Answers submitted!');
+                    if (window.activityComplete) window.activityComplete();
+                    resolve(true);
+                })
+                .catch(error => {
+                    console.error('Error submitting answers: ', error);
+                    const errorMessages = error.response?.data?.error_message || 'An unknown error occurred.';
+                    if (window.showError) window.showError(errorMessages);
+                    reject(false);
+                });
+        });
+    }
+
+    collectAnswers() {
+        const answers = {};
+        
+        // get answers from each component
+        for (const [questionNumber, component] of this.questionComponents) {
+            if (component.isAnswered()) {
+                answers[questionNumber] = component.getValue();
+            }
+        }
+        
+        return answers;
+    }
+}
+
+export default QuizController;

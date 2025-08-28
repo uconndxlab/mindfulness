@@ -5,9 +5,9 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function pauseAllAudio() {
-    const audios = document.querySelectorAll('audio');
-    audios.forEach((audio) => audio.pause());
+    document.querySelectorAll('audio').forEach(audio => { try { audio.pause(); } catch (_) {} });
 }
+if (!window.pauseAllAudio) window.pauseAllAudio = pauseAllAudio;
 
 // Logout handling
 const logoutBtn = document.getElementById('logoutBtn');

@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (document.getElementById('lock_button_reg')) imports.push(import('./components/registration-lock'));
     if (document.getElementById('pdf-viewer')) imports.push(import('./components/pdf-viewer'));
     if (document.querySelector('.slide__audio.js-audio')) imports.push(import('./components/audio-player'));
-    if (document.getElementById('quizForm')) imports.push(import('./components/quiz'));
+    if (document.getElementById('quizForm')) imports.push(import('./components/quiz/index.js'));
     
     try {
         await Promise.all(imports);

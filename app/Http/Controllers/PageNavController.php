@@ -234,9 +234,8 @@ class PageNavController extends Controller
         $quiz = $activity->quiz;
         $journal = $activity->journal;
         if ($quiz) {
-            $quiz->question_options = $quiz->question_options;
             $temp_answers = $user->quiz_answers($quiz->id)->first();
-            $quiz->answers = $temp_answers ? json_decode($temp_answers->answers) : [];
+            $quiz->answers = $temp_answers ? $temp_answers->answers : [];
         }
         //decode the audio options
         else if ($content && $content->type == 'audio' && $content->audio_options) {
@@ -281,19 +280,16 @@ class PageNavController extends Controller
             //get quiz
             $quiz = Quiz::findOrFail($request->quiz_id);
     
-            //get answers from request
-            $answers = [];
-            foreach ($request->all() as $key => $value) {
-                if (Str::startsWith($key, 'answer_') || Str::startsWith($key, 'other_answer_')) {
-                    $answers[$key] = $value;
-                }
-            }
+            // get answers
+            $answers = $request->has('answers') 
+                ? json_decode($request->answers, true)
+                : [];
     
             QuizAnswers::updateOrCreate([
                 'user_id' => Auth::id(),
                 'quiz_id' => $quiz->id
             ], [
-                'answers' => json_encode($answers)
+                'answers' => $answers
             ]);
             return response()->json(['success_message' => 'Quiz answers updated successfully.'], 200);
         }
