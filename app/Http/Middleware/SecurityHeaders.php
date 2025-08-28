@@ -105,7 +105,7 @@ class SecurityHeaders
         $directives = [
             'default-src' => ["'self'"],
             'script-src' => $this->getScriptSrc($request, $nonce, $viteHosts, $isProd),
-            'style-src' => $this->getStyleSrc($request, $nonce, $viteHosts, $isProd),
+            'style-src' => $this->getStyleSrc($nonce, $viteHosts, $isProd),
             'img-src' => $this->getImgSrc($isProd),
             'font-src' => $this->getFontSrc($viteHosts, $isProd),
             'connect-src' => $this->getConnectSrc($viteHosts, $isProd),
@@ -197,16 +197,10 @@ class SecurityHeaders
     /**
      * Get style-src directive
      */
-    private function getStyleSrc(Request $request, string $nonce, array $viteHosts, bool $isProd): array
+    private function getStyleSrc(string $nonce, array $viteHosts, bool $isProd): array
     {
-        $sources = ["'self'"];
-
-        $routeName = $request->route()?->getName() ?? '';
-
-        // nonce for livewire (required for Alpine.js)
-        if (in_array($routeName, self::LIVEWIRE_ROUTES)) {
-            $sources[] = "'nonce-{$nonce}'";
-        }
+        $sources = ["'self'", "'nonce-{$nonce}'"];
+        // nonce is required for livewire (required for Alpine.js)
         
         // vite hosts included in development
         if (!$isProd) {
