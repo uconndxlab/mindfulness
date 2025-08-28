@@ -43,11 +43,23 @@ class MigrateQuizAnswers extends Command
                 $this->line("Processing answers for Quiz #{$answerSet->quiz_id}, User #{$answerSet->user_id}...");
                 
                 $oldAnswers = $answerSet->answers;
+                
+                // Debug information
+                if ($this->getOutput()->isVerbose()) {
+                    $this->line("    📋 Raw answers type: " . gettype($oldAnswers));
+                    if (is_string($oldAnswers)) {
+                        $this->line("    📋 Raw answers string: " . substr($oldAnswers, 0, 100) . "...");
+                    }
+                }
+                
                 $newAnswers = $this->convertAnswerStructure($oldAnswers, $answerSet->quiz);
                 
                 if ($dryRun) {
                     $this->info("  ✅ Would migrate " . count($newAnswers) . " question answers");
-                    $this->showAnswerComparison($oldAnswers, $newAnswers);
+                    
+                    // Ensure oldAnswers is decoded for comparison display
+                    $decodedOldAnswers = is_string($oldAnswers) ? json_decode($oldAnswers, true) : $oldAnswers;
+                    $this->showAnswerComparison($decodedOldAnswers, $newAnswers);
                 } else {
                     $answerSet->update([
                         'answers' => $newAnswers
@@ -85,6 +97,18 @@ class MigrateQuizAnswers extends Command
     {
         $newAnswers = [];
         $otherAnswers = [];
+        
+        // Ensure we have an array to work with
+        if (is_string($oldAnswers)) {
+            $oldAnswers = json_decode($oldAnswers, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception("Invalid JSON in answers: " . json_last_error_msg());
+            }
+        }
+        
+        if (!is_array($oldAnswers)) {
+            throw new \Exception("Answers must be an array, got: " . gettype($oldAnswers));
+        }
         
         // First pass: collect regular answers and other answers
         foreach ($oldAnswers as $key => $value) {
@@ -167,16 +191,31 @@ class MigrateQuizAnswers extends Command
             $this->line("    📋 Old format: " . count($old) . " keys (" . implode(', ', array_keys($old)) . ")");
             $this->line("    📋 New format: " . count($new) . " questions");
             
-            foreach ($new as $questionNum => $answer) {
-                $summary = "Q{$questionNum}: {$answer['type']}";
-                if (isset($answer['values'])) {
-                    $summary .= " [" . implode(',', $answer['values']) . "]";
-                } else if (isset($answer['value'])) {
-                    $summary .= " = {$answer['value']}";
+            foreach ($new as $questionNum => $answerArray) {
+                $summary = "Q{$questionNum}: ";
+                
+                if (is_array($answerArray)) {
+                    $parts = [];
+                    foreach ($answerArray as $item) {
+                        if (is_array($item)) {
+                            // Option object like {"6": "other text"} or {"3": null}
+                            foreach ($item as $optionId => $otherText) {
+                                if ($otherText !== null) {
+                                    $parts[] = "option {$optionId} (+ other text)";
+                                } else {
+                                    $parts[] = "option {$optionId}";
+                                }
+                            }
+                        } else {
+                            // Simple value (slider)
+                            $parts[] = "value {$item}";
+                        }
+                    }
+                    $summary .= "[" . implode(', ', $parts) . "]";
+                } else {
+                    $summary .= "value {$answerArray}";
                 }
-                if (isset($answer['other_text'])) {
-                    $summary .= " + other text";
-                }
+                
                 $this->line("      • {$summary}");
             }
         }
