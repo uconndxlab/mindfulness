@@ -1,5 +1,5 @@
 @if (isset($quiz))
-    <form id="quizForm" method="POST" class="pt-3" data-quiz-id="{{ $quiz->id }}" data-question-count="{{ $quiz->question_count }}" data-answers='@json($quiz->answers)'>
+    <form id="quizForm" method="POST" class="pt-3" data-quiz-id="{{ $quiz->id }}" data-answers='@json($quiz->answers)'>
         @csrf
         @foreach ($quiz->question_options as $question)
             <div id="question_{{ $question['number'] }}" class="quiz-div {{ $question['number'] == 1 ? '' : 'd-none'}}" data-number="{{ $question['number'] }}" data-type="{{ $question['type'] }}" @if ($question['type'] == 'slider') data-question-json='@json($question)' @endif>

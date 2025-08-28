@@ -15,7 +15,7 @@ class QuizController {
         
         this.questionNumber = 1;
         this.quizId = parseInt(this.quizForm.getAttribute('data-quiz-id') || '0', 10);
-        this.questionCount = parseInt(this.quizForm.getAttribute('data-question-count') || '1', 10);
+        this.questionCount = this.quizForm.querySelectorAll('.quiz-div').length;
         this.answerSet = new Set();
         const answersJson = this.quizForm.getAttribute('data-answers');
         this.answers = answersJson ? JSON.parse(answersJson) : {};
@@ -25,7 +25,7 @@ class QuizController {
         this.nextQBtn = document.getElementById('next_q_button');
         this.submitBtn = document.getElementById('submitButton');
         
-        // Map to store question components
+        // map qs to components
         this.questionComponents = new Map();
 
         this.init();
@@ -96,7 +96,7 @@ class QuizController {
         for (const [questionNumber, answerArray] of Object.entries(answers)) {
             const questionComponent = this.questionComponents.get(parseInt(questionNumber));
             
-            if (questionComponent && Array.isArray(answerArray)) {
+            if (questionComponent) {
                 // component knows how to handle its own answer array
                 questionComponent.setValue(answerArray);
             }
@@ -157,20 +157,19 @@ class QuizController {
         console.log('Question No.: ' + q_no);
         this.questionNumber = q_no;
 
-        // iterate through question count
-        for (let currentNumber = 1; currentNumber <= this.questionCount; currentNumber++) {
-            const qDiv = document.getElementById('question_' + currentNumber);
-            if (window.pauseAllAudio) window.pauseAllAudio();
+        if (window.pauseAllAudio) window.pauseAllAudio();
 
-            // show current question, hide others
-            if (currentNumber === this.questionNumber) {
-                qDiv.classList.remove('d-none');
-            } else {
-                qDiv.classList.add('d-none');
+        // show current question, hide others
+        for (const [questionNumber, component] of this.questionComponents) {
+            if (component && component.questionDiv) {
+                if (questionNumber === this.questionNumber) {
+                    component.questionDiv.classList.remove('d-none');
+                } else {
+                    component.questionDiv.classList.add('d-none');
+                }
             }
         }
 
-        // update nav buttons
         this.updateNavigationButtons();
     }
 
