@@ -5,7 +5,7 @@
          
         @if ($option['audio_path'])
             <div class="feedback-audio js-audio col-12 mb-2">
-                <audio id="fbAudio_{{ $question['number'] }}_{{ $option['id'] }}" class="feedback-aduio-player media-player" preload="auto" src="{{ $option['audio_path'] }}"></audio>
+                <audio id="fbAudio_{{ $question['number'] }}_{{ $option['id'] }}" class="feedback-aduio-player media-player" preload="auto" src="{{ Storage::url('content/'.$option['audio_path']) }}"></audio>
                 <div class="feedback-audio__controls d-flex justify-content-between">
                     <div class="d-flex">
                         <button class="play-pause" type="button">
