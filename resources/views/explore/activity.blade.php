@@ -3,6 +3,10 @@
 @section('title', $activity->title)
 @section('page_id', 'activity')
 
+@section('additional_head')
+    <link rel="stylesheet" href="{{ asset('css/quiz-loading.css') }}">
+@endsection
+
 @section('content')
 <div class="col-md-8" data-activity-root data-activity-id="{{ $activity->id }}" data-start-log-id="{{ $start_log_id }}" data-day-name="{{ $activity->day->name }}" data-status="{{ $activity->completed ? 'completed' : 'unlocked' }}" data-has-content="{{ $content ? 'true' : 'false' }}" data-has-quiz="{{ $quiz ? 'true' : 'false' }}" data-has-journal="{{ $journal ? 'true' : 'false' }}" data-is-favorited="{{ $activity->favorited ? 'true' : 'false' }}" data-favorite-toggle-route="{{ route('favorite.toggle') }}" data-log-interaction-route="{{ route('activities.log_interaction') }}" data-skip-route="{{ route('activities.skip', ['activity_id' => $activity->id]) }}">
     @if (session('success'))

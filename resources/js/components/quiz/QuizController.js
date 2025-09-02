@@ -128,7 +128,13 @@ class QuizController {
     }
     
     markAsLoaded() {
-        // TODO
+        if (this.quizContainer) {
+            // use requestAnimationFrame to ensure smooth transition
+            requestAnimationFrame(() => {
+                this.quizContainer.classList.remove('quiz-loading');
+                this.quizContainer.classList.add('quiz-loaded');
+            });
+        }
     }
     
     // callback for answer change

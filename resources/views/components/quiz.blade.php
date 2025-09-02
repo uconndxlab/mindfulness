@@ -1,5 +1,10 @@
 @if (isset($quiz))
-    <div id="quiz-container">
+    <div id="quiz-container" class="quiz-loading position-relative">
+        <div id="quiz-throbber" class="quiz-throbber">
+            <div class="spinner-border text-secondary" role="status">
+                <span class="visually-hidden">Loading quiz...</span>
+            </div>
+        </div>
         <form id="quizForm" method="POST" class="pt-3" data-quiz-id="{{ $quiz->id }}" data-answers='@json($quiz->answers)'>
             @csrf
             @foreach ($quiz->question_options as $question)
