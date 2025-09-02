@@ -1,4 +1,3 @@
-{{-- Radio Question --}}
 @if ($question['type'] === 'radio')
     @foreach ($question['options'] as $option)
         <div class="form-check type-radio mb-2">
@@ -23,10 +22,7 @@
             @endif
         </div>
     @endforeach
-@endif
-
-{{-- Checkbox Question --}}
-@if ($question['type'] === 'checkbox')
+@elseif ($question['type'] === 'checkbox')
     @foreach ($question['options'] as $option)
         <div class="form-check type-checkbox mb-2">
             <input class="form-check-input" 
@@ -50,10 +46,7 @@
             @endif
         </div>
     @endforeach
-@endif
-
-{{-- Slider Question --}}
-@if ($question['type'] === 'slider')
+@elseif ($question['type'] === 'slider')
     @php $value = $question['slider_config']['default'] ?? 50; @endphp
     <div class="slider-container noui-custom-pips">
         <div class="text-center slider-loading" id="slider_loading_{{ $question['number'] }}">

@@ -20,6 +20,8 @@ class QuizController {
         const answersJson = this.quizForm.getAttribute('data-answers');
         this.answers = answersJson ? JSON.parse(answersJson) : {};
 
+        this.quizContainer = document.getElementById('quiz-container');
+
         // nav buttons
         this.prevQBtn = document.getElementById('prev_q_button');
         this.nextQBtn = document.getElementById('next_q_button');
@@ -28,34 +30,57 @@ class QuizController {
         // map qs to components
         this.questionComponents = new Map();
 
-        this.init();
+        this.initializeOptimized();
     }
 
-    init() {
-        // init submission handler
+    // efficient initialization
+    async initializeOptimized() {
+        try {
+            // batch DOM operations to prevent thrashing
+            this.batchInitialization();
+            this.initializeEventListeners();
+            // initialize components (slider setup is async)
+            await this.initializeQuestionComponents();
+            this.populateAnswers(this.answers);
+            this.updateNavigationButtons();
+            this.markAsLoaded();
+            
+        } catch (error) {
+            console.error('Quiz initialization failed:', error);
+            // fallback - still show quiz
+            this.markAsLoaded();
+        }
+    }
+
+    batchInitialization() {
+        // pre-cache all question elements to avoid repeated DOM queries
+        const quizDivs = this.quizForm.querySelectorAll('.quiz-div');
+        this.questionElements = new Map();
+        
+        quizDivs.forEach(div => {
+            const questionNumber = parseInt(div.getAttribute('data-number'));
+            this.questionElements.set(questionNumber, div);
+        });
+    }
+
+    initializeEventListeners() {
+        // form and nav
         this.quizForm.addEventListener('submit', (event) => {
             event.preventDefault();
             console.log('submitting');
             this.submitAnswers();
         });
 
-        // init nav buttons
-        if (this.prevQBtn) this.prevQBtn.addEventListener('click', () => { this.changeQuestion(this.questionNumber - 1); });
-        if (this.nextQBtn) this.nextQBtn.addEventListener('click', () => { this.changeQuestion(this.questionNumber + 1); });
-
-        // init question components
-        this.initializeQuestionComponents();
-        
-        // load answers and show initial question
-        this.populateForm(this.answers);
-        this.changeQuestion(this.questionNumber);
+        if (this.prevQBtn) this.prevQBtn.addEventListener('click', () => { 
+            this.changeQuestion(this.questionNumber - 1); 
+        });
+        if (this.nextQBtn) this.nextQBtn.addEventListener('click', () => { 
+            this.changeQuestion(this.questionNumber + 1); 
+        });
     }
 
     initializeQuestionComponents() {
-        const questionDivs = this.quizForm.querySelectorAll('.quiz-div');
-        
-        questionDivs.forEach(questionDiv => {
-            const questionNumber = parseInt(questionDiv.getAttribute('data-number'));
+        for (const [questionNumber, questionDiv] of this.questionElements) {
             const questionType = questionDiv.getAttribute('data-type');
             
             let questionComponent;
@@ -86,23 +111,26 @@ class QuizController {
                 this.questionComponents.set(questionNumber, questionComponent);
                 console.log(`Initialized ${questionType} question ${questionNumber}`);
             }
-        });
+        };
     }
 
-    // populate the components with the answers
-    populateForm(answers) {
+    populateAnswers(answers) {
         // answer format = { "1": [{"1": null}, {"6": "other text"}], "2": [{"3": null}], "3": [92], "4": [0] }
         console.log(`Populating form with answers: ${answers}`);
         for (const [questionNumber, answerArray] of Object.entries(answers)) {
             const questionComponent = this.questionComponents.get(parseInt(questionNumber));
             
             if (questionComponent) {
-                // component knows how to handle its own answer array
+                // component knows how to handle its own answers
                 questionComponent.setValue(answerArray);
             }
         }
     }
-
+    
+    markAsLoaded() {
+        // TODO
+    }
+    
     // callback for answer change
     onQuestionAnswerChange(questionNumber, isAnswered) {
         console.log(`Question ${questionNumber} answer changed. Answered: ${isAnswered}`);
@@ -159,14 +187,11 @@ class QuizController {
 
         if (window.pauseAllAudio) window.pauseAllAudio();
 
-        // show current question, hide others
-        for (const [questionNumber, component] of this.questionComponents) {
-            if (component && component.questionDiv) {
-                if (questionNumber === this.questionNumber) {
-                    component.questionDiv.classList.remove('d-none');
-                } else {
-                    component.questionDiv.classList.add('d-none');
-                }
+        for (const [questionNumber, questionDiv] of this.questionElements) {
+            if (questionNumber === this.questionNumber) {
+                questionDiv.classList.remove('d-none');
+            } else {
+                questionDiv.classList.add('d-none');
             }
         }
 

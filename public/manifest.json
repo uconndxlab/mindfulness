@@ -1,7 +1,7 @@
 {
     "name": "Healing Hearts",
     "short_name": "Healing Hearts",
-    "description": "Mindfulness and healing application",
+    "description": "A mindfulness app for divorced and separated parents",
     "start_url": "/about",
     "display": "standalone",
     "background_color": "#ffffff",
