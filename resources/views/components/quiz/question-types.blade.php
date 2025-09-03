@@ -47,20 +47,25 @@
         </div>
     @endforeach
 @elseif ($question['type'] === 'slider')
-    @php $value = $question['slider_config']['default'] ?? 50; @endphp
-    <div class="slider-container noui-custom-pips">
-        <div class="text-center slider-loading" id="slider_loading_{{ $question['number'] }}">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
+    @foreach ($question['options'] as $option)
+        @if ($option['text'])
+            <label class="form-label">{{ $option['text'] }}</label>
+        @endif
+        <div class="slider-container noui-custom-pips">
+            <div class="text-center slider-loading" id="slider_loading_{{ $question['number'] }}_{{ $option['id'] }}">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
             </div>
+            <div class="position-relative">
+                <div id="quiz_slider_bubble_{{ $question['number'] }}_{{ $option['id'] }}" 
+                    class="slider-bubble d-none">{{ $option['slider_config']['default'] ?? 50 }}</div>
+                <div id="slider_{{ $question['number'] }}_{{ $option['id'] }}" class="d-none"></div>
+            </div>
+            <input type="hidden" 
+                name="answer_{{ $question['number'] }}[{{ $option['id'] }}]" 
+                id="slider_input_{{ $question['number'] }}_{{ $option['id'] }}" 
+                value="{{ $option['slider_config']['default'] ?? 50 }}">
         </div>
-        <div class="position-relative">
-            <div id="quiz_slider_bubble_{{ $question['number'] }}" class="slider-bubble d-none">{{ $value }}</div>
-            <div id="slider_{{ $question['number'] }}" class="d-none"></div>
-        </div>
-        <input type="hidden" 
-               name="answer_{{ $question['number'] }}" 
-               id="slider_input_{{ $question['number'] }}" 
-               value="{{ $value }}">
-    </div>
+    @endforeach
 @endif

@@ -1,59 +1,90 @@
-/**
- * QuizSliderQuestion - Handles slider question logic with noUiSlider
- * Simple interface: isAnswered(), getValue(), setValue(), onAnswerChange(callback)
- */
 class QuizSliderQuestion {
     constructor(questionDiv, questionNumber, onAnswerChange) {
         this.questionDiv = questionDiv;
         this.questionNumber = questionNumber;
-        this.onAnswerChange = onAnswerChange; // Callback to notify controller
-        this.sliderElement = null;
-        this.hiddenInput = null;
-        this.loadingElement = null;
-        this.bubbleElement = null;
-        this.questionData = null;
-        this.currentValue = 50;
-        this.isUserInteracting = false;
+        this.onAnswerChange = onAnswerChange; // callback
         
-        this.init();
-    }
+        // maps for efficient lookups across multiple sliders
+        this.sliders = new Map();           // optionId -> noUiSlider instance
+        this.hiddenInputs = new Map();      // optionId -> input element  
+        this.currentValues = new Map();     // optionId -> current value
+        this.loadingElements = new Map();   // optionId -> loading element
+        this.bubbleElements = new Map();    // optionId -> bubble element
+        this.interactionStates = new Map(); // optionId -> boolean (is user currently interacting)
+        this.userInteracted = new Map();    // optionId -> boolean (has user ever interacted)
 
-    init() {
-        this.findElements();
-        this.extractQuestionData();
-        this.initializeSlider();
-        console.log(`Slider question ${this.questionNumber} initialized`);
-    }
-
-    findElements() {
-        this.sliderElement = document.getElementById(`slider_${this.questionNumber}`);
-        this.hiddenInput = document.getElementById(`slider_input_${this.questionNumber}`);
-        this.loadingElement = document.getElementById(`slider_loading_${this.questionNumber}`);
-        this.bubbleElement = document.getElementById(`quiz_slider_bubble_${this.questionNumber}`);
-    }
-
-    extractQuestionData() {
+        this.answered = false;
+        
         const questionDataJson = this.questionDiv.getAttribute('data-question-json');
         this.questionData = questionDataJson ? JSON.parse(questionDataJson) : null;
         
-        if (this.hiddenInput) {
-            this.currentValue = parseInt(this.hiddenInput.value) || 50;
+        this.batchInit();
+    }
+
+    batchInit() {
+        console.log(`Slider question ${this.questionNumber} batchInit`);
+        this.findAndCacheElements();
+        this.initializeAllSliders();
+        console.log(`Slider question ${this.questionNumber} initialized with ${this.sliders.size} slider(s)`);
+    }
+
+    findAndCacheElements() {
+        // find all elements based on the options structure
+        const options = this.questionData?.options || [];
+        
+        for (const option of options) {
+            const optionId = option.id;
+            
+            // cache elements for this option
+            const sliderElement = document.getElementById(`slider_${this.questionNumber}_${optionId}`);
+            const hiddenInput = document.getElementById(`slider_input_${this.questionNumber}_${optionId}`);
+            const loadingElement = document.getElementById(`slider_loading_${this.questionNumber}_${optionId}`);
+            const bubbleElement = document.getElementById(`quiz_slider_bubble_${this.questionNumber}_${optionId}`);
+            
+            if (sliderElement) {
+                this.sliders.set(optionId, sliderElement);
+                this.hiddenInputs.set(optionId, hiddenInput);
+                this.loadingElements.set(optionId, loadingElement);
+                this.bubbleElements.set(optionId, bubbleElement);
+                this.interactionStates.set(optionId, false);
+                this.userInteracted.set(optionId, false);
+                
+                // get current value from hidden input
+                const currentValue = hiddenInput ? (parseInt(hiddenInput.value) || 50) : 50;
+                this.currentValues.set(optionId, currentValue);
+            }
         }
     }
 
-    initializeSlider() {
-        if (!this.sliderElement || !window.noUiSlider) {
-            console.warn(`Slider question ${this.questionNumber}: Missing slider element or noUiSlider library`);
+    initializeAllSliders() {
+        if (!window.noUiSlider) {
+            console.warn(`Slider question ${this.questionNumber}: noUiSlider library not available`);
             return;
         }
 
-        // Get slider configuration from the new structure
-        const sliderData = this.questionData?.slider_config || {};
+        const options = this.questionData?.options || [];
         
-        // Configure pips for responsive display
+        for (const option of options) {
+            const optionId = option.id;
+            const sliderElement = this.sliders.get(optionId);
+            
+            if (!sliderElement) {
+                console.warn(`Slider question ${this.questionNumber}: Missing slider element for option ${optionId}`);
+                continue;
+            }
+
+            this.initializeSingleSlider(optionId, option);
+        }
+    }
+
+    initializeSingleSlider(optionId, option) {
+        const sliderElement = this.sliders.get(optionId);
+        const currentValue = this.currentValues.get(optionId);
+        const sliderConfig = option.slider_config || {};
+        
         let pipsConfig = undefined;
-        if (sliderData.pips) {
-            const pipKeys = Object.keys(sliderData.pips);
+        if (sliderConfig.pips) {
+            const pipKeys = Object.keys(sliderConfig.pips);
             const firstPipValue = pipKeys.length > 0 ? pipKeys[0] : null;
             const lastPipValue = pipKeys.length > 0 ? pipKeys[pipKeys.length - 1] : null;
             
@@ -63,122 +94,176 @@ class QuizSliderQuestion {
                 density: 4,
                 format: {
                     to: (value) => {
-                        if (window.innerWidth >= 768) return sliderData.pips[value];
-                        if (value == firstPipValue || value == lastPipValue) return sliderData.pips[value];
+                        if (window.innerWidth >= 768) return sliderConfig.pips[value];
+                        if (value == firstPipValue || value == lastPipValue) return sliderConfig.pips[value];
                         return '';
                     }
                 }
             };
         }
 
-        // Create the slider
-        window.noUiSlider.create(this.sliderElement, {
-            start: [this.currentValue],
+        // create the slider
+        window.noUiSlider.create(sliderElement, {
+            start: [currentValue],
             connect: 'lower',
-            step: sliderData.step ?? 1,
+            step: sliderConfig.step ?? 1,
             range: {
-                min: sliderData.min ?? 0,
-                max: sliderData.max ?? 100
+                min: sliderConfig.min ?? 0,
+                max: sliderConfig.max ?? 100
             },
             pips: pipsConfig
         });
 
-        this.bindSliderEvents();
-        this.hideLoadingShowSlider();
-        
-        // Sliders are always considered "answered" since they have a default value
-        this.onAnswerChange(this.questionNumber, true);
+        this.bindSliderEvents(optionId);
+        this.hideLoadingShowSlider(optionId);
     }
 
-    bindSliderEvents() {
-        if (!this.sliderElement.noUiSlider) return;
+    bindSliderEvents(optionId) {
+        const sliderElement = this.sliders.get(optionId);
+        const hiddenInput = this.hiddenInputs.get(optionId);
+        const bubbleElement = this.bubbleElements.get(optionId);
         
-        this.sliderElement.noUiSlider.on('start', () => {
-            this.isUserInteracting = true;
+        if (!sliderElement || !sliderElement.noUiSlider) return;
+        
+        sliderElement.noUiSlider.on('start', () => {
+            this.interactionStates.set(optionId, true);
+            // mark this slider as interacted with
+            this.userInteracted.set(optionId, true);
+            this.checkIfAllSlidersInteracted();
         });
         
-        this.sliderElement.noUiSlider.on('update', (values, handle) => {
+        sliderElement.noUiSlider.on('update', (values, handle) => {
             const value = Math.round(values[handle]);
-            this.currentValue = value;
+            this.currentValues.set(optionId, value);
             
-            if (this.hiddenInput) {
-                this.hiddenInput.value = value;
+            if (hiddenInput) {
+                hiddenInput.value = value;
             }
             
-            this.updateBubble(value, handle);
-            
-            // Notify controller of answer change
-            this.onAnswerChange(this.questionNumber, true);
+            this.updateBubble(optionId, value, handle);
         });
         
-        this.sliderElement.noUiSlider.on('end', () => {
-            this.isUserInteracting = false;
-            if (this.bubbleElement) {
-                this.bubbleElement.classList.add('d-none');
+        sliderElement.noUiSlider.on('end', () => {
+            this.interactionStates.set(optionId, false);
+            if (bubbleElement) {
+                bubbleElement.classList.add('d-none');
             }
         });
     }
 
-    updateBubble(value, handle) {
-        if (!this.bubbleElement || !this.isUserInteracting) return;
+    checkIfAllSlidersInteracted() {
+        // check if all sliders have been interacted with at least once
+        let allInteracted = true;
+        for (const [optionId, hasInteracted] of this.userInteracted) {
+            if (!hasInteracted) {
+                allInteracted = false;
+                break;
+            }
+        }
         
-        const sliderRect = this.sliderElement.getBoundingClientRect();
-        const handles = this.sliderElement.querySelectorAll('.noUi-handle');
+        if (allInteracted && !this.answered) {
+            this.answered = true;
+            this.onAnswerChange(this.questionNumber, true);
+            console.log(`Slider question ${this.questionNumber} marked as answered - all sliders interacted`);
+        }
+    }
+
+    updateBubble(optionId, value, handle) {
+        const bubbleElement = this.bubbleElements.get(optionId);
+        const sliderElement = this.sliders.get(optionId);
+        const isInteracting = this.interactionStates.get(optionId);
+        
+        if (!bubbleElement || !sliderElement || !isInteracting) return;
+        
+        const sliderRect = sliderElement.getBoundingClientRect();
+        const handles = sliderElement.querySelectorAll('.noUi-handle');
         const activeHandle = handles[handle];
         
         if (activeHandle) {
             const handleRect = activeHandle.getBoundingClientRect();
             const left = handleRect.left + handleRect.width / 2 - sliderRect.left;
             
-            this.bubbleElement.style.transform = `translateX(${left}px) translateX(-50%)`;
-            this.bubbleElement.textContent = value + '%';
-            this.bubbleElement.classList.remove('d-none');
+            bubbleElement.style.transform = `translateX(${left}px) translateX(-50%)`;
+            bubbleElement.textContent = value + '%';
+            bubbleElement.classList.remove('d-none');
         }
     }
 
-    hideLoadingShowSlider() {
-        if (this.loadingElement) {
-            this.loadingElement.classList.add('d-none');
-        }
+    hideLoadingShowSlider(optionId) {
+        const loadingElement = this.loadingElements.get(optionId);
+        const sliderElement = this.sliders.get(optionId);
         
-        if (this.sliderElement) {
-            this.sliderElement.classList.remove('d-none');
+        if (loadingElement) {
+            loadingElement.classList.add('d-none');
+        }
+        if (sliderElement) {
+            sliderElement.classList.remove('d-none');
         }
     }
 
-    // Interface methods that controller can use
+    // interface methods for QuizController
     isAnswered() {
-        // Sliders are always considered answered since they have a default value
-        return true;
+        // sliders always considered answered...
+        return this.answered;
     }
 
     getValue() {
-        return this.currentValue;
+        // return array format: [{"0": 67}, {"1": 42}] 
+        const result = [];
+        for (const [optionId, value] of this.currentValues) {
+            const item = {};
+            item[optionId] = value;
+            result.push(item);
+        }
+        return result;
     }
 
-    // Method to set answer programmatically (for loading saved answers)
-    setValue(value) {
+    // load saved answers
+    setValue(values) {
+        // handle array format: [{"0": 67}, {"1": 42}]
+        if (Array.isArray(values)) {
+            for (const item of values) {
+                const optionId = parseInt(Object.keys(item)[0]);
+                const value = Object.values(item)[0];
+                this.setSingleSliderValue(optionId, value);
+                // mark as interacted since we're loading a saved answer
+                this.userInteracted.set(optionId, true);
+            }
+            // check if all sliders are now considered interacted
+            this.checkIfAllSlidersInteracted();
+        }
+        
+        console.log(`Slider question ${this.questionNumber} values set to:`, JSON.stringify(values));
+    }
+
+    setSingleSliderValue(optionId, value) {
         const numericValue = parseInt(value) || 50;
-        this.currentValue = numericValue;
+        this.currentValues.set(optionId, numericValue);
         
-        if (this.hiddenInput) {
-            this.hiddenInput.value = numericValue;
+        const hiddenInput = this.hiddenInputs.get(optionId);
+        if (hiddenInput) {
+            hiddenInput.value = numericValue;
         }
         
-        if (this.sliderElement && this.sliderElement.noUiSlider) {
-            this.sliderElement.noUiSlider.set([numericValue]);
+        const sliderElement = this.sliders.get(optionId);
+        if (sliderElement && sliderElement.noUiSlider) {
+            sliderElement.noUiSlider.set([numericValue]);
         }
-        
-        // Notify controller
-        this.onAnswerChange(this.questionNumber, true);
-        
-        console.log(`Slider question ${this.questionNumber} value set to:`, numericValue);
     }
 
-    // Reset the question to default value
     reset() {
-        const defaultValue = this.questionData?.slider_config?.default ?? 50;
-        this.setValue(defaultValue);
+        const options = this.questionData?.options || [];
+        
+        for (const option of options) {
+            const defaultValue = option.slider_config?.default ?? 50;
+            this.setSingleSliderValue(option.id, defaultValue);
+            // reset interaction tracking
+            this.userInteracted.set(option.id, false);
+        }
+        
+        // reset answered state
+        this.answered = false;
+        this.onAnswerChange(this.questionNumber, false);
     }
 }
 

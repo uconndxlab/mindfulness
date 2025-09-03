@@ -63,7 +63,7 @@ class ActivityController extends Controller
         if ($next_activity
             && ($activity->type === 'practice' || $next_activity->id === $last_activity_in_module->id)
             && $next_activity->quiz
-            && $next_activity->quiz->question_options['question_1']['type'] === 'slider') 
+            && $next_activity->quiz->question_options[0]['type'] === 'slider') 
         {
                 $redirect_url = route('explore.activity', ['activity_id' => $next_activity->id]);
         }
