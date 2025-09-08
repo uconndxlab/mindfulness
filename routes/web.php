@@ -9,12 +9,12 @@ use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
-use App\Http\Controllers\ContactFormController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PageNavController;
 use App\Http\Controllers\UserController;
 use App\Models\User;
 
+use App\Models\QuizAnswers;
 
 Route::middleware('web')->group(function () {
     //default
@@ -43,7 +43,7 @@ Route::middleware('web')->group(function () {
             }
             return view('auth.verify');
         })->name('verification.notice');
-        Route::post('/email/verification-notification', [AuthController::class, 'sendVerifyEmail'])->name('verification.send');
+        Route::post('/email/verification-notification', [AuthController::class, 'sendVerifyEmail'])->middleware('throttle:4,1')->name('verification.send'); // throttled in controller too
         Route::get('/check-verification', [AuthController::class, 'checkVerification'])->name('verification.check');
     });
     // verify email button in email
@@ -69,7 +69,7 @@ Route::middleware('web')->group(function () {
             }
           
             // if user is already logged in
-            if (Auth::user()->id == $user->id) {
+            if (Auth::check() && Auth::id() == $user->id) {
                 return redirect('/welcome');
             }
 
@@ -90,9 +90,9 @@ Route::middleware('web')->group(function () {
     
     
     //AUTH protected routes
-    Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock'])->group(function () {
+    Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock', 'session.policy'])->group(function () {
         //logout
-        Route::post('/logout', [AuthController::class,'logout'])->name('logout');
+        Route::post('/logout', [AuthController::class,'logout'])->middleware('throttle:20,1')->name('logout');
 
         //NEW EXPLORE
         Route::get('/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
@@ -103,13 +103,13 @@ Route::middleware('web')->group(function () {
         Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
         // use for when skipping warning modal
         Route::get('/explore/activity/{activity_id}/fast', [PageNavController::class, 'exploreActivityBypass'])->name('explore.activity.bypass');
-        Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
+        Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->middleware('throttle:30,1')->name('quiz.submit');
         Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
 
-        // activity completion
-        Route::post('/activities/complete', [ActivityController::class, 'complete'])->name('activities.complete');
-        Route::post('/activities/skip', [ActivityController::class, 'skip'])->name('activities.skip');
-        Route::post('/activities/log-interaction', [ActivityController::class, 'logInteraction'])->name('activities.log_interaction');
+        // activity completion (add light rate-limiting)
+        Route::post('/activities/complete', [ActivityController::class, 'complete'])->middleware('throttle:30,1')->name('activities.complete');
+        Route::post('/activities/skip', [ActivityController::class, 'skip'])->middleware('throttle:30,1')->name('activities.skip');
+        Route::post('/activities/log-interaction', [ActivityController::class, 'logInteraction'])->middleware('throttle:60,1')->name('activities.log_interaction');
         
         //NAVIGATION
         //Page Navigation - the controller is not totally necessary
@@ -134,21 +134,45 @@ Route::middleware('web')->group(function () {
         
         //User updates
         Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
-        Route::put('/user/update/namePass', [UserController::class, 'updateNamePass'])->name('user.update.namePass');
         
         //favorites
-        Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->middleware('throttle:70,1')->name('favorite.toggle');
+        Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->middleware('throttle:30,1')->name('favorite.toggle');
         
-        //contact form - throttled in controller
-        Route::post('/contact', [ContactFormController::class, 'submitForm'])->name('contact.submit');
-        
-        //NOTES - throttled in controller
-        Route::resource('note', NoteController::class);
+        //NOTES - throttled in controller + guard API spam
+        Route::resource('note', NoteController::class)->middleware('throttle:30,1');
         
         //ADMIN ONLY
         Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
             Route::get('/dashboard', [AdminUserController::class, 'dashboard'])->name('dashboard');
-            Route::post('/lock-registration-access', [AdminUserController::class, 'lockRegistrationAccess'])->name('lock-registration-access');
+            Route::post('/lock-registration-access', [AdminUserController::class, 'lockRegistrationAccess'])->middleware('throttle:10,1')->name('lock-registration-access');
+            
+            Route::get('/test', function () {
+                $quizAnswer = QuizAnswers::first();
+                if (!$quizAnswer) {
+                    dd('No quiz answers found');
+                }
+                
+                // Show the current format
+                echo "<h3>Current Raw Answer:</h3>";
+                echo "<pre>" . json_encode($quizAnswer->answers, JSON_PRETTY_PRINT) . "</pre>";
+                
+                // Show what it should look like in the new format
+                echo "<h3>Expected New Format:</h3>";
+                $newFormat = [
+                    "1" => [["6" => "some other text"]],
+                    "2" => [["3" => null]]
+                ];
+                echo "<pre>" . json_encode($newFormat, JSON_PRETTY_PRINT) . "</pre>";
+                
+                // Show all quiz answers for user 1
+                echo "<h3>All Quiz Answers for User 1:</h3>";
+                $allAnswers = QuizAnswers::where('user_id', 1)->get();
+                foreach($allAnswers as $answer) {
+                    echo "<strong>Quiz #{$answer->quiz_id}:</strong><br>";
+                    echo "<pre>" . json_encode($answer->answers, JSON_PRETTY_PRINT) . "</pre>";
+                    echo "<hr>";
+                }
+            });
             
             Route::get('/users', [AdminUserController::class, 'index'])->name('users');
             Route::get('/events', [AdminEventController::class, 'index'])->name('events');

@@ -56,7 +56,12 @@ class PageNavController extends Controller
     {
         $user = Auth::user();
         //find the module
+        // order days and activities by order
         $module = Module::with('days.activities')->findOrFail($module_id);
+        $module->days = $module->days->sortBy('order');
+        foreach ($module->days as $day) {
+            $day->activities = $day->activities->sortBy('order');
+        }
 
         // get user_module information
         $stats = $module->getStats($user);
@@ -150,9 +155,9 @@ class PageNavController extends Controller
                 if ($lastCompletionLocal->isSameDay($now) || $lastCompletionLocal->diffInHours($now) < 2) {
                     return response()->json(['locked' => true, 'modalContent' => [
                         'label' => 'You are progressing fast!',
-                        'body' => 'It appears you have already completed <strong>'.$last_day_name.'</strong> today. '.
+                        'body' => (string) app(\League\CommonMark\CommonMarkConverter::class)->convert('It appears you have already completed **'.$last_day_name.'** today. '.
                             'While your efforts are admirable, we recommend you take your time through this program and take it one day at a time. '.
-                            'How about repeating your favorite activity?',
+                            'How about repeating your favorite activity?'),
                         'route' => route('explore.activity.bypass', ['activity_id' => $activity->id]),
                         'method' => 'GET',
                         'buttonLabel' => 'No, go to the next module',
@@ -216,7 +221,6 @@ class PageNavController extends Controller
                 $page_info['redirect_label'] = "Back to Part ".$activity->day->module->id;
                 $page_info['redirect_route'] = $page_info['exit_route'];
             }
-
         }
 
         //setting back route
@@ -230,9 +234,8 @@ class PageNavController extends Controller
         $quiz = $activity->quiz;
         $journal = $activity->journal;
         if ($quiz) {
-            $quiz->question_options = json_decode($quiz->question_options, true);
             $temp_answers = $user->quiz_answers($quiz->id)->first();
-            $quiz->answers = $temp_answers ? json_decode($temp_answers->answers) : [];
+            $quiz->answers = $temp_answers ? $temp_answers->answers : [];
         }
         //decode the audio options
         else if ($content && $content->type == 'audio' && $content->audio_options) {
@@ -277,24 +280,26 @@ class PageNavController extends Controller
             //get quiz
             $quiz = Quiz::findOrFail($request->quiz_id);
     
-            //get answers from request
-            $answers = [];
-            foreach ($request->all() as $key => $value) {
-                if (Str::startsWith($key, 'answer_') || Str::startsWith($key, 'other_answer_')) {
-                    $answers[$key] = $value;
-                }
-            }
+            // get answers
+            $answers = $request->has('answers') 
+                ? json_decode($request->answers, true)
+                : [];
     
             QuizAnswers::updateOrCreate([
                 'user_id' => Auth::id(),
                 'quiz_id' => $quiz->id
             ], [
-                'answers' => json_encode($answers)
+                'answers' => $answers
             ]);
             return response()->json(['success_message' => 'Quiz answers updated successfully.'], 200);
         }
-        catch (\Exception $e) {
-            return response()->json(['error_message' => 'Failed to submit quiz answers.', 'error' => $e], 500);
+        catch (\Throwable $e) {
+            \Log::error('Quiz submission failed', [
+                'user_id' => Auth::id(),
+                'quiz_id' => $request->quiz_id ?? null,
+                'message' => $e->getMessage(),
+            ]);
+            return response()->json(['error_message' => 'Failed to submit quiz answers.'], 500);
         }
     }
         
@@ -329,22 +334,22 @@ class PageNavController extends Controller
         $rand_query = $user->unlockedActivities();
         
         //base param
-        $empty_text = null;
+        $empty_page = null;
         if ($request->base_param) {
             if ($request->base_param == 'main') {
-                $empty_text = 'Keep progressing to unlock more exercises...';
+                $empty_page = 'main';
             }
             else if ($request->base_param == 'favorited') {
                 $query = $user->favoritedActivities();
                 $rand_query = $user->favoritedActivities();
-                $empty_text = '<span>Click the "<i class="bi bi-star"></i>" found in activities to add them to your favorites and view them here!</span>';
+                $empty_page = 'favorited';
             }
         }
 
         //check if empty
         $empty = !$query->exists();
         if ($empty) {
-            $view = view('components.search-results', ['empty_text' => $empty_text])->render();
+            $view = view('components.search-results', ['empty_page' => $empty_page])->render();
             return response()->json(['html' => $view, 'empty' => true]);
         }
 
@@ -499,13 +504,16 @@ class PageNavController extends Controller
 
     public function journalSearch (Request $request) {
         //get user
-        $id = Auth::id();
-        $query = Note::where('user_id', $id);
+        $user = Auth::user();
+        if (!$user) {
+            return;
+        }
+        $query = Note::where('user_id', $user->id);
 
         //check if empty
         $empty = !$query->exists();
         if ($empty) {
-            $view = view('components.journal-search-results', ['empty_text' => '<span>Continue progressing to find a Journal activity, or write your first journal in the <a href="/journal">Journal</a> tab.</span>'])->render();
+            $view = view('components.journal-search-results')->render();
             return response()->json(['html' => $view]);
         }
 

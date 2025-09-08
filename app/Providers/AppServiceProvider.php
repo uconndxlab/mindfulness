@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use App\Events\FinalActivityCompleted;
 use App\Http\Middleware\AdminOnly;
-use App\Listeners\ShowCompletionModal;
+use App\Models\Module;
+use App\Observers\ModuleObserver;
 use App\Services\ProgressService;
 use Event;
 use Illuminate\Auth\SessionGuard;
@@ -41,14 +41,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Module::observe(ModuleObserver::class);
+
         Livewire::addPersistentMiddleware([
             AdminOnly::class,
         ]);
-        
-        Event::listen(
-            FinalActivityCompleted::class,
-            [ShowCompletionModal::class, 'handle']
-        );
 
         Auth::extend('custom-session', function ($app, $name, array $config) {
             $provider = Auth::createUserProvider($config['provider']);
@@ -68,7 +65,10 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Blade::directive('markdown', function ($expression) {
-            return "<?php echo app(League\CommonMark\CommonMarkConverter::class)->convert($expression); ?>";
+            return '<?php 
+                $content_for_markdown = is_string(' . $expression . ') ? ' . $expression . ' : "";
+                echo "<div class=\"markdown\">" . app(\League\CommonMark\CommonMarkConverter::class)->convert($content_for_markdown) . "</div>"; 
+            ?>';
         });
     }
 }

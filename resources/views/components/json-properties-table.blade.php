@@ -4,7 +4,7 @@
     <tbody>
         @foreach ($data as $key => $value)
             <tr>
-                <th style="width: 25%">{{ str($key)->headline() }}</th>
+                <th class="w-25">{{ str($key)->headline() }}</th>
                 <td>
                     @if (is_array($value) || is_object($value))
                         <x-json-properties-table :data="$value" />

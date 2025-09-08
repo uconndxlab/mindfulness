@@ -40,19 +40,12 @@ class AuthController extends Controller
 
         //check if user exists first
         $credentials = $request->only('email', 'password');
-        // $user = User::where('email', $credentials['email'])->first();
-        // if (!$user) { 
-        //     return back()->withErrors(['email' => 'We can\'t find a user with that email address.']);
-        // }
-
-        if (Auth::attempt($credentials)) {
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-        }
         
         //check auth and remember
         $remember = $request->has('remember');
         if (Auth::attempt($credentials, $remember)) {
+            $request->session()->regenerate();
+            $request->session()->regenerateToken();
             //if user is locked
             if (Auth::user()->lock_access) {
                 //log user out
@@ -82,6 +75,7 @@ class AuthController extends Controller
 
     public function logout(Request $request) {
         $request->session()->invalidate();
+        $request->session()->regenerate();
         $request->session()->regenerateToken();
         Cache::forget('user_'.Auth::id().'_progress_activities');
         Auth::logout();
@@ -111,7 +105,7 @@ class AuthController extends Controller
         try {
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['required',  'email', new ValidEmail(), 'max:255',  'unique:'.User::class],
+                'email' => ['required', 'email:rfc,dns', 'max:255',  'unique:'.User::class],
                 'password'=> ['required', Password::min(8)->mixedCase()->numbers()],
                 'timezone' => ['string', 'nullable']
             ], [
@@ -141,10 +135,11 @@ class AuthController extends Controller
             lockAll($user->id);
             unlockFirst($user->id);
           
-            //login, hit limiter, redirect, event hits MustVerifyEmail which calls sendEmailVerificationNotification
+            //login, redirect, event hits MustVerifyEmail which calls sendEmailVerificationNotification
             event(new Registered($user));
-            $remember = $request->has('remember');
-            Auth::attempt($request->only('email', 'password'), $remember);
+            Auth::login($user, $request->boolean('remember'));
+            $request->session()->regenerate();
+            $request->session()->regenerateToken();
             RateLimiter::hit($key, $limit['decay']);
           
             // log registration

@@ -9,9 +9,8 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Log;
 
-class FinalActivityCompleted
+class DayCompleted
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -22,7 +21,6 @@ class FinalActivityCompleted
     public function __construct($day)
     {
         $this->day = $day;
-        Log::info('FinalActivityCompleted event fired for day: '.$day->name);
     }
 
     /**

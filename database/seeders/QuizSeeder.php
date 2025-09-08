@@ -21,9 +21,6 @@ class QuizSeeder extends Seeder
         $quizzes = json_decode(file_get_contents(database_path('data/quizzes'.$ftype)), true);
         
         foreach ($quizzes as $quiz) {
-            if (isset($quiz['question_options'])) {
-                $quiz['question_options'] = json_encode($quiz['question_options']);
-            }
             Quiz::updateOrCreate(
                 ['id' => $quiz['id']],
                 [

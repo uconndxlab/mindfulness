@@ -14,13 +14,17 @@
                 <div class="col-12">
                     <div class="h-100">
                         <div class="card p-2 module mb-2">
-                            @php
-                                $disabled = $module->unlocked ? '' : 'disabled';
-                            @endphp
-                            <a style="display:flex" id="moduleLink" class="stretched-link w-100 {{ $disabled }}" {!! $disabled ? '' : 'href='.route('explore.module', ['module_id' => $module->id]) !!}>
-                                <img src="{{ Storage::url('flowers/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon" style="width:50px; height:50px; margin-right:10px;">
-                                Part {{ $module->order }} - {{ $module->name }} <br> {{ $module->daysCompleted }}/{{ $module->totalDays }} days completed
-                            </a>
+                            @if ($module->unlocked)
+                                <a id="moduleLink" href="{{ route('explore.module', ['module_id' => $module->id]) }}" class="stretched-link w-100 module-link">
+                                    <img src="{{ Storage::url('flowers/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon">
+                                    Part {{ $module->order }} - {{ $module->name }} <br> {{ $module->daysCompleted }}/{{ $module->totalDays }} days completed
+                                </a>
+                            @else
+                                <span id="moduleLink" class="stretched-link w-100 module-link disabled">
+                                    <img src="{{ Storage::url('flowers/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon">
+                                    Part {{ $module->order }} - {{ $module->name }} <br> {{ $module->daysCompleted }}/{{ $module->totalDays }} days completed
+                                </span>
+                            @endif
                             <i class="bi bi-arrow-right"></i>
                         </div>
                     </div>

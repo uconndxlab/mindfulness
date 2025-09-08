@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Events\BonusUnlocked;
+use App\Events\DayCompleted;
 use App\Models\Activity;
 use App\Models\Day;
 use App\Models\Module;
@@ -136,6 +136,8 @@ class ProgressService
             ],
         ]);
         $result['day_completed'] = true;
+        // fire day completion event
+        event(new DayCompleted($day->id));
         // log day completion
         activity('day')
             ->event('day_completed')
@@ -153,8 +155,6 @@ class ProgressService
             ->get();
         if ($optional->count() > 0) {
             $result['optional_unlocked'] = true;
-            // fire bonus event
-            event(new BonusUnlocked($day));
             foreach ($optional as $opt) {
                 $user->activities()->syncWithoutDetaching([
                     $opt->id => [
@@ -303,5 +303,97 @@ class ProgressService
             $result = array_merge($result, $dayResult);
         }
         return $result;
+    }
+
+    /*
+    * Get the latest completed activity for a user
+    */
+    public function getLatestCompletedActivity(User $user): ?Activity
+    {
+        return $user->activities()
+            ->wherePivot('completed', true)
+            ->orderBy('order', 'desc')
+            ->first();
+    }
+
+    /**
+     * Unlock all activities up to and including the specified activity
+     */
+    public function unlockActivitiesUpTo(User $user, Activity $activity): void
+    {
+        $activitiesToUnlock = Activity::where('order', '<=', $activity->order)
+            ->orderBy('order')
+            ->get();
+
+        foreach ($activitiesToUnlock as $act) {
+            $user->activities()->syncWithoutDetaching([
+                $act->id => [
+                    'unlocked' => true,
+                ],
+            ]);
+        }
+    }
+
+    /**
+     * Unlock the next activity after the specified activity
+     */
+    public function unlockNextActivity(User $user, Activity $activity): ?Activity
+    {
+        $nextActivity = Activity::where('order', '>', $activity->order)
+            ->orderBy('order')
+            ->where('optional', false)
+            ->first();
+
+        if ($nextActivity) {
+            $user->activities()->syncWithoutDetaching([
+                $nextActivity->id => [
+                    'unlocked' => true,
+                ],
+            ]);
+            $user->days()->syncWithoutDetaching([
+                $nextActivity->day_id => [
+                    'unlocked' => true,
+                ],
+            ]);
+            $user->modules()->syncWithoutDetaching([
+                $nextActivity->day->module_id => [
+                    'unlocked' => true,
+                ],
+            ]);
+            return $nextActivity;
+        }
+
+        return null;
+    }
+
+    /**
+     * Unlock activities up to latest completion for a single user
+     * This ensures all activities up to their latest completion are unlocked,
+     * plus the next activity after their highest completion
+     */
+    public function unlockUpToLatestCompletion(User $user): void
+    {
+        $latestCompleted = $this->getLatestCompletedActivity($user);
+        
+        if ($latestCompleted) {
+            // Unlock all activities up to and including the latest completed
+            $this->unlockActivitiesUpTo($user, $latestCompleted);
+            
+            // Unlock the next activity after the latest completed
+            $this->unlockNextActivity($user, $latestCompleted);
+        }
+    }
+
+    /**
+     * Unlock activities up to latest completion for all users
+     * Call this after content management actions that affect activity order
+     */
+    public function unlockAllUsersUpToLatestCompletion(): void
+    {
+        $users = User::all();
+        
+        foreach ($users as $user) {
+            $this->unlockUpToLatestCompletion($user);
+        }
     }
 }

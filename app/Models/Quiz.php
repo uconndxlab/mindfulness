@@ -10,6 +10,7 @@ class Quiz extends Model
     use HasFactory;
 
     protected $casts = [
+        'question_options' => 'json',
         'options_feedback' => 'json',
     ];
 

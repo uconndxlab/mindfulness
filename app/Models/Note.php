@@ -10,6 +10,10 @@ class Note extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'note' => 'encrypted',
+    ];
+
 
     public function user()
     {

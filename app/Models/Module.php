@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Module extends Model
 {
     use HasFactory;
+    
+    protected $fillable = ['name', 'description', 'workbook_path', 'order'];
 
     public function days()
     {
-        return $this->hasMany(Day::class)->orderBy('order');
+        return $this->hasMany(Day::class);
     }
 
     // user progress functions
@@ -63,5 +65,17 @@ class Module extends Model
             'daysCompleted' => $daysCompleted,
             'totalDays' => $totalDays,
         ];
+    }
+    
+    public static function setNewOrder(array $order): void
+    {
+        foreach ($order as $i => $id) {
+            static::find($id)->update(['order' => $i + 1]);
+        }
+    }
+
+    public function lastActivity()
+    {
+        return $this->days()->orderBy('order', 'desc')->first()->activities()->where('optional', false)->orderBy('order', 'desc')->first();
     }
 }

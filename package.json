@@ -12,6 +12,13 @@
         "axios": "^1.6.4",
         "concurrently": "^9.0.0",
         "laravel-vite-plugin": "^1.0",
-        "vite": "^6.2.3"
+        "vite": "^6.3.5"
+    },
+    "dependencies": {
+        "bootstrap": "^5.3.7",
+        "bootstrap-icons": "^1.13.1",
+        "nosleep.js": "^0.12.0",
+        "nouislider": "^15.8.1",
+        "pdfjs-dist": "^5.4.54"
     }
 }

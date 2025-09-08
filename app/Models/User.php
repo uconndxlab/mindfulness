@@ -61,7 +61,7 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     public function sendEmailVerificationNotification()
-    {
+    {        
         $this->notify(new VerifyEmail);
     }
 
@@ -116,22 +116,19 @@ class User extends Authenticatable implements MustVerifyEmail
     public function activities()
     {
         return $this->belongsToMany(Activity::class, 'user_activity')
-            ->withPivot('completed', 'unlocked', 'favorited')
-            ->orderBy('order');
+            ->withPivot('completed', 'unlocked', 'favorited');
     }
 
     public function days()
     {
         return $this->belongsToMany(Day::class, 'user_day')
-            ->withPivot('completed', 'unlocked', 'completed_at')
-            ->orderBy('order');
+            ->withPivot('completed', 'unlocked', 'completed_at');
     }
 
     public function modules()
     {
         return $this->belongsToMany(Module::class, 'user_module')
-            ->withPivot('completed', 'unlocked')
-            ->orderBy('order');
+            ->withPivot('completed', 'unlocked');
     }
 
     // activity progress functions

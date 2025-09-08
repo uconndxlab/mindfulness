@@ -1,6 +1,6 @@
 @if (!isset($notes) || $notes->isEmpty())
     <div class="text-left muted">
-        {!! $empty_text ?? 'No matching notes found.' !!}
+        <span>Continue progressing to find a Journal activity, or write your first journal in the <a href="/journal">Journal</a> tab.</span>
     </div>
 @else
     @foreach ($notes as $index => $note)
@@ -10,7 +10,7 @@
                     @if ($note->topic === 'no-topic')
                         <span>No Topic</span>
                     @else
-                        <span>{!! ucfirst($note->topic) !!}</span>
+                        @markdown(ucfirst(strip_tags($note->topic)))
                     @endif
                 </h5>
                 <small>{{ $note->formatted_date }}</small>
@@ -22,7 +22,7 @@
                         <span class="dots">
                             ...
                         </span>
-                        <span class="more-text" style="display: none">
+                        <span class="more-text d-none">
                             {{ substr($note->note, 75) }}
                         </span>
                     </p>

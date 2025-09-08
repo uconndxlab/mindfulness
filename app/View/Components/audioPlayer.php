@@ -11,18 +11,18 @@ class audioPlayer extends Component
     
     public $file;
     public $id;
-    public $controlsList;
     public $allowSeek;
+    public $allowPlaybackRate;
 
     /**
      * Create a new component instance.
      */
-    public function __construct($file, $id = null, $controlsList = null, $allowSeek = false)
+    public function __construct($file, $id = null, $allowSeek = false, $allowPlaybackRate = false)
     {
         $this->file = $file;
         $this->id = $id;
-        $this->controlsList = $controlsList;    
         $this->allowSeek = $allowSeek;
+        $this->allowPlaybackRate = $allowPlaybackRate;
     }
 
     /**

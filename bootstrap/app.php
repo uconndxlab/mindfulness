@@ -16,13 +16,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // $middleware->trustProxies(at: '*');
         $middleware->alias([
             'admin' => AdminOnly::class,
             'update.last.active' => UpdateLastActiveAt::class,
             'check.account.lock' => CheckAccountLock::class,
             'registration.lock' => CheckRegistrationLock::class,
             'email.rate.limiter' => \App\Http\Middleware\EmailRateLimiter::class,
+            'session.policy' => \App\Http\Middleware\SessionPolicy::class,
         ]);
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -4,7 +4,7 @@
             <input type="text" class="form-control" placeholder="Search..." wire:model.live.debounce.300ms="search"/>
         </div>
         <div>
-            <a href="{{ route('admin.events.export') }}" class="btn btn-info btn-sm" style="margin: 0 !important;">Export to CSV</a>
+            <a href="{{ route('admin.events.export') }}" class="btn btn-info btn-sm m-0">Export to CSV</a>
         </div>
     </div>
     <div class="table-responsive">
@@ -92,12 +92,7 @@
                                 @case('properties')
                                     <td>
                                         @if ($event->properties->isNotEmpty())
-                                            <button class="btn btn-info btn-sm"
-                                                onclick="showModal({
-                                                    label: 'Event Details',
-                                                    body: document.getElementById('details-{{ $event->id }}').innerHTML,
-                                                    closeLabel: 'Close'
-                                                })">
+                                            <button class="btn btn-info btn-sm" data-open-modal data-modal-label="Event Details" data-modal-body-from="#details-{{ $event->id }}">
                                                 <i class="bi bi-info-circle"></i>
                                             </button>
                                             <div id="details-{{ $event->id }}" class="d-none">

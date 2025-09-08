@@ -1,6 +1,7 @@
 @extends('layouts.auth')
 
 @section('title', 'Log In')
+@section('page_id', 'auth-login-register')
 
 @section('content')
 <div class="col-md-6">
@@ -29,7 +30,7 @@
             <input id="email" type="email" class="form-control @error('email') is-invalid @enderror @error('credentials') is-invalid @enderror" name="email" value="{{ old('email') }}">
             @error('email')
                 <span class="invalid-feedback" role="alert">
-                    <strong>{!! $message !!}</strong>
+                    <strong>{{ $message }}</strong>
                 </span>
             @enderror
         </div>
@@ -44,7 +45,7 @@
             @enderror
             @error('credentials')
                 <span class="invalid-feedback" role="alert">
-                    <strong>{!! $message !!}</strong>
+                    <strong>{{ $message }}</strong>
                 </span>
             @enderror
         </div>
@@ -74,10 +75,4 @@
         </div>
     @endif
 </div>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        document.getElementById('timezone').value = timezone;
-    });
-</script>
 @endsection

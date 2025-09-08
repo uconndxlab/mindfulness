@@ -56,21 +56,22 @@ class ActivityController extends Controller
 
         // redirect url
         $redirect_url = null;
-        // check if practice - redirect to the next activity (slider reflection usually)
-        if ($activity->type === 'practice') {
-            $next_activity = $activity->nextActivity();
-            if ($next_activity
-                && $next_activity->type === 'reflection'
-                && $next_activity->quiz
-                && $next_activity->quiz->type === 'slider') {
+        // redirection on slider questions
+        $next_activity = $activity->nextActivity();
+        $last_activity_in_module = $activity->day->module->lastActivity();
+        // slider questions follow practice, or are last activity in module
+        if ($next_activity
+            && ($activity->type === 'practice' || $next_activity->id === $last_activity_in_module->id)
+            && $next_activity->quiz
+            && $next_activity->quiz->question_options[0]['type'] === 'slider') 
+        {
                 $redirect_url = route('explore.activity', ['activity_id' => $next_activity->id]);
-            }
         }
 
         // check if already completed
         if ($already_completed) {
             // potential for debugging in case the next day did not unlock
-            return response()->json(['success' => true, 'message' => 'Activity already completed', 'redirect_url' => $redirect_url], 200);
+            return response()->json(['success' => true, 'message' => 'Activity already completed'], 200);
         }
         
         // complete activity

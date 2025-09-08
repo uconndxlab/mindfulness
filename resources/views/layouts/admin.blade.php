@@ -36,18 +36,6 @@
                         Event Log
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#">
-                        <i class="bi bi-envelope me-2"></i>
-                        Email Log?
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#">
-                        <i class="bi bi-envelope me-2"></i>
-                        Inquiries?
-                    </a>
-                </li>
             </ul>
         </div>
     </div>

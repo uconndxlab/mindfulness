@@ -1,0 +1,15 @@
+# docker-compose.yml
+services:
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025" # Web UI access
+      - "1025:1025" # SMTP server for Laravel
+    environment:
+      MP_SMTP_AUTH_ALLOW_INSECURE: "true"
+      # issues with TLS handshake from Laravel
+      MP_SMTP_ACCEPT_INSECURE_STARTTLS: "true"
+      # allows any username/password
+      MP_SMTP_AUTH_ACCEPT_ANY: "true"

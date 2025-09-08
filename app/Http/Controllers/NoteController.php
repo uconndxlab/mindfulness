@@ -71,7 +71,7 @@ class NoteController extends Controller
                     'activity_id' => $request->activity_id
                 ],[
                     'note' => $request->note,
-                    'topic' => '<a href="/explore/activity/'.$act->id.'">'.$act->title.'</a> - '.$act->day->name.', '.$act->day->module->name.'</span>',
+                    'topic' => '['.$act->title.'](/explore/activity/'.$act->id.') - '.$act->day->name.', '.$act->day->module->name,
                 ]);
             }
             else {
@@ -86,7 +86,11 @@ class NoteController extends Controller
             return response()->json(['success' => 'Note submitted!'], 200);
         }
         catch (ValidationException $e) {
-            return response()->json(['error_message' => 'Failed to submit note.', 'error' => $e], 500);
+            \Log::warning('Note validation failed', [
+                'user_id' => Auth::id(),
+                'errors' => $e->errors(),
+            ]);
+            return response()->json(['error_message' => 'Failed to submit note.'], 500);
         }
     }
 }

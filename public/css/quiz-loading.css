@@ -1,0 +1,19 @@
+/* hide quiz during loading */
+.quiz-loading #quizForm {
+    display: none;
+}
+.quiz-loaded #quizForm {
+    display: block;
+}
+
+/* throbber */
+.quiz-throbber {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+.quiz-loaded .quiz-throbber {
+    display: none;
+}
