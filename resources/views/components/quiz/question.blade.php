@@ -5,7 +5,7 @@
      @if ($question['type'] == 'slider') data-question-json='@json($question)' @endif>
      
     <div class="text-left quiz-question mb-3">
-        <h4>{{ $question['question'] }}</h4>
+        <h4>@markdown($question['question'])</h4>
     </div>
 
     @include('components.quiz.question-types', ['question' => $question])

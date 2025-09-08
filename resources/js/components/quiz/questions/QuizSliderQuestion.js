@@ -87,6 +87,7 @@ class QuizSliderQuestion {
             const pipKeys = Object.keys(sliderConfig.pips);
             const firstPipValue = pipKeys.length > 0 ? pipKeys[0] : null;
             const lastPipValue = pipKeys.length > 0 ? pipKeys[pipKeys.length - 1] : null;
+            const middlePipValue = pipKeys.length > 0 ? pipKeys[Math.floor(pipKeys.length / 2)] : null;
             
             pipsConfig = {
                 mode: 'values',
@@ -94,8 +95,19 @@ class QuizSliderQuestion {
                 density: 4,
                 format: {
                     to: (value) => {
-                        if (window.innerWidth >= 768) return sliderConfig.pips[value];
-                        if (value == firstPipValue || value == lastPipValue) return sliderConfig.pips[value];
+                        const label = sliderConfig.pips[value];
+                        let pipContent = `${value}%`;
+                        if (label) {
+                            pipContent = pipContent + `<br><span class="pip-label">${label}</span>`;
+                        }
+
+                        if (window.innerWidth >= 768) {
+                            return pipContent;
+                        }
+
+                        if (value == firstPipValue || value == lastPipValue || value == middlePipValue) {
+                            return pipContent;
+                        }
                         return '';
                     }
                 }

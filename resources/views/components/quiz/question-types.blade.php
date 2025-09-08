@@ -49,7 +49,9 @@
 @elseif ($question['type'] === 'slider')
     @foreach ($question['options'] as $option)
         @if ($option['text'])
-            <label class="form-label">{{ $option['text'] }}</label>
+            <label class="form-label">
+                @markdown($option['text'])
+            </label>
         @endif
         <div class="slider-container noui-custom-pips">
             <div class="text-center slider-loading" id="slider_loading_{{ $question['number'] }}_{{ $option['id'] }}">
