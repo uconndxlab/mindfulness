@@ -67,5 +67,6 @@
                 id="slider_input_{{ $question['number'] }}_{{ $option['id'] }}" 
                 value="{{ $option['slider_config']['default'] ?? 50 }}">
         </div>
+        <hr>
     @endforeach
 @endif

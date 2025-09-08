@@ -1045,8 +1045,8 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 
 /* margins/padding for slider container in refleciton question */
 .slider-container {
-    margin-top: 2.5rem;
-    margin-bottom: 2.5rem;
+    margin-top: 2rem;
+    margin-bottom: 5rem;
     padding: 0 25px;
 }
 
