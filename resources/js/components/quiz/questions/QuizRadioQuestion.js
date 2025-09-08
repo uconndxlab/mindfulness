@@ -94,19 +94,14 @@ class QuizRadioQuestion {
     }
 
     handleOtherInput(radio, otherText = null) {
-        if (radio.getAttribute('data-other') === 'true') {
-            const optionId = this.extractOptionId(radio.id);
-            const otherInput = this.otherInputElements.get(optionId);
-            
-            if (otherInput) {
-                if (radio.checked) {
-                    otherInput.removeAttribute('disabled');
-                    if (otherText !== null) {
-                        otherInput.value = otherText;
-                    }
-                } else {
-                    otherInput.setAttribute('disabled', '');
+        for (const [id, otherInput] of this.otherInputElements) {
+            if (id === radio.value) {
+                otherInput.removeAttribute('disabled');
+                if (otherText !== null) {
+                    otherInput.value = otherText;
                 }
+            } else {
+                otherInput.setAttribute('disabled', '');
             }
         }
     }
