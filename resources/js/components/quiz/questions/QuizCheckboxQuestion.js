@@ -137,6 +137,7 @@ class QuizCheckboxQuestion {
         
         for (const value of this.selectedValues) {
             const checkbox = this.checkboxElements.get(value);
+            const item = {};
             
             if (checkbox && checkbox.getAttribute('data-other') === 'true') {
                 // need to include other text
@@ -145,13 +146,12 @@ class QuizCheckboxQuestion {
                 const otherText = otherInput ? otherInput.value.trim() : null;
                 
                 // return as object: {optionId: otherText}
-                const item = {};
                 item[value] = otherText || null;
-                result.push(item);
             } else {
                 // regular options return as simple values
-                result.push(value);
+                item[value] = null;
             }
+            result.push(item);
         }
         
         return result;
