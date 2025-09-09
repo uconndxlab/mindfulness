@@ -108,7 +108,7 @@ class QuizSliderQuestion {
                         if (value == firstPipValue || value == lastPipValue || value == middlePipValue) {
                             return pipContent;
                         }
-                        return '';
+                        return pipContent;
                     }
                 }
             };
