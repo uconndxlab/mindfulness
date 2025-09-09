@@ -40,7 +40,7 @@
             @endif
             @php
                 $allowSeek = $activity->completed;
-                $allowPlaybackRate = $activity->type == 'practice' && $activity->completed;
+                $allowPlaybackRate = $activity->type == 'lesson' && $activity->completed;
 
                 $hasAudioOptions = isset($content->audio_options) && !empty($content->audio_options);
                 
