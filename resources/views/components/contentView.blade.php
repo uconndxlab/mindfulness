@@ -1,5 +1,5 @@
 @if ($type == 'video')
-    <video id="{{ isset($id) ? $id : '' }}" class="media-player video-player" controls preload="auto">
+    <video id="{{ isset($id) ? $id : '' }}" class="media-player video-player col-md-8" controls preload="auto">
         <source src="{{ Storage::url('content/'.$file) }}" type="video/mp4">
         Your browser does not support the video element.
     </video>

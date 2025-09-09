@@ -167,4 +167,5 @@ return [
 
     ],
 
+    'num_backups' => env('NUM_BACKUPS', 20),
 ];
