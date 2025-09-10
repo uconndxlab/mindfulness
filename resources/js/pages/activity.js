@@ -191,7 +191,6 @@ function initActivityPage() {
     window.addEventListener('beforeunload', function(e) {
         if (!completed && showBrowserModal) {
             e.preventDefault();
-            e.returnValue = '';
         }
     });
 

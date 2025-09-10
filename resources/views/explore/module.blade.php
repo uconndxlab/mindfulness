@@ -24,6 +24,9 @@
             @php
                 $disabled = $day->unlocked ? '' : 'disabled';
             @endphp
+            @if ($day->is_check_in)
+                <hr>
+            @endif
 
             <div class="accordion-item border mb-2" id="day_{{ $day->id }}">
                 <h2 class="accordion-header" id="heading_{{ $index }}">
@@ -80,9 +83,6 @@
                     </div>
                 </div>
             </div>
-            @if ($day->is_check_in)
-                <hr>
-            @endif
         @endforeach
     </div>
 </div>

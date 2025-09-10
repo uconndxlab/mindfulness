@@ -61,9 +61,7 @@ class PageNavController extends Controller
         // order days and activities by order
         $module = Module::with('days.activities')->findOrFail($module_id);
         // put check in days first
-        $module->days = $module->days->sortBy('order')->sortBy(function ($day) {
-            return $day->is_check_in ? 0 : 1;
-        });
+        $module->days = $module->days->sortBy('order');
         foreach ($module->days as $day) {
             $day->activities = $day->activities->sortBy('order');
         }
@@ -143,7 +141,8 @@ class PageNavController extends Controller
         $explore_day = $activity->day;
         
         // check for progress warning, last day completed id, and if day to explore is not completed
-        if ($user->quick_progress_warning && $user->last_day_completed_id && !$user->isDayCompleted($explore_day)) {
+        // and if day to explore is not a check in day
+        if ($user->quick_progress_warning && $user->last_day_completed_id && !$user->isDayCompleted($explore_day) && !$explore_day->is_check_in) {
             // get time and name of day completion
             /** @var ?Day $completedDay */
             $completedDay = Day::find($user->last_day_completed_id) ?? null;
