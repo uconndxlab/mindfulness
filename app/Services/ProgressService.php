@@ -431,6 +431,10 @@ class ProgressService
             ->get();
 
         foreach ($days as $day) {
+            if ($user->isDayCompleted($day)) {
+                continue;
+            }
+
             $completed = true;
             foreach ($day->activities()->where('optional', false)->get() as $activity) {
                 if (!$user->isActivityCompleted($activity)) {
@@ -474,6 +478,10 @@ class ProgressService
             ->get();
 
         foreach ($modules as $module) {
+            if ($user->isModuleCompleted($module)) {
+                continue;
+            }
+
             $completed = true;
             foreach ($module->days()->get() as $day) {
                 if (!$user->isDayCompleted($day)) {
