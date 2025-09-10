@@ -13,7 +13,12 @@
         @endif
     </div>
 
-    <h5 class="mb-2">Progress: {{ $module->daysCompleted }}/{{ $module->totalDays }} days completed</h5>
+    <h5 class="mb-2">
+        Completed: {{ $module->daysCompleted }}/{{ $module->totalDays }} days
+        @if($module->totalCheckInDays > 0)
+            , {{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Check-Ins
+        @endif
+    </h5>
     <div class="accordion accordion-flush mb-3" id="accordionDays" data-accordion-day="{{ $accordion_day ?? '' }}">
         @foreach ($module->days as $index => $day)
             @php
@@ -75,6 +80,9 @@
                     </div>
                 </div>
             </div>
+            @if ($day->is_check_in)
+                <hr>
+            @endif
         @endforeach
     </div>
 </div>

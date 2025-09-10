@@ -47,6 +47,8 @@ class PageNavController extends Controller
             $module->completed = $stats['completed'];
             $module->daysCompleted = $stats['daysCompleted'];
             $module->totalDays = $stats['totalDays'];
+            $module->completedCheckInDays = $stats['completedCheckInDays'];
+            $module->totalCheckInDays = $stats['totalCheckInDays'];
         }
     
         return view("explore.home", compact('modules'));
@@ -58,7 +60,10 @@ class PageNavController extends Controller
         //find the module
         // order days and activities by order
         $module = Module::with('days.activities')->findOrFail($module_id);
-        $module->days = $module->days->sortBy('order');
+        // put check in days first
+        $module->days = $module->days->sortBy('order')->sortBy(function ($day) {
+            return $day->is_check_in ? 0 : 1;
+        });
         foreach ($module->days as $day) {
             $day->activities = $day->activities->sortBy('order');
         }
@@ -69,6 +74,8 @@ class PageNavController extends Controller
         $module->completed = $stats['completed'];
         $module->daysCompleted = $stats['daysCompleted'];
         $module->totalDays = $stats['totalDays'];
+        $module->completedCheckInDays = $stats['completedCheckInDays'];
+        $module->totalCheckInDays = $stats['totalCheckInDays'];
         
         // check if module locked
         if (!$module->unlocked) {
@@ -564,10 +571,10 @@ class PageNavController extends Controller
         $modules = Module::orderBy('order', 'asc')->get();
         foreach ($modules as $module) {
             $stats = $module->getStats(Auth::user() ?? null);
-            $module->unlocked = $stats['unlocked'];
-            $module->completed = $stats['completed'];
             $module->daysCompleted = $stats['daysCompleted'];
             $module->totalDays = $stats['totalDays'];
+            $module->completedCheckInDays = $stats['completedCheckInDays'];
+            $module->totalCheckInDays = $stats['totalCheckInDays'];
         }
         return view("other.account", compact('page_info', 'modules'));
     }
