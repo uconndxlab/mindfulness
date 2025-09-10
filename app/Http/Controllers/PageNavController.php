@@ -54,7 +54,7 @@ class PageNavController extends Controller
         return view("explore.home", compact('modules'));
     }
 
-    public function exploreModule($module_id, $accordion_day=null)
+    public function exploreModule($module_id, $activity_id=null)
     {
         $user = Auth::user();
         //find the module
@@ -79,16 +79,20 @@ class PageNavController extends Controller
         if (!$module->unlocked) {
             return redirect()->route('explore.home');
         }
-        
+
+        $accordion_activity = $activity_id ? Activity::find($activity_id) ?? null : null;
+        $accordion_activity_id = null;
+
         //get progress
         foreach ($module->days as $day) {
             $day->unlocked = $day->canBeAccessedBy($user);
             $day->completed = $day->isCompletedBy($user);
 
             // show accordion day, or last unlocked and incomplete
-            if ($accordion_day) {
+            if ($accordion_activity) {
                 // if accordion day is set, only one possible active day
-                if ($day->id == $accordion_day) {
+                if ($day->id == $accordion_activity->day_id) {
+                    $accordion_activity_id = $accordion_activity->id;
                     $day->active = true;
                 }
             } else if ($day->unlocked && !$day->completed) {
@@ -113,13 +117,7 @@ class PageNavController extends Controller
         Session::put('current_nav', ['route' => route('explore.module', ['module_id' => $module_id]), 'back' => 'Part '.$module_id]);
         Session::put('previous_explore', route('explore.module', ['module_id' => $module_id]));
         
-        return view("explore.module", compact('module', 'page_info', 'accordion_day'));
-    }
-
-    public function exploreModuleBonus(Request $request) {
-        $accordion_day = $request->day_id ?? null;
-        $module_id = Day::findOrFail($accordion_day)->module_id ?? null;
-        return $this->exploreModule($module_id, $accordion_day);
+        return view("explore.module", compact('module', 'page_info', 'accordion_activity_id',));
     }
 
     public function checkActivityLocked($activity_id) {

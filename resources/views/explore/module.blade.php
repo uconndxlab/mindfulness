@@ -19,7 +19,7 @@
             , {{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Check-Ins
         @endif
     </h5>
-    <div class="accordion accordion-flush mb-3" id="accordionDays" data-accordion-day="{{ $accordion_day ?? '' }}">
+    <div class="accordion accordion-flush mb-3" id="accordionDays" data-accordion-activity="{{ $accordion_activity_id ?? '' }}">
         @foreach ($module->days as $index => $day)
             @php
                 $disabled = $day->unlocked ? '' : 'disabled';
@@ -55,7 +55,7 @@
                                     $disabled = $activity->unlocked ? '' : 'disabled';
                                 @endphp
                                 <div class="card p-2 module mb-2">
-                                    <a id="moduleLink" class="stretched-link w-100 activity-link {{ $disabled }} pb-1" data-id="{{ $activity->id }}" href="#">
+                                    <a id="moduleLink_{{ $activity->id }}" class="stretched-link w-100 activity-link {{ $disabled }} pb-1" data-id="{{ $activity->id }}" href="#">
                                         <div class="d-flex">
                                             @if ($activity->completed)
                                                 <i class="bi bi-check-square-fill"></i>
