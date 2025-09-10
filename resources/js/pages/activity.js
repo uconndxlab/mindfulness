@@ -13,7 +13,7 @@ function initActivityPage() {
 
     const redirectDiv = document.getElementById('redirect_div');
     const compLateBtn = document.getElementById('complete-later');
-    let completed = false;
+    let completed = status === 'completed';
     let type = null;
 
     function unlockRedirect() {
@@ -191,7 +191,6 @@ function initActivityPage() {
     window.addEventListener('beforeunload', function(e) {
         if (!completed && showBrowserModal) {
             e.preventDefault();
-            e.returnValue = '';
         }
     });
 

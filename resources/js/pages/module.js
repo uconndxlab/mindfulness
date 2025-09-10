@@ -1,26 +1,20 @@
 function initModulePage() {
     // scroll to bonus activity
     const accordionContainer = document.getElementById('accordionDays');
-    const dayId = accordionContainer.dataset.accordionDay;
-    if (dayId) {
-        console.log('override found');
-        var dayElement = document.getElementById('day_' + dayId);
-        if (dayElement) {
-            console.log('day element found');
-            setTimeout(function() {
-                var bonusActivity = dayElement.querySelector('.activity-tag-optional');
-                if (bonusActivity) {
-                    console.log('bonus activity found');
-                    var offset = 125;
-                    var elementPosition = bonusActivity.getBoundingClientRect().top;
-                    var offsetPosition = elementPosition + window.pageYOffset - offset;
-                    window.scrollTo({
-                        top: offsetPosition,
-                        behavior: 'smooth'
-                    });
-                }
-            }, 100);
-        }
+    const activityId = accordionContainer.dataset.accordionActivity;
+    if (activityId) {
+        setTimeout(function() {
+            var scrollActivity = document.getElementById('moduleLink_' + activityId);
+            if (scrollActivity) {
+                var offset = 125;
+                var elementPosition = scrollActivity.getBoundingClientRect().top;
+                var offsetPosition = elementPosition + window.pageYOffset - offset;
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }, 100);
     }
 
     document.querySelectorAll('.activity-link').forEach(function (activity) {

@@ -165,9 +165,12 @@ class ProgressService
         }
 
         // completion warning for quick completion
-        $user->quick_progress_warning = true;
-        $user->last_day_completed_id = $day->id;
-        $user->save();
+        // ignore check in days
+        if (!$day->is_check_in) {
+            $user->quick_progress_warning = true;
+            $user->last_day_completed_id = $day->id;
+            $user->save();
+        }
 
         // get next day within module
         $nextDay = $day->module->days()
@@ -305,6 +308,43 @@ class ProgressService
         return $result;
     }
 
+
+    // PROGRESS EVALUATION - functions to run after content management actions
+    /**
+     * Unlock activities up to latest completion for all users
+     * Call this after content management actions that affect activity order
+     */
+    public function unlockAllUsersUpToLatestCompletion(): void
+    {
+        $users = User::all();
+        
+        foreach ($users as $user) {
+            $this->unlockUpToLatestCompletion($user);
+        }
+    }
+
+    /**
+     * Unlock activities up to latest completion for a single user
+     * This ensures all activities up to their latest completion are unlocked,
+     * plus the next activity after their highest completion
+     */
+    public function unlockUpToLatestCompletion(User $user): void
+    {
+        $latestCompleted = $this->getLatestCompletedActivity($user);
+
+        if ($latestCompleted) {
+            // Unlock all activities up to and including the latest completed
+            $this->unlockActivitiesUpTo($user, $latestCompleted);
+            
+            // Unlock the next activity after the latest completed
+            $this->unlockNextActivity($user, $latestCompleted);
+
+            // check day and module completion up to latest completion
+            $this->checkDayCompletionUpTo($user, $latestCompleted->day);
+            $this->checkModuleCompletionUpTo($user, $latestCompleted->day->module);
+        }
+    }
+
     /*
     * Get the latest completed activity for a user
     */
@@ -331,6 +371,24 @@ class ProgressService
                     'unlocked' => true,
                 ],
             ]);
+
+            // unlock day and module if they are not unlocked
+            // should only run once for each day and module if not already unlocked
+            // handles case where there is a new day or module
+            if (!$act->day->canBeAccessedBy($user)) {
+                $user->days()->syncWithoutDetaching([
+                    $act->day_id => [
+                        'unlocked' => true,
+                    ],
+                ]);
+                if (!$act->day->module->canBeAccessedBy($user)) {
+                    $user->modules()->syncWithoutDetaching([
+                        $act->day->module_id => [
+                            'unlocked' => true,
+                        ],
+                    ]);
+                }
+            }
         }
     }
 
@@ -367,33 +425,94 @@ class ProgressService
     }
 
     /**
-     * Unlock activities up to latest completion for a single user
-     * This ensures all activities up to their latest completion are unlocked,
-     * plus the next activity after their highest completion
+     * Check day completion up to latest completion - if completed, complete day in evaluation
      */
-    public function unlockUpToLatestCompletion(User $user): void
+    public function checkDayCompletionUpTo(User $user, Day $day): void
     {
-        $latestCompleted = $this->getLatestCompletedActivity($user);
-        
-        if ($latestCompleted) {
-            // Unlock all activities up to and including the latest completed
-            $this->unlockActivitiesUpTo($user, $latestCompleted);
-            
-            // Unlock the next activity after the latest completed
-            $this->unlockNextActivity($user, $latestCompleted);
+        $days = Day::where('order', '<=', $day->order)
+            ->orderBy('order')
+            ->get();
+
+        foreach ($days as $day) {
+            if ($user->isDayCompleted($day)) {
+                continue;
+            }
+
+            $completed = true;
+            foreach ($day->activities()->where('optional', false)->get() as $activity) {
+                if (!$user->isActivityCompleted($activity)) {
+                    $completed = false;
+                    break;
+                }
+            }
+            if ($completed) {
+                $this->completeDayInEvaluation($user, $day);
+            }
         }
     }
 
-    /**
-     * Unlock activities up to latest completion for all users
-     * Call this after content management actions that affect activity order
-     */
-    public function unlockAllUsersUpToLatestCompletion(): void
+    // complete day in evaluation - has different behavior than normal completion - just completion and event
+    public function completeDayInEvaluation(User $user, Day $day): void
     {
-        $users = User::all();
-        
-        foreach ($users as $user) {
-            $this->unlockUpToLatestCompletion($user);
+        $user->days()->syncWithoutDetaching([
+            $day->id => [
+                'completed' => true,
+                'completed_at' => now(),
+            ],
+        ]);
+        activity('day')
+            ->event('day_completed_in_evaluation')
+            ->performedOn($day)
+            ->causedBy($user)
+            ->withProperties([
+                'day' => $day->name,
+                'module' => $day->module->name,
+            ])
+            ->log('Day completed in App Update');
+    }
+
+    /**
+     * Check module completion up to latest completion - if completed, complete module in evaluation
+     */
+    public function checkModuleCompletionUpTo(User $user, Module $module): void
+    {
+        $modules = Module::where('order', '<=', $module->order)
+            ->orderBy('order')
+            ->get();
+
+        foreach ($modules as $module) {
+            if ($user->isModuleCompleted($module)) {
+                continue;
+            }
+
+            $completed = true;
+            foreach ($module->days()->get() as $day) {
+                if (!$user->isDayCompleted($day)) {
+                    $completed = false;
+                    break;
+                }
+            }
+            if ($completed) {
+                $this->completemoduleInEvaluation($user, $module);
+            }
         }
+    }
+
+    public function completeModuleInEvaluation(User $user, Module $module): void
+    {
+        $user->modules()->syncWithoutDetaching([
+            $module->id => [
+                'completed' => true,
+                'completed_at' => now(),
+            ],
+        ]);
+        activity('module')
+            ->event('module_completed_in_evaluation')
+            ->performedOn($module)
+            ->causedBy($user)
+            ->withProperties([
+                'module' => $module->name,
+            ])
+            ->log('Module completed in App Update');
     }
 }

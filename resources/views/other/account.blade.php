@@ -13,7 +13,16 @@
                 <h5 class="fw-bold d-flex justify-content-between">
                     <span>Part {{ $module->order }} - {{ $module->name }}</span>
                 </h5>
-                <small class="{{ $module->completed ? 'fw-bold' : '' }}">{{ $module->daysCompleted }}/{{ $module->totalDays }} days completed</small>
+                <span>
+                    <small class="{{ $module->daysCompleted == $module->totalDays ? 'fw-bold' : '' }}">
+                        {{ $module->daysCompleted }}/{{ $module->totalDays }} Days completed
+                    </small>
+                    @if($module->totalCheckInDays > 0)
+                        <small class="{{ $module->completedCheckInDays == $module->totalCheckInDays ? 'fw-bold' : '' }}">
+                            , {{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Check-Ins completed
+                        </small>
+                    @endif
+                </span>
             </div>
         </div>
     @endforeach

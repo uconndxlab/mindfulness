@@ -13,12 +13,20 @@
         @endif
     </div>
 
-    <h5 class="mb-2">Progress: {{ $module->daysCompleted }}/{{ $module->totalDays }} days completed</h5>
-    <div class="accordion accordion-flush mb-3" id="accordionDays" data-accordion-day="{{ $accordion_day ?? '' }}">
+    <h5 class="mb-2">
+        Completed: {{ $module->daysCompleted }}/{{ $module->totalDays }} days
+        @if($module->totalCheckInDays > 0)
+            , {{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Check-Ins
+        @endif
+    </h5>
+    <div class="accordion accordion-flush mb-3" id="accordionDays" data-accordion-activity="{{ $accordion_activity_id ?? '' }}">
         @foreach ($module->days as $index => $day)
             @php
                 $disabled = $day->unlocked ? '' : 'disabled';
             @endphp
+            @if ($day->is_check_in)
+                <hr>
+            @endif
 
             <div class="accordion-item border mb-2" id="day_{{ $day->id }}">
                 <h2 class="accordion-header" id="heading_{{ $index }}">
@@ -47,7 +55,7 @@
                                     $disabled = $activity->unlocked ? '' : 'disabled';
                                 @endphp
                                 <div class="card p-2 module mb-2">
-                                    <a id="moduleLink" class="stretched-link w-100 activity-link {{ $disabled }} pb-1" data-id="{{ $activity->id }}" href="#">
+                                    <a id="moduleLink_{{ $activity->id }}" class="stretched-link w-100 activity-link {{ $disabled }} pb-1" data-id="{{ $activity->id }}" href="#">
                                         <div class="d-flex">
                                             @if ($activity->completed)
                                                 <i class="bi bi-check-square-fill"></i>

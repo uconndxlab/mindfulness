@@ -28,6 +28,7 @@ class DaySeeder extends Seeder
                     'completion_message' => $day->completion_message,
                     'media_path' => $day->media_path,
                     'order' => $day->order,
+                    'is_check_in' => $day->is_check_in,
                 ]
             );
         }

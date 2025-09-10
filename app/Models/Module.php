@@ -44,26 +44,39 @@ class Module extends Model
         if (!$user) {
             return 0;
         }
+        $completedDays = 0;
+        $completedCheckInDays = 0;
 
         $days = $this->days;
-        $completedDays = $days->filter(function ($day) use ($user) {
-            return $day->isCompletedBy($user);
-        });
-        return $completedDays->count();
+        foreach ($days as $day) {
+            if ($day->isCompletedBy($user)) {
+                if ($day->is_check_in) {
+                    $completedCheckInDays++;
+                } else {
+                    $completedDays++;
+                }
+            }
+        }
+        return [$completedDays, $completedCheckInDays];
     }
 
+    // when progress is actually checked, it does NOT use this
+    // a module is completed if ALL days are completed regardless of check-in or not
     public function getStats(?User $user)
     {
         $unlocked = $this->canBeAccessedBy($user);
         $completed = $this->isCompletedBy($user);
-        $daysCompleted = $this->numberDaysCompletedBy($user);
-        $totalDays = $this->days->count();
+        [$daysCompleted, $completedCheckInDays] = $this->numberDaysCompletedBy($user);
+        $totalDays = $this->days->where('is_check_in', false)->count();
+        $totalCheckInDays = $this->days->count() - $totalDays;
 
         return [
             'unlocked' => $unlocked,
             'completed' => $completed,
             'daysCompleted' => $daysCompleted,
             'totalDays' => $totalDays,
+            'completedCheckInDays' => $completedCheckInDays,
+            'totalCheckInDays' => $totalCheckInDays,
         ];
     }
     

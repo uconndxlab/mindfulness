@@ -25,20 +25,24 @@ class ShowDayCompletedModal
     {
         $day = Day::find($event->day);
         $hasBonus = $day->activities->where('optional', true)->count() > 0;
+        $nextDay = $day->module->days()
+            ->where('order', '>', $day->order)
+            ->orderBy('order')
+            ->first();
 
         // build modal
-        $modalData = $this->buildModalData($day, $hasBonus);
+        $modalData = $this->buildModalData($day, $hasBonus, $nextDay);
 
         session([
             'modal_data' => $modalData
         ]);
     }
 
-    private function buildModalData(Day $day, bool $hasBonus): array
+    private function buildModalData(Day $day, bool $hasBonus, Day $nextDay = null): array
     {
         $label = "Congrats on completing {$day->name}! 🎉";
-        $body = $this->buildModalBody($day, $hasBonus);
-        $media = Storage::url('flowers/'.($day->media_path ? $day->media_path : ''));
+        $body = $this->buildModalBody($day, $hasBonus, $nextDay);
+        $media = $day->media_path ? Storage::url('flowers/'.$day->media_path) : null;
         $route = '/home';
 
         $modalData = [
@@ -51,22 +55,33 @@ class ShowDayCompletedModal
             'buttonLabel' => 'Home',
         ];
 
-        if ($hasBonus) {
-            $modalData['route'] = route('explore.module.bonus', ['day_id' => $day->id]);
+        // check in has precedence over bonus
+        if ($nextDay && $nextDay->is_check_in) {
+            $modalData['route'] = route('explore.module', ['module_id' => $nextDay->module_id, 'activity_id' => $nextDay->activities->first()->id]);
+            $modalData['buttonLabel'] = 'Go to Check-In';
+        }
+        else if ($hasBonus) {
+            $modalData['route'] = route('explore.module', ['module_id' => $day->module_id, 'activity_id' => $day->activities->where('optional', true)->first()->id]);
             $modalData['buttonLabel'] = 'View Bonus Activities';
         }
 
         return $modalData;
     }
 
-    private function buildModalBody(Day $day, bool $hasBonus): string
+    private function buildModalBody(Day $day, bool $hasBonus, Day $nextDay = null): string
     {
         $converter = app(\League\CommonMark\CommonMarkConverter::class);
         
         $bodyMessage = $day->completion_message ?? "Congratulations on completing **{$day->module->name}: {$day->name}**!";
 
+        if ($nextDay && $nextDay->is_check_in) {
+            $order = $nextDay->module->order;
+            $nextPartOrder = $order + 1;
+            $checkInRoute = route('explore.module', ['module_id' => $nextDay->module_id, 'activity_id' => $nextDay->activities->first()->id]);
+            $bodyMessage .= "\n\n You have completed **Part {$order} - {$nextDay->module->name}** and unlocked a Check-In! Click [here]({$checkInRoute}) to complete the Check-In before moving on to Part {$nextPartOrder}.";
+        }
         if ($hasBonus) {
-            $bonusRoute = route('explore.module.bonus', ['day_id' => $day->id]);
+            $bonusRoute = route('explore.module', ['module_id' => $day->module_id, 'activity_id' => $day->activities->where('optional', true)->first()->id]);
             $bodyMessage .= "\n\nYou have also unlocked bonus activities for this day! Click [here]({$bonusRoute}) to view them.";
         }
 
