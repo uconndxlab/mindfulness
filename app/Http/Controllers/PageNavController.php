@@ -47,6 +47,8 @@ class PageNavController extends Controller
             $module->completed = $stats['completed'];
             $module->daysCompleted = $stats['daysCompleted'];
             $module->totalDays = $stats['totalDays'];
+            $module->completedCheckInActivities = $stats['completedCheckInActivities'];
+            $module->totalCheckInActivities = $stats['totalCheckInActivities'];
             $module->completedCheckInDays = $stats['completedCheckInDays'];
             $module->totalCheckInDays = $stats['totalCheckInDays'];
         }
@@ -72,6 +74,8 @@ class PageNavController extends Controller
         $module->completed = $stats['completed'];
         $module->daysCompleted = $stats['daysCompleted'];
         $module->totalDays = $stats['totalDays'];
+        $module->completedCheckInActivities = $stats['completedCheckInActivities'];
+        $module->totalCheckInActivities = $stats['totalCheckInActivities'];
         $module->completedCheckInDays = $stats['completedCheckInDays'];
         $module->totalCheckInDays = $stats['totalCheckInDays'];
         

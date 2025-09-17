@@ -14,9 +14,12 @@
     </div>
 
     <h5 class="mb-2">
-        Completed: {{ $module->daysCompleted }}/{{ $module->totalDays }} days
+        <strong>Completed:</strong> {{ $module->daysCompleted }}/{{ $module->totalDays }} days
+        @if($module->totalCheckInActivities > 0)
+            , {{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins
+        @endif
         @if($module->totalCheckInDays > 0)
-            , {{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Check-Ins
+            , {{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Rate My Awareness
         @endif
     </h5>
     <div class="accordion accordion-flush mb-3" id="accordionDays" data-accordion-activity="{{ $accordion_activity_id ?? '' }}">
