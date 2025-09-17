@@ -20,7 +20,7 @@
     }
 @endphp
 
-<nav class="navbar navbar-expand-lg navbar-light">
+<nav class="navbar navbar-expand-lg navbar-light sticky-top top-nav">
     <div class="container-fluid container">
         <ul class="navbar-nav">
             @if(isset($page_info['back_route']) && isset($page_info['back_label']))

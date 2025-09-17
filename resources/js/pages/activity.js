@@ -18,6 +18,19 @@ function initActivityPage() {
 
     function unlockRedirect() {
         if (!redirectDiv) return;
+
+        // scroll to redirect div
+        setTimeout(function() {
+            var offset = 125;
+            var elementPosition = redirectDiv.getBoundingClientRect().top;
+            var offsetPosition = elementPosition + window.pageYOffset - offset;
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }, 200);
+        // do not show buttons if completed
+        if (status === 'completed') return;
         redirectDiv.querySelectorAll('.redirect-btn').forEach(btn => {
             btn.classList.remove('d-none');
             btn.classList.remove('disabled');
@@ -54,9 +67,7 @@ function initActivityPage() {
                             completeButton.classList.add('d-none');
                         }
                     }
-                    if (status === 'unlocked') {
-                        unlockRedirect(message);
-                    }
+                    unlockRedirect(message);
                     showCompletionMessage();
                 }
             }).catch(error => {
