@@ -62,7 +62,7 @@ if (!function_exists('unlockFirst')) {
     {
         // unlocking the first activity/day/module
         $user = User::findOrFail($user_id);
-        $firstActId = getConfig('first_activity_id');
+        $firstActId = Activity::where('optional', false)->orderBy('order')->first()->id;
         $activity = Activity::findOrFail($firstActId);
 
         if ($activity) {

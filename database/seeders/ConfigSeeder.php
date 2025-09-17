@@ -15,10 +15,6 @@ class ConfigSeeder extends Seeder
     public function run(): void
     {
         Config::updateOrCreate(
-            ['key' => 'first_activity_id'],
-            ['value' => '1']
-        );
-        Config::updateOrCreate(
             ['key' => 'registration_locked'],
             ['value' => false]
         );

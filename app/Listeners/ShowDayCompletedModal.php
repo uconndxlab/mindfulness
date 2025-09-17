@@ -73,6 +73,7 @@ class ShowDayCompletedModal
         $converter = app(\League\CommonMark\CommonMarkConverter::class);
         
         $bodyMessage = $day->completion_message ?? "Congratulations on completing **{$day->module->name}: {$day->name}**!";
+        $bodyMessage .= "\n\n Return [Home](/home) to view your progress!";
 
         if ($nextDay && $nextDay->is_check_in) {
             $order = $nextDay->module->order;

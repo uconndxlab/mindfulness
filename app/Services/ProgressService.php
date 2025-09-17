@@ -352,6 +352,7 @@ class ProgressService
     {
         return $user->activities()
             ->wherePivot('completed', true)
+            ->where('optional', false)
             ->orderBy('order', 'desc')
             ->first();
     }
