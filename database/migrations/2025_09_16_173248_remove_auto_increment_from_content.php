@@ -12,10 +12,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // note, this migration might drop the days table...
-        $this->recreateTableWithoutAutoIncrement('content');
-        $this->recreateTableWithoutAutoIncrement('quizzes');
-        $this->recreateTableWithoutAutoIncrement('journals');
+        DB::statement('PRAGMA foreign_keys = OFF');
+        
+        try {
+            // note, this migration might drop the days table...
+            $this->recreateTableWithoutAutoIncrement('content');
+            $this->recreateTableWithoutAutoIncrement('quizzes');
+            $this->recreateTableWithoutAutoIncrement('journals');
+        } finally {
+            DB::statement('PRAGMA foreign_keys = ON');
+        }
     }
 
     /**
