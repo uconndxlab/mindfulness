@@ -1201,6 +1201,49 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     height: auto;
 }
 
+/* video container */
+.video-container {
+    position: relative;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+/* video player responsive styling */
+.video-player, .media-player {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* mobile */
+@media (max-width: 767.98px) {
+    .video-player, .media-player {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto;
+        border-radius: 6px;
+    }
+}
+
+/* tablet */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+    .video-player, .media-player {
+        width: 100%;
+        max-width: 90%;
+        margin: 0 auto;
+    }
+}
+
+/* desktop */
+@media (min-width: 1200px) {
+    .video-player, .media-player {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+}
+
 .faq-body {
     padding: 10px 20px !important;
 }

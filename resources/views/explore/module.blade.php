@@ -70,8 +70,12 @@
                                                 @if ($activity->type)
                                                     <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>
                                                 @endif
-                                                @if ($activity->time)
-                                                    <span class="sub-activity-font activity-tag-time">{{ $activity->time.' min' }}</span>
+                                                @if (isset($activity->time))
+                                                    @if ($activity->time >= 1)
+                                                        <span class="sub-activity-font activity-tag-time">{{ $activity->time.' min' }}</span>
+                                                    @else
+                                                        <span class="sub-activity-font activity-tag-time">{{ '<1 min' }}</span>
+                                                    @endif
                                                 @endif
                                                 @if ($activity->optional)
                                                     <span class="sub-activity-font activity-tag-optional"></i>Bonus</span>

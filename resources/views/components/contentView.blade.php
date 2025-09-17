@@ -1,8 +1,10 @@
 @if ($type == 'video')
-    <video id="{{ isset($id) ? $id : '' }}" class="media-player video-player col-md-8" controls preload="auto">
-        <source src="{{ Storage::url('content/'.$file) }}" type="video/mp4">
-        Your browser does not support the video element.
-    </video>
+    <div class="video-container w-100 d-flex justify-content-center">
+        <video id="{{ isset($id) ? $id : '' }}" class="media-player video-player" controls preload="auto">
+            <source src="{{ Storage::url('content/'.$file) }}" type="video/mp4">
+            Your browser does not support the video element.
+        </video>
+    </div>
 @elseif ($type == 'pdf')
     <div>
         <!-- class="link-workbook" -->
