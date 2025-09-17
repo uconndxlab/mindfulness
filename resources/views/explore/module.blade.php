@@ -13,15 +13,18 @@
         @endif
     </div>
 
-    <h5 class="mb-2">
-        <strong>Completed:</strong> {{ $module->daysCompleted }}/{{ $module->totalDays }} days
-        @if($module->totalCheckInActivities > 0)
-            , {{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins
-        @endif
-        @if($module->totalCheckInDays > 0)
-            , {{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Rate My Awareness
-        @endif
-    </h5>
+    <div class="mb-2">
+        <h5>Progress:</h5>
+        <ul>
+            <li class="list-check{{ $module->daysCompleted == $module->totalDays ? '-filled' : '' }}">{{ $module->daysCompleted }}/{{ $module->totalDays }} Days</li>
+            @if ($module->totalCheckInActivities > 0)
+                <li class="list-check{{ $module->completedCheckInActivities == $module->totalCheckInActivities ? '-filled' : '' }}">{{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins</li>
+            @endif
+            @if ($module->totalCheckInDays > 0)
+                <li class="list-check{{ $module->completedCheckInDays == $module->totalCheckInDays ? '-filled' : '' }}">{{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Rate My Awareness</li>
+            @endif
+        </ul>
+    </div>
     <div class="accordion accordion-flush mb-3" id="accordionDays" data-accordion-activity="{{ $accordion_activity_id ?? '' }}">
         @foreach ($module->days as $index => $day)
             @php

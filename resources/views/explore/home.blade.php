@@ -18,20 +18,14 @@
                                 <a id="moduleLink" href="{{ route('explore.module', ['module_id' => $module->id]) }}" class="stretched-link w-100 module-link">
                                     <img src="{{ Storage::url('flowers/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon">
                                     <div class="col">
-                                        @php
-                                            $completed = $module->totalDays > 0 && $module->daysCompleted == $module->totalDays;
-                                            $hasCheckIn = $module->totalCheckInDays > 0;
-                                            $completedCheckIn = $module->completedCheckInDays == $module->totalCheckInDays;
-                                        @endphp
                                         <h6 class="mb-0">Part {{ $module->order }} - {{ $module->name }}</h6>
-                                        <span>
-                                            @if ($completed)
-                                                <i class="bi bi-check-square-fill me-1"></i>
+                                        <span class="text-muted">
+                                            {{ $module->daysCompleted }}/{{ $module->totalDays }} Days
+                                            @if ($module->totalCheckInActivities > 0)
+                                                , {{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins
                                             @endif
-                                            {{ $module->daysCompleted }}/{{ $module->totalDays }} days completed
-                                            @if ( $hasCheckIn && !$completedCheckIn )
-                                                - <i class="bi bi-exclamation-circle text-danger me-1"></i>
-                                                {{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Check-Ins complete
+                                            @if ($module->totalCheckInDays > 0)
+                                                , {{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Rate My Awareness
                                             @endif
                                         </span>
                                     </div>
