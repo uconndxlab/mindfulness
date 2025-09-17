@@ -14,12 +14,19 @@
                     <span>Part {{ $module->order }} - {{ $module->name }}</span>
                 </h5>
                 <span>
-                    <small class="{{ $module->daysCompleted == $module->totalDays ? 'fw-bold' : '' }}">
-                        {{ $module->daysCompleted }}/{{ $module->totalDays }} Days completed
-                    </small>
+                    @if($module->totalDays > 0)
+                        <small class="{{ $module->daysCompleted == $module->totalDays ? 'fw-bold' : '' }}">
+                            {{ $module->daysCompleted }}/{{ $module->totalDays }} Days
+                        </small>
+                    @endif
+                    @if($module->totalCheckInActivities > 0)
+                        <small class="{{ $module->completedCheckInActivities == $module->totalCheckInActivities ? 'fw-bold' : '' }}">
+                            , {{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins
+                        </small>
+                    @endif
                     @if($module->totalCheckInDays > 0)
                         <small class="{{ $module->completedCheckInDays == $module->totalCheckInDays ? 'fw-bold' : '' }}">
-                            , {{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Check-Ins completed
+                            , {{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Rate My Awareness
                         </small>
                     @endif
                 </span>

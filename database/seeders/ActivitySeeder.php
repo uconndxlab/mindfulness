@@ -30,6 +30,7 @@ class ActivitySeeder extends Seeder
                     'order' => $activity->order,
                     'skippable' => $activity->skippable ?? true,
                     'optional' => $activity->optional ?? false,
+                    'is_check_in' => $activity->is_check_in ?? false,
                 ]
             );
         }

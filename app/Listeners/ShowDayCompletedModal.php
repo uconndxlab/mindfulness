@@ -58,7 +58,7 @@ class ShowDayCompletedModal
         // check in has precedence over bonus
         if ($nextDay && $nextDay->is_check_in) {
             $modalData['route'] = route('explore.module', ['module_id' => $nextDay->module_id, 'activity_id' => $nextDay->activities->first()->id]);
-            $modalData['buttonLabel'] = 'Go to Check-In';
+            $modalData['buttonLabel'] = "Go to {$nextDay->name}";
         }
         else if ($hasBonus) {
             $modalData['route'] = route('explore.module', ['module_id' => $day->module_id, 'activity_id' => $day->activities->where('optional', true)->first()->id]);
@@ -79,7 +79,7 @@ class ShowDayCompletedModal
             $order = $nextDay->module->order;
             $nextPartOrder = $order + 1;
             $checkInRoute = route('explore.module', ['module_id' => $nextDay->module_id, 'activity_id' => $nextDay->activities->first()->id]);
-            $bodyMessage .= "\n\n You have completed **Part {$order} - {$nextDay->module->name}** and unlocked a Check-In! Click [here]({$checkInRoute}) to complete the Check-In before moving on to Part {$nextPartOrder}.";
+            $bodyMessage .= "\n\n You have unlocked **{$nextDay->name}**! Click [here]({$checkInRoute}) to complete **{$nextDay->name}** before moving on to Part {$nextPartOrder}.";
         }
         if ($hasBonus) {
             $bonusRoute = route('explore.module', ['module_id' => $day->module_id, 'activity_id' => $day->activities->where('optional', true)->first()->id]);

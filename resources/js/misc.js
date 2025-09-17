@@ -31,3 +31,19 @@ function logoutClick() {
 if (window.sessionModalData && typeof window.showModal === 'function') {
     window.showModal(window.sessionModalData);
 }
+
+// add shadow to top nav when scrolled
+const topNav = document.querySelector('.top-nav');
+if (topNav) {
+    const handleScroll = () => {
+        if (window.scrollY > 0) {
+            topNav.classList.add('scrolled');
+        } else {
+            topNav.classList.remove('scrolled');
+        }
+    };
+
+    // scroll event listener
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+}

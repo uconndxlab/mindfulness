@@ -17,12 +17,28 @@
                             @if ($module->unlocked)
                                 <a id="moduleLink" href="{{ route('explore.module', ['module_id' => $module->id]) }}" class="stretched-link w-100 module-link">
                                     <img src="{{ Storage::url('flowers/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon">
-                                    Part {{ $module->order }} - {{ $module->name }} <br> {{ $module->daysCompleted }}/{{ $module->totalDays }} days completed
+                                    <div class="col">
+                                        <h6 class="mb-0">Part {{ $module->order }} - {{ $module->name }}</h6>
+                                        <span class="text-muted">
+                                            {{ $module->daysCompleted }}/{{ $module->totalDays }} Days
+                                            @if ($module->totalCheckInActivities > 0)
+                                                , {{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins
+                                            @endif
+                                            @if ($module->totalCheckInDays > 0)
+                                                , {{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Rate My Awareness
+                                            @endif
+                                        </span>
+                                    </div>
                                 </a>
                             @else
                                 <span id="moduleLink" class="stretched-link w-100 module-link disabled">
                                     <img src="{{ Storage::url('flowers/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon">
-                                    Part {{ $module->order }} - {{ $module->name }} <br> {{ $module->daysCompleted }}/{{ $module->totalDays }} days completed
+                                    <div class="col">
+                                        <h6 class="mb-0">Part {{ $module->order }} - {{ $module->name }}</h6>
+                                        <span>
+                                            {{ $module->daysCompleted }}/{{ $module->totalDays }} days completed
+                                        </span>
+                                    </div>
                                 </span>
                             @endif
                             <i class="bi bi-arrow-right"></i>

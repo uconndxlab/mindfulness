@@ -333,6 +333,14 @@ button:disabled i{
     padding-right: 0px !important;
 }
 
+/* top nav shadow when scrolled */
+.top-nav{
+    transition: box-shadow 0.3s ease;
+}
+.top-nav.scrolled{
+    box-shadow: 0px 0px 12px 0px rgba(0,0,0,.2);
+}
+
 /*tabs*/
 .navbar .tabs ul li{
     background:var(--blue-grey);
@@ -1155,11 +1163,19 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 /* module link */
 .module-link {
     display:flex;
+    align-items: center;
 }
 .module-link img {
     width:50px;
     height:50px;
     margin-right:10px;
+}
+.module-content {
+    display: flex;
+    flex-direction: column;
+}
+.module-content h5 {
+    margin-bottom: 0;
 }
 
 /* help page */
@@ -1183,6 +1199,49 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 .tutorial-container video {
     width: 100%;
     height: auto;
+}
+
+/* video container */
+.video-container {
+    position: relative;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+/* video player responsive styling */
+.video-player, .media-player {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* mobile */
+@media (max-width: 767.98px) {
+    .video-player, .media-player {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto;
+        border-radius: 6px;
+    }
+}
+
+/* tablet */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+    .video-player, .media-player {
+        width: 100%;
+        max-width: 90%;
+        margin: 0 auto;
+    }
+}
+
+/* desktop */
+@media (min-width: 1200px) {
+    .video-player, .media-player {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+    }
 }
 
 .faq-body {
@@ -1228,4 +1287,31 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     margin: 0;
     font-size: 0.875rem;
     line-height: 1.4;
+}
+
+/* module progress - list styling */
+.list-check, .list-check-filled {
+    list-style: none;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.list-check::before {
+    content: "\F584";
+    position: absolute;
+    left: 0;
+    top: 0.1rem;
+    font-family: "bootstrap-icons";
+    font-size: 0.9rem;
+    color: var(--dark-grey);
+}
+
+.list-check-filled::before {
+    content: "\F26C";
+    position: absolute;
+    left: 0;
+    top: 0.1rem;
+    font-family: "bootstrap-icons";
+    font-size: 0.9rem;
+    color: var(--dark-green);
 }

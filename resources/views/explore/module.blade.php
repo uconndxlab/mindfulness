@@ -13,12 +13,18 @@
         @endif
     </div>
 
-    <h5 class="mb-2">
-        Completed: {{ $module->daysCompleted }}/{{ $module->totalDays }} days
-        @if($module->totalCheckInDays > 0)
-            , {{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Check-Ins
-        @endif
-    </h5>
+    <div class="mb-2">
+        <h5>Progress:</h5>
+        <ul>
+            <li class="list-check{{ $module->daysCompleted == $module->totalDays ? '-filled' : '' }}">{{ $module->daysCompleted }}/{{ $module->totalDays }} Days</li>
+            @if ($module->totalCheckInActivities > 0)
+                <li class="list-check{{ $module->completedCheckInActivities == $module->totalCheckInActivities ? '-filled' : '' }}">{{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins</li>
+            @endif
+            @if ($module->totalCheckInDays > 0)
+                <li class="list-check{{ $module->completedCheckInDays == $module->totalCheckInDays ? '-filled' : '' }}">{{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Rate My Awareness</li>
+            @endif
+        </ul>
+    </div>
     <div class="accordion accordion-flush mb-3" id="accordionDays" data-accordion-activity="{{ $accordion_activity_id ?? '' }}">
         @foreach ($module->days as $index => $day)
             @php
@@ -64,8 +70,12 @@
                                                 @if ($activity->type)
                                                     <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>
                                                 @endif
-                                                @if ($activity->time)
-                                                    <span class="sub-activity-font activity-tag-time">{{ $activity->time.' min' }}</span>
+                                                @if (isset($activity->time))
+                                                    @if ($activity->time >= 1)
+                                                        <span class="sub-activity-font activity-tag-time">{{ $activity->time.' min' }}</span>
+                                                    @else
+                                                        <span class="sub-activity-font activity-tag-time">{{ '<1 min' }}</span>
+                                                    @endif
                                                 @endif
                                                 @if ($activity->optional)
                                                     <span class="sub-activity-font activity-tag-optional"></i>Bonus</span>

@@ -46,8 +46,10 @@ class Module extends Model
         }
         $completedDays = 0;
         $completedCheckInDays = 0;
+        $totalCheckInActivities = 0;
+        $completedCheckInActivities = 0;
 
-        $days = $this->days;
+        $days = $this->days->load('activities');
         foreach ($days as $day) {
             if ($day->isCompletedBy($user)) {
                 if ($day->is_check_in) {
@@ -56,8 +58,17 @@ class Module extends Model
                     $completedDays++;
                 }
             }
+
+            foreach ($day->activities as $activity) {
+                if ($activity->is_check_in) {
+                    $totalCheckInActivities++;
+                    if ($activity->isCompletedBy($user)) {
+                        $completedCheckInActivities++;
+                    }
+                }
+            }
         }
-        return [$completedDays, $completedCheckInDays];
+        return [$completedDays, $completedCheckInDays, $totalCheckInActivities, $completedCheckInActivities];
     }
 
     // when progress is actually checked, it does NOT use this
@@ -66,7 +77,7 @@ class Module extends Model
     {
         $unlocked = $this->canBeAccessedBy($user);
         $completed = $this->isCompletedBy($user);
-        [$daysCompleted, $completedCheckInDays] = $this->numberDaysCompletedBy($user);
+        [$daysCompleted, $completedCheckInDays, $totalCheckInActivities, $completedCheckInActivities] = $this->numberDaysCompletedBy($user);
         $totalDays = $this->days->where('is_check_in', false)->count();
         $totalCheckInDays = $this->days->count() - $totalDays;
 
@@ -77,6 +88,8 @@ class Module extends Model
             'totalDays' => $totalDays,
             'completedCheckInDays' => $completedCheckInDays,
             'totalCheckInDays' => $totalCheckInDays,
+            'totalCheckInActivities' => $totalCheckInActivities,
+            'completedCheckInActivities' => $completedCheckInActivities,
         ];
     }
     
