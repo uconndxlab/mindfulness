@@ -165,12 +165,12 @@ class PageNavController extends Controller
                         'label' => 'You are progressing fast!',
                         'body' => (string) app(\League\CommonMark\CommonMarkConverter::class)->convert('It appears you have already completed **'.$last_day_name.'** today. '.
                             'While your efforts are admirable, we recommend you take your time through this program and take it one day at a time. '.
-                            'How about repeating your favorite activity?'),
+                            'How about repeating your favorite activity? Click [here](/favorites) to view your favorites.'),
                         'route' => route('explore.activity.bypass', ['activity_id' => $activity->id]),
                         'method' => 'GET',
-                        'buttonLabel' => 'No, go to the next module',
+                        'buttonLabel' => 'Let me make more progress in the app today.',
                         'buttonClass' => 'btn-danger',
-                        'closeLabel' => 'Okay. Go back'
+                        'closeLabel' => 'Okay. Go back.'
                     ]]);
                 }
             }

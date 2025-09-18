@@ -2,16 +2,6 @@ async function initSlideAudioPlayers() {
     const players = document.querySelectorAll('.slide__audio.js-audio');
     if (!players.length) return;
 
-    // Lazy-load NoSleep only when players exist
-    let NoSleepCtor = null;
-    try {
-        // nosleep.js is a tiny lib; add to package.json if missing
-        const mod = await import('nosleep.js');
-        NoSleepCtor = mod.default;
-    } catch (e) {
-        console.warn('NoSleep failed to load; continuing without it', e);
-    }
-
     players.forEach(playerEl => {
         const id = playerEl.id?.replace('player-', '') || playerEl.querySelector('audio')?.id?.replace('audio-', '') || 'unknown';
         const audioEl = playerEl.querySelector('audio');
@@ -25,7 +15,6 @@ async function initSlideAudioPlayers() {
         }
         const allowPlaybackRate = playerEl.getAttribute('data-allow-playback-rate') === 'true';
 
-        const noSleep = NoSleepCtor ? new NoSleepCtor() : null;
         let watchedTime = 0;
         let hasBeenPlayed = false;
 
@@ -217,7 +206,6 @@ async function initSlideAudioPlayers() {
                     try { el.pause(); } catch (_) {}
                 }
             });
-            if (noSleep && noSleep.enable) noSleep.enable();
             audioEl.play().then(() => {
                 playerEl.classList.remove('paused');
                 playerEl.classList.add('playing');
@@ -232,7 +220,6 @@ async function initSlideAudioPlayers() {
 
         function pauseAudio() {
             if (audioEl.paused) return;
-            if (noSleep && noSleep.disable) noSleep.disable();
             try { audioEl.pause(); } catch (_) {}
             playerEl.classList.remove('playing');
             playerEl.classList.add('paused');
@@ -251,7 +238,6 @@ async function initSlideAudioPlayers() {
         const originalPause = audioEl.pause.bind(audioEl);
         audioEl.pause = function() {
             if (audioEl.paused) return;
-            if (noSleep && noSleep.disable) noSleep.disable();
             originalPause();
             playerEl.classList.remove('playing');
             playerEl.classList.add('paused');
@@ -272,7 +258,6 @@ async function initSlideAudioPlayers() {
         });
 
         audioEl.addEventListener('ended', () => {
-            if (noSleep && noSleep.disable) noSleep.disable();
             playerEl.classList.remove('playing');
             const icon = playerEl.querySelector('#icon');
             if (icon) { icon.classList.remove('bi-pause'); icon.classList.add('bi-play'); }
@@ -310,6 +295,19 @@ async function initSlideAudioPlayers() {
         updatePlayerUI(0, 0);
     });
 }
+
+// use page visibility api to pause audio when user switches tabs/apps
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        document.querySelectorAll('audio').forEach(audioEl => {
+            if (!audioEl.paused) {
+                try { 
+                    audioEl.pause(); 
+                } catch (_) {}
+            }
+        });
+    }
+});
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initSlideAudioPlayers);
