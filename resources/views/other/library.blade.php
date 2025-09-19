@@ -107,7 +107,7 @@
                                                     </h2>
                                                     <div id="collapseTime" class="accordion-collapse collapse" aria-labelledby="headingTime">
                                                         <div class="accordion-body">
-                                                            <div class="position-relative">
+                                                            <div class="position-relative library-slider slider-container">
                                                                 <div id="slider_value_bubble" class="d-none slider-bubble">0 min</div>
                                                                 <div id="time_range_slider"></div>
                                                             </div>

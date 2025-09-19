@@ -161,6 +161,9 @@ function initLibraryPage() {
         const startLabel = document.getElementById('start_time_label');
         const endLabel = document.getElementById('end_time_label');
         const bubble = document.getElementById('slider_value_bubble');
+        
+        // slider interaction state
+        let isInteracting = false;
 
         //SLIDER CHANGE
         slider.noUiSlider.on('update', function (values, handle) {
@@ -168,13 +171,9 @@ function initLibraryPage() {
             startLabel.textContent = values[0];
             endLabel.textContent = values[1];
 
-            const handles = slider.querySelectorAll('.noUi-handle');
-            const activeHandle = handles[handle];
-            if (activeHandle && bubble && !bubble.classList.contains('d-none')) {
-                if (bubble.parentElement !== activeHandle) {
-                    activeHandle.appendChild(bubble);
-                }
-                bubble.textContent = values[handle];
+            // update bubble during interaction
+            if (isInteracting) {
+                updateBubblePosition(handle, values[handle]);
             }
 
             //convert the # mins to #
@@ -199,37 +198,36 @@ function initLibraryPage() {
             }
         });
 
-        // Show bubble when interaction starts
-        slider.noUiSlider.on('start', function (values, handle) {
+        // bubble positioning function
+        function updateBubblePosition(handle, value) {
+            if (!bubble || !slider) return;
+            
             const handles = slider.querySelectorAll('.noUi-handle');
             const activeHandle = handles[handle];
-            if (activeHandle && bubble) {
+            
+            if (activeHandle) {
                 if (bubble.parentElement !== activeHandle) {
                     activeHandle.appendChild(bubble);
                 }
-                bubble.textContent = values[handle];
+                bubble.textContent = value;
                 bubble.classList.remove('d-none');
             }
-        });
+        }
 
-        // Keep bubble updated while sliding
-        slider.noUiSlider.on('slide', function (values, handle) {
-            const handles = slider.querySelectorAll('.noUi-handle');
-            const activeHandle = handles[handle];
-            if (activeHandle && bubble) {
-                if (bubble.parentElement !== activeHandle) {
-                    activeHandle.appendChild(bubble);
-                }
-                bubble.textContent = values[handle];
+        // show bubble when interaction starts
+        slider.noUiSlider.on('start', function (values, handle) {
+            isInteracting = true;
+            if (bubble) {
+                updateBubblePosition(handle, values[handle]);
             }
         });
 
-        // Hide bubble when not dragging
+        // hide bubble when interaction ends
         slider.noUiSlider.on('end', function () {
-            if (bubble) bubble.classList.add('d-none');
-        });
-        slider.noUiSlider.on('change', function () {
-            if (bubble) bubble.classList.add('d-none');
+            isInteracting = false;
+            if (bubble) {
+                bubble.classList.add('d-none');
+            }
         });
         slider.noUiSlider.set([parseInt(startVal), parseInt(endVal)]);
     }

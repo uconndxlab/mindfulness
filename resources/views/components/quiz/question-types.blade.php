@@ -53,7 +53,7 @@
                 @markdown($option['text'])
             </label>
         @endif
-        <div class="slider-container noui-custom-pips">
+        <div class="quiz-slider slider-container noui-custom-pips">
             <div class="text-center slider-loading" id="slider_loading_{{ $question['number'] }}_{{ $option['id'] }}">
                 <div class="spinner-border" role="status">
                     <span class="visually-hidden">Loading...</span>

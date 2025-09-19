@@ -1051,11 +1051,19 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     margin: 0 !important;
 }
 
-/* margins/padding for slider container in refleciton question */
-.slider-container {
+/* margins/padding for slider container in reflection question */
+.quiz-slider {
     margin-top: 2rem;
     margin-bottom: 5rem;
     padding: 0 25px;
+}
+
+/* margins/padding for slider container in library filter */
+.library-slider {
+    margin-top: 2rem;
+}
+.library-slider #slider_value_bubble {
+    top: -50px;
 }
 
 /* noUiSlider bubble */
