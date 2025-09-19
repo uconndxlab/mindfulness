@@ -50,7 +50,9 @@
     @foreach ($question['options'] as $option)
         @if ($option['text'])
             <label class="form-label">
-                @markdown($option['text'])
+                <div class="quiz-slider-label">
+                    @markdown($option['text'])
+                </div>
             </label>
         @endif
         <div class="quiz-slider slider-container noui-custom-pips">

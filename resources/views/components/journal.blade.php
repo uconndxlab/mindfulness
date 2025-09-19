@@ -11,7 +11,9 @@
         <div id="error-messages" class="alert alert-danger d-none"></div>
         @if ($journal->prompts)
             <div class="text-left mb-3">
-                <h4>@markdown($journal->prompts)</h4>
+                <div class="journal-prompts">
+                    @markdown($journal->prompts)
+                </div>
             </div>
         @else
             <div class="form-group dropdown">

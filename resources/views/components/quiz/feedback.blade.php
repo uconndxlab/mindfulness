@@ -29,7 +29,7 @@
             </div>
         @endif
         
-        <div class="text-info">
+        <div class="text-info feedback-text">
             @markdown(is_string($option['feedback'] ?? null) ? $option['feedback'] : '')
         </div>
     </div>

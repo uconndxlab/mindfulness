@@ -10,7 +10,9 @@
                     @if ($note->topic === 'no-topic')
                         <span>No Topic</span>
                     @else
-                        @markdown(ucfirst(strip_tags($note->topic)))
+                        <div class="journal-labels">
+                            @markdown(ucfirst(strip_tags($note->topic)))
+                        </div>
                     @endif
                 </h5>
                 <small>{{ $note->formatted_date }}</small>

@@ -1115,11 +1115,32 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     transform: translate(-75%, 10px);
 }
 
-/* markdown padding fix */
-.markdown p {
+/* MARKDOWN CLASSES */
+/* general markdown classes */
+/* .markdown p {
+    
+} */
+
+/* context specific */
+.journal-labels .markdown p {
     padding: 0px !important;
     margin-bottom: 0px !important;
 }
+
+/* .journal-prompts .markdown {
+}
+.feedback-text .markdown {
+}
+.quiz-slider-label .markdown {
+}
+.quiz-question .markdown {
+}
+.activity-instructions .markdown {
+}
+.completion-message .markdown {
+}
+.faq-answer .markdown {
+} */
 
 /* teacher styling help page */
 .teacher-image-container {

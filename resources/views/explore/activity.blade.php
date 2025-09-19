@@ -35,7 +35,9 @@
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
             @if (isset($content->instructions))
                 <div class="text-left mb-3">
-                    <h5>@markdown($content->instructions)</h5>
+                    <div class="activity-instructions">
+                        @markdown($content->instructions)
+                    </div>
                 </div>
             @endif
             @php
@@ -80,7 +82,9 @@
             </div>
         @endif
         <div id="comp_message" class="mt-2 d-none">
-            <div class="text-success">@markdown(is_string($activity->completion_message ?? null) ? $activity->completion_message : 'Congrats on completing this activity!')</div>
+            <div class="text-success completion-message">
+                @markdown(is_string($activity->completion_message ?? null) ? $activity->completion_message : 'Congrats on completing this activity!')
+            </div>
         </div>
     </div>
     <div class="manual-margin-top" id="redirect_div">
