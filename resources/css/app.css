@@ -1053,7 +1053,7 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 
 /* margins/padding for slider container in reflection question */
 .quiz-slider {
-    margin-top: 2rem;
+    margin-top: 1rem;
     margin-bottom: 5rem;
     padding: 0 25px;
 }
@@ -1118,22 +1118,33 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 /* MARKDOWN CLASSES */
 /* general markdown classes */
 /* .markdown p {
-    
+    margin-bottom: 1rem;
 } */
+
+/* remove margin from last child */
+.markdown *:last-child {
+    margin-bottom: 0 !important;
+}
+.markdown blockquote {
+    border-left: 2px solid var(--dark-green);
+    padding-left: 1rem;
+    margin-left: 0;
+    margin-right: 0;
+}
 
 /* context specific */
 .journal-labels .markdown p {
     padding: 0px !important;
-    margin-bottom: 0px !important;
 }
 
-/* .journal-prompts .markdown {
+.journal-prompts .markdown blockquote {
+    border-left: 2px solid var(--dark-grey) !important;
 }
-.feedback-text .markdown {
+.journal-prompts .markdown blockquote p {
+    margin-bottom: 0.25rem;
 }
-.quiz-slider-label .markdown {
-}
-.quiz-question .markdown {
+
+/* .quiz-slider-label .markdown {
 }
 .activity-instructions .markdown {
 }

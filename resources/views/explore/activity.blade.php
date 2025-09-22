@@ -30,7 +30,7 @@
             <span class="sub-activity-font activity-tag-time"></i>{{ $activity->time.' min' }}</span>
         @endif
     </div>
-    <div class="manual-margin-top">
+    <div class={{ in_array($activity->type, ['reflection', 'journal']) ? 'mt-4' : 'manual-margin-top' }}>
         <!-- audio -->
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
             @if (isset($content->instructions))
@@ -87,7 +87,7 @@
             </div>
         </div>
     </div>
-    <div class="manual-margin-top" id="redirect_div">
+    <div class="mt-1" id="redirect_div">
         @if (isset($page_info['redirect_route']))
             <a id="redirect_button" class="btn btn-primary btn-tertiary redirect-btn disabled d-none" href="{{ $page_info['redirect_route'] }}">
                 {{ $page_info['redirect_label'] }}
