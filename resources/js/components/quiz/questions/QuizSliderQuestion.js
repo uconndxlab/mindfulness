@@ -141,6 +141,7 @@ class QuizSliderQuestion {
             this.interactionStates.set(optionId, true);
             // mark this slider as interacted with
             this.userInteracted.set(optionId, true);
+            sliderElement.classList.remove('no-interaction');
             this.checkIfAllSlidersInteracted();
         });
         
@@ -237,9 +238,10 @@ class QuizSliderQuestion {
             for (const item of values) {
                 const optionId = parseInt(Object.keys(item)[0]);
                 const value = Object.values(item)[0];
-                this.setSingleSliderValue(optionId, value);
                 // mark as interacted since we're loading a saved answer
                 this.userInteracted.set(optionId, true);
+                // set the actual value - this function will remove no-interaction class
+                this.setSingleSliderValue(optionId, value, true);
             }
             // check if all sliders are now considered interacted
             this.checkIfAllSlidersInteracted();
@@ -248,7 +250,7 @@ class QuizSliderQuestion {
         console.log(`Slider question ${this.questionNumber} values set to:`, JSON.stringify(values));
     }
 
-    setSingleSliderValue(optionId, value) {
+    setSingleSliderValue(optionId, value, savedAnswer=true) {
         const numericValue = parseInt(value) || 50;
         this.currentValues.set(optionId, numericValue);
         
@@ -260,6 +262,10 @@ class QuizSliderQuestion {
         const sliderElement = this.sliders.get(optionId);
         if (sliderElement && sliderElement.noUiSlider) {
             sliderElement.noUiSlider.set([numericValue]);
+            // show interaction if setting value from 
+            if (savedAnswer) {
+                sliderElement.classList.remove('no-interaction');
+            }
         }
     }
 
