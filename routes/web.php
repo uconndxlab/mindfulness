@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PageNavController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ErrorLogController;
 use App\Models\User;
 
 use App\Models\QuizAnswers;
@@ -138,6 +139,9 @@ Route::middleware('web')->group(function () {
         
         //NOTES - throttled in controller + guard API spam
         Route::resource('note', NoteController::class)->middleware('throttle:30,1');
+        
+        //CLIENT ERROR LOGGING - for debugging production issues
+        Route::post('/log-client-error', [ErrorLogController::class, 'logClientError'])->middleware('throttle:20,1')->name('log.client.error');
         
         //ADMIN ONLY
         Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {

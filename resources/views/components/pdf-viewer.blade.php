@@ -3,9 +3,6 @@
         View Workbook
         <i class="bi bi-arrow-right"></i>
     </button>
-    <a href="{{ $fpath }}" class="btn btn-icon" download="workbook.pdf">
-        <i class="bi bi-download"></i>
-    </a>
 </div>
 <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="appModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">

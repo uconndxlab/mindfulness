@@ -47,10 +47,13 @@
         </div>
     @endforeach
 @elseif ($question['type'] === 'slider')
-    @foreach ($question['options'] as $option)
+    @foreach ($question['options'] as $index => $option)
+        <hr>
         @if ($option['text'])
             <label class="form-label">
-                @markdown($option['text'])
+                <div class="quiz-slider-label">
+                    @markdown($option['text'])
+                </div>
             </label>
         @endif
         <div class="quiz-slider slider-container noui-custom-pips">
@@ -69,6 +72,8 @@
                 id="slider_input_{{ $question['number'] }}_{{ $option['id'] }}" 
                 value="{{ $option['slider_config']['default'] ?? 50 }}">
         </div>
-        <hr>
+        @if ($index === count($question['options']) - 1)
+            <hr>
+        @endif
     @endforeach
 @endif

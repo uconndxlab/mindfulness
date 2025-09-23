@@ -81,7 +81,9 @@
                         </h2>
                         <div id="collapseFAQ_{{ $index }}" class="accordion-collapse collapse" aria-labelledby="headingFAQ_{{ $index }}">
                             <div class="accordion-body faq-body">
-                                @markdown(is_string($faq->answer ?? null) ? $faq->answer : '')
+                                <div class="faq-answer">
+                                    @markdown(is_string($faq->answer ?? null) ? $faq->answer : '')
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 @if (isset($journal))
     <form id="journalForm" method="POST" class="pt-3" data-has-activity="{{ isset($journal->activity) ? 'true' : 'false' }}" data-activity-id="{{ $journal->activity ? $journal->activity->id : '' }}">
-        <p>***Please do not write any sensitive information here.***</p>
+        <p>***<em>Please do not write any sensitive information here.***</em></p>
         @csrf
         <div id="success-message" class="alert alert-success note-err-message d-none">
             Journal saved!
@@ -11,7 +11,9 @@
         <div id="error-messages" class="alert alert-danger d-none"></div>
         @if ($journal->prompts)
             <div class="text-left mb-3">
-                <h4>@markdown($journal->prompts)</h4>
+                <div class="journal-prompts">
+                    @markdown($journal->prompts)
+                </div>
             </div>
         @else
             <div class="form-group dropdown">

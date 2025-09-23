@@ -64,10 +64,11 @@ class AppServiceProvider extends ServiceProvider
             \URL::forceScheme('https');
         }
 
+        // markdown directive
         Blade::directive('markdown', function ($expression) {
             return '<?php 
                 $content_for_markdown = is_string(' . $expression . ') ? ' . $expression . ' : "";
-                echo "<div class=\"markdown\">" . app(\League\CommonMark\CommonMarkConverter::class)->convert($content_for_markdown) . "</div>"; 
+                echo "<div class=\"markdown\">" . app(\League\CommonMark\CommonMarkConverter::class)->convert($content_for_markdown)->getContent() . "</div>"; 
             ?>';
         });
     }
