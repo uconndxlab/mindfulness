@@ -14,3 +14,10 @@ const csrfMeta = document.querySelector('meta[name="csrf-token"]');
 if (csrfMeta) {
     window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfMeta.getAttribute('content');
 }
+
+// Using dynamic imports defers execution until after the above global assignments
+Promise.resolve()
+    .then(() => import('nosleep.js'))
+    .catch((e) => {
+        console.error('Failed to load plugins', e);
+    });

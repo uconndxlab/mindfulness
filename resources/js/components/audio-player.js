@@ -1,6 +1,69 @@
+// log errors to backend
+async function logToServer(errorType, message, additionalData = {}) {
+    try {
+        // device/browser info
+        const deviceInfo = {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            vendor: navigator.vendor,
+            language: navigator.language,
+            cookieEnabled: navigator.cookieEnabled,
+            onLine: navigator.onLine,
+            screen: {
+                width: screen.width,
+                height: screen.height,
+                colorDepth: screen.colorDepth
+            },
+            viewport: {
+                width: window.innerWidth,
+                height: window.innerHeight
+            },
+            url: window.location.href,
+            timestamp: new Date().toISOString(),
+            ...additionalData
+        };
+
+        const response = await fetch('/log-client-error', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                error_type: errorType,
+                message: message,
+                user_agent: navigator.userAgent,
+                url: window.location.href,
+                additional_data: deviceInfo
+            })
+        });
+
+        if (!response.ok) {
+            console.warn('Failed to log error to server:', response.status);
+        }
+    } catch (e) {
+        console.warn('Failed to send error log to server:', e);
+    }
+}
+
 async function initSlideAudioPlayers() {
     const players = document.querySelectorAll('.slide__audio.js-audio');
     if (!players.length) return;
+
+    // Lazy-load NoSleep only when players exist
+    let NoSleepCtor = null;
+    try {
+        // nosleep.js is a tiny lib; add to package.json if missing
+        const mod = await import('nosleep.js');
+        NoSleepCtor = mod.default;
+    } catch (e) {
+        console.warn('NoSleep failed to load; continuing without it', e);
+        await logToServer('NoSleep_Load_Failed', `NoSleep library failed to load: ${e.message}`, {
+            error: e.toString(),
+            stack: e.stack
+        });
+    }
 
     players.forEach(playerEl => {
         const id = playerEl.id?.replace('player-', '') || playerEl.querySelector('audio')?.id?.replace('audio-', '') || 'unknown';
@@ -15,6 +78,22 @@ async function initSlideAudioPlayers() {
         }
         const allowPlaybackRate = playerEl.getAttribute('data-allow-playback-rate') === 'true';
 
+        let noSleep = null;
+        let noSleepEnabled = false;
+        // init nosleep with error handling
+        if (NoSleepCtor) {
+            try {
+                noSleep = new NoSleepCtor();
+                console.log(`[Player ${id}] NoSleep instance created successfully`);
+            } catch (e) {
+                console.error(`[Player ${id}] Failed to create NoSleep instance:`, e);
+                logToServer('NoSleep_Instance_Failed', `Failed to create NoSleep instance for player ${id}: ${e.message}`, {
+                    playerId: id,
+                    error: e.toString(),
+                    stack: e.stack
+                });
+            }
+        }
         let watchedTime = 0;
         let hasBeenPlayed = false;
 
@@ -206,6 +285,32 @@ async function initSlideAudioPlayers() {
                     try { el.pause(); } catch (_) {}
                 }
             });
+
+            // Enable NoSleep with comprehensive error handling
+            if (noSleep && noSleep.enable) {
+                try {
+                    noSleep.enable();
+                    noSleepEnabled = true;
+                    console.log(`[Player ${id}] NoSleep enabled successfully`);
+                } catch (e) {
+                    console.error(`[Player ${id}] NoSleep enable failed:`, e);
+                    logToServer('NoSleep_Enable_Failed', `NoSleep enable failed for player ${id}: ${e.message}`, {
+                        playerId: id,
+                        error: e.toString(),
+                        stack: e.stack,
+                        noSleepExists: !!noSleep,
+                        enableMethodExists: !!(noSleep && noSleep.enable)
+                    });
+                }
+            } else {
+                console.warn(`[Player ${id}] NoSleep not available for enabling`);
+                logToServer('NoSleep_Not_Available', `NoSleep not available for enabling on player ${id}`, {
+                    playerId: id,
+                    noSleepExists: !!noSleep,
+                    enableMethodExists: !!(noSleep && noSleep.enable)
+                });
+            }
+
             audioEl.play().then(() => {
                 playerEl.classList.remove('paused');
                 playerEl.classList.add('playing');
@@ -220,6 +325,25 @@ async function initSlideAudioPlayers() {
 
         function pauseAudio() {
             if (audioEl.paused) return;
+            
+            // Disable NoSleep with error handling
+            if (noSleep && noSleep.disable && noSleepEnabled) {
+                try {
+                    noSleep.disable();
+                    noSleepEnabled = false;
+                    console.log(`[Player ${id}] NoSleep disabled successfully`);
+                } catch (e) {
+                    console.error(`[Player ${id}] NoSleep disable failed:`, e);
+                    logToServer('NoSleep_Disable_Failed', `NoSleep disable failed for player ${id}: ${e.message}`, {
+                        playerId: id,
+                        error: e.toString(),
+                        stack: e.stack,
+                        noSleepExists: !!noSleep,
+                        disableMethodExists: !!(noSleep && noSleep.disable)
+                    });
+                }
+            }
+            
             try { audioEl.pause(); } catch (_) {}
             playerEl.classList.remove('playing');
             playerEl.classList.add('paused');
@@ -238,6 +362,25 @@ async function initSlideAudioPlayers() {
         const originalPause = audioEl.pause.bind(audioEl);
         audioEl.pause = function() {
             if (audioEl.paused) return;
+            
+            // Disable NoSleep with error handling (audio element pause override)
+            if (noSleep && noSleep.disable && noSleepEnabled) {
+                try {
+                    noSleep.disable();
+                    noSleepEnabled = false;
+                    console.log(`[Player ${id}] NoSleep disabled successfully (audio.pause override)`);
+                } catch (e) {
+                    console.error(`[Player ${id}] NoSleep disable failed (audio.pause override):`, e);
+                    logToServer('NoSleep_Disable_Failed_AudioPause', `NoSleep disable failed in audio.pause override for player ${id}: ${e.message}`, {
+                        playerId: id,
+                        error: e.toString(),
+                        stack: e.stack,
+                        noSleepExists: !!noSleep,
+                        disableMethodExists: !!(noSleep && noSleep.disable)
+                    });
+                }
+            }
+            
             originalPause();
             playerEl.classList.remove('playing');
             playerEl.classList.add('paused');
@@ -258,6 +401,24 @@ async function initSlideAudioPlayers() {
         });
 
         audioEl.addEventListener('ended', () => {
+            // Disable NoSleep with error handling (audio ended)
+            if (noSleep && noSleep.disable && noSleepEnabled) {
+                try {
+                    noSleep.disable();
+                    noSleepEnabled = false;
+                    console.log(`[Player ${id}] NoSleep disabled successfully (audio ended)`);
+                } catch (e) {
+                    console.error(`[Player ${id}] NoSleep disable failed (audio ended):`, e);
+                    logToServer('NoSleep_Disable_Failed_AudioEnded', `NoSleep disable failed on audio ended for player ${id}: ${e.message}`, {
+                        playerId: id,
+                        error: e.toString(),
+                        stack: e.stack,
+                        noSleepExists: !!noSleep,
+                        disableMethodExists: !!(noSleep && noSleep.disable)
+                    });
+                }
+            }
+            
             playerEl.classList.remove('playing');
             const icon = playerEl.querySelector('#icon');
             if (icon) { icon.classList.remove('bi-pause'); icon.classList.add('bi-play'); }
@@ -295,19 +456,6 @@ async function initSlideAudioPlayers() {
         updatePlayerUI(0, 0);
     });
 }
-
-// use page visibility api to pause audio when user switches tabs/apps
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        document.querySelectorAll('audio').forEach(audioEl => {
-            if (!audioEl.paused) {
-                try { 
-                    audioEl.pause(); 
-                } catch (_) {}
-            }
-        });
-    }
-});
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initSlideAudioPlayers);
