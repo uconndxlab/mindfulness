@@ -19,26 +19,23 @@ class NoteController extends Controller
         $validator = null;
         if ($request->activity) {
             $validator = Validator::make($request->all(), [
-                'note' => ['required', 'string', 'max:1027', 'regex:/^[\w\s.,!?()\-\'"&]*$/'],
+                'note' => ['required', 'string', 'max:3000'],
                 'activity_id' => ['required', 'integer', new ActIdRule()]
             ], [
                 'note.required' => 'A note is required.',
                 'note.string' => 'The note must be a string.',
-                'note.max' => 'The note may not be greater than 1027 characters.',
-                'note.regex' => 'The note may only contain letters, numbers, spaces, and basic punctuation.'
+                'note.max' => 'The note may not be greater than 3000 characters.',
             ]);
         }
         else {
             $validator = Validator::make($request->all(), [
-                'note' => ['required', 'string', 'max:1027', 'regex:/^[\w\s.,!?()\-\'"&]*$/'],
-                'topic' => ['in:self-care,self-understanding,parenting,gratitude,joy,love,relationships,boundaries,no-topic', 'regex:/^[\w\s.,!?()\-\'"&]*$/']
+                'note' => ['required', 'string', 'max:3000'],
+                'topic' => ['in:self-care,self-understanding,parenting,gratitude,joy,love,relationships,boundaries,no-topic']
             ], [
                 'note.required' => 'A note is required.',
                 'note.string' => 'The note must be a string.',
-                'note.max' => 'The note may not be greater than 1027 characters.',
-                'note.regex' => 'The note may only contain letters, numbers, spaces, and basic punctuation.',
+                'note.max' => 'The note may not be greater than 3000 characters.',
                 'topic.in' => 'Word of the day must come from the provided list.',
-                'topic.regex' => 'Word of the day must come from the provided list.'
             ]);
         }
         return $validator;
