@@ -61,13 +61,17 @@
                     @foreach ($content->audio_options as $voice => $file_path)
                         @php
                             $audioTitle = $activity->title." (".$voice.")";
+                            $audioArtist = "Healing Hearts";
+                            $audioArtwork = asset('icons/ms-icon-310x310.png');
                         @endphp
                         <div id="audio_content" class="content-main d-none" voice="{{ $voice }}" data-type="audio">
                             <x-audio-player :file="$file_path" 
                                 :id="$voice" 
                                 :allowSeek="$allowSeek" 
                                 :allowPlaybackRate="$allowPlaybackRate"
-                                :title="$audioTitle"/>
+                                :title="$audioTitle"
+                                :artist="$audioArtist"
+                                :artwork="$audioArtwork"/>
                         </div>
                     @endforeach
                 </div>

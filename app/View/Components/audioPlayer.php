@@ -20,15 +20,15 @@ class audioPlayer extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct($file, $id = null, $allowSeek = false, $allowPlaybackRate = false, $title = null)
+    public function __construct($file, $id = null, $allowSeek = false, $allowPlaybackRate = false, $title = null, $artist = null, $artwork = null)
     {
         $this->file = $file;
         $this->id = $id;
         $this->allowSeek = $allowSeek;
         $this->allowPlaybackRate = $allowPlaybackRate;
         $this->title = $title;
-        $this->artist = "Healing Hearts";
-        $this->artwork = asset('icons/ms-icon-310x310.png');
+        $this->artist = $artist;
+        $this->artwork = $artwork;
     }
 
     /**
