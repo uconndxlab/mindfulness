@@ -140,9 +140,6 @@ Route::middleware('web')->group(function () {
         //NOTES - throttled in controller + guard API spam
         Route::resource('note', NoteController::class)->middleware('throttle:30,1');
         
-        //CLIENT ERROR LOGGING - for debugging production issues
-        Route::post('/log-client-error', [ErrorLogController::class, 'logClientError'])->middleware('throttle:20,1')->name('log.client.error');
-        
         //ADMIN ONLY
         Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
             Route::get('/dashboard', [AdminUserController::class, 'dashboard'])->name('dashboard');

@@ -59,8 +59,15 @@
                 <!-- audio content views -->
                 <div class="mt-4">
                     @foreach ($content->audio_options as $voice => $file_path)
+                        @php
+                            $audioTitle = $activity->title." (".$voice.")";
+                        @endphp
                         <div id="audio_content" class="content-main d-none" voice="{{ $voice }}" data-type="audio">
-                            <x-audio-player :file="$file_path" :id="$voice" :allowSeek="$allowSeek" :allowPlaybackRate="$allowPlaybackRate"/>
+                            <x-audio-player :file="$file_path" 
+                                :id="$voice" 
+                                :allowSeek="$allowSeek" 
+                                :allowPlaybackRate="$allowPlaybackRate"
+                                :title="$audioTitle"/>
                         </div>
                     @endforeach
                 </div>

@@ -206,12 +206,18 @@ async function initSlideAudioPlayers() {
                     try { el.pause(); } catch (_) {}
                 }
             });
+            
             audioEl.play().then(() => {
                 playerEl.classList.remove('paused');
                 playerEl.classList.add('playing');
                 const icon = playerEl.querySelector('#icon');
                 if (icon) { icon.classList.remove('bi-play'); icon.classList.add('bi-pause'); }
                 updatePlayerUI(audioEl.currentTime, audioEl.duration);
+                
+                // update media session
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.playbackState = 'playing';
+                }
             }).catch(error => {
                 console.error(`[Player ${id}] Audio play() failed:`, error);
                 pauseAudio();
@@ -226,6 +232,11 @@ async function initSlideAudioPlayers() {
             const icon = playerEl.querySelector('#icon');
             if (icon) { icon.classList.remove('bi-pause'); icon.classList.add('bi-play'); }
             updatePlayerUI(audioEl.currentTime, audioEl.duration);
+            
+            // update media session
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = 'paused';
+            }
         }
 
         const playBtn = playerEl.querySelector('.play-pause');
@@ -255,6 +266,19 @@ async function initSlideAudioPlayers() {
             if (!audioEl.seeking && currentTime > watchedTime) {
                 watchedTime = currentTime;
             }
+            
+            // update media session position
+            if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession) {
+                try {
+                    navigator.mediaSession.setPositionState({
+                        duration: duration || 0,
+                        playbackRate: audioEl.playbackRate || 1,
+                        position: currentTime || 0
+                    });
+                } catch (error) {
+                    console.error(`[Player ${id}] Media Session position state update failed:`, error);
+                }
+            }
         });
 
         audioEl.addEventListener('ended', () => {
@@ -265,6 +289,9 @@ async function initSlideAudioPlayers() {
             // reset ui
             watchedTime = 0;
             updatePlayerUI(0, 0);
+            
+            // clear media session when audio ends
+            // clears on its own?
         });
 
         audioEl.addEventListener('seeking', () => {
@@ -295,6 +322,87 @@ async function initSlideAudioPlayers() {
         updatePlayerUI(0, 0);
     });
 }
+
+// simple functions for voice selector
+window.audioPlayerControls = {
+    setupMediaSessionForPlayer: function(playerId) {
+        const playerEl = document.getElementById(`player-${playerId}`);
+        if (!playerEl) {
+            console.log(`Player ${playerId} not found`);
+            return;
+        }
+        
+        const audioEl = playerEl.querySelector('audio');
+        if (!audioEl) return;
+        
+        // get metadata from player element
+        const title = playerEl.getAttribute('data-title') || 'Audio Track';
+        const artist = playerEl.getAttribute('data-artist') || 'Unknown Artist';
+        const artwork = playerEl.getAttribute('data-artwork') || '';
+        
+        if ('mediaSession' in navigator) {
+            const artworkArray = [];
+            if (artwork) {
+                artworkArray.push(
+                    { src: artwork, sizes: '96x96', type: 'image/png' },
+                    { src: artwork, sizes: '128x128', type: 'image/png' },
+                    { src: artwork, sizes: '192x192', type: 'image/png' },
+                    { src: artwork, sizes: '256x256', type: 'image/png' },
+                    { src: artwork, sizes: '384x384', type: 'image/png' },
+                    { src: artwork, sizes: '512x512', type: 'image/png' }
+                );
+            }
+
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: title,
+                artist: artist,
+                artwork: artworkArray
+            });
+
+            // set playback state based on actual audio state
+            navigator.mediaSession.playbackState = audioEl.paused ? 'paused' : 'playing';
+
+            // set up action handlers
+            navigator.mediaSession.setActionHandler('play', () => {
+                const playBtn = playerEl.querySelector('.play-pause');
+                if (playBtn && audioEl.paused) {
+                    playBtn.click();
+                }
+            });
+
+            navigator.mediaSession.setActionHandler('pause', () => {
+                const playBtn = playerEl.querySelector('.play-pause');
+                if (playBtn && !audioEl.paused) {
+                    playBtn.click();
+                }
+            });
+
+            navigator.mediaSession.setActionHandler('seekto', (details) => {
+                if (details.seekTime !== undefined && audioEl.duration) {
+                    const targetTime = Math.max(0, Math.min(audioEl.duration, details.seekTime));
+                    const allowSeek = playerEl.getAttribute('data-allow-seek') === 'true';
+                    // do not have watchedTime ??
+                    if (allowSeek || true) {
+                        audioEl.currentTime = targetTime;
+                    }
+                }
+            });
+            
+            // update position if available
+            if ('setPositionState' in navigator.mediaSession && audioEl.duration) {
+                try {
+                    navigator.mediaSession.setPositionState({
+                        duration: audioEl.duration || 0,
+                        playbackRate: audioEl.playbackRate || 1,
+                        position: audioEl.currentTime || 0
+                    });
+                } catch (error) {
+                    console.error(`[Player ${playerId}] Media Session position state update failed:`, error);
+                }
+            }
+        }
+    }
+};
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initSlideAudioPlayers);

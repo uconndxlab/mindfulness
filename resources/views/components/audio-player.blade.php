@@ -1,4 +1,10 @@
-<div id="player-{{ $id }}" class="slide__audio js-audio col-12" data-allow-seek="{{ $allowSeek ? 'true' : 'false' }}" data-allow-playback-rate="{{ $allowPlaybackRate ? 'true' : 'false' }}">
+<div id="player-{{ $id }}" 
+    class="slide__audio js-audio col-12" 
+    data-allow-seek="{{ $allowSeek ? 'true' : 'false' }}" 
+    data-allow-playback-rate="{{ $allowPlaybackRate ? 'true' : 'false' }}"
+    data-title="{{ $title ?? 'Audio Track' }}"
+    data-artist="{{ $artist ?? 'Unknown Artist' }}"
+    data-artwork="{{ $artwork ?? '' }}">
     <audio id="audio-{{ $id }}" class="slide__audio-player media-player" preload="auto" src="{{ Storage::url('content/'.$file) }}"></audio>
     <div class="audio__controls">
         <svg version="1.1" id="circle" width="300px" height="300px" viewBox="-5 -5 110 110">
