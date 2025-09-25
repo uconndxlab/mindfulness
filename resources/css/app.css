@@ -398,15 +398,15 @@ button:disabled i{
     font-size:12px;
 }
 
-.no-interaction .noUi-connect {
+.no-interaction .noUi-connects {
     opacity: 0.5;
     transition: opacity 0.3s ease;
 }
-.no-interaction .noUi-connect:hover {
+.no-interaction .noUi-connects:hover {
     opacity: 1;
 }
 
-.noUi-connect {
+.noUi-connects {
     background: var(--dark-green)!important;
 }
 
