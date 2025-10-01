@@ -1,9 +1,3 @@
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        pauseAllAudio();
-    }
-});
-
 function pauseAllAudio() {
     document.querySelectorAll('audio').forEach(audio => { try { audio.pause(); } catch (_) {} });
 }

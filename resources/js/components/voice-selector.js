@@ -32,6 +32,13 @@ function initVoiceSelector() {
             div.classList.toggle('d-none', div.getAttribute('voice') !== voice);
         });
 
+        // setup media session for the new voice - always
+        setTimeout(() => {
+            if (window.audioPlayerControls) {
+                window.audioPlayerControls.setupMediaSessionForPlayer(voice);
+            }
+        }, 50); // small delay for DOM updates
+
         console.log(`Switched to voice: ${voice}`);
     }
 
