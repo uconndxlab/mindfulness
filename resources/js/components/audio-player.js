@@ -37,9 +37,9 @@ async function initSlideAudioPlayers() {
         
         // initialize watched progress arc
         if (watchedPath && watchedPath.getTotalLength) {
-            const watchedLength = watchedPath.getTotalLength();
-            watchedPath.setAttribute('stroke-dasharray', String(watchedLength));
-            watchedPath.setAttribute('stroke-dashoffset', String(watchedLength));
+            const watchedPathLength = watchedPath.getTotalLength();
+            watchedPath.setAttribute('stroke-dasharray', String(watchedPathLength));
+            watchedPath.setAttribute('stroke-dashoffset', String(watchedPathLength));
         }
 
         // svg handle
@@ -287,8 +287,8 @@ async function initSlideAudioPlayers() {
             if (icon) { icon.classList.remove('bi-pause'); icon.classList.add('bi-play'); }
             
             // reset ui
-            watchedTime = 0;
-            updatePlayerUI(0, 0);
+            // use duration to keep the watched progress - otherwise it wipes to 0
+            updatePlayerUI(0, audioEl.duration);
             
             // clear media session when audio ends
             // clears on its own?
@@ -312,10 +312,6 @@ async function initSlideAudioPlayers() {
         audioEl.addEventListener('seeked', () => updatePlayerUI(audioEl.currentTime, audioEl.duration));
         
         audioEl.addEventListener('loadedmetadata', () => {
-            // if seeking allowed, user can seek anywhere
-            if (allowSeek && audioEl.duration) {
-                watchedTime = audioEl.duration;
-            }
             updatePlayerUI(audioEl.currentTime, audioEl.duration);
         });
 
