@@ -60,9 +60,9 @@
                 <div class="mt-4">
                     @foreach ($content->audio_options as $voice => $file_path)
                         @php
-                            $audioTitle = $activity->title." (".$voice.")";
+                            $audioTitle = $activity->title;
                             $audioArtist = "Healing Hearts";
-                            $audioArtwork = asset('icons/ms-icon-310x310.png');
+                            $audioArtwork = asset('icons/hh_512x512.png');
                         @endphp
                         <div id="audio_content" class="content-main d-none" voice="{{ $voice }}" data-type="audio">
                             <x-audio-player :file="$file_path" 

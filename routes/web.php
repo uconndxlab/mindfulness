@@ -12,7 +12,6 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PageNavController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\ErrorLogController;
 use App\Models\User;
 
 use App\Models\QuizAnswers;
