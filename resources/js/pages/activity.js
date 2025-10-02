@@ -15,6 +15,7 @@ function initActivityPage() {
     const compLateBtn = document.getElementById('complete-later');
     let completed = status === 'completed';
     let type = null;
+    const hasAudioVideo = type === 'audio' || type === 'video';
 
     function unlockRedirect() {
         if (!redirectDiv) return;
@@ -50,7 +51,8 @@ function initActivityPage() {
         completed = true;
         
         // completion time for metrics
-        if (!engagementMetrics.completionTime) {
+        if (!engagementMetrics.completionTime && !engagementMetrics.completed) {
+            engagementMetrics.completed = true;
             engagementMetrics.completionTime = performance.now();
             console.log('Activity completion tracked for engagement metrics');
 
@@ -70,6 +72,9 @@ function initActivityPage() {
                 if (data?.success) {
                     console.log('ProgressService: ' + data.message);
                     if (data.redirect_url) {
+                        // log exit before nav
+                        const duration = performance.now() - lastFocusTimestamp;
+                        logInteraction('exited', duration);
                         window.location.href = data.redirect_url;
                         return;
                     }
@@ -95,6 +100,7 @@ function initActivityPage() {
     // Favorites handling
     const favButton = document.getElementById('favorite_btn');
     let isFavorited = (root.getAttribute('data-is-favorited') === 'true');
+    const startFavorited = isFavorited;
     const favIcon = document.getElementById('favorite_icon');
     if (isFavorited && favIcon) favIcon.className = 'bi bi-star-fill';
     function toggleFavorite() {
@@ -163,6 +169,7 @@ function initActivityPage() {
                         let lastVideoTime = 0;
                         const VIDEO_SEEK_THRESHOLD = 1.5; // seek distance should be greater than this
                         const VIDEO_SEEK_DEBOUNCE = 2000; // wait between seeks - prevent spam while dragging
+                        let lastVideoSeekDirection = null;
                         
                         videoPlayer.addEventListener('timeupdate', function() {
                             const currentTime = videoPlayer.currentTime;
@@ -173,13 +180,15 @@ function initActivityPage() {
                             if (absTimeDiff > VIDEO_SEEK_THRESHOLD && lastVideoTime > 0) {
                                 const timeSinceLastSeek = now - engagementMetrics.lastSeekTime;
                                 
-                                if (timeSinceLastSeek > VIDEO_SEEK_DEBOUNCE) {
-                                    if (timeDiff > 0) {
+                                if (timeSinceLastSeek > VIDEO_SEEK_DEBOUNCE || lastVideoSeekDirection != null) {
+                                    if (timeDiff > 0 && lastVideoSeekDirection != 'forward') {
                                         // forward
+                                        lastVideoSeekDirection = 'forward';
                                         engagementMetrics.seekForwardCount++;
                                         console.log('Video seek forward. Total:', engagementMetrics.seekForwardCount);
-                                    } else {
+                                    } else if (timeDiff < 0 && lastVideoSeekDirection != 'backward') {
                                         // backward
+                                        lastVideoSeekDirection = 'backward';
                                         engagementMetrics.seekBackwardCount++;
                                         console.log('Video seek backward. Total:', engagementMetrics.seekBackwardCount);
                                     }
@@ -211,7 +220,8 @@ function initActivityPage() {
                     let lastAudioTime = 0;
                     const SEEK_THRESHOLD = 1.5; // seconds - must jump more than this
                     const SEEK_DEBOUNCE = 2000; // ms - must wait this long between counting seeks
-                    
+                    let lastSeekDirection = null;
+
                     player.addEventListener('timeupdate', function() {
                         const currentTime = player.currentTime;
                         const timeDiff = currentTime - lastAudioTime;
@@ -221,13 +231,15 @@ function initActivityPage() {
                         if (absTimeDiff > SEEK_THRESHOLD && lastAudioTime > 0) {
                             const timeSinceLastSeek = now - engagementMetrics.lastSeekTime;
                             
-                            if (timeSinceLastSeek > SEEK_DEBOUNCE) {
-                                if (timeDiff > 0) {
+                            if (timeSinceLastSeek > SEEK_DEBOUNCE || lastSeekDirection != null) {
+                                if (timeDiff > 0 && lastSeekDirection != 'forward') {
                                     // forward
+                                    lastSeekDirection = 'forward';
                                     engagementMetrics.seekForwardCount++;
                                     console.log('Audio seek forward. Total:', engagementMetrics.seekForwardCount);
-                                } else {
+                                } else if (timeDiff < 0 && lastSeekDirection != 'backward') {
                                     // backward
+                                    lastSeekDirection = 'backward';
                                     engagementMetrics.seekBackwardCount++;
                                     console.log('Audio seek backward. Total:', engagementMetrics.seekBackwardCount);
                                 }
@@ -255,21 +267,29 @@ function initActivityPage() {
 
     // Engagement metrics tracking
     const engagementMetrics = {
+        // general
         visibleTime: 0,
         hiddenTime: 0,
+        interactionCount: 0,
+        unfocusEvents: [], // {timestamp, duration, type}
+        // audio/video
         pauseCount: 0,
         seekForwardCount: 0,
         seekBackwardCount: 0,
-        interactionCount: 0,
-        unfocusEvents: [], // {timestamp, duration, type}
+        // post-completion - metrics
+        // if user is unfocused during completion
+        activitySkipped: false,
+        completed: false,
+        completionTime: null, // when activity was completed - will calc time to complete
+        timeToRefocus: null, // time from completion to next refocus
+        timeToExit: null, // time from completion to exit
+        // favorited
+        startFavorited: startFavorited,
+        endFavorited: null,
+        // for calculating engagement metrics
         sessionStart: performance.now(),
         lastInteractionTime: performance.now(),
         lastSeekTime: 0, // for seek debouncing
-        // post-completion - metrics
-        // if user is unfocused during completion
-        completionTime: null, // when activity was completed
-        timeToExit: null, // time from completion to exit
-        timeToRefocus: null // time from completion to next refocus
     };
 
     let userUnfocused = false;
@@ -292,7 +312,7 @@ function initActivityPage() {
         }
 
         // track visible time when unfocusing
-        if (eventType === 'unfocused' || eventType === 'frozen') {
+        if (eventType === 'unfocused' || eventType === 'frozen' || eventType === 'exited') {
             const visibleDuration = duration ? Math.round(duration / 1000) : 0;
             engagementMetrics.visibleTime += visibleDuration;
             data.append('time_since_interaction', String(Math.round((performance.now() - engagementMetrics.lastInteractionTime) / 1000)));
@@ -309,6 +329,8 @@ function initActivityPage() {
                 let unfocusType = 'short';
                 if (hiddenDuration >= 90) unfocusType = 'long';      // > 1.5min
                 else if (hiddenDuration >= 10) unfocusType = 'medium'; // 10s - 1.5min
+
+                console.log('Unfocus type: ', unfocusType);
                 
                 engagementMetrics.unfocusEvents.push({
                     timestamp: Date.now(),
@@ -322,11 +344,6 @@ function initActivityPage() {
             }
         }
 
-        // calculate time to exit after completion
-        if (eventType === 'exited' && engagementMetrics.completionTime) {
-            engagementMetrics.timeToExit = Math.round((performance.now() - engagementMetrics.completionTime) / 1000);
-        }
-
         // calculate time to refocus after completion - should only set if user is unfocused
         if (eventType === 'refocused' && engagementMetrics.completionTime && engagementMetrics.timeToRefocus === null) {
             engagementMetrics.timeToRefocus = Math.round((performance.now() - engagementMetrics.completionTime) / 1000);
@@ -335,21 +352,56 @@ function initActivityPage() {
 
         // add engagement metrics for exited event
         if (eventType === 'exited') {
-            data.append('total_visible_time', String(engagementMetrics.visibleTime));
-            data.append('total_hidden_time', String(engagementMetrics.hiddenTime));
-            data.append('pause_count', String(engagementMetrics.pauseCount));
-            data.append('seek_forward_count', String(engagementMetrics.seekForwardCount));
-            data.append('seek_backward_count', String(engagementMetrics.seekBackwardCount));
-            data.append('interaction_count', String(engagementMetrics.interactionCount));
-            data.append('short_unfocus_count', String(engagementMetrics.unfocusEvents.filter(e => e.type === 'short').length));
-            data.append('medium_unfocus_count', String(engagementMetrics.unfocusEvents.filter(e => e.type === 'medium').length));
-            data.append('long_unfocus_count', String(engagementMetrics.unfocusEvents.filter(e => e.type === 'long').length));
-            data.append('session_duration', String(Math.round((performance.now() - engagementMetrics.sessionStart) / 1000)));
-            
-            // post-completion metrics
-            if (engagementMetrics.timeToExit !== null) {
-                data.append('time_to_exit_after_completion', String(engagementMetrics.timeToExit));
+            // get favorite status
+            engagementMetrics.endFavorited = isFavorited;
+            // calculate time to exit after completion
+            if (engagementMetrics.completionTime) {
+                engagementMetrics.timeToExit = Math.round((performance.now() - engagementMetrics.completionTime) / 1000);
             }
+
+            console.log('COMPLETION METRICS');
+            // add general metrics
+            data.append('total_visible_time', String(engagementMetrics.visibleTime));
+            console.log('Total visible time: ', engagementMetrics.visibleTime);
+            data.append('total_hidden_time', String(engagementMetrics.hiddenTime));
+            console.log('Total hidden time: ', engagementMetrics.hiddenTime);
+            data.append('session_duration', String(Math.round((performance.now() - engagementMetrics.sessionStart) / 1000)));
+            console.log('Session duration: ', Math.round((performance.now() - engagementMetrics.sessionStart) / 1000));
+            data.append('interaction_count', String(engagementMetrics.interactionCount));
+            console.log('Interaction count: ', engagementMetrics.interactionCount);
+            data.append('short_unfocus_count', String(engagementMetrics.unfocusEvents.filter(e => e.type === 'short').length));
+            console.log('Short unfocus count: ', engagementMetrics.unfocusEvents.filter(e => e.type === 'short').length);
+            data.append('medium_unfocus_count', String(engagementMetrics.unfocusEvents.filter(e => e.type === 'medium').length));
+            console.log('Medium unfocus count: ', engagementMetrics.unfocusEvents.filter(e => e.type === 'medium').length);
+            data.append('long_unfocus_count', String(engagementMetrics.unfocusEvents.filter(e => e.type === 'long').length));
+            console.log('Long unfocus count: ', engagementMetrics.unfocusEvents.filter(e => e.type === 'long').length);
+            // add audio/video metrics
+            if (hasAudioVideo) {
+                data.append('pause_count', String(engagementMetrics.pauseCount));
+                console.log('Pause count: ', engagementMetrics.pauseCount);
+                data.append('seek_forward_count', String(engagementMetrics.seekForwardCount));
+                console.log('Seek forward count: ', engagementMetrics.seekForwardCount);
+                data.append('seek_backward_count', String(engagementMetrics.seekBackwardCount));
+                console.log('Seek backward count: ', engagementMetrics.seekBackwardCount);
+            }
+            // add post-completion metrics
+            data.append('activity_skipped', String(engagementMetrics.activitySkipped));
+            console.log('Activity skipped: ', engagementMetrics.activitySkipped);
+            data.append('activity_completed', String(engagementMetrics.completed));
+            console.log('Activity completed: ', engagementMetrics.completed);
+            if (engagementMetrics.completed) {
+                data.append('time_to_complete', String(Math.round((engagementMetrics.completionTime - engagementMetrics.sessionStart) / 1000)));
+                console.log('Time to complete: ', Math.round((engagementMetrics.completionTime - engagementMetrics.sessionStart) / 1000));
+                data.append('time_to_refocus_after_completion', String(engagementMetrics.timeToRefocus));
+                console.log('Time to refocus after completion: ', engagementMetrics.timeToRefocus);
+                data.append('time_to_exit_after_completion', String(engagementMetrics.timeToExit));
+                console.log('Time to exit after completion: ', engagementMetrics.timeToExit);
+            }
+            // add favorited metrics
+            data.append('end_favorited', String(engagementMetrics.endFavorited));
+            console.log('End favorited: ', engagementMetrics.endFavorited);
+            data.append('start_favorited', String(engagementMetrics.startFavorited));
+            console.log('Start favorited: ', engagementMetrics.startFavorited);
         }
 
         // add any additional data
@@ -420,22 +472,31 @@ function initActivityPage() {
         backButton.addEventListener('click', function(event) {
             event.preventDefault();
             showBrowserModal = false;
+            const href = this.href;
             if (!completed && window.showModal) {
                 window.showModal({
                     label: 'Leave activity?',
                     body: 'Leaving will erase your progress on this activity. Are you sure you want to leave?',
-                    route: this.href,
+                    route: href,
                     method: 'GET',
                     buttonLabel: 'Leave Activity',
                     buttonClass: 'btn-danger',
                     closeLabel: 'Stay',
+                    onConfirm: function() {
+                        // log exit before nav
+                        const duration = performance.now() - lastFocusTimestamp;
+                        logInteraction('exited', duration);
+                    },
                     onCancel: function() {
                         console.log('cancelled in leave');
                         showBrowserModal = true;
                     }
                 });
             } else {
-                window.location.href = this.href;
+                // manually log exit before nav - without modal
+                const duration = performance.now() - lastFocusTimestamp;
+                logInteraction('exited', duration);
+                window.location.href = href;
             }
         });
     }
@@ -452,11 +513,35 @@ function initActivityPage() {
                     method: 'POST',
                     buttonLabel: 'Continue',
                     buttonClass: 'btn-danger',
+                    onConfirm: function() {
+                        // log exit before nav
+                        const duration = performance.now() - lastFocusTimestamp;
+                        engagementMetrics.activitySkipped = true;
+                        logInteraction('exited', duration);
+                    },
                     onCancel: function() {
                         showBrowserModal = true;
                     }
                 });
+            } else {
+                // log exit before nav (no modal)
+                const duration = performance.now() - lastFocusTimestamp;
+                engagementMetrics.activitySkipped = true;
+                logInteraction('exited', duration);
+                window.location.href = skipRoute;
             }
+        });
+    }
+
+    // handle redirect buttons manually to ensure logInteraction('exited') is called
+    const redirectButton = document.getElementById('redirect_button');
+    if (redirectButton) {
+        redirectButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            // log exit before nav
+            const duration = performance.now() - lastFocusTimestamp;
+            logInteraction('exited', duration);
+            window.location.href = this.href;
         });
     }
 
