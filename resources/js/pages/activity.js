@@ -56,12 +56,12 @@ function initActivityPage() {
         if (!engagementMetrics.completionTime && !engagementMetrics.completed) {
             engagementMetrics.completed = true;
             engagementMetrics.completionTime = performance.now();
-            console.log('Activity completion tracked for engagement metrics');
+            // console.log('Activity completion tracked for engagement metrics');
 
             if (!userUnfocused) {
                 // if user is focused, should not set refocus time
                 engagementMetrics.timeToRefocus = 0;
-                console.log('Time to refocus tracked for engagement metrics');
+                // console.log('Time to refocus tracked for engagement metrics');
             }
         }
         
@@ -72,7 +72,7 @@ function initActivityPage() {
             }).then(response => {
                 const data = response.data;
                 if (data?.success) {
-                    console.log('ProgressService: ' + data.message);
+                    // console.log('ProgressService: ' + data.message);
                     if (data.redirect_url) {
                         // log exit before nav
                         const duration = performance.now() - lastFocusTimestamp;
@@ -96,7 +96,6 @@ function initActivityPage() {
             });
         }
     }
-    // expose globally for subcomponents
     window.activityComplete = activityComplete;
 
     // Favorites handling
@@ -107,17 +106,15 @@ function initActivityPage() {
     if (isFavorited && favIcon) favIcon.className = 'bi bi-star-fill';
     function toggleFavorite() {
         const currentState = isFavorited;
-        console.log('Current state: ', currentState);
         isFavorited = !isFavorited;
         if (favIcon) favIcon.className = isFavorited ? 'bi bi-star-fill' : 'bi bi-star';
         return new Promise((resolve, reject) => {
             window.axios.post(favoriteToggleRoute, {
                 activity_id: activityId
             }).then(response => {
-                console.log(response.data?.message || 'Favorited');
                 resolve(true);
             }).catch(error => {
-                console.error('There was an error toggling favorite', error);
+                // console.error('There was an error toggling favorite', error);
                 isFavorited = currentState;
                 if (favIcon) favIcon.className = isFavorited ? 'bi bi-star-fill' : 'bi bi-star';
                 reject(false);
@@ -126,7 +123,6 @@ function initActivityPage() {
     }
     if (favButton) {
         favButton.addEventListener('click', function() {
-            console.log('Toggling favorite');
             toggleFavorite();
         });
     }
@@ -156,14 +152,12 @@ function initActivityPage() {
                 } else if (type === 'video') {
                     const videoPlayer = document.getElementById('content_view');
                     if (videoPlayer) {
-                        console.log('video player found');
                         videoPlayer.addEventListener('ended', activityComplete);
                         
                         // track pause events
                         videoPlayer.addEventListener('pause', function() {
                             if (!videoPlayer.ended) {
                                 engagementMetrics.pauseCount++;
-                                console.log('Video paused. Total pauses:', engagementMetrics.pauseCount);
                             }
                         });
                         
@@ -187,12 +181,10 @@ function initActivityPage() {
                                         // forward
                                         lastVideoSeekDirection = 'forward';
                                         engagementMetrics.seekForwardCount++;
-                                        console.log('Video seek forward. Total:', engagementMetrics.seekForwardCount);
                                     } else if (timeDiff < 0 && lastVideoSeekDirection != 'backward') {
                                         // backward
                                         lastVideoSeekDirection = 'backward';
                                         engagementMetrics.seekBackwardCount++;
-                                        console.log('Video seek backward. Total:', engagementMetrics.seekBackwardCount);
                                     }
                                     engagementMetrics.lastSeekTime = now;
                                 }
@@ -200,21 +192,19 @@ function initActivityPage() {
                             lastVideoTime = currentTime;
                         });
                     } else {
-                        console.log('video player not found');
+                        console.error('video player not found');
                     }
                 }
             } else {
                 // handle all audio players (both in audio_content and main content area)
                 const audioPlayers = document.querySelectorAll('.slide__audio-player');
                 audioPlayers.forEach(player => {
-                    console.log('Adding completion listener to audio player');
                     player.addEventListener('ended', () => activityComplete(true, player.getAttribute('voice') ??  'none'));
                     
                     // track pause events
                     player.addEventListener('pause', function() {
                         if (!player.ended) {
                             engagementMetrics.pauseCount++;
-                            console.log('Audio paused. Total pauses:', engagementMetrics.pauseCount);
                         }
                     });
                     
@@ -238,12 +228,10 @@ function initActivityPage() {
                                     // forward
                                     lastSeekDirection = 'forward';
                                     engagementMetrics.seekForwardCount++;
-                                    console.log('Audio seek forward. Total:', engagementMetrics.seekForwardCount);
                                 } else if (timeDiff < 0 && lastSeekDirection != 'backward') {
                                     // backward
                                     lastSeekDirection = 'backward';
                                     engagementMetrics.seekBackwardCount++;
-                                    console.log('Audio seek backward. Total:', engagementMetrics.seekBackwardCount);
                                 }
                                 engagementMetrics.lastSeekTime = now;
                             }
@@ -299,7 +287,6 @@ function initActivityPage() {
     let userUnfocused = false;
     function logInteraction(eventType, duration, additionalData = {}) {
         if (exited) return;
-        console.log('Logging interaction: ', eventType);
         const data = new FormData();
         data.append('activity_id', String(activityId));
         // rename exited to summary
@@ -319,7 +306,7 @@ function initActivityPage() {
         if (eventType === 'unfocused' || eventType === 'frozen' || eventType === 'exited') {
             const visibleDuration = duration ? Math.round(duration / 1000) : 0;
             engagementMetrics.visibleTime += visibleDuration;
-            data.append('time_since_interaction', String(Math.round((performance.now() - engagementMetrics.lastInteractionTime) / 1000)));
+            // data.append('time_since_interaction', String(Math.round((performance.now() - engagementMetrics.lastInteractionTime) / 1000)));
         }
 
         // track hidden time when refocusing
@@ -333,8 +320,6 @@ function initActivityPage() {
                 let unfocusType = 'short';
                 if (hiddenDuration >= 90) unfocusType = 'long';      // > 1.5min
                 else if (hiddenDuration >= 10) unfocusType = 'medium'; // 10s - 1.5min
-
-                console.log('Unfocus type: ', unfocusType);
                 
                 engagementMetrics.unfocusEvents.push({
                     timestamp: Date.now(),
@@ -343,15 +328,15 @@ function initActivityPage() {
                 });
                 engagementMetrics.hiddenTime += hiddenDuration;
                 
-                data.append('unfocus_type', unfocusType);
-                data.append('hidden_duration', String(hiddenDuration));
+                // data.append('unfocus_type', unfocusType);
+                // data.append('hidden_duration', String(hiddenDuration));
             }
         }
 
         // calculate time to refocus after completion - should only set if user is unfocused
         if (eventType === 'refocused' && engagementMetrics.completionTime && engagementMetrics.timeToRefocus === null) {
             engagementMetrics.timeToRefocus = Math.round((performance.now() - engagementMetrics.completionTime) / 1000);
-            data.append('time_to_refocus_after_completion', String(engagementMetrics.timeToRefocus));
+            // data.append('time_to_refocus_after_completion', String(engagementMetrics.timeToRefocus));
         }
 
         // add engagement metrics for exited event
@@ -363,34 +348,53 @@ function initActivityPage() {
                 engagementMetrics.timeToExit = Math.round((performance.now() - engagementMetrics.completionTime) / 1000);
             }
 
-            // add general metrics
-            data.append('total_visible_time', String(engagementMetrics.visibleTime));
-            data.append('total_hidden_time', String(engagementMetrics.hiddenTime));
-            data.append('session_duration', String(Math.round((performance.now() - engagementMetrics.sessionStart) / 1000)));
-            data.append('interaction_count', String(engagementMetrics.interactionCount));
-            data.append('short_unfocus_count', String(engagementMetrics.unfocusEvents.filter(e => e.type === 'short').length));
-            data.append('medium_unfocus_count', String(engagementMetrics.unfocusEvents.filter(e => e.type === 'medium').length));
-            data.append('long_unfocus_count', String(engagementMetrics.unfocusEvents.filter(e => e.type === 'long').length));
-            // add audio/video metrics
-            if (hasAudioVideo) {
-                data.append('pause_count', String(engagementMetrics.pauseCount));
-                data.append('seek_forward_count', String(engagementMetrics.seekForwardCount));
-                data.append('seek_backward_count', String(engagementMetrics.seekBackwardCount));
-            }
-            // add post-completion metrics
-            data.append('activity_skipped', String(engagementMetrics.activitySkipped));
-            data.append('activity_completed', String(engagementMetrics.completed));
+            // build metrics
+            const metrics = {
+                // session metrics
+                session_duration: Math.round((performance.now() - engagementMetrics.sessionStart) / 1000),
+                // total_visible_time: engagementMetrics.visibleTime,
+                total_hidden_time: engagementMetrics.hiddenTime,
+                // interaction_count: engagementMetrics.interactionCount,
+                
+                // unfocus metrics
+                total_unfocus_count: engagementMetrics.unfocusEvents.length,
+                // short_unfocus_count: engagementMetrics.unfocusEvents.filter(e => e.type === 'short').length,
+                // medium_unfocus_count: engagementMetrics.unfocusEvents.filter(e => e.type === 'medium').length,
+                // long_unfocus_count: engagementMetrics.unfocusEvents.filter(e => e.type === 'long').length,
+                
+                // audio/video metrics
+                // pause_count: engagementMetrics.pauseCount,
+                // seek_forward_count: engagementMetrics.seekForwardCount,
+                // seek_backward_count: engagementMetrics.seekBackwardCount,
+                
+                // completion metrics
+                activity_skipped: engagementMetrics.activitySkipped,
+                activity_completed: engagementMetrics.completed,
+                // other completion metrics done conditionally
+                
+                // favorites
+                start_favorited: engagementMetrics.startFavorited,
+                end_favorited: engagementMetrics.endFavorited,
+            };
+            
+            // conditional items
+            // add completion-related metrics only if activity was completed
             if (engagementMetrics.completed) {
-                data.append('time_to_complete', String(Math.round((engagementMetrics.completionTime - engagementMetrics.sessionStart) / 1000)));
-                data.append('time_to_refocus_after_completion', String(engagementMetrics.timeToRefocus));
-                data.append('time_to_exit_after_completion', String(engagementMetrics.timeToExit));
+                metrics.time_to_complete = Math.round((engagementMetrics.completionTime - engagementMetrics.sessionStart) / 1000);
+                metrics.time_to_refocus_after_completion = engagementMetrics.timeToRefocus;
+                metrics.time_to_exit_after_completion = engagementMetrics.timeToExit;
             }
             if (engagementMetrics.voice) {
-                data.append('voice', engagementMetrics.voice);
+                metrics.voice = engagementMetrics.voice;
             }
-            // add favorited metrics
-            data.append('end_favorited', String(engagementMetrics.endFavorited));
-            data.append('start_favorited', String(engagementMetrics.startFavorited));
+            if (hasAudioVideo) {
+                metrics.pause_count = engagementMetrics.pauseCount;
+                metrics.seek_forward_count = engagementMetrics.seekForwardCount;
+                metrics.seek_backward_count = engagementMetrics.seekBackwardCount;
+            }
+            
+            // metrics as json
+            data.append('metrics', JSON.stringify(metrics));
         }
 
         // add any additional data
@@ -408,7 +412,6 @@ function initActivityPage() {
                 const responseData = response.data;
                 if (responseData?.status === 'success' && responseData?.log_id) {
                     engagementMetrics.startLogId = responseData.log_id;
-                    console.log('New start log ID:', engagementMetrics.startLogId);
                 }
             }).catch(error => {
                 console.error('There was an error logging the interaction:', error);
@@ -438,21 +441,18 @@ function initActivityPage() {
     // page lifecycle api - better mobile detection
     if ('onfreeze' in document) {
         document.addEventListener('freeze', () => {
-            console.log('Page frozen (likely mobile background)');
             const duration = performance.now() - lastFocusTimestamp;
             lastUnfocusTimestamp = performance.now();
             logInteraction('frozen', duration, { lifecycle_event: 'freeze' });
         });
 
         document.addEventListener('resume', () => {
-            console.log('Page resumed from frozen');
             lastFocusTimestamp = performance.now();
             logInteraction('resumed', 0, { lifecycle_event: 'resume' });
         });
     }
 
     window.addEventListener('pagehide', () => {
-        console.log('Page hidden');
         const duration = performance.now() - lastFocusTimestamp;
         logInteraction('exited', duration);
     });
@@ -467,7 +467,6 @@ function initActivityPage() {
         
         // For back/forward navigation, reset engagement metrics for new session
         if (navType === 'back_forward') {
-            console.log('Resetting metrics for back/forward navigation');
             exited = false;
             lastFocusTimestamp = performance.now();
             lastUnfocusTimestamp = 0;
@@ -523,7 +522,6 @@ function initActivityPage() {
                         logInteraction('exited', duration);
                     },
                     onCancel: function() {
-                        console.log('cancelled in leave');
                         showBrowserModal = true;
                     }
                 });
