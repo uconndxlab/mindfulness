@@ -143,36 +143,8 @@ Route::middleware('web')->group(function () {
         Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
             Route::get('/dashboard', [AdminUserController::class, 'dashboard'])->name('dashboard');
             Route::post('/lock-registration-access', [AdminUserController::class, 'lockRegistrationAccess'])->middleware('throttle:10,1')->name('lock-registration-access');
-            
-            Route::get('/test', function () {
-                $quizAnswer = QuizAnswers::first();
-                if (!$quizAnswer) {
-                    dd('No quiz answers found');
-                }
-                
-                // Show the current format
-                echo "<h3>Current Raw Answer:</h3>";
-                echo "<pre>" . json_encode($quizAnswer->answers, JSON_PRETTY_PRINT) . "</pre>";
-                
-                // Show what it should look like in the new format
-                echo "<h3>Expected New Format:</h3>";
-                $newFormat = [
-                    "1" => [["6" => "some other text"]],
-                    "2" => [["3" => null]]
-                ];
-                echo "<pre>" . json_encode($newFormat, JSON_PRETTY_PRINT) . "</pre>";
-                
-                // Show all quiz answers for user 1
-                echo "<h3>All Quiz Answers for User 1:</h3>";
-                $allAnswers = QuizAnswers::where('user_id', 1)->get();
-                foreach($allAnswers as $answer) {
-                    echo "<strong>Quiz #{$answer->quiz_id}:</strong><br>";
-                    echo "<pre>" . json_encode($answer->answers, JSON_PRETTY_PRINT) . "</pre>";
-                    echo "<hr>";
-                }
-            });
-            
             Route::get('/users', [AdminUserController::class, 'index'])->name('users');
+            Route::get('/users/export/csv', [AdminUserController::class, 'exportUsers'])->name('users.export');
             Route::get('/events', [AdminEventController::class, 'index'])->name('events');
             Route::get('/events/export/csv', [AdminEventController::class, 'exportEvents'])->name('events.export');
         });

@@ -26,7 +26,7 @@ class EventsExport implements FromCollection, WithHeadings, WithMapping
             'Description',
             'Subject Type',
             'Subject ID/Name',
-            'Timestamp',
+            'Timestamp (UTC)',
             'Local Timestamp',
             'Log Name',
             'Event',
