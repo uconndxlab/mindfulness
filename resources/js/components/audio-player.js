@@ -1,69 +1,6 @@
-// log errors to backend
-async function logToServer(errorType, message, additionalData = {}) {
-    try {
-        // device/browser info
-        const deviceInfo = {
-            userAgent: navigator.userAgent,
-            platform: navigator.platform,
-            vendor: navigator.vendor,
-            language: navigator.language,
-            cookieEnabled: navigator.cookieEnabled,
-            onLine: navigator.onLine,
-            screen: {
-                width: screen.width,
-                height: screen.height,
-                colorDepth: screen.colorDepth
-            },
-            viewport: {
-                width: window.innerWidth,
-                height: window.innerHeight
-            },
-            url: window.location.href,
-            timestamp: new Date().toISOString(),
-            ...additionalData
-        };
-
-        const response = await fetch('/log-client-error', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                error_type: errorType,
-                message: message,
-                user_agent: navigator.userAgent,
-                url: window.location.href,
-                additional_data: deviceInfo
-            })
-        });
-
-        if (!response.ok) {
-            console.warn('Failed to log error to server:', response.status);
-        }
-    } catch (e) {
-        console.warn('Failed to send error log to server:', e);
-    }
-}
-
 async function initSlideAudioPlayers() {
     const players = document.querySelectorAll('.slide__audio.js-audio');
     if (!players.length) return;
-
-    // Lazy-load NoSleep only when players exist
-    let NoSleepCtor = null;
-    try {
-        // nosleep.js is a tiny lib; add to package.json if missing
-        const mod = await import('nosleep.js');
-        NoSleepCtor = mod.default;
-    } catch (e) {
-        console.warn('NoSleep failed to load; continuing without it', e);
-        await logToServer('NoSleep_Load_Failed', `NoSleep library failed to load: ${e.message}`, {
-            error: e.toString(),
-            stack: e.stack
-        });
-    }
 
     players.forEach(playerEl => {
         const id = playerEl.id?.replace('player-', '') || playerEl.querySelector('audio')?.id?.replace('audio-', '') || 'unknown';
@@ -78,24 +15,12 @@ async function initSlideAudioPlayers() {
         }
         const allowPlaybackRate = playerEl.getAttribute('data-allow-playback-rate') === 'true';
 
-        let noSleep = null;
-        let noSleepEnabled = false;
-        // init nosleep with error handling
-        if (NoSleepCtor) {
-            try {
-                noSleep = new NoSleepCtor();
-                console.log(`[Player ${id}] NoSleep instance created successfully`);
-            } catch (e) {
-                console.error(`[Player ${id}] Failed to create NoSleep instance:`, e);
-                logToServer('NoSleep_Instance_Failed', `Failed to create NoSleep instance for player ${id}: ${e.message}`, {
-                    playerId: id,
-                    error: e.toString(),
-                    stack: e.stack
-                });
-            }
-        }
         let watchedTime = 0;
         let hasBeenPlayed = false;
+        
+        // media session access
+        audioEl._watchedTime = 0;
+        audioEl._allowSeek = allowSeek;
 
         const circle = playerEl.querySelector('#seekbar');
         const circlePath = circle ? circle : null;
@@ -116,9 +41,9 @@ async function initSlideAudioPlayers() {
         
         // initialize watched progress arc
         if (watchedPath && watchedPath.getTotalLength) {
-            const watchedLength = watchedPath.getTotalLength();
-            watchedPath.setAttribute('stroke-dasharray', String(watchedLength));
-            watchedPath.setAttribute('stroke-dashoffset', String(watchedLength));
+            const watchedPathLength = watchedPath.getTotalLength();
+            watchedPath.setAttribute('stroke-dasharray', String(watchedPathLength));
+            watchedPath.setAttribute('stroke-dashoffset', String(watchedPathLength));
         }
 
         // svg handle
@@ -285,38 +210,18 @@ async function initSlideAudioPlayers() {
                     try { el.pause(); } catch (_) {}
                 }
             });
-
-            // Enable NoSleep with comprehensive error handling
-            if (noSleep && noSleep.enable) {
-                try {
-                    noSleep.enable();
-                    noSleepEnabled = true;
-                    console.log(`[Player ${id}] NoSleep enabled successfully`);
-                } catch (e) {
-                    console.error(`[Player ${id}] NoSleep enable failed:`, e);
-                    logToServer('NoSleep_Enable_Failed', `NoSleep enable failed for player ${id}: ${e.message}`, {
-                        playerId: id,
-                        error: e.toString(),
-                        stack: e.stack,
-                        noSleepExists: !!noSleep,
-                        enableMethodExists: !!(noSleep && noSleep.enable)
-                    });
-                }
-            } else {
-                console.warn(`[Player ${id}] NoSleep not available for enabling`);
-                logToServer('NoSleep_Not_Available', `NoSleep not available for enabling on player ${id}`, {
-                    playerId: id,
-                    noSleepExists: !!noSleep,
-                    enableMethodExists: !!(noSleep && noSleep.enable)
-                });
-            }
-
+            
             audioEl.play().then(() => {
                 playerEl.classList.remove('paused');
                 playerEl.classList.add('playing');
                 const icon = playerEl.querySelector('#icon');
                 if (icon) { icon.classList.remove('bi-play'); icon.classList.add('bi-pause'); }
                 updatePlayerUI(audioEl.currentTime, audioEl.duration);
+                
+                // update media session
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.playbackState = 'playing';
+                }
             }).catch(error => {
                 console.error(`[Player ${id}] Audio play() failed:`, error);
                 pauseAudio();
@@ -325,31 +230,17 @@ async function initSlideAudioPlayers() {
 
         function pauseAudio() {
             if (audioEl.paused) return;
-            
-            // Disable NoSleep with error handling
-            if (noSleep && noSleep.disable && noSleepEnabled) {
-                try {
-                    noSleep.disable();
-                    noSleepEnabled = false;
-                    console.log(`[Player ${id}] NoSleep disabled successfully`);
-                } catch (e) {
-                    console.error(`[Player ${id}] NoSleep disable failed:`, e);
-                    logToServer('NoSleep_Disable_Failed', `NoSleep disable failed for player ${id}: ${e.message}`, {
-                        playerId: id,
-                        error: e.toString(),
-                        stack: e.stack,
-                        noSleepExists: !!noSleep,
-                        disableMethodExists: !!(noSleep && noSleep.disable)
-                    });
-                }
-            }
-            
             try { audioEl.pause(); } catch (_) {}
             playerEl.classList.remove('playing');
             playerEl.classList.add('paused');
             const icon = playerEl.querySelector('#icon');
             if (icon) { icon.classList.remove('bi-pause'); icon.classList.add('bi-play'); }
             updatePlayerUI(audioEl.currentTime, audioEl.duration);
+            
+            // update media session
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = 'paused';
+            }
         }
 
         const playBtn = playerEl.querySelector('.play-pause');
@@ -362,25 +253,6 @@ async function initSlideAudioPlayers() {
         const originalPause = audioEl.pause.bind(audioEl);
         audioEl.pause = function() {
             if (audioEl.paused) return;
-            
-            // Disable NoSleep with error handling (audio element pause override)
-            if (noSleep && noSleep.disable && noSleepEnabled) {
-                try {
-                    noSleep.disable();
-                    noSleepEnabled = false;
-                    console.log(`[Player ${id}] NoSleep disabled successfully (audio.pause override)`);
-                } catch (e) {
-                    console.error(`[Player ${id}] NoSleep disable failed (audio.pause override):`, e);
-                    logToServer('NoSleep_Disable_Failed_AudioPause', `NoSleep disable failed in audio.pause override for player ${id}: ${e.message}`, {
-                        playerId: id,
-                        error: e.toString(),
-                        stack: e.stack,
-                        noSleepExists: !!noSleep,
-                        disableMethodExists: !!(noSleep && noSleep.disable)
-                    });
-                }
-            }
-            
             originalPause();
             playerEl.classList.remove('playing');
             playerEl.classList.add('paused');
@@ -397,35 +269,34 @@ async function initSlideAudioPlayers() {
             // updating watched time for seeking enforcement
             if (!audioEl.seeking && currentTime > watchedTime) {
                 watchedTime = currentTime;
+                audioEl._watchedTime = currentTime; // sync to audio element
+            }
+            
+            // update media session position
+            if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession) {
+                try {
+                    navigator.mediaSession.setPositionState({
+                        duration: duration || 0,
+                        playbackRate: audioEl.playbackRate || 1,
+                        position: currentTime || 0
+                    });
+                } catch (error) {
+                    console.error(`[Player ${id}] Media Session position state update failed:`, error);
+                }
             }
         });
 
         audioEl.addEventListener('ended', () => {
-            // Disable NoSleep with error handling (audio ended)
-            if (noSleep && noSleep.disable && noSleepEnabled) {
-                try {
-                    noSleep.disable();
-                    noSleepEnabled = false;
-                    console.log(`[Player ${id}] NoSleep disabled successfully (audio ended)`);
-                } catch (e) {
-                    console.error(`[Player ${id}] NoSleep disable failed (audio ended):`, e);
-                    logToServer('NoSleep_Disable_Failed_AudioEnded', `NoSleep disable failed on audio ended for player ${id}: ${e.message}`, {
-                        playerId: id,
-                        error: e.toString(),
-                        stack: e.stack,
-                        noSleepExists: !!noSleep,
-                        disableMethodExists: !!(noSleep && noSleep.disable)
-                    });
-                }
-            }
-            
             playerEl.classList.remove('playing');
             const icon = playerEl.querySelector('#icon');
             if (icon) { icon.classList.remove('bi-pause'); icon.classList.add('bi-play'); }
             
             // reset ui
-            watchedTime = 0;
-            updatePlayerUI(0, 0);
+            // use duration to keep the watched progress - otherwise it wipes to 0
+            updatePlayerUI(0, audioEl.duration);
+            
+            // clear media session when audio ends
+            // clears on its own?
         });
 
         audioEl.addEventListener('seeking', () => {
@@ -446,10 +317,6 @@ async function initSlideAudioPlayers() {
         audioEl.addEventListener('seeked', () => updatePlayerUI(audioEl.currentTime, audioEl.duration));
         
         audioEl.addEventListener('loadedmetadata', () => {
-            // if seeking allowed, user can seek anywhere
-            if (allowSeek && audioEl.duration) {
-                watchedTime = audioEl.duration;
-            }
             updatePlayerUI(audioEl.currentTime, audioEl.duration);
         });
 
@@ -457,10 +324,93 @@ async function initSlideAudioPlayers() {
     });
 }
 
+// simple functions for voice selector
+window.audioPlayerControls = {
+    setupMediaSessionForPlayer: function(playerId) {
+        const playerEl = document.getElementById(`player-${playerId}`);
+        if (!playerEl) {
+            console.log(`Player ${playerId} not found`);
+            return;
+        }
+        
+        const audioEl = playerEl.querySelector('audio');
+        if (!audioEl) return;
+        
+        // get metadata from player element
+        const title = playerEl.getAttribute('data-title') || 'Audio Track';
+        const artist = playerEl.getAttribute('data-artist') || 'Unknown Artist';
+        const artwork = playerEl.getAttribute('data-artwork') || '';
+        
+        if ('mediaSession' in navigator) {
+            const artworkArray = [];
+            if (artwork) {
+                artworkArray.push(
+                    { src: artwork, sizes: '96x96', type: 'image/png' },
+                    { src: artwork, sizes: '128x128', type: 'image/png' },
+                    { src: artwork, sizes: '192x192', type: 'image/png' },
+                    { src: artwork, sizes: '256x256', type: 'image/png' },
+                    { src: artwork, sizes: '384x384', type: 'image/png' },
+                    { src: artwork, sizes: '512x512', type: 'image/png' }
+                );
+            }
+
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: title,
+                artist: artist,
+                artwork: artworkArray
+            });
+
+            // set playback state based on actual audio state
+            navigator.mediaSession.playbackState = audioEl.paused ? 'paused' : 'playing';
+
+            // set up action handlers
+            navigator.mediaSession.setActionHandler('play', () => {
+                const playBtn = playerEl.querySelector('.play-pause');
+                if (playBtn && audioEl.paused) {
+                    playBtn.click();
+                }
+            });
+
+            navigator.mediaSession.setActionHandler('pause', () => {
+                const playBtn = playerEl.querySelector('.play-pause');
+                if (playBtn && !audioEl.paused) {
+                    playBtn.click();
+                }
+            });
+
+            navigator.mediaSession.setActionHandler('seekto', (details) => {
+                if (details.seekTime !== undefined && audioEl.duration) {
+                    let targetTime = Math.max(0, Math.min(audioEl.duration, details.seekTime));
+                    const allowSeek = audioEl._allowSeek || false;
+                    const watchedTime = audioEl._watchedTime || 0;
+                    
+                    // enforce seek restriction
+                    if (!allowSeek && targetTime > watchedTime) {
+                        targetTime = watchedTime;
+                    }
+                    
+                    audioEl.currentTime = targetTime;
+                }
+            });
+            
+            // update position if available
+            if ('setPositionState' in navigator.mediaSession && audioEl.duration) {
+                try {
+                    navigator.mediaSession.setPositionState({
+                        duration: audioEl.duration || 0,
+                        playbackRate: audioEl.playbackRate || 1,
+                        position: audioEl.currentTime || 0
+                    });
+                } catch (error) {
+                    console.error(`[Player ${playerId}] Media Session position state update failed:`, error);
+                }
+            }
+        }
+    }
+};
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initSlideAudioPlayers);
 } else {
     initSlideAudioPlayers();
 }
-
-

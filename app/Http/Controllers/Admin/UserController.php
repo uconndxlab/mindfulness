@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Carbon\Carbon;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Mail;
 
 class UserController extends Controller
@@ -15,9 +17,14 @@ class UserController extends Controller
         $registration_locked = getConfig('registration_locked', false);
         return view('admin.dashboard', compact('registration_locked'));
     }
+    
     public function index()
     {
         return view('admin.users');
+    }
+    
+    public function exportUsers() {
+        return Excel::download(new UsersExport, 'users.xlsx');
     }
 
     public function lockRegistrationAccess(Request $request) {

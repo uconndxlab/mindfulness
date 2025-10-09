@@ -130,6 +130,19 @@ class QuizSliderQuestion {
         this.hideLoadingShowSlider(optionId);
     }
 
+    markAsInteracted(optionId, checkAll=true) {
+        if (!this.userInteracted.get(optionId)) {
+            const sliderElement = this.sliders.get(optionId);
+            this.userInteracted.set(optionId, true);
+            if (sliderElement) {
+                sliderElement.classList.remove('no-interaction');
+            }
+            if (checkAll) {
+                this.checkIfAllSlidersInteracted();
+            }
+        }
+    }
+
     bindSliderEvents(optionId) {
         const sliderElement = this.sliders.get(optionId);
         const hiddenInput = this.hiddenInputs.get(optionId);
@@ -139,11 +152,13 @@ class QuizSliderQuestion {
         
         sliderElement.noUiSlider.on('start', () => {
             this.interactionStates.set(optionId, true);
-            // mark this slider as interacted with
-            this.userInteracted.set(optionId, true);
-            this.checkIfAllSlidersInteracted();
+            this.markAsInteracted(optionId);
         });
         
+        sliderElement.noUiSlider.on('change', () => {
+            this.markAsInteracted(optionId);
+        });
+
         sliderElement.noUiSlider.on('update', (values, handle) => {
             const value = Math.round(values[handle]);
             this.currentValues.set(optionId, value);
@@ -237,9 +252,10 @@ class QuizSliderQuestion {
             for (const item of values) {
                 const optionId = parseInt(Object.keys(item)[0]);
                 const value = Object.values(item)[0];
-                this.setSingleSliderValue(optionId, value);
                 // mark as interacted since we're loading a saved answer
-                this.userInteracted.set(optionId, true);
+                this.markAsInteracted(optionId, false);
+                // set the actual value
+                this.setSingleSliderValue(optionId, value);
             }
             // check if all sliders are now considered interacted
             this.checkIfAllSlidersInteracted();
@@ -271,6 +287,8 @@ class QuizSliderQuestion {
             this.setSingleSliderValue(option.id, defaultValue);
             // reset interaction tracking
             this.userInteracted.set(option.id, false);
+            // add no-interaction class
+            this.sliders.get(option.id).classList.add('no-interaction');
         }
         
         // reset answered state

@@ -65,7 +65,7 @@
             <div class="position-relative">
                 <div id="quiz_slider_bubble_{{ $question['number'] }}_{{ $option['id'] }}" 
                     class="slider-bubble d-none">{{ $option['slider_config']['default'] ?? 50 }}</div>
-                <div id="slider_{{ $question['number'] }}_{{ $option['id'] }}" class="d-none"></div>
+                <div id="slider_{{ $question['number'] }}_{{ $option['id'] }}" class="d-none no-interaction"></div>
             </div>
             <input type="hidden" 
                 name="answer_{{ $question['number'] }}[{{ $option['id'] }}]" 

@@ -52,8 +52,13 @@ function initJournal() {
                 console.log('Note submitted!');
                 noteSuccessDiv.classList.remove('d-none');
                 errDiv.classList.add('d-none');
-                if (hasActivity && window.activityComplete) {
-                    window.activityComplete();
+                if (hasActivity) {
+                    document.dispatchEvent(new CustomEvent('activity:complete', {
+                        detail: {
+                            message: true,
+                            voice: null
+                        }
+                    }));
                 }
                 else {
                     wordOtdButton.innerHTML = 'Select a Topic'; 

@@ -1,7 +1,10 @@
 <div class="container-fluid">
-    <div class="row mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="col-md-4">
             <input type="text" class="form-control" placeholder="Search..." wire:model.live="search">
+        </div>
+        <div>
+            <a href="{{ route('admin.users.export') }}" class="btn btn-info btn-sm m-0">Export to CSV</a>
         </div>
     </div>
     <div class="table-responsive">

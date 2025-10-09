@@ -218,8 +218,12 @@ class QuizController {
         return new Promise((resolve, reject) => {
             window.axios.post('/quiz/' + this.quizId, formData)
                 .then(response => {
-                    console.log('Answers submitted!');
-                    if (window.activityComplete) window.activityComplete();
+                    document.dispatchEvent(new CustomEvent('activity:complete', {
+                        detail: {
+                            message: true,
+                            voice: null
+                        }
+                    }));
                     resolve(true);
                 })
                 .catch(error => {

@@ -19,6 +19,7 @@ function bindModalHandlers() {
             buttonClass = 'btn-primary',
             closeLabel = 'Close',
             onCancel = null,
+            onConfirm = null,
         } = options;
 
         if (!modal || !myModal) return;
@@ -67,6 +68,15 @@ function bindModalHandlers() {
         };
 
         modal.addEventListener('hidden.bs.modal', currentCancelHandler, { once: true });
+
+        // confirm handler - call before form submission
+        if (onConfirm) {
+            const confirmHandler = (e) => {
+                onConfirm();
+            };
+            modalForm.removeEventListener('submit', confirmHandler);
+            modalForm.addEventListener('submit', confirmHandler, { once: true });
+        }
 
         myModal.show();
     }

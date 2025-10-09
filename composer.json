@@ -12,6 +12,7 @@
         "laravel/ui": "^4.5",
         "league/commonmark": "^2.7",
         "livewire/livewire": "^3.6",
+        "maatwebsite/excel": "^3.1",
         "spatie/laravel-activitylog": "^4.10"
     },
     "require-dev": {
@@ -29,6 +30,12 @@
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         },
+        "exclude-from-classmap": [
+            "database/data/*",
+            "database/backups/*",
+            "storage/logs/*",
+            "storage/app/public/*"
+        ],
         "files": [
             "app/helpers.php"
         ]
