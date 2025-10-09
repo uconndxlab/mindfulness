@@ -96,7 +96,9 @@ function initActivityPage() {
             });
         }
     }
-    window.activityComplete = activityComplete;
+    document.addEventListener('activity:complete', function(event) {
+        activityComplete(event.detail.message, event.detail.voice);
+    });
 
     // Favorites handling
     const favButton = document.getElementById('favorite_btn');
@@ -271,6 +273,7 @@ function initActivityPage() {
         // if user is unfocused during completion
         activitySkipped: false,
         completed: false,
+        alreadyCompleted: completed,
         completionTime: null, // when activity was completed - will calc time to complete
         timeToRefocus: null, // time from completion to next refocus
         timeToExit: null, // time from completion to exit
@@ -370,6 +373,7 @@ function initActivityPage() {
                 // completion metrics
                 activity_skipped: engagementMetrics.activitySkipped,
                 activity_completed: engagementMetrics.completed,
+                already_completed: engagementMetrics.alreadyCompleted,
                 // other completion metrics done conditionally
                 
                 // favorites
