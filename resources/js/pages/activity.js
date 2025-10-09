@@ -45,9 +45,12 @@ function initActivityPage() {
         }
     }
 
-    function activityComplete(message = true) {
+    function activityComplete(message = true, voice=null) {
         console.log('activity completed');
         completed = true;
+        if (voice) {
+            engagementMetrics.voice = voice;
+        }
         
         // completion time for metrics
         if (!engagementMetrics.completionTime && !engagementMetrics.completed) {
@@ -205,7 +208,7 @@ function initActivityPage() {
                 const audioPlayers = document.querySelectorAll('.slide__audio-player');
                 audioPlayers.forEach(player => {
                     console.log('Adding completion listener to audio player');
-                    player.addEventListener('ended', activityComplete);
+                    player.addEventListener('ended', () => activityComplete(true, player.getAttribute('voice') ??  'none'));
                     
                     // track pause events
                     player.addEventListener('pause', function() {
@@ -283,6 +286,7 @@ function initActivityPage() {
         completionTime: null, // when activity was completed - will calc time to complete
         timeToRefocus: null, // time from completion to next refocus
         timeToExit: null, // time from completion to exit
+        voice: null,
         // favorited
         startFavorited: startFavorited,
         endFavorited: null,
@@ -380,6 +384,9 @@ function initActivityPage() {
                 data.append('time_to_complete', String(Math.round((engagementMetrics.completionTime - engagementMetrics.sessionStart) / 1000)));
                 data.append('time_to_refocus_after_completion', String(engagementMetrics.timeToRefocus));
                 data.append('time_to_exit_after_completion', String(engagementMetrics.timeToExit));
+            }
+            if (engagementMetrics.voice) {
+                data.append('voice', engagementMetrics.voice);
             }
             // add favorited metrics
             data.append('end_favorited', String(engagementMetrics.endFavorited));

@@ -35,24 +35,25 @@ class ActivityController extends Controller
 
         $already_completed = $user->isActivityCompleted($activity);
 
-        // get time to complete and log activity
-        if ($start_log) {
-            $time_to_complete = $start_log->created_at->diffInSeconds(now());
+        if (!$already_completed) {
+            // get time to complete and log activity
+            if ($start_log) {
+                $time_to_complete = $start_log->created_at->diffInSeconds(now());
+            }
+            activity('activity')
+                ->event('activity_completed')
+                ->performedOn($activity)
+                ->causedBy($user)
+                ->withProperties([
+                    'activity' => $activity->title,
+                    'day' => $activity->day->name,
+                    'module' => $activity->day->module->name,
+                    'activity_type' => $activity->type,
+                    'time_to_complete' => $time_to_complete,
+                ])
+                ->log('Activity completed');
+            // day and module completion logged in ProgressService
         }
-        activity('activity')
-            ->event('activity_completed')
-            ->performedOn($activity)
-            ->causedBy($user)
-            ->withProperties([
-                'activity' => $activity->title,
-                'day' => $activity->day->name,
-                'module' => $activity->day->module->name,
-                'activity_type' => $activity->type,
-                'repeat_completion' => $already_completed,
-                'time_to_complete' => $time_to_complete,
-            ])
-            ->log('Activity completed');
-        // day and module completion logged in ProgressService
 
         // redirect url
         $redirect_url = null;
@@ -65,7 +66,7 @@ class ActivityController extends Controller
             && $next_activity->quiz
             && $next_activity->quiz->question_options[0]['type'] === 'slider') 
         {
-                $redirect_url = route('explore.activity', ['activity_id' => $next_activity->id]);
+            $redirect_url = route('explore.activity', ['activity_id' => $next_activity->id]);
         }
 
         // check if already completed
@@ -155,7 +156,8 @@ class ActivityController extends Controller
         $validated = $request->validate([
             'activity_id' => 'required|integer|exists:activities,id',
             'event_type' => 'required|string|in:summary,started',
-            'start_log_id' => 'sometimes|integer|exists:event_log,id'
+            'start_log_id' => 'sometimes|integer|exists:event_log,id',
+            'metrics' => 'sometimes|json',
         ]);
 
         $activity = Activity::with('day.module')->find($validated['activity_id']);
@@ -171,21 +173,6 @@ class ActivityController extends Controller
             $properties['already_completed'] = $activity->isCompletedBy($user);
         }
         
-        // $engagementFields = [
-        //     'time_since_interaction', 'unfocus_type', 'hidden_duration',
-        //     'time_to_refocus_after_completion', 'total_visible_time', 'total_hidden_time',
-        //     'session_duration', 'interaction_count', 'short_unfocus_count',
-        //     'medium_unfocus_count', 'long_unfocus_count', 'pause_count',
-        //     'seek_forward_count', 'seek_backward_count', 'activity_skipped',
-        //     'activity_completed', 'time_to_complete', 'time_to_exit_after_completion',
-        //     'end_favorited', 'start_favorited', 'page_cached', 'lifecycle_event'
-        // ];
-        // foreach ($engagementFields as $field) {
-        //     if ($request->has($field)) {
-        //         $properties[$field] = $request->input($field);
-        //     }
-        // }
-
         // if the event is summary (was exited), check start log for auth
         if ($validated['event_type'] === 'summary' && isset($validated['start_log_id'])) {
             $startLog = EventLog::find($validated['start_log_id']);
@@ -194,6 +181,14 @@ class ActivityController extends Controller
             }
         }
 
+        // parse metrics json for summary events
+        if ($validated['event_type'] === 'summary' && $request->has('metrics')) {
+            $metrics = json_decode($request->input('metrics'), true);
+            foreach ($metrics as $key => $value) {
+                $properties[$key] = $value;
+            }
+        }
+        
         $log = activity('activity')
             ->event('activity_' . $validated['event_type'])
             ->performedOn($activity)

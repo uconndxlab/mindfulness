@@ -406,7 +406,8 @@ button:disabled i{
     opacity: 1;
 }
 
-.noUi-connect {
+.noUi-connect,
+.noUi-connects {
     background: var(--dark-green)!important;
 }
 
