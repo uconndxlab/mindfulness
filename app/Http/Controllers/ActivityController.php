@@ -154,9 +154,8 @@ class ActivityController extends Controller
     {
         $validated = $request->validate([
             'activity_id' => 'required|integer|exists:activities,id',
-            'event_type' => 'required|string|in:refocused,unfocused,exited',
-            'start_log_id' => 'sometimes|integer|exists:event_log,id',
-            'duration' => 'sometimes|integer',
+            'event_type' => 'required|string|in:summary,started',
+            'start_log_id' => 'sometimes|integer|exists:event_log,id'
         ]);
 
         $activity = Activity::with('day.module')->find($validated['activity_id']);
@@ -167,26 +166,42 @@ class ActivityController extends Controller
             'module' => $activity->day->module->name,
             'activity_type' => $activity->type,
         ];
-
-        if (isset($validated['duration'])) {
-            $properties['focus_duration_in_seconds'] = $validated['duration'];
+        
+        if ($validated['event_type'] === 'started') {
+            $properties['already_completed'] = $activity->isCompletedBy($user);
         }
+        
+        // $engagementFields = [
+        //     'time_since_interaction', 'unfocus_type', 'hidden_duration',
+        //     'time_to_refocus_after_completion', 'total_visible_time', 'total_hidden_time',
+        //     'session_duration', 'interaction_count', 'short_unfocus_count',
+        //     'medium_unfocus_count', 'long_unfocus_count', 'pause_count',
+        //     'seek_forward_count', 'seek_backward_count', 'activity_skipped',
+        //     'activity_completed', 'time_to_complete', 'time_to_exit_after_completion',
+        //     'end_favorited', 'start_favorited', 'page_cached', 'lifecycle_event'
+        // ];
+        // foreach ($engagementFields as $field) {
+        //     if ($request->has($field)) {
+        //         $properties[$field] = $request->input($field);
+        //     }
+        // }
 
-        // if the event is exited, check start log for auth
-        if ($validated['event_type'] === 'exited' && isset($validated['start_log_id'])) {
+        // if the event is summary (was exited), check start log for auth
+        if ($validated['event_type'] === 'summary' && isset($validated['start_log_id'])) {
             $startLog = EventLog::find($validated['start_log_id']);
             if (!$startLog || $startLog->causer_id !== $user->id) {
                 return response()->json(['status' => 'unauthorized'], 403);
             }
         }
 
-        activity('activity')
+        $log = activity('activity')
             ->event('activity_' . $validated['event_type'])
             ->performedOn($activity)
             ->causedBy($user)
             ->withProperties($properties)
             ->log('Activity ' . $validated['event_type']);
+        $log_id = $log->id;
 
-        return response()->json(['status' => 'success'], 200);
+        return response()->json(['status' => 'success', 'log_id' => $log_id], 200);
     }
 }

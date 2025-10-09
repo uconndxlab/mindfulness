@@ -1,7 +1,6 @@
 function initActivityPage() {
     const root = document.querySelector('[data-activity-root]') || document.body;
     const activityId = parseInt(root.getAttribute('data-activity-id') || '0', 10);
-    const startLogId = parseInt(root.getAttribute('data-start-log-id') || '0', 10);
     const dayName = root.getAttribute('data-day-name') || '';
     const status = root.getAttribute('data-status') || 'unlocked';
     const hasContent = root.getAttribute('data-has-content') === 'true';
@@ -66,7 +65,7 @@ function initActivityPage() {
         if (status === 'unlocked' || status === 'completed') {
             window.axios.post('/activities/complete', {
                 activity_id: activityId,
-                start_log_id: startLogId
+                start_log_id: engagementMetrics.startLogId
             }).then(response => {
                 const data = response.data;
                 if (data?.success) {
@@ -268,6 +267,7 @@ function initActivityPage() {
     // Engagement metrics tracking
     const engagementMetrics = {
         // general
+        startLogId: null,
         visibleTime: 0,
         hiddenTime: 0,
         interactionCount: 0,
@@ -298,10 +298,10 @@ function initActivityPage() {
         console.log('Logging interaction: ', eventType);
         const data = new FormData();
         data.append('activity_id', String(activityId));
-        data.append('event_type', eventType);
+        // rename exited to summary
+        data.append('event_type', eventType == 'exited' ? 'summary' : eventType);
         data.append('_token', csrfToken);
-        if (duration) data.append('duration', String(Math.round(duration / 1000)));
-        if (eventType === 'exited') data.append('start_log_id', String(startLogId));
+        if (eventType === 'exited') data.append('start_log_id', String(engagementMetrics.startLogId));
 
         // track users focus
         if (eventType === 'unfocused' || eventType === 'frozen' || eventType === 'exited') {
@@ -359,49 +359,31 @@ function initActivityPage() {
                 engagementMetrics.timeToExit = Math.round((performance.now() - engagementMetrics.completionTime) / 1000);
             }
 
-            console.log('COMPLETION METRICS');
             // add general metrics
             data.append('total_visible_time', String(engagementMetrics.visibleTime));
-            console.log('Total visible time: ', engagementMetrics.visibleTime);
             data.append('total_hidden_time', String(engagementMetrics.hiddenTime));
-            console.log('Total hidden time: ', engagementMetrics.hiddenTime);
             data.append('session_duration', String(Math.round((performance.now() - engagementMetrics.sessionStart) / 1000)));
-            console.log('Session duration: ', Math.round((performance.now() - engagementMetrics.sessionStart) / 1000));
             data.append('interaction_count', String(engagementMetrics.interactionCount));
-            console.log('Interaction count: ', engagementMetrics.interactionCount);
             data.append('short_unfocus_count', String(engagementMetrics.unfocusEvents.filter(e => e.type === 'short').length));
-            console.log('Short unfocus count: ', engagementMetrics.unfocusEvents.filter(e => e.type === 'short').length);
             data.append('medium_unfocus_count', String(engagementMetrics.unfocusEvents.filter(e => e.type === 'medium').length));
-            console.log('Medium unfocus count: ', engagementMetrics.unfocusEvents.filter(e => e.type === 'medium').length);
             data.append('long_unfocus_count', String(engagementMetrics.unfocusEvents.filter(e => e.type === 'long').length));
-            console.log('Long unfocus count: ', engagementMetrics.unfocusEvents.filter(e => e.type === 'long').length);
             // add audio/video metrics
             if (hasAudioVideo) {
                 data.append('pause_count', String(engagementMetrics.pauseCount));
-                console.log('Pause count: ', engagementMetrics.pauseCount);
                 data.append('seek_forward_count', String(engagementMetrics.seekForwardCount));
-                console.log('Seek forward count: ', engagementMetrics.seekForwardCount);
                 data.append('seek_backward_count', String(engagementMetrics.seekBackwardCount));
-                console.log('Seek backward count: ', engagementMetrics.seekBackwardCount);
             }
             // add post-completion metrics
             data.append('activity_skipped', String(engagementMetrics.activitySkipped));
-            console.log('Activity skipped: ', engagementMetrics.activitySkipped);
             data.append('activity_completed', String(engagementMetrics.completed));
-            console.log('Activity completed: ', engagementMetrics.completed);
             if (engagementMetrics.completed) {
                 data.append('time_to_complete', String(Math.round((engagementMetrics.completionTime - engagementMetrics.sessionStart) / 1000)));
-                console.log('Time to complete: ', Math.round((engagementMetrics.completionTime - engagementMetrics.sessionStart) / 1000));
                 data.append('time_to_refocus_after_completion', String(engagementMetrics.timeToRefocus));
-                console.log('Time to refocus after completion: ', engagementMetrics.timeToRefocus);
                 data.append('time_to_exit_after_completion', String(engagementMetrics.timeToExit));
-                console.log('Time to exit after completion: ', engagementMetrics.timeToExit);
             }
             // add favorited metrics
             data.append('end_favorited', String(engagementMetrics.endFavorited));
-            console.log('End favorited: ', engagementMetrics.endFavorited);
             data.append('start_favorited', String(engagementMetrics.startFavorited));
-            console.log('Start favorited: ', engagementMetrics.startFavorited);
         }
 
         // add any additional data
@@ -412,9 +394,18 @@ function initActivityPage() {
         if (eventType === 'exited') {
             exited = true;
             navigator.sendBeacon(logInteractionRoute, data);
-        } else {
-            window.axios.post(logInteractionRoute, data)
-                .catch(error => console.error(`Error logging ${eventType}:`, error));
+        }
+        else if (eventType === 'started') {
+            // send the request, get the new start log id
+            window.axios.post(logInteractionRoute, data).then(response => {
+                const responseData = response.data;
+                if (responseData?.status === 'success' && responseData?.log_id) {
+                    engagementMetrics.startLogId = responseData.log_id;
+                    console.log('New start log ID:', engagementMetrics.startLogId);
+                }
+            }).catch(error => {
+                console.error('There was an error logging the interaction:', error);
+            });
         }
     }
 
@@ -458,6 +449,43 @@ function initActivityPage() {
         const duration = performance.now() - lastFocusTimestamp;
         logInteraction('exited', duration);
     });
+
+    // log activity start - runs on script init
+    // handles all navigation types (initial, reload, back/forward)
+    (function logActivityStart() {
+        const navEntries = performance.getEntriesByType('navigation');
+        const navType = navEntries.length > 0 ? navEntries[0].type : 'unknown';
+        
+        console.log('Activity page initialized - Navigation type:', navType);
+        
+        // For back/forward navigation, reset engagement metrics for new session
+        if (navType === 'back_forward') {
+            console.log('Resetting metrics for back/forward navigation');
+            exited = false;
+            lastFocusTimestamp = performance.now();
+            lastUnfocusTimestamp = 0;
+            engagementMetrics.visibleTime = 0;
+            engagementMetrics.hiddenTime = 0;
+            engagementMetrics.interactionCount = 0;
+            engagementMetrics.unfocusEvents = [];
+            engagementMetrics.pauseCount = 0;
+            engagementMetrics.seekForwardCount = 0;
+            engagementMetrics.seekBackwardCount = 0;
+            engagementMetrics.activitySkipped = false;
+            engagementMetrics.completed = false;
+            engagementMetrics.completionTime = null;
+            engagementMetrics.timeToRefocus = null;
+            engagementMetrics.timeToExit = null;
+            engagementMetrics.startFavorited = startFavorited;
+            engagementMetrics.endFavorited = null;
+            engagementMetrics.sessionStart = performance.now();
+            engagementMetrics.lastInteractionTime = performance.now();
+            engagementMetrics.lastSeekTime = 0;
+        }
+        
+        // always log started event - bf events, ctrl+shift+t, reload, initial navigation
+        logInteraction('started', 0, { navigation_type: navType });
+    })();
 
     // Page unload warning for progress
     let showBrowserModal = true;
