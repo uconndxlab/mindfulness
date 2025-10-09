@@ -17,6 +17,10 @@ async function initSlideAudioPlayers() {
 
         let watchedTime = 0;
         let hasBeenPlayed = false;
+        
+        // media session access
+        audioEl._watchedTime = 0;
+        audioEl._allowSeek = allowSeek;
 
         const circle = playerEl.querySelector('#seekbar');
         const circlePath = circle ? circle : null;
@@ -265,6 +269,7 @@ async function initSlideAudioPlayers() {
             // updating watched time for seeking enforcement
             if (!audioEl.seeking && currentTime > watchedTime) {
                 watchedTime = currentTime;
+                audioEl._watchedTime = currentTime; // sync to audio element
             }
             
             // update media session position
@@ -375,12 +380,16 @@ window.audioPlayerControls = {
 
             navigator.mediaSession.setActionHandler('seekto', (details) => {
                 if (details.seekTime !== undefined && audioEl.duration) {
-                    const targetTime = Math.max(0, Math.min(audioEl.duration, details.seekTime));
-                    const allowSeek = playerEl.getAttribute('data-allow-seek') === 'true';
-                    // do not have watchedTime ??
-                    if (allowSeek || true) {
-                        audioEl.currentTime = targetTime;
+                    let targetTime = Math.max(0, Math.min(audioEl.duration, details.seekTime));
+                    const allowSeek = audioEl._allowSeek || false;
+                    const watchedTime = audioEl._watchedTime || 0;
+                    
+                    // enforce seek restriction
+                    if (!allowSeek && targetTime > watchedTime) {
+                        targetTime = watchedTime;
                     }
+                    
+                    audioEl.currentTime = targetTime;
                 }
             });
             
