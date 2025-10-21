@@ -58,31 +58,52 @@
                                     $disabled = $activity->unlocked ? '' : 'disabled';
                                 @endphp
                                 <div class="card p-2 module mb-2">
-                                    <a id="moduleLink_{{ $activity->id }}" class="stretched-link w-100 activity-link {{ $disabled }} pb-1" data-id="{{ $activity->id }}" href="#">
-                                        <div class="d-flex">
-                                            @if ($activity->completed)
-                                                <i class="bi bi-check-square-fill"></i>
-                                            @else
-                                                <i class="bi bi-square-fill"></i>
-                                            @endif
-                                            <div>
-                                                <p class="activity-font">{{ $activity->title }}</p>
-                                                @if ($activity->type)
-                                                    <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>
+                                    <div class="flex-grow-1">
+                                        <a id="moduleLink_{{ $activity->id }}" class="stretched-link w-100 activity-link {{ $disabled }} pb-1" data-id="{{ $activity->id }}" href="#">
+                                            <div class="d-flex">
+                                                @if ($activity->completed)
+                                                    <i class="bi bi-check-square-fill"></i>
+                                                @else
+                                                    <i class="bi bi-square-fill"></i>
                                                 @endif
-                                                @if (isset($activity->time))
-                                                    @if ($activity->time >= 1)
-                                                        <span class="sub-activity-font activity-tag-time">{{ $activity->time.' min' }}</span>
-                                                    @else
-                                                        <span class="sub-activity-font activity-tag-time">{{ '<1 min' }}</span>
-                                                    @endif
-                                                @endif
-                                                @if ($activity->optional)
-                                                    <span class="sub-activity-font activity-tag-optional"></i>Bonus</span>
-                                                @endif
+                                                <div class="flex-grow-1">
+                                                    <p class="activity-font mb-1">{{ $activity->title }}</p>
+                                                    <div>
+                                                        @if ($activity->type)
+                                                            <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>
+                                                        @endif
+                                                        @if (isset($activity->time))
+                                                            @if ($activity->time >= 1)
+                                                                <span class="sub-activity-font activity-tag-time">{{ $activity->time.' min' }}</span>
+                                                            @else
+                                                                <span class="sub-activity-font activity-tag-time">{{ '<1 min' }}</span>
+                                                            @endif
+                                                        @endif
+                                                        @if ($activity->optional)
+                                                            <span class="sub-activity-font activity-tag-optional">Bonus</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </a>
+                                        </a>
+                                        @if ($activity->description)
+                                            <div class="activity-description-accordion col-md-4">
+                                                <div class="accordion-item border-0 activity-description-item">
+                                                    <h2 class="accordion-header">
+                                                        <button class="accordion-button collapsed activity-description-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_description_{{ $activity->id }}" aria-expanded="false" aria-controls="collapse_description_{{ $activity->id }}">
+                                                            <i class="bi bi-info-circle me-2"></i>
+                                                            <small>Learn more</small>
+                                                        </button>
+                                                    </h2>
+                                                    <div id="collapse_description_{{ $activity->id }}" class="accordion-collapse collapse">
+                                                        <div class="accordion-body activity-description-body">
+                                                            {{ $activity->description }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
                                     <i class="bi bi-arrow-right"></i>
                                 </div>
                             @endforeach
