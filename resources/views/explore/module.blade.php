@@ -86,16 +86,16 @@
                                                 </div>
                                             </div>
                                         </a>
-                                        @if ($activity->description)
+                                        @if ($activity->unlocked && $activity->description)
                                             <div class="activity-description-accordion col-md-4">
                                                 <div class="accordion-item border-0 activity-description-item">
                                                     <h2 class="accordion-header">
-                                                        <button class="accordion-button collapsed activity-description-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_description_{{ $activity->id }}" aria-expanded="false" aria-controls="collapse_description_{{ $activity->id }}">
+                                                        <button class="accordion-button activity-description-button {{ $accordion_activity_id == $activity->id ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_description_{{ $activity->id }}" aria-expanded="false" aria-controls="collapse_description_{{ $activity->id }}">
                                                             <i class="bi bi-info-circle me-2"></i>
                                                             <small>Learn more</small>
                                                         </button>
                                                     </h2>
-                                                    <div id="collapse_description_{{ $activity->id }}" class="accordion-collapse collapse">
+                                                    <div id="collapse_description_{{ $activity->id }}" class="accordion-collapse collapse {{ $accordion_activity_id == $activity->id ? 'show' : '' }}">
                                                         <div class="accordion-body activity-description-body">
                                                             {{ $activity->description }}
                                                         </div>

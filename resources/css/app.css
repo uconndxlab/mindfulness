@@ -1386,6 +1386,9 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     font-weight: 500 !important;
     box-shadow: none !important;
 }
+.activity-description-item .accordion-button i {
+    color: var(--success-green)!important;
+}
 
 .activity-description-accordion .activity-description-body {
     color: #6c757d !important;

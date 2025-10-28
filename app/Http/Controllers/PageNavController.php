@@ -84,7 +84,7 @@ class PageNavController extends Controller
             return redirect()->route('explore.home');
         }
 
-        $accordion_activity = $activity_id ? Activity::find($activity_id) ?? null : null;
+        $accordion_activity = $activity_id ? Activity::find($activity_id) : (Activity::find($user->latestUnlock()?->id) ?? null);
         $accordion_activity_id = null;
 
         //get progress

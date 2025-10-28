@@ -235,6 +235,16 @@ class User extends Authenticatable implements MustVerifyEmail
             ->first();
     }
 
+    public function latestUnlock()
+    {
+        return $this->activities()
+            ->wherePivot('unlocked', true)
+            ->wherePivot('completed', false)
+            ->where('optional', false)
+            ->orderBy('order', 'desc')
+            ->first();
+    }
+
     public function canSendReminder()
     {
         $inactive_limit = (int) config('mail.remind_email_day_limit', 30);
