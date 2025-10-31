@@ -112,6 +112,20 @@ class User extends Authenticatable implements MustVerifyEmail
         return $query;
     }
 
+    public function getStats()
+    {
+        $qas = $this->quiz_answers()->reflections();
+        $qas_check_ins = (clone $qas)->where('reflection_type', 'check_in');
+        $qas_rmas = (clone $qas)->where('reflection_type', 'rate_my_awareness');
+        return [
+            'pq_check_ins' => $qas_check_ins->avg('average'),
+            'count_check_ins' => $qas_check_ins->count(),
+            'pq_rmas' => $qas_rmas->avg('average'),
+            'count_rmas' => $qas_rmas->count(),
+            'pq_avg' => $qas->avg('average'),
+        ];
+    }
+
     // MDA relations
     public function activities()
     {

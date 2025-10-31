@@ -19,15 +19,15 @@
                                     <img src="{{ Storage::url('flowers/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon">
                                     <div class="col">
                                         <h6 class="mb-0">Part {{ $module->order }} - {{ $module->name }}</h6>
-                                        <span class="text-muted">
-                                            {{ $module->daysCompleted }}/{{ $module->totalDays }} Days
+                                        <ul class="text-muted ps-2 mb-0">
+                                            <li class="list-check{{ $module->daysCompleted == $module->totalDays ? '-filled' : '' }}">{{ $module->daysCompleted }}/{{ $module->totalDays }} Days</li>
                                             @if ($module->totalCheckInActivities > 0)
-                                                , {{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins
+                                                <li class="list-check{{ $module->completedCheckInActivities == $module->totalCheckInActivities ? '-filled' : '' }}">{{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins</li>
                                             @endif
                                             @if ($module->totalCheckInDays > 0)
-                                                , {{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Rate My Awareness
+                                                <li class="list-check{{ $module->completedCheckInDays == $module->totalCheckInDays ? '-filled' : '' }}">{{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Rate My Awareness</li>
                                             @endif
-                                        </span>
+                                        </ul>
                                     </div>
                                 </a>
                             @else
@@ -35,9 +35,15 @@
                                     <img src="{{ Storage::url('flowers/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon">
                                     <div class="col">
                                         <h6 class="mb-0">Part {{ $module->order }} - {{ $module->name }}</h6>
-                                        <span>
-                                            {{ $module->daysCompleted }}/{{ $module->totalDays }} days completed
-                                        </span>
+                                        <ul class="text-muted ps-2 mb-0">
+                                            <li class="list-check">{{ $module->daysCompleted }}/{{ $module->totalDays }} Days</li>
+                                            @if ($module->totalCheckInActivities > 0)
+                                                <li class="list-check{{ $module->completedCheckInActivities == $module->totalCheckInActivities ? '-filled' : '' }}">{{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins</li>
+                                            @endif
+                                            @if ($module->totalCheckInDays > 0)
+                                                <li class="list-check{{ $module->completedCheckInDays == $module->totalCheckInDays ? '-filled' : '' }}">{{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Rate My Awareness</li>
+                                            @endif
+                                        </ul>
                                     </div>
                                 </span>
                             @endif

@@ -571,7 +571,10 @@ class PageNavController extends Controller
             $module->completedCheckInDays = $stats['completedCheckInDays'];
             $module->totalCheckInDays = $stats['totalCheckInDays'];
         }
-        return view("other.account", compact('page_info', 'modules'));
+
+        $stats = Auth::user()->getStats();
+
+        return view("other.account", compact('page_info', 'modules', 'stats'));
     }
 
     public function helpPage()
