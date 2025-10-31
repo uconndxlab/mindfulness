@@ -18,7 +18,12 @@ class QuizAnswers extends Model
     protected $fillable = [
         'user_id',
         'quiz_id',
-        'answers'
+        'answers',
+        'reflection_type',
+        'activity_id',
+        'average',
+        'subject_id',
+        'subject_type',
     ];
 
     public function user()
@@ -29,5 +34,35 @@ class QuizAnswers extends Model
     public function quiz()
     {
         return $this->belongsTo(Quiz::class);
+    }
+
+    // the actual activity id (quiz has this too)
+    public function activity()
+    {
+        return $this->belongsTo(Activity::class);
+    }
+
+    // what this quiz answer is about (polymorphic relationship) - could be activity or module
+    public function subject()
+    {
+        return $this->morphTo();
+    }
+
+    // get checkins 
+    public function scopeCheckIns($query)
+    {
+        return $query->where('reflection_type', 'check_in');
+    }
+
+    // get rate my awareness reflections
+    public function scopeRateMyAwareness($query)
+    {
+        return $query->where('reflection_type', 'rate_my_awareness');
+    }
+
+    // all slider reflections
+    public function scopeReflections($query)
+    {
+        return $query->whereIn('reflection_type', ['check_in', 'rate_my_awareness']);
     }
 }

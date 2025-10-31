@@ -19,6 +19,7 @@ class QuizController {
         this.answerSet = new Set();
         const answersJson = this.quizForm.getAttribute('data-answers');
         this.answers = answersJson ? JSON.parse(answersJson) : {};
+        this.average = parseFloat(this.quizForm.getAttribute('data-average')) || null;
 
         this.quizContainer = document.getElementById('quiz-container');
 
@@ -102,7 +103,8 @@ class QuizController {
                 questionComponent = new QuizSliderQuestion(
                     questionDiv, 
                     questionNumber, 
-                    (qNum, isAnswered) => this.onQuestionAnswerChange(qNum, isAnswered)
+                    (qNum, isAnswered) => this.onQuestionAnswerChange(qNum, isAnswered),
+                    this.average
                 );
             }
             
@@ -213,7 +215,12 @@ class QuizController {
         // create formdata
         const formData = new FormData();
         formData.append('quiz_id', this.quizId);
-        formData.append('answers', JSON.stringify(newFormatAnswers));
+        formData.append('answers', JSON.stringify(newFormatAnswers.answers));
+        
+        // if there's an average from slider question, include it
+        if (newFormatAnswers.average !== null && newFormatAnswers.average !== undefined) {
+            formData.append('average', newFormatAnswers.average);
+        }
         
         return new Promise((resolve, reject) => {
             window.axios.post('/quiz/' + this.quizId, formData)
@@ -237,15 +244,21 @@ class QuizController {
 
     collectAnswers() {
         const answers = {};
+        let average = null;
         
         // get answers from each component
         for (const [questionNumber, component] of this.questionComponents) {
             if (component.isAnswered()) {
                 answers[questionNumber] = component.getValue();
+                
+                // if this is a slider question, get its average
+                if (typeof component.getAverage === 'function') {
+                    average = component.getAverage();
+                }
             }
         }
         
-        return answers;
+        return { answers, average };
     }
 }
 

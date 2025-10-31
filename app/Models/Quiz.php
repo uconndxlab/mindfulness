@@ -19,6 +19,12 @@ class Quiz extends Model
         return $this->belongsTo(Activity::class);
     }
 
+    // what quiz is about (polymorphic relationship)
+    public function subject()
+    {
+        return $this->morphTo();
+    }
+
     public function answers($user_id = null)
     {
         $query = $this->hasMany(QuizAnswers::class);

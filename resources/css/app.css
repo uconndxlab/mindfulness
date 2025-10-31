@@ -7,6 +7,7 @@
     --dark-green: #48745D;
     --darker-green: #1a492d;
     --light-green:#C9EDC1;
+    --success-green:#198754;
     --xlight-green:#E6F8E2;
     --light-grey:#F2F2F2;
     --dark-grey:#e2e2e2;
@@ -585,11 +586,13 @@ i.bi-lock-fill{
     border-radius:10px 10px 10px 10px!important;
 }
 
-.accordion-item:has(.collapsed){
+/* remove border on collapsed accordions, except activity descriptions */
+.accordion-item:not(.activity-description-item):has(> .accordion-header > .accordion-button.collapsed) {
     border:0px!important;
 }
 
-.accordion-flush .accordion-item .accordion-button, .accordion-flush .accordion-item .accordion-button.collapsed {
+.accordion-flush > .accordion-item > .accordion-header > .accordion-button , 
+.accordion-flush > .accordion-item > .accordion-header > .accordion-button.collapsed  {
     color: #000!important;
     background-color: var(--blue-grey)!important;
 }
@@ -1361,4 +1364,64 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     font-family: "bootstrap-icons";
     font-size: 0.9rem;
     color: var(--dark-green);
+}
+
+/* Stats container styling */
+.stats-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+
+.stat-value {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--dark-green);
+}
+
+/* activity description accordion */
+.activity-description-accordion {
+    position: relative;
+    z-index: 2;
+    margin-top: 0.75rem;
+    margin-left: 21px;
+    margin-right: 1rem;
+}
+
+.activity-description-item {
+    border: 2px solid var(--light-green) !important;
+}
+
+.activity-description-item .accordion-button {
+    background-color: var(--light-grey)!important;
+    color: var(--success-green) !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+}
+.activity-description-item .accordion-button i {
+    color: var(--success-green)!important;
+}
+
+.activity-description-accordion .activity-description-body {
+    color: #6c757d !important;
+    font-size: 0.875rem !important;
+    padding: 1rem !important;
 }

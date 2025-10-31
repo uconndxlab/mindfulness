@@ -84,7 +84,7 @@ class PageNavController extends Controller
             return redirect()->route('explore.home');
         }
 
-        $accordion_activity = $activity_id ? Activity::find($activity_id) ?? null : null;
+        $accordion_activity = $activity_id ? Activity::find($activity_id) : (Activity::find($user->latestUnlock()?->id) ?? null);
         $accordion_activity_id = null;
 
         //get progress
@@ -244,6 +244,7 @@ class PageNavController extends Controller
         if ($quiz) {
             $temp_answers = $user->quiz_answers($quiz->id)->first();
             $quiz->answers = $temp_answers ? $temp_answers->answers : [];
+            $quiz->average = $temp_answers ? $temp_answers->average : null;
         }
         //decode the audio options
         else if ($content && $content->type == 'audio' && $content->audio_options) {
@@ -276,12 +277,19 @@ class PageNavController extends Controller
             $answers = $request->has('answers') 
                 ? json_decode($request->answers, true)
                 : [];
+            
+            $average = null;
+            // if average is provided (for slider questions), save it
+            if ($request->has('average') && $request->average !== null) {
+                $average = $request->average;
+            }
     
             QuizAnswers::updateOrCreate([
                 'user_id' => Auth::id(),
                 'quiz_id' => $quiz->id
             ], [
-                'answers' => $answers
+                'answers' => $answers,
+                'average' => $average
             ]);
             return response()->json(['success_message' => 'Quiz answers updated successfully.'], 200);
         }
@@ -563,7 +571,10 @@ class PageNavController extends Controller
             $module->completedCheckInDays = $stats['completedCheckInDays'];
             $module->totalCheckInDays = $stats['totalCheckInDays'];
         }
-        return view("other.account", compact('page_info', 'modules'));
+
+        $stats = Auth::user()->getStats();
+
+        return view("other.account", compact('page_info', 'modules', 'stats'));
     }
 
     public function helpPage()

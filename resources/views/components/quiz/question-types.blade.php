@@ -76,4 +76,9 @@
             <hr>
         @endif
     @endforeach
+    <div class="d-flex justify-content-end mt-2 me-2">
+        <div id="slider_average_display_{{ $question['number'] }}" class="text-muted d-none">
+            <strong>Practice Quality:</strong> <span id="slider_average_value_{{ $question['number'] }}">--</span>%
+        </div>
+    </div>
 @endif
