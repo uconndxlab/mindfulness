@@ -35,8 +35,11 @@ class BackfillQuizAnswers extends Command
         foreach ($quizAnswers as $quizAnswer) {
             $subject = $quizAnswer->quiz->subject;
 
-            $quizAnswer->subject_id = $subject->id;
-            $quizAnswer->subject_type = get_class($subject);
+            if ($subject) {
+                $quizAnswer->subject_id = $subject->id;
+                $quizAnswer->subject_type = get_class($subject);
+            }
+            
             $quizAnswer->activity_id = $quizAnswer->quiz->activity_id;
 
             $this->info($quizAnswer->quiz->activity->title);
