@@ -5,7 +5,7 @@
                 <span class="visually-hidden">Loading quiz...</span>
             </div>
         </div>
-        <form id="quizForm" method="POST" class="pt-3" data-quiz-id="{{ $quiz->id }}" data-answers='@json($quiz->answers)'>
+        <form id="quizForm" method="POST" class="pt-3" data-quiz-id="{{ $quiz->id }}" data-answers='@json($quiz->answers)' data-average="{{ $quiz->average }}">
             @csrf
             @foreach ($quiz->question_options as $question)
                 @include('components.quiz.question', ['question' => $question, 'isFirst' => $question['number'] == 1])

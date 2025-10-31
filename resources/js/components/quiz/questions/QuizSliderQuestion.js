@@ -1,11 +1,14 @@
 class QuizSliderQuestion {
-    constructor(questionDiv, questionNumber, onAnswerChange) {
+    constructor(questionDiv, questionNumber, onAnswerChange, initialAverage = null) {
         this.questionDiv = questionDiv;
         this.questionNumber = questionNumber;
         this.onAnswerChange = onAnswerChange; // callback
+        this.average = initialAverage;
         
         // maps for efficient lookups across multiple sliders
         this.sliders = new Map();           // optionId -> noUiSlider instance
+        // should only utilize this to computer average
+        this.inverseSliders = new Map();    // optionId -> boolean (is inverse slider)
         this.hiddenInputs = new Map();      // optionId -> input element  
         this.currentValues = new Map();     // optionId -> current value
         this.loadingElements = new Map();   // optionId -> loading element
@@ -25,6 +28,7 @@ class QuizSliderQuestion {
         console.log(`Slider question ${this.questionNumber} batchInit`);
         this.findAndCacheElements();
         this.initializeAllSliders();
+        this.updateAverage();
         console.log(`Slider question ${this.questionNumber} initialized with ${this.sliders.size} slider(s)`);
     }
 
@@ -32,9 +36,14 @@ class QuizSliderQuestion {
         // find all elements based on the options structure
         const options = this.questionData?.options || [];
         
+        // cache average display elements
+        this.averageDisplayDiv = document.getElementById(`slider_average_display_${this.questionNumber}`);
+        this.averageValueSpan = document.getElementById(`slider_average_value_${this.questionNumber}`);
+        
         for (const option of options) {
             const optionId = option.id;
-            
+            const isInverse = option.inverse_score;
+
             // cache elements for this option
             const sliderElement = document.getElementById(`slider_${this.questionNumber}_${optionId}`);
             const hiddenInput = document.getElementById(`slider_input_${this.questionNumber}_${optionId}`);
@@ -48,8 +57,8 @@ class QuizSliderQuestion {
                 this.bubbleElements.set(optionId, bubbleElement);
                 this.interactionStates.set(optionId, false);
                 this.userInteracted.set(optionId, false);
-                
-                // get current value from hidden input
+                this.inverseSliders.set(optionId, isInverse);
+
                 const currentValue = hiddenInput ? (parseInt(hiddenInput.value) || 50) : 50;
                 this.currentValues.set(optionId, currentValue);
             }
@@ -168,6 +177,7 @@ class QuizSliderQuestion {
             }
             
             this.updateBubble(optionId, value, handle);
+            this.updateAverage();
         });
         
         sliderElement.noUiSlider.on('end', () => {
@@ -228,10 +238,38 @@ class QuizSliderQuestion {
         }
     }
 
+    updateAverage() {
+        if (!this.averageDisplayDiv || !this.averageValueSpan) return;
+        
+        // calculate average with inverse score logic
+        let total = 0;
+        let count = 0;
+        for (const [optionId, value] of this.currentValues) {
+            const score = this.inverseSliders.get(optionId) ? (100 - value) : value;
+            total += score;
+            count++;
+        }
+        
+        if (count > 0) {
+            this.average = (total / count).toFixed(3);
+            this.averageValueSpan.textContent = Math.round(this.average);
+            this.averageDisplayDiv.classList.remove('d-none');
+        } else if (this.average !== null) {
+            // show initial average if we have one but no values yet
+            this.averageValueSpan.textContent = this.average;
+            this.averageDisplayDiv.classList.remove('d-none');
+        }
+    }
+
     // interface methods for QuizController
     isAnswered() {
         // sliders always considered answered...
         return this.answered;
+    }
+
+    getAverage() {
+        // accessed by controller
+        return this.average;
     }
 
     getValue() {
@@ -259,6 +297,7 @@ class QuizSliderQuestion {
             }
             // check if all sliders are now considered interacted
             this.checkIfAllSlidersInteracted();
+            // average is already set on init
         }
         
         console.log(`Slider question ${this.questionNumber} values set to:`, JSON.stringify(values));
