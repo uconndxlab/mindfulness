@@ -827,7 +827,7 @@ color:#000!important;
 
 /* content view */
 .content-view-image img {
-    max-width: 100%; max-height: 65vh;
+    max-width: 100%; max-height: 50vh;
 }
 
 #prev_q_button, #next_q_button{
@@ -1025,8 +1025,17 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 
 /* nowrap on table cols */
 .table-nowrap th,
-.table-nowrap td {
+.table-nowrap td:not(.email-column) {
     white-space: nowrap !important;
+}
+
+.email-column {
+    min-width: 225px;
+    max-width: 300px;
+    width: 150px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal !important;
 }
 
 /* sortable styling for cols */
@@ -1425,3 +1434,62 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     font-size: 0.875rem !important;
     padding: 1rem !important;
 }
+
+/* timer */
+.timer-container {
+    background: #f5f5f5;
+    border-radius: 20px;
+    border: 2px solid var(--light-green);
+    padding: 1rem;
+}
+
+.timer-layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+/* reset button and play-pause button styles */
+.timer-controls .btn {
+    background: transparent !important;
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+/* style the icons inside buttons */
+.timer-controls .btn .bi {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    width: 30px;
+    height: 30px;
+    color: #000;
+    background-color: rgba(117, 186, 150, .25);
+    border-radius: 100px;
+}
+
+/* timer display */
+.timer-display {
+    font-size: 1.5rem;
+    min-width: 80px;
+    text-align: center;
+    color: var(--darker-green);
+}
+
+/* time selector dropdown */
+/* .time-selector {
+    width: auto;
+    display: inline-block;
+    margin: 0.5rem 0;
+} */

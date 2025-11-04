@@ -51,7 +51,7 @@
                                     <td>{{ $user->name }}</td>
                                     @break
                                 @case('email')
-                                    <td>
+                                    <td class="email-column">
                                         <span title="{{ $user->email }}">{{ $user->email }}</span>
                                     </td>
                                     @break

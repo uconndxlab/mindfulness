@@ -78,7 +78,53 @@
             @else
                 <!-- default video, image -->
                 <div id="content_main" class="content-main d-flex justify-content-center align-items-center flex-column" data-type="{{ $content->type }}">
-                    <x-contentView id="content_view" id2="download_btn" voiceId="none" type="{{ $content->type }}" file="{{ $content->file_path }}" allowSeek="{{ $allowSeek }}"/>
+                    @if ($content->type === 'image')
+                        <h6 class="fw-normal text-center col-md-8 col-lg-6 col-sm-10">Take your time with this activity. Please start the timer, the activity will complete when the timer runs out.</h6>
+                        {{-- data-allow-select="false" --}}
+                        <div id="timer-container" class="timer-container" data-preset-time="{{ $activity->time ?? 5 }}">
+                            <div class="timer-layout">
+                                <div id="timer-controls" class="timer-controls">
+                                    <button id="timer-reset" class="btn btn-secondary">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                    <button id="timer-play-pause" class="btn btn-primary">
+                                        <i class="bi bi-play"></i>
+                                    </button>
+                                </div>
+                                <div id="timer-display" class="timer-display">{{ $activity->time ?? 5 }}:00</div>
+                            </div>
+                        </div>
+
+                        {{-- <h6 class="fw-normal text-center mt-3">Take your time and set a timer to complete this activity.</h6>
+                        <div class="text-center mb-2">
+                            <select id="time-selector" class="form-select form-select-sm time-selector">
+                                <option value="1">1 minute</option>
+                                <option value="2">2 minutes</option>
+                                <option value="3">3 minutes</option>
+                                <option value="4">4 minutes</option>
+                                <option value="5" selected>5 minutes</option>
+                                <option value="10">10 minutes</option>
+                                <option value="15">15 minutes</option>
+                                <option value="20">20 minutes</option>
+                            </select>
+                        </div>
+                        <div id="timer-container" class="timer-container" data-preset-time="5" data-allow-select="true">
+                            <div class="timer-layout">
+                                <div id="timer-controls" class="timer-controls">
+                                    <button id="timer-reset" class="btn btn-secondary">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                    <button id="timer-play-pause" class="btn btn-primary">
+                                        <i class="bi bi-play-fill"></i>
+                                    </button>
+                                </div>
+                                <div id="timer-display" class="timer-display">5:00</div>
+                            </div>
+                        </div> --}}
+                    @endif
+                    <div class="mt-3">
+                        <x-contentView id="content_view" id2="download_btn" voiceId="none" type="{{ $content->type }}" file="{{ $content->file_path }}" allowSeek="{{ $allowSeek }}"/>
+                    </div>
                 </div>
             @endif
 
