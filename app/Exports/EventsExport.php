@@ -50,7 +50,7 @@ class EventsExport implements FromCollection, WithHeadings, WithMapping
 
         return [
             $event->id,
-            $event->causer->hh_id,
+            $event->causer?->hh_id ?? 'Unknown',
             $event->description,
             $subjectType,
             $subjectName,
