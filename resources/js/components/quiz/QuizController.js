@@ -135,8 +135,19 @@ class QuizController {
             requestAnimationFrame(() => {
                 this.quizContainer.classList.remove('quiz-loading');
                 this.quizContainer.classList.add('quiz-loaded');
+                
+                // initialize popovers for practice quality info icons
+                this.initializePopovers();
             });
         }
+    }
+    
+    initializePopovers() {
+        // initialize Bootstrap popovers for info icons
+        const popoverTriggerList = [].slice.call(this.quizForm.querySelectorAll('[data-bs-toggle="popover"]'));
+        popoverTriggerList.forEach(function (popoverTriggerEl) {
+            new bootstrap.Popover(popoverTriggerEl);
+        });
     }
     
     // callback for answer change

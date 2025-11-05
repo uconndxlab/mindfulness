@@ -69,6 +69,23 @@ a {
     font-weight:500!important;
 }
 
+.text-link {
+    color: var(--dark-green) !important;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    text-decoration: underline;
+}
+
+.text-link:hover {
+    opacity: 0.7;
+}
+
+.pq-score {
+    font-size: 1.25rem;
+    margin-left: 0.5rem;
+    font-weight: 500;
+}
+
 .alert-success {
     --bs-alert-color: var(--dark-green);
     --bs-alert-bg: var(--xlight-green);
@@ -133,6 +150,13 @@ textarea.form-control {
 
 .btn-nav {
     padding: 10px 20px!important;
+    border: 2px solid rgba(0,0,0,0.5)!important;
+}
+.btn-nav:hover {
+    background-color: rgba(0,0,0,0.05)!important;
+}
+.btn-nav:active {
+    background-color: rgba(0,0,0,0.1)!important;
 }
 
 .btn-icon {
@@ -299,7 +323,9 @@ button:disabled i{
 
 .nav-link{
     color:rgba(0,0,0,0.5)!important;
+    border-width: 1px!important;
 }
+
 .nav-link.active {
     color:rgba(0,0,0,1)!important;
 }
@@ -1413,7 +1439,7 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     background-color: var(--light-grey)!important;
     color: var(--success-green) !important;
     font-size: 0.875rem !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
     box-shadow: none !important;
 }
 .activity-description-item .accordion-button i {
@@ -1421,6 +1447,34 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 }
 
 .activity-description-accordion .activity-description-body {
+    color: #6c757d !important;
+    font-size: 0.875rem !important;
+    padding: 1rem !important;
+}
+
+/* PRACTICE QUALITY */
+.pq-score {
+    font-weight: bold;
+    color: #000 !important;
+    margin-left: 0.25rem;
+}
+
+.popover {
+    border: 2px solid var(--light-green) !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    --bs-popover-border-color: var(--light-green) !important;
+    --bs-popover-border-width: 2px !important;
+}
+
+.popover-header {
+    background-color: var(--light-grey) !important;
+    color: var(--success-green) !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid var(--light-green) !important;
+}
+
+.popover-body {
     color: #6c757d !important;
     font-size: 0.875rem !important;
     padding: 1rem !important;

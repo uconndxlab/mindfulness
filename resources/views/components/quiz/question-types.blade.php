@@ -76,9 +76,21 @@
             <hr>
         @endif
     @endforeach
-    <div class="d-flex justify-content-end mt-2 me-2">
+    <div class="d-flex justify-content-end">
         <div id="slider_average_display_{{ $question['number'] }}" class="text-muted d-none">
-            <strong>Practice Quality:</strong> <span id="slider_average_value_{{ $question['number'] }}">--</span>%
+            <strong class="text-link"
+                role="button"
+                tabindex="0"
+                data-bs-toggle="popover" 
+                data-bs-trigger="click"
+                data-bs-placement="top"
+                data-bs-html="true"
+                data-bs-title="Practice Quality"
+                data-bs-content="This percentage reflects how consistently you returned to your present-moment experience during the practice. A higher score indicates you spent more time being aware and accepting, rather than avoiding or pushing away experiences.">
+                <i class="bi bi-info-circle" ></i> 
+                Practice Quality:
+            </strong> 
+            <span id="slider_average_value_{{ $question['number'] }}" class="pq-score">--</span>%
         </div>
     </div>
 @endif
