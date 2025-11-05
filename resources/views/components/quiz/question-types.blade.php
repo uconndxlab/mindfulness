@@ -82,7 +82,7 @@
                 role="button"
                 tabindex="0"
                 data-bs-toggle="popover" 
-                data-bs-trigger="click"
+                data-bs-trigger="hover"
                 data-bs-placement="top"
                 data-bs-html="true"
                 data-bs-title="Practice Quality"
