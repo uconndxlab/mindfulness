@@ -983,8 +983,11 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     max-width: 300px;
     width: 100%;
     height: auto;
-    display: block;
-    margin: 0 auto;
+}
+
+.modal-body p:last-child,
+#appModalBody p:last-child {
+    margin-bottom: 0;
 }
 /* end modal */
 

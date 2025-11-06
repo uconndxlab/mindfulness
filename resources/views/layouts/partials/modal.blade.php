@@ -6,7 +6,7 @@
             </div>
             <div id="appModalBody" class="modal-body d-none">
             </div>
-            <img id="appModalImg" src="" alt="Example Image" class="img-fluid mb-3 d-none">
+            <img id="appModalImg" src="" alt="Example Image" class="img-fluid d-block mx-auto d-none">
             <div class="modal-footer d-flex justify-content-center">
                 <form id="modalForm" method="POST" class="w-100">
                     @csrf

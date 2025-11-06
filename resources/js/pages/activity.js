@@ -1,3 +1,5 @@
+import { escapeHtml } from '../utils/escapeHtml.js';
+
 function initActivityPage() {
     const root = document.querySelector('[data-activity-root]') || document.body;
     const activityId = parseInt(root.getAttribute('data-activity-id') || '0', 10);
@@ -545,7 +547,7 @@ function initActivityPage() {
             if (window.showModal) {
                 window.showModal({
                     label: 'Complete Activity Later?',
-                    body: `Click 'Continue' to move on to the next activity. All progress on this activity will be lost. This activity must still be completed later in order to finish ${dayName}.`,
+                    body: `Click 'Continue' to move on to the next activity. All progress on this activity will be lost. This activity must still be completed later in order to finish ${escapeHtml(dayName)}.`,
                     route: skipRoute,
                     method: 'POST',
                     buttonLabel: 'Continue',

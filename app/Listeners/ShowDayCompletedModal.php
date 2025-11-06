@@ -40,7 +40,7 @@ class ShowDayCompletedModal
 
     private function buildModalData(Day $day, bool $hasBonus, Day $nextDay = null): array
     {
-        $label = "Congrats on completing {$day->name}! 🎉";
+        $label = "Congrats on completing ".e($day->name)."! 🎉";
         $body = $this->buildModalBody($day, $hasBonus, $nextDay);
         $media = $day->media_path ? Storage::url('flowers/'.$day->media_path) : null;
         $route = '/home';
@@ -58,7 +58,7 @@ class ShowDayCompletedModal
         // check in has precedence over bonus
         if ($nextDay && $nextDay->is_check_in) {
             $modalData['route'] = route('explore.module', ['module_id' => $nextDay->module_id, 'activity_id' => $nextDay->activities->first()->id]);
-            $modalData['buttonLabel'] = "Go to {$nextDay->name}";
+            $modalData['buttonLabel'] = "Go to ".e($nextDay->name);
         }
         else if ($hasBonus) {
             $modalData['route'] = route('explore.module', ['module_id' => $day->module_id, 'activity_id' => $day->activities->where('optional', true)->first()->id]);
@@ -72,14 +72,18 @@ class ShowDayCompletedModal
     {
         $converter = app(\League\CommonMark\CommonMarkConverter::class);
         
-        $bodyMessage = $day->completion_message ?? "Congratulations on completing **{$day->module->name}: {$day->name}**!";
-        $bodyMessage .= "\n\n Return [Home](/home) to view your progress!";
+        $moduleName = e($day->module->name);
+        $dayName = e($day->name);
+        
+        $bodyMessage = $day->completion_message ?? "Congratulations on completing **{$moduleName}: {$dayName}**!";
+        $bodyMessage .= " Return [Home](/home) to view your progress!";
 
         if ($nextDay && $nextDay->is_check_in) {
             $order = $nextDay->module->order;
             $nextPartOrder = $order + 1;
+            $nextDayName = e($nextDay->name);
             $checkInRoute = route('explore.module', ['module_id' => $nextDay->module_id, 'activity_id' => $nextDay->activities->first()->id]);
-            $bodyMessage .= "\n\n You have unlocked **{$nextDay->name}**! Click [here]({$checkInRoute}) to complete **{$nextDay->name}** before moving on to Part {$nextPartOrder}.";
+            $bodyMessage .= "\n\n You have unlocked **{$nextDayName}**! Click [here]({$checkInRoute}) to complete **{$nextDayName}** before moving on to Part {$nextPartOrder}.";
         }
         if ($hasBonus) {
             $bonusRoute = route('explore.module', ['module_id' => $day->module_id, 'activity_id' => $day->activities->where('optional', true)->first()->id]);

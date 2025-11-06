@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Page-based (when entire page is dedicated)
     if (page === 'help') imports.push(import('./pages/help'));
+    if (page === 'home') imports.push(import('./pages/home'));
     if (page === 'auth-login-register') imports.push(import('./pages/auth-login-register'));
     if (page === 'auth-verify') imports.push(import('./pages/auth-verify'));
     if (page === 'module') imports.push(import('./pages/module'));

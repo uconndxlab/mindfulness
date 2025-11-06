@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Home')
+@section('page_id', 'home')
 
 @section('content')
 <div class="col-md-8">
@@ -31,7 +32,7 @@
                                     </div>
                                 </a>
                             @else
-                                <span id="moduleLink" class="stretched-link w-100 module-link disabled">
+                                <a href="#" class="stretched-link w-100 module-link disabled locked-module-link" data-module-name="Part {{ $module->order }} - {{ $module->name }}">
                                     <img src="{{ Storage::url('flowers/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon">
                                     <div class="col">
                                         <h6 class="mb-0">Part {{ $module->order }} - {{ $module->name }}</h6>
@@ -45,7 +46,7 @@
                                             @endif
                                         </ul>
                                     </div>
-                                </span>
+                                </a>
                             @endif
                             <i class="bi bi-arrow-right"></i>
                         </div>
