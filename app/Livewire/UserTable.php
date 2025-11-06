@@ -25,6 +25,7 @@ class UserTable extends Component
         'role' => ['label' => 'Role', 'sortable' => false],
         'current_activity' => ['label' => 'Current Activity', 'sortable' => false],
         'last_active_at' => ['label' => 'Last Active', 'sortable' => true],
+        'num_favorites' => ['label' => 'Number of Favorites', 'sortable' => false],
         'created_at' => ['label' => 'Joined', 'sortable' => true],
         'verified' => ['label' => 'Verified', 'sortable' => false],
         'last_reminded_at' => ['label' => 'Last Reminder', 'sortable' => true],
@@ -50,6 +51,7 @@ class UserTable extends Component
     {
         // query
         $usersQuery = User::select('id', 'hh_id', 'name', 'email', 'role', 'created_at', 'lock_access', 'email_verified_at', 'last_active_at', 'last_reminded_at')
+            ->with(['favoritedActivities' => fn($query) => $query->orderBy('order', 'asc'), 'favoritedActivities.day.module'])
             ->orderBy($this->sortColumn, $this->sortDirection);
 
         // search - cannot query search because of current activity

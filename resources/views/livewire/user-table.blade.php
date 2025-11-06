@@ -78,6 +78,47 @@
                                 @case('last_active_at')
                                     <td>{{ $user->last_active_at ? $user->last_active_at->diffForHumans() : 'Never' }}</td>
                                     @break
+                                @case('num_favorites')
+                                    <td class="text-center">
+                                        @if ($user->favoritedActivities->isNotEmpty())
+                                            <button class="btn btn-link text-link" 
+                                                data-bs-toggle="tooltip"
+                                                title="View Favorites"
+                                                data-open-modal
+                                                data-modal-label="Favorites"
+                                                data-modal-body-from="#favorites-{{ $user->id }}">
+                                                {{ $user->favoritedActivities->count() }} <i class="bi bi-star-fill"></i>
+                                            </button>
+                                            <div id="favorites-{{ $user->id }}" class="d-none">
+                                                @php
+                                                    $groupedByModule = $user->favoritedActivities->groupBy('day.module.id');
+                                                @endphp
+                                                <div class="border rounded p-3 bg-light favorite-list-container">
+                                                    @foreach ($groupedByModule as $moduleId => $activitiesInModule)
+                                                        <strong>{{ $activitiesInModule->first()->day->module->name }}</strong>
+                                                        @php
+                                                            $groupedByDay = $activitiesInModule->groupBy('day.id');
+                                                        @endphp
+                                                        <ul class="mb-2">
+                                                            @foreach ($groupedByDay as $dayId => $activitiesInDay)
+                                                                <li>
+                                                                    <strong>{{ $activitiesInDay->first()->day->name }}:</strong>
+                                                                    <ul class="mb-0">
+                                                                        @foreach ($activitiesInDay as $activity)
+                                                                            <li>{{ $activity->title }}</li>
+                                                                        @endforeach
+                                                                    </ul>
+                                                                </li>
+                                                            @endforeach
+                                                        </ul>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @else
+                                            0
+                                        @endif
+                                    </td>
+                                    @break
                                 @case('verified')
                                     <td class="text-center">
                                         <span class="badge bg-{{ $user->email_verified_at ? 'success' : 'danger' }}">

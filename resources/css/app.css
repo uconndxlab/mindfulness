@@ -80,6 +80,15 @@ a {
     opacity: 0.7;
 }
 
+.btn-link.text-link {
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 1.25rem !important;
+}
+.btn-link.text-link .bi-star-fill {
+    color: var(--dark-green) !important;
+}
+
 .pq-score {
     font-size: 1.25rem;
     margin-left: 0.5rem;
@@ -1481,4 +1490,9 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     color: #6c757d !important;
     font-size: 0.875rem !important;
     padding: 1rem !important;
+}
+
+.favorite-list-container {
+    max-height: 400px;
+    overflow-y: auto;
 }
