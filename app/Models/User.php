@@ -31,6 +31,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_active_at',
         'lock_access',
         'timezone',
+        'terms_accepted_at',
+        'terms_version',
     ];
 
     /**
@@ -57,6 +59,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'lock_access' => 'boolean',
             'timezone' => 'string',
             'last_reminded_at' => 'datetime',
+            'terms_accepted_at' => 'datetime',
+            'terms_version' => 'string',
         ];
     }
 

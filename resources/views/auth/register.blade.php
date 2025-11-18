@@ -49,6 +49,20 @@
             @enderror
         </div>
 
+        <div class="form-group mb-3">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="terms_accepted" name="terms_accepted" value="1">
+                <label class="form-check-label" for="terms_accepted">
+                    I have read and agree to the <a href="{{ Storage::url(config('terms.file_path')) }}" target="_blank" rel="noopener noreferrer">Terms of Use</a>
+                </label>
+            </div>
+            @error('terms_accepted')
+                <span class="invalid-feedback d-block" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
+
         <div class="d-flex justify-content-end">
             <div class="form-check mt-1 mb-2">
                 <input type="checkbox" class="form-check-input" id="remember" name="remember" checked>

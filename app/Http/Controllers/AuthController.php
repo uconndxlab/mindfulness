@@ -107,7 +107,8 @@ class AuthController extends Controller
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'email:rfc,dns', 'max:255',  'unique:'.User::class],
                 'password'=> ['required', Password::min(8)->mixedCase()->numbers()],
-                'timezone' => ['string', 'nullable']
+                'timezone' => ['string', 'nullable'],
+                'terms_accepted' => ['required', 'accepted']
             ], [
                 'name.required' => 'Please enter a name.',
                 'name.max' => 'Name must be no longer than 255 characters.',
@@ -115,7 +116,9 @@ class AuthController extends Controller
                 'email.email' => 'Not a valid email address.',
                 'email.max' => 'Email must be no longer than 255 characters.',
                 'email.unique' => 'The provided email is already in use.',
-                'password.required' => 'Please enter a password.'
+                'password.required' => 'Please enter a password.',
+                'terms_accepted.required' => 'You must accept the Terms of Use to register.',
+                'terms_accepted.accepted' => 'You must accept the Terms of Use to register.'
             ]);
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
@@ -129,6 +132,8 @@ class AuthController extends Controller
                 'password'=> Hash::make(value: $request->input('password')),
                 'timezone' => $request->timezone ?? config('app.timezone'),
                 'last_active_at' => Carbon::now(),
+                'terms_accepted_at' => Carbon::now(),
+                'terms_version' => config('terms.current_version'),
             ]);
             
             //unlocking first module/day/activity
