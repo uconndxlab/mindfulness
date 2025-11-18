@@ -288,6 +288,10 @@ class PageNavController extends Controller
                 'user_id' => Auth::id(),
                 'quiz_id' => $quiz->id
             ], [
+                'activity_id' => $quiz->activity_id,
+                'subject_id' => $quiz->subject_id,
+                'subject_type' => $quiz->subject_type,
+                'reflection_type' => $quiz->type,
                 'answers' => $answers,
                 'average' => $average
             ]);
