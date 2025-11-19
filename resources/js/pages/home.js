@@ -14,7 +14,7 @@ function bindHomeHandlers() {
         if (window.showModal) {
             window.showModal({
                 label: 'Module Locked',
-                body: `<p><strong>${escapeHtml(moduleName)}</strong> is not yet unlocked. Complete previous modules to unlock this one.</p>`,
+                body: `<p><strong>${escapeHtml(moduleName)}</strong> is currently locked. Complete previous modules to unlock this one.</p>`,
                 closeLabel: 'OK'
             });
         }

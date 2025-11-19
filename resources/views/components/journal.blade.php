@@ -1,6 +1,6 @@
 @if (isset($journal))
     <form id="journalForm" method="POST" class="pt-3" data-has-activity="{{ isset($journal->activity) ? 'true' : 'false' }}" data-activity-id="{{ $journal->activity ? $journal->activity->id : '' }}">
-        <p>***<em>Please do not write any sensitive information here.***</em></p>
+        <p><em>For your data safety, please don’t write any sensitive personal information here such as your home address, government ID numbers, or financial details.</em></p>
         @csrf
         <div id="success-message" class="alert alert-success note-err-message d-none">
             Journal saved!
