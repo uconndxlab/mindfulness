@@ -18,7 +18,7 @@
                 {{ session('error') }}
             </div>
         @endif
-        <table class="table table-striped table-nowrap">
+        <table class="table table-striped table-nowrap table-bordered">
             <thead>
                 <tr>
                     @foreach ($columns as $column => $details)

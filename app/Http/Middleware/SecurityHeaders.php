@@ -14,7 +14,9 @@ class SecurityHeaders
     // - Risk mitigation: Admin routes should be behind strong authentication
     private const LIVEWIRE_ROUTES = [
         'admin.users',
-        'admin.events', 
+        'admin.events',
+        'admin.journals',
+        'admin.reflection',
         'account',
         'help'
     ];

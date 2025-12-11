@@ -1201,6 +1201,13 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     margin-bottom: 0.25rem;
 }
 
+.no-links .markdown a {
+    pointer-events: none;
+    cursor: default;
+    color: inherit;
+    text-decoration: none;
+}
+
 /* .quiz-slider-label .markdown {
 }
 .activity-instructions .markdown {
@@ -1556,4 +1563,22 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 .favorite-list-container {
     max-height: 400px;
     overflow-y: auto;
+}
+
+.note-cell {
+    width: 500px;
+    max-width: 500px;
+    min-width: 250px;
+    padding: 0 !important;
+    vertical-align: top;
+}
+
+.note-cell-content {
+    max-height: 150px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.75rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
 }

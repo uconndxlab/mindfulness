@@ -64,11 +64,24 @@ class AppServiceProvider extends ServiceProvider
             \URL::forceScheme('https');
         }
 
-        // markdown directive
+        // markdown directive - secured against XSS
         Blade::directive('markdown', function ($expression) {
             return '<?php 
                 $content_for_markdown = is_string(' . $expression . ') ? ' . $expression . ' : "";
-                echo "<div class=\"markdown\">" . app(\League\CommonMark\CommonMarkConverter::class)->convert($content_for_markdown)->getContent() . "</div>"; 
+                
+                // secure CommonMark configuration
+                $config = [
+                    "html_input" => "escape",  // escape all HTML input
+                    "allow_unsafe_links" => false,  // disallow javascript: and data: URIs
+                ];
+                
+                $environment = new \League\CommonMark\Environment\Environment($config);
+                $environment->addExtension(new \League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension());
+                
+                $converter = new \League\CommonMark\MarkdownConverter($environment);
+                $htmlContent = $converter->convert($content_for_markdown)->getContent();
+                
+                echo "<div class=\"markdown\">" . $htmlContent . "</div>"; 
             ?>';
         });
     }

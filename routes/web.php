@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
+use App\Http\Controllers\Admin\ReflectionController as AdminReflectionController;
+use App\Http\Controllers\Admin\NoteController as AdminNoteController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -19,6 +21,7 @@ use App\Models\QuizAnswers;
 Route::middleware('web')->group(function () {
     //default
     Route::redirect("/","/home");
+    Route::redirect('/study', 'https://draft.mindfulnesslab.hdfs.uconn.edu/healing-hearts/');
 
     //AUTHENTICATION
     //login page
@@ -147,6 +150,10 @@ Route::middleware('web')->group(function () {
             Route::get('/users/export/csv', [AdminUserController::class, 'exportUsers'])->name('users.export');
             Route::get('/events', [AdminEventController::class, 'index'])->name('events');
             Route::get('/events/export/csv', [AdminEventController::class, 'exportEvents'])->name('events.export');
+            Route::get('/reflection', [AdminReflectionController::class, 'index'])->name('reflection');
+            Route::get('/reflections/export/csv', [AdminReflectionController::class, 'exportReflections'])->name('reflections.export');
+            Route::get('/journals', [AdminNoteController::class, 'index'])->name('journals');
+            Route::get('/journals/export/csv', [AdminNoteController::class, 'exportNotes'])->name('notes.export');
         });
     }); 
 });

@@ -36,6 +36,18 @@
                         Event Log
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.reflection') ? 'active' : '' }}" href="{{ route('admin.reflection') }}">
+                        <i class="bi bi-patch-question me-2"></i>
+                        Reflections
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.journals') ? 'active' : '' }}" href="{{ route('admin.journals') }}">
+                        <i class="bi bi-journal-plus me-2"></i>
+                        Journals
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
