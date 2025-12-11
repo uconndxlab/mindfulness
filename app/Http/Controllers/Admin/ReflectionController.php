@@ -11,11 +11,11 @@ class ReflectionController extends Controller
 {
     public function index()
     {
-        //
+        return view('admin.reflections');
     }
 
     public function exportReflections()
     {
-        //
+        return Excel::download(new ReflectionsExport, 'reflections.xlsx');
     }
 }
