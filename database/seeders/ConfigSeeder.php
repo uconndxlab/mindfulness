@@ -18,5 +18,10 @@ class ConfigSeeder extends Seeder
             ['key' => 'registration_locked'],
             ['value' => false]
         );
+        
+        Config::updateOrCreate(
+            ['key' => 'invitation_only_mode'],
+            ['value' => false]
+        );
     }
 }

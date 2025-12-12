@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AdminOnly;
 use App\Http\Middleware\CheckAccountLock;
+use App\Http\Middleware\CheckInvitationRequired;
 use App\Http\Middleware\CheckRegistrationLock;
 use App\Http\Middleware\UpdateLastActiveAt;
 use Illuminate\Console\Scheduling\Schedule;
@@ -22,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'update.last.active' => UpdateLastActiveAt::class,
             'check.account.lock' => CheckAccountLock::class,
             'registration.lock' => CheckRegistrationLock::class,
+            'invitation.required' => CheckInvitationRequired::class,
             'email.rate.limiter' => \App\Http\Middleware\EmailRateLimiter::class,
             'session.policy' => \App\Http\Middleware\SessionPolicy::class,
         ]);

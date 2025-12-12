@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\ReflectionController as AdminReflectionController;
 use App\Http\Controllers\Admin\NoteController as AdminNoteController;
+use App\Http\Controllers\Admin\InvitationController as AdminInvitationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -30,7 +31,7 @@ Route::middleware('web')->group(function () {
     Route::post('/login', [AuthController::class,'authenticate'])->middleware('throttle:10,1')->name('login.submit');
     
     //REGISTRATION
-    Route::middleware('registration.lock')->group(function () { 
+    Route::middleware(['registration.lock', 'invitation.required'])->group(function () { 
         //registration page
         Route::get('/account-creation', [AuthController::class, 'registrationPage'])->name('register');
         //registration request - throttled in controller
@@ -154,6 +155,9 @@ Route::middleware('web')->group(function () {
             Route::get('/reflections/export/csv', [AdminReflectionController::class, 'exportReflections'])->name('reflections.export');
             Route::get('/journals', [AdminNoteController::class, 'index'])->name('journals');
             Route::get('/journals/export/csv', [AdminNoteController::class, 'exportNotes'])->name('notes.export');
+            
+            // Invitations
+            Route::get('/invitations', [AdminInvitationController::class, 'index'])->name('invitations');
         });
     }); 
 });

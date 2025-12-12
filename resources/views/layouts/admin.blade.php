@@ -31,6 +31,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.invitations*') ? 'active' : '' }}" href="{{ route('admin.invitations') }}">
+                        <i class="bi bi-envelope-paper me-2"></i>
+                        Invitations
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.events') ? 'active' : '' }}" href="{{ route('admin.events') }}">
                         <i class="bi bi-list-check me-2"></i>
                         Event Log
