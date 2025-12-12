@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SubmitQuizRequest;
 use App\Models\Day;
 use App\Models\Journal;
 use App\Models\Quiz;
@@ -267,22 +268,20 @@ class PageNavController extends Controller
     }
 
     //QUIZ
-    public function submitQuiz(Request $request)
+    public function submitQuiz(SubmitQuizRequest $request)
     {
         try {
-            //get quiz
-            $quiz = Quiz::findOrFail($request->quiz_id);
-    
-            // get answers
-            $answers = $request->has('answers') 
-                ? json_decode($request->answers, true)
-                : [];
+            // validation is already handled by SubmitQuizRequest
+            $validated = $request->validated();
             
-            $average = null;
-            // if average is provided (for slider questions), save it
-            if ($request->has('average') && $request->average !== null) {
-                $average = $request->average;
-            }
+            // get quiz (already validated to exist and be accessible)
+            $quiz = Quiz::findOrFail($validated['quiz_id']);
+    
+            // get validated answers
+            $answers = $request->getAnswersArray();
+            
+            // get average if provided (already validated to be 0-100)
+            $average = $validated['average'] ?? null;
     
             QuizAnswers::updateOrCreate([
                 'user_id' => Auth::id(),
@@ -295,13 +294,15 @@ class PageNavController extends Controller
                 'answers' => $answers,
                 'average' => $average
             ]);
+            
             return response()->json(['success_message' => 'Quiz answers updated successfully.'], 200);
         }
         catch (\Throwable $e) {
             \Log::error('Quiz submission failed', [
                 'user_id' => Auth::id(),
-                'quiz_id' => $request->quiz_id ?? null,
+                'quiz_id' => $request->input('quiz_id') ?? null,
                 'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             return response()->json(['error_message' => 'Failed to submit quiz answers.'], 500);
         }

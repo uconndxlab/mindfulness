@@ -2,12 +2,12 @@
 
 namespace App\Rules;
 
-use App\Models\Activity;
+use App\Models\Quiz;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Auth;
 
-class ActIdRule implements ValidationRule
+class QuizAccessRule implements ValidationRule
 {
     /**
      * Run the validation rule.
@@ -16,18 +16,25 @@ class ActIdRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $activity = Activity::find($value);
+        $quiz = Quiz::find($value);
         
-        if (!$activity || $activity->type != 'journal') {
-            $fail("Activity not found.");
+        if (!$quiz) {
+            $fail("Quiz not found.");
             return;
         }
         
-        // check if user has access to this activity
+        // check if user has access to the activity this quiz belongs to
+        $activity = $quiz->activity;
+        if (!$activity) {
+            $fail("Quiz is not associated with an activity.");
+            return;
+        }
+        
         $user = Auth::user();
         if (!$user || !$activity->canBeAccessedBy($user)) {
-            $fail("You do not have access to this activity.");
+            $fail("You do not have access to this quiz.");
             return;
         }
     }
 }
+
