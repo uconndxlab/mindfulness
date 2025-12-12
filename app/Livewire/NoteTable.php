@@ -51,7 +51,6 @@ class NoteTable extends Component
                     ->orWhereHas('activity', function ($q) {
                         $q->where('title', 'like', '%' . $this->search . '%');
                     })
-                    ->orWhere('note', 'like', '%' . $this->search . '%')
                     ->orWhereHas('user', function ($q) {
                         $q->where('hh_id', 'like', '%' . $this->search . '%');
                     });
