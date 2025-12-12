@@ -14,6 +14,14 @@
             </div>
         @enderror
 
+        @if(session('invitation_token') && isset($invitation))
+            @if($invitation->expires_at->diffInHours() < 24)
+                <div class="alert alert-warning" role="alert">
+                    <i class="bi bi-clock"></i> Your invitation expires {{ $invitation->expires_at->diffForHumans() }}.
+                </div>
+            @endif
+        @endif
+
         <div class="text-left fs-5 fw-bold mb-3">
             Create an Account
         </div>
@@ -30,12 +38,25 @@
 
         <div class="form-group mb-3">
             <label class="fw-bold mb-1" for="email">Email</label>
-            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" autocomplete="off">
-            @error('email')
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-            @enderror
+            @if(session('invitation_email'))
+                <input id="email" type="email"
+                    class="form-control" 
+                    value="{{ session('invitation_email') }}" 
+                    readonly disabled>
+                <input type="hidden" name="email" value="{{ session('invitation_email') }}">
+                <small class="text-muted">Email is pre-filled from your invitation.</small>
+            @else
+                <input id="email" type="email"
+                    class="form-control @error('email') is-invalid @enderror" 
+                    name="email" 
+                    value="{{ old('email') }}" 
+                    autocomplete="off">
+                @error('email')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
+            @endif
         </div>
 
         <div class="form-group mb-3">
@@ -71,6 +92,9 @@
         </div>
         
         <input type="hidden" name="timezone" id="timezone">
+        @if(session('invitation_token'))
+            <input type="hidden" name="invitation_token" value="{{ session('invitation_token') }}">
+        @endif
 
         <div class="form-group text-center mb-3">
             <button type="submit" class="btn btn-primary">SIGN UP</button>

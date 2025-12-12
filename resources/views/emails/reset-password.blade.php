@@ -16,16 +16,19 @@
     </div>
 
     <p style="margin-bottom: 15px;">
-        This password reset link will expire in 60 minutes.
-    </p>
-
-    <p style="margin-bottom: 15px;">
         If you did not request a password reset, no further action is required.
     </p>
 
-    <p style="margin-bottom: 15px; font-size: 14px; color: #666666;">
-        If you're having trouble clicking the "Reset Password" button, copy and paste the URL below into your web browser:
-        <br>
-        <span style="color: #48745D;">{{ $resetUrl }}</span>
+    <p style="margin-bottom: 15px; font-size: 14px; color: #666;">
+        <strong>Important:</strong> This password reset link will expire in 60 minutes.
+    </p>
+
+    <p style="margin-bottom: 15px; color: #666; font-size: 14px;">
+        If you have any questions or need assistance, please don't hesitate to reach out to us.
+    </p>
+
+    <p style="margin-bottom: 15px; color: #999; font-size: 12px;">
+        If the button doesn't work, you can copy and paste this link into your browser:<br>
+        <a href="{{ $resetUrl }}" style="color: #48745D; word-break: break-all;">{{ $resetUrl }}</a>
     </p>
 @endsection 

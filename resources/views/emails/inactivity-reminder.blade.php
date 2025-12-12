@@ -15,7 +15,12 @@
         </a>
     </div>
 
-    <p style="margin-bottom: 15px;">
-        If you're having any issues with your account or have questions, we're here to help!
+    <p style="margin-bottom: 15px; color: #666; font-size: 14px;">
+        If you have any questions or need assistance, please don't hesitate to reach out to us.
+    </p>
+
+    <p style="margin-bottom: 15px; color: #999; font-size: 12px;">
+        If the button doesn't work, you can copy and paste this link into your browser:<br>
+        <a href="{{ url('/login') }}" style="color: #48745D; word-break: break-all;">{{ url('/login') }}</a>
     </p>
 @endsection

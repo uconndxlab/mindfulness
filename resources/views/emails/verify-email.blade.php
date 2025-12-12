@@ -19,9 +19,12 @@
         If you did not create an account, no further action is required.
     </p>
 
-    <p style="margin-bottom: 15px; font-size: 14px; color: #666666;">
-        If you're having trouble clicking the "Verify Email Address" button, copy and paste the URL below into your web browser:
-        <br>
-        <span style="color: #48745D;">{{ $verificationUrl }}</span>
+    <p style="margin-bottom: 15px; color: #666; font-size: 14px;">
+        If you have any questions or need assistance, please don't hesitate to reach out to us.
+    </p>
+
+    <p style="margin-bottom: 15px; color: #999; font-size: 12px;">
+        If the button doesn't work, you can copy and paste this link into your browser:<br>
+        <a href="{{ $verificationUrl }}" style="color: #48745D; word-break: break-all;">{{ $verificationUrl }}</a>
     </p>
 @endsection 

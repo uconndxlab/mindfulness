@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (document.getElementById('journalForm')) imports.push(import('./components/journal'));
     if (document.getElementById('library-root')) imports.push(import('./pages/library'));
     if (document.getElementById('lock_button_reg')) imports.push(import('./components/registration-lock'));
+    if (document.getElementById('invitation_toggle_btn')) imports.push(import('./components/invitation-toggle'));
     if (document.getElementById('pdf-viewer')) imports.push(import('./components/pdf-viewer'));
     if (document.querySelector('.slide__audio.js-audio')) imports.push(import('./components/audio-player'));
     if (document.getElementById('timer-container')) imports.push(import('./components/timer'));

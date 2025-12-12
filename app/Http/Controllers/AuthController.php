@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
+use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -82,9 +83,17 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 
-    public function registrationPage()
+    public function registrationPage(Request $request)
     {
-        return view('auth.register');
+        $invitation = null;
+        
+        // if invitation token in session (from middleware), get inv details
+        if ($request->session()->has('invitation_token')) {
+            $token = $request->session()->get('invitation_token');
+            $invitation = Invitation::where('token', $token)->first();
+        }
+        
+        return view('auth.register', compact('invitation'));
     }
 
     //account registration
@@ -125,6 +134,27 @@ class AuthController extends Controller
         }
         
         try {
+            // check if invitation-only mode is enabled and validate invitation
+            $invitation = null;
+            if (getConfig('invitation_only_mode', false)) {
+                $invitationToken = $request->input('invitation_token');
+                
+                if (!$invitationToken) {
+                    return back()->withErrors(['error' => 'An invitation is required to register.']);
+                }
+                
+                $invitation = Invitation::where('token', $invitationToken)->first();
+                
+                if (!$invitation || !$invitation->isValid()) {
+                    return back()->withErrors(['error' => 'Invalid or expired invitation.']);
+                }
+                
+                // verify email matches invitation
+                if ($invitation->email !== $request->input('email')) {
+                    return back()->withErrors(['error' => 'Email must match the invitation email.']);
+                }
+            }
+            
             //create user
             $user = User::create([
                 'name' => $request->input('name'),
@@ -136,6 +166,11 @@ class AuthController extends Controller
                 'terms_version' => config('terms.current_version'),
             ]);
             
+            // mark invitation as used if it exists
+            if ($invitation) {
+                $invitation->markAsUsed($user);
+            }
+            
             //unlocking first module/day/activity
             lockAll($user->id);
             unlockFirst($user->id);
@@ -145,6 +180,10 @@ class AuthController extends Controller
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
             $request->session()->regenerateToken();
+            
+            // clear invitation session data
+            $request->session()->forget(['invitation_token', 'invitation_email']);
+            
             RateLimiter::hit($key, $limit['decay']);
           
             // log registration
