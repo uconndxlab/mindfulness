@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (page === 'auth-login-register') imports.push(import('./pages/auth-login-register'));
     if (page === 'auth-verify') imports.push(import('./pages/auth-verify'));
     if (page === 'module') imports.push(import('./pages/module'));
+    if (page === 'bonus') imports.push(import('./pages/module'));
     if (page === 'activity') imports.push(import('./pages/activity'));
 
     // Component-based (when component is embedded within another page)

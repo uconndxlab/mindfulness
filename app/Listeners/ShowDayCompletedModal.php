@@ -61,7 +61,7 @@ class ShowDayCompletedModal
             $modalData['buttonLabel'] = "Go to ".e($nextDay->name);
         }
         else if ($hasBonus) {
-            $modalData['route'] = route('explore.module', ['module_id' => $day->module_id, 'activity_id' => $day->activities->where('optional', true)->first()->id]);
+            $modalData['route'] = route('explore.bonus', ['activity_id' => $day->activities->where('optional', true)->first()->id]);
             $modalData['buttonLabel'] = 'View Bonus Activities';
         }
 
