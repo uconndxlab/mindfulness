@@ -39,6 +39,7 @@ class CheckInvitationRequired
         $invitation = Invitation::where('token', $token)->first();
 
         if (!$invitation) {
+            $request->session()->forget(['invitation_token', 'invitation_email']);
             return redirect()->route('login')->withErrors([
                 'credentials' => 'Invalid invitation link.'
             ]);
@@ -46,6 +47,9 @@ class CheckInvitationRequired
 
         // check if invitation is valid
         if (!$invitation->isValid()) {
+            // clear session data for invalid cases
+            $request->session()->forget(['invitation_token', 'invitation_email']);
+            
             if ($invitation->status === 'expired' || $invitation->expires_at->isPast()) {
                 return redirect()->route('login')->withErrors([
                     'credentials' => 'This invitation has expired.'

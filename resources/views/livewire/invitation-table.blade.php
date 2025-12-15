@@ -75,8 +75,9 @@
                                                 'revoked' => 'danger'
                                             ];
                                             $badgeColor = $statusColors[$invitation->status] ?? 'secondary';
+                                            $text = $badgeColor === 'secondary' ? 'text-black' : '';
                                         @endphp
-                                        <span class="badge bg-{{ $badgeColor }}">
+                                        <span class="badge bg-{{ $badgeColor }} {{ $text }}">
                                             {{ ucfirst($invitation->status) }}
                                         </span>
                                     </td>

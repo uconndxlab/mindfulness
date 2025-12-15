@@ -12,11 +12,16 @@
                 {{ session('success') }}
             </div>
         @endif
-        @error('error')
+        
+        @if ($errors->has('credentials') || $errors->has('error'))
             <div class="alert alert-danger" role="alert">
-                {{ $message }}
+                <ul class="mb-0 ps-3">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
-        @enderror
+        @endif
 
         <div class="text-left fs-2 fw-bold mb-1">
             {{ config('app.name') }}
@@ -27,7 +32,7 @@
 
         <div class="form-group mb-3">
             <label class="fw-bold" for="email">Email</label>
-            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror @error('credentials') is-invalid @enderror" name="email" value="{{ old('email') }}">
+            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror @error('login') is-invalid @enderror" name="email" value="{{ old('email') }}">
             @error('email')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
@@ -37,13 +42,13 @@
 
         <div class="form-group mb-3">
             <label class="fw-bold" for="password">Password</label>
-            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror @error('credentials') is-invalid @enderror" name="password">
+            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror @error('login') is-invalid @enderror" name="password">
             @error('password')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
                 </span>
             @enderror
-            @error('credentials')
+            @error('login')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
                 </span>

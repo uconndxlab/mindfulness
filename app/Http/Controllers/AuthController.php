@@ -52,7 +52,7 @@ class AuthController extends Controller
                 //log user out
                 Auth::logout();
                 return back()->withErrors([
-                    'credentials' => 'Your account is locked. If you have any questions, feel free to contact us at <a href="mailto:'.config('mail.contact_email').'">'.config('mail.contact_email').'</a>.',
+                    'error' => 'Your account is locked. If you have any questions, feel free to contact us at <a href="mailto:'.config('mail.contact_email').'">'.config('mail.contact_email').'</a>.',
                 ]);
             }
 
@@ -71,7 +71,7 @@ class AuthController extends Controller
             return redirect()->intended('/home');
         }
       
-        return back()->withErrors(['credentials' => 'Invalid credentials.'])->withInput();
+        return back()->withErrors(['login' => 'Invalid credentials.'])->withInput();
     }
 
     public function logout(Request $request) {
