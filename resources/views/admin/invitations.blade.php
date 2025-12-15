@@ -71,4 +71,6 @@
             </div>
         </div>
     </div>
+
+    @livewire('invitation-table')
 @endsection

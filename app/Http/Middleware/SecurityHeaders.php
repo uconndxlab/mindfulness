@@ -17,6 +17,7 @@ class SecurityHeaders
         'admin.events',
         'admin.journals',
         'admin.reflection',
+        'admin.invitations',
         'account',
         'help'
     ];

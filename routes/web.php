@@ -159,6 +159,8 @@ Route::middleware('web')->group(function () {
             // Invitations
             Route::get('/invitations', [AdminInvitationController::class, 'index'])->name('invitations');
             Route::post('/invitations', [AdminInvitationController::class, 'store'])->middleware('throttle:20,1')->name('invitations.store');
+            Route::post('/invitations/{id}/resend', [AdminInvitationController::class, 'resend'])->middleware('throttle:10,1')->name('invitations.resend');
+            Route::post('/invitations/{id}/revoke', [AdminInvitationController::class, 'revoke'])->middleware('throttle:10,1')->name('invitations.revoke');
             Route::post('/invitations/toggle', [AdminInvitationController::class, 'toggleInvitationMode'])->middleware('throttle:10,1')->name('invitations.toggle');
         });
     }); 
