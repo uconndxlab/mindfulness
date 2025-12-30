@@ -21,7 +21,7 @@ use App\Models\QuizAnswers;
 Route::middleware('web')->group(function () {
     //default
     Route::redirect("/","/home");
-    Route::redirect('/study', 'https://draft.mindfulnesslab.hdfs.uconn.edu/healing-hearts/');
+    Route::redirect('/study', config('app.study_url'));
 
     //AUTHENTICATION
     //login page
