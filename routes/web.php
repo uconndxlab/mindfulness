@@ -22,7 +22,7 @@ use App\Models\QuizAnswers;
 Route::middleware('web')->group(function () {
     //default
     Route::redirect("/","/home");
-    Route::redirect('/study', 'https://draft.mindfulnesslab.hdfs.uconn.edu/healing-hearts/');
+    Route::redirect('/study', config('app.study_url'));
 
     //AUTHENTICATION
     //login page
@@ -101,6 +101,7 @@ Route::middleware('web')->group(function () {
         //NEW EXPLORE
         Route::get('/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
         Route::get('/explore/module/{module_id}/{activity_id?}', [PageNavController::class, 'exploreModule'])->name('explore.module');
+        Route::get('/explore/bonus/{activity_id?}', [PageNavController::class, 'exploreBonus'])->name('explore.bonus');
         Route::get('/checkActivity/{activity_id}', [PageNavController::class, 'checkActivityLocked'])->name('check.activity');
         Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
         // use for when skipping warning modal

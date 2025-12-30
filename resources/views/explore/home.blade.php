@@ -54,6 +54,31 @@
                 </div>
             </div>
         @endforeach
+        @if ($bonusInfo['numberBonusUnlocked'] > 0)
+            <hr>
+            <div class="row mb-3 justify-content-center">
+                <div class="col-12">
+                    <div class="h-100">
+                        <div class="card p-2 module mb-2">
+                            <a id="bonusLink" href="{{ route('explore.bonus') }}" class="stretched-link w-100 module-link">
+                                @php
+                                    $petals = floor($bonusInfo['numberBonusCompleted'] / $bonusInfo['totalBonus'] * 5);
+                                @endphp
+                                <img src="{{ Storage::url('flowers/Flower-'.$petals.'.svg') }}" alt="Icon">
+                                <div class="col">
+                                    <h6 class="mb-0">Bonus Activities</h6>
+                                    <ul class="text-muted ps-2 mb-0">
+                                        <li class="list-check{{ $bonusInfo['numberBonusUnlocked'] == $bonusInfo['totalBonus'] ? '-filled' : '' }}">{{ $bonusInfo['numberBonusUnlocked'] }}/{{ $bonusInfo['totalBonus'] }} Activities Unlocked</li>
+                                        <li class="list-check{{ $bonusInfo['numberBonusCompleted'] == $bonusInfo['totalBonus'] ? '-filled' : '' }}">{{ $bonusInfo['numberBonusCompleted'] }}/{{ $bonusInfo['totalBonus'] }} Activities Completed</li>
+                                    </ul>
+                                </div>
+                            </a>
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 </div>
 @endsection

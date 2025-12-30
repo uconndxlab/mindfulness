@@ -122,4 +122,6 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+
+    'study_url' => env('APP_STUDY_URL', config('app.url')),
 ];

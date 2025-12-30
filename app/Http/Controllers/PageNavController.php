@@ -53,8 +53,10 @@ class PageNavController extends Controller
             $module->completedCheckInDays = $stats['completedCheckInDays'];
             $module->totalCheckInDays = $stats['totalCheckInDays'];
         }
+
+        $bonusInfo = $user->getBonusStats();
     
-        return view("explore.home", compact('modules'));
+        return view("explore.home", compact('modules', 'bonusInfo'));
     }
 
     public function exploreModule($module_id, $activity_id=null)
@@ -66,7 +68,7 @@ class PageNavController extends Controller
         // put check in days first
         $module->days = $module->days->sortBy('order');
         foreach ($module->days as $day) {
-            $day->activities = $day->activities->sortBy('order');
+            $day->activities = $day->activities->where('optional', false)->sortBy('order');
         }
 
         // get user_module information
@@ -123,6 +125,67 @@ class PageNavController extends Controller
         Session::put('previous_explore', route('explore.module', ['module_id' => $module_id]));
         
         return view("explore.module", compact('module', 'page_info', 'accordion_activity_id',));
+    }
+
+    public function exploreBonus($activity_id=null)
+    {
+        $user = Auth::user();
+        $stats = $user->getBonusStats();
+
+        if ($stats['numberBonusUnlocked'] == 0) {
+            return redirect()->route('explore.home');
+        }
+
+        $activities = $user->bonusActivities()
+            ->with('day')
+            ->join('days', 'activities.day_id', '=', 'days.id')
+            ->orderBy('days.order', 'asc')
+            ->orderBy('activities.order', 'asc')
+            ->select('activities.*')
+            ->get();
+        
+        // group activities by day
+        $activitiesByDay = $activities->groupBy('day_id')->map(function ($dayActivities) {
+            return [
+                'day' => $dayActivities->first()->day,
+                'activities' => $dayActivities
+            ];
+        });
+
+        $accordion_activity = $activity_id ? Activity::find($activity_id) : null;
+        $accordion_activity_id = null;
+
+        // progress info
+        foreach ($activitiesByDay as $groupKey => $group) {
+            $day = $group['day'];
+            $day->unlocked = $day->canBeAccessedBy($user);
+            $day->completed = $day->isCompletedBy($user);
+            
+            // set active day if accordion_activity matches
+            if ($accordion_activity && $day->id == $accordion_activity->day_id) {
+                $accordion_activity_id = $accordion_activity->id;
+                $day->active = true;
+            } else {
+                $day->active = false;
+            }
+            
+            // activity statuses
+            foreach ($group['activities'] as $activity) {
+                $activity->unlocked = $activity->canBeAccessedBy($user);
+                $activity->completed = $activity->isCompletedBy($user);
+            }
+        }
+
+        // page info
+        $page_info = [];
+        $page_info['back_label'] = " Back to Home";
+        $page_info['back_route'] = route('explore.home');
+
+        // navigation
+        Session::put('current_nav', ['route' => route('explore.bonus'), 'back' => 'Bonus Activities']);
+        Session::put('previous_explore', route('explore.bonus'));
+        
+        return view("explore.bonus", compact('activitiesByDay', 'page_info', 'accordion_activity_id', 'stats'));
     }
 
     public function checkActivityLocked($activity_id) {

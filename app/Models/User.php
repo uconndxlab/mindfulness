@@ -166,10 +166,30 @@ class User extends Authenticatable implements MustVerifyEmail
             ->exists() : false;
     }
 
-    public function unlockedActivities()
+    // bonus activites
+    public function bonusActivities()
     {
         return $this->activities()
-        ->wherePivot('unlocked', true);
+            ->wherePivot('unlocked', true)
+            ->where('optional', true);
+    }
+
+    public function completedBonusActivities()
+    {
+        return $this->activities()
+            ->wherePivot('unlocked', true)
+            ->wherePivot('completed', true)
+            ->where('optional', true);
+    }
+
+    public function getBonusStats()
+    {
+
+        return [
+            'totalBonus' => Activity::where('optional', true)->count(),
+            'numberBonusCompleted' => $this->completedBonusActivities()->count(),
+            'numberBonusUnlocked' => $this->bonusActivities()->count(),
+        ];
     }
 
     public function isActivityFavorited(?Activity $activity)
