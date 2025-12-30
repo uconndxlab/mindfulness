@@ -82,10 +82,12 @@
                                         </span>
                                     </td>
                                     @break
-                                @case('created_at')
+                                @case('last_sent_at')
                                     <td>
-                                        {{ $invitation->created_at->timezone(auth()->user()->timezone ?? config('app.timezone'))->format('M d, Y g:i A') }}
-                                        <br><small class="text-muted">{{ $invitation->created_at->diffForHumans() }}</small>
+                                        @php
+                                            $lastSent = $invitation->last_sent_at ?? $invitation->created_at;
+                                        @endphp
+                                        {{ $lastSent->timezone(auth()->user()->timezone ?? config('app.timezone'))->format('M d, Y g:i A') }}
                                     </td>
                                     @break
                                 @case('expires_at')
@@ -93,10 +95,8 @@
                                         {{ $invitation->expires_at->timezone(auth()->user()->timezone ?? config('app.timezone'))->format('M d, Y g:i A') }}
                                         @if($invitation->status === 'pending' && $invitation->expires_at->isPast())
                                             <br><small class="text-danger">(Expired)</small>
-                                        @elseif($invitation->status === 'pending' && $invitation->expires_at->diffInHours() < 24)
+                                        @elseif($invitation->status === 'pending' && now()->diffInHours($invitation->expires_at) < 24)
                                             <br><small class="text-warning">(Expires soon)</small>
-                                        @else
-                                            <br><small class="text-muted">{{ $invitation->expires_at->diffForHumans() }}</small>
                                         @endif
                                     </td>
                                     @break
@@ -114,14 +114,16 @@
                                     @break
                                 @case('actions')
                                     <td>
-                                        @if($invitation->status === 'pending' && $invitation->expires_at->isFuture())
+                                        @if($invitation->status === 'pending' || $invitation->status === 'expired')
                                             <div class="btn-group" role="group" aria-label="Invitation Actions">
                                                 <button wire:click="resendInvitation({{ $invitation->id }})" class="btn btn-sm btn-info btn-fit" data-bs-toggle="tooltip" title="Resend Invitation">
                                                     <i class="bi bi-envelope-fill"></i>
                                                 </button>
-                                                <button wire:click="revokeInvitation({{ $invitation->id }})" class="btn btn-sm btn-danger btn-fit" data-bs-toggle="tooltip" title="Revoke Invitation">
-                                                    <i class="bi bi-x-circle-fill"></i>
-                                                </button>
+                                                @if($invitation->status === 'pending' && $invitation->expires_at->isFuture())
+                                                    <button wire:click="revokeInvitation({{ $invitation->id }})" class="btn btn-sm btn-danger btn-fit" data-bs-toggle="tooltip" title="Revoke Invitation">
+                                                        <i class="bi bi-x-circle-fill"></i>
+                                                    </button>
+                                                @endif
                                             </div>
                                         @else
                                             <span class="text-muted">-</span>

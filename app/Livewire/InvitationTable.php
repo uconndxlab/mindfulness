@@ -20,14 +20,14 @@ class InvitationTable extends Component
     #[Url(except: 'all')]
     public $statusFilter = 'all';
     
-    public $sortColumn = 'created_at';
+    public $sortColumn = 'last_sent_at';
     public $sortDirection = 'desc';
 
     public $columns = [
         'email' => ['label' => 'Email', 'sortable' => true],
         'invited_by' => ['label' => 'Invited By', 'sortable' => false],
         'status' => ['label' => 'Status', 'sortable' => true],
-        'created_at' => ['label' => 'Sent', 'sortable' => true],
+        'last_sent_at' => ['label' => 'Sent', 'sortable' => true],
         'expires_at' => ['label' => 'Expires', 'sortable' => true],
         'used_at' => ['label' => 'Used', 'sortable' => true],
         'actions' => ['label' => 'Actions', 'sortable' => false],
@@ -93,16 +93,29 @@ class InvitationTable extends Component
             $invitation = Invitation::findOrFail($invitationId);
 
             // only resend pending invitations
-            if ($invitation->status !== 'pending') {
+            if ($invitation->status !== 'pending' && $invitation->status !== 'expired') {
                 session()->flash('error', 'Can only resend pending invitations.');
                 return;
             }
 
-            // check if expired
-            if ($invitation->expires_at->isPast()) {
-                $invitation->markAsExpired();
-                session()->flash('error', 'This invitation has expired.');
-                return;
+            // check if expired - mark as pending
+            if ($invitation->status === 'expired' || $invitation->expires_at->isPast()) {
+                // check for active pending invitations for this email
+                $activePendingInvitations = Invitation::where('email', $invitation->email)
+                    ->where('status', 'pending')
+                    ->where('expires_at', '>', Carbon::now())
+                    ->count();
+                if ($activePendingInvitations > 0) {
+                    session()->flash('error', 'An active invitation already exists for this email.');
+                    return;
+                }
+                $invitation->markAsPending();
+            }
+            else {
+                $invitation->update([
+                    'last_sent_at' => Carbon::now(),
+                    'resend_count' => $invitation->resend_count + 1,
+                ]);
             }
 
             // resend the email

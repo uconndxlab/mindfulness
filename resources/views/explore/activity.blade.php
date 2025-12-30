@@ -111,7 +111,7 @@
             </div>
         @endif
         <div id="comp_message" class="mt-2 d-none">
-            <div class="text-success completion-message">
+            <div class="completion-message">
                 @markdown(is_string($activity->completion_message ?? null) ? $activity->completion_message : 'Congrats on completing this activity!')
             </div>
         </div>

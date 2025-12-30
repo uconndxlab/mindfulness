@@ -897,14 +897,14 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     margin-left:-10px;
 }
 
-.feedback-div, .text-success{
+.feedback-div, .completion-message{
     padding:20px;
     background:#f5f5f5;
     border-radius:20px;
     border:2px solid var(--light-green)
 }
 
-.text-success{
+.completion-message{
     margin-top:20px;
 }
 

@@ -4,6 +4,7 @@ function initInvitationToggle() {
 
     const toggleIcon = document.getElementById('invitation_icon');
     const toggleText = document.getElementById('invitation_text');
+    const modeStatus = document.getElementById('invitation_mode_status');
     const route = toggleButton.dataset.route;
     if (!route) return;
 
@@ -33,6 +34,9 @@ function initInvitationToggle() {
                 toggleIcon.classList.toggle('bi-envelope-slash', isEnabled);
                 toggleIcon.classList.toggle('bi-envelope-check', !isEnabled);
                 toggleText.textContent = isEnabled ? 'Disable Invitation-Only Mode' : 'Enable Invitation-Only Mode';
+                modeStatus.classList.toggle('text-success', isEnabled);
+                modeStatus.classList.toggle('text-danger', !isEnabled);
+                modeStatus.textContent = isEnabled ? '[ENABLED]' : '[DISABLED]';
             } else {
                 throw new Error(data.error || 'Failed to toggle invitation mode');
             }

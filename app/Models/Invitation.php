@@ -16,11 +16,14 @@ class Invitation extends Model
         'expires_at',
         'used_at',
         'registered_user_id',
+        'last_sent_at',
+        'resend_count',
     ];
 
     protected $casts = [
         'expires_at' => 'datetime',
         'used_at' => 'datetime',
+        'last_sent_at' => 'datetime',
     ];
 
     // relationships
@@ -81,6 +84,18 @@ class Invitation extends Model
     {
         $this->update([
             'status' => 'expired',
+        ]);
+    }
+
+    public function markAsPending(): void
+    {
+        $time = Carbon::now();
+        $this->update([
+            'status' => 'pending',
+            'token' => self::generateUniqueToken(),
+            'expires_at' => $time->addDays((int) config('invitations.expiration_days', 7)),
+            'last_sent_at' => $time,
+            'resend_count' => $this->resend_count + 1,
         ]);
     }
 

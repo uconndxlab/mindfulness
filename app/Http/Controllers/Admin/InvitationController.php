@@ -64,6 +64,8 @@ class InvitationController extends Controller
                 'invited_by' => Auth::id(),
                 'status' => 'pending',
                 'expires_at' => $expiresAt,
+                'last_sent_at' => Carbon::now(),
+                'resend_count' => 0,
             ]);
 
             // send invitation email

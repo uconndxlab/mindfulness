@@ -11,7 +11,7 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Invitation Settings</h5>
+                    <h5 class="card-title">Invitation Settings - <span id="invitation_mode_status" class="text-{{ $invitation_only_mode ? 'success' : 'danger'}}">{{ $invitation_only_mode ? '[ENABLED]' : '[DISABLED]' }}</span></h5>
                     <button 
                         id="invitation_toggle_btn" 
                         class="btn btn-{{ $invitation_only_mode ? 'primary' : 'warning'}}" 
