@@ -136,6 +136,7 @@ class AuthController extends Controller
         try {
             // check if invitation-only mode is enabled and validate invitation
             $invitation = null;
+            $skipEmailValidation = false;
             if (getConfig('invitation_only_mode', false)) {
                 $invitationToken = $request->input('invitation_token');
                 
@@ -153,6 +154,7 @@ class AuthController extends Controller
                 if ($invitation->email !== $request->input('email')) {
                     return back()->withErrors(['error' => 'Email must match the invitation email.']);
                 }
+                $skipEmailValidation = true;
             }
             
             //create user
@@ -169,6 +171,9 @@ class AuthController extends Controller
             // mark invitation as used if it exists
             if ($invitation) {
                 $invitation->markAsUsed($user);
+
+                $user->email_verified_at = Carbon::now();
+                $user->save();
             }
             
             //unlocking first module/day/activity
@@ -176,7 +181,9 @@ class AuthController extends Controller
             unlockFirst($user->id);
           
             //login, redirect, event hits MustVerifyEmail which calls sendEmailVerificationNotification
-            event(new Registered($user));
+            if (!$skipEmailValidation) {
+                event(new Registered($user));
+            }
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
             $request->session()->regenerateToken();
@@ -192,7 +199,7 @@ class AuthController extends Controller
                 ->causedBy($user)
                 ->log('Registered');
 
-            return redirect(route('verification.notice'));
+            return $skipEmailValidation ? redirect()->route('explore.home') : redirect()->route('verification.notice');
         }
         catch (\Exception $e) {
             return back()->withErrors(['error' => 'An error occurred. Please try again.']);
