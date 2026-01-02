@@ -61,17 +61,19 @@
                     @foreach ($content->audio_options as $voice => $file_path)
                         @php
                             $audioTitle = $activity->title;
-                            $audioArtist = "Healing Hearts";
+                            $audioArtist = config('app.name');
                             $audioArtwork = asset('icons/hh_512x512.png');
+                            $audioVoice = 'audio-'.\Illuminate\Support\Str::slug($voice);
                         @endphp
-                        <div id="audio_content" class="content-main d-none" voice="{{ $voice }}" data-type="audio">
+                        <div id="audio_content" class="content-main d-none" voice="{{ $audioVoice }}" data-type="audio">
                             <x-audio-player :file="$file_path" 
-                                :id="$voice" 
+                                :id="$audioVoice" 
                                 :allowSeek="$allowSeek" 
                                 :allowPlaybackRate="$allowPlaybackRate"
                                 :title="$audioTitle"
                                 :artist="$audioArtist"
-                                :artwork="$audioArtwork"/>
+                                :artwork="$audioArtwork"
+                                :voiceDisplay="$voice"/>
                         </div>
                     @endforeach
                 </div>
@@ -111,7 +113,7 @@
             </div>
         @endif
         <div id="comp_message" class="mt-2 d-none">
-            <div class="completion-message">
+            <div class="text-success completion-message">
                 @markdown(is_string($activity->completion_message ?? null) ? $activity->completion_message : 'Congrats on completing this activity!')
             </div>
         </div>

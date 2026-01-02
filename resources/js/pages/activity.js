@@ -203,7 +203,7 @@ function initActivityPage() {
                 // handle all audio players (both in audio_content and main content area)
                 const audioPlayers = document.querySelectorAll('.slide__audio-player');
                 audioPlayers.forEach(player => {
-                    player.addEventListener('ended', () => activityComplete(true, player.getAttribute('voice') ??  'none'));
+                    player.addEventListener('ended', () => activityComplete(true, player.dataset.voiceDisplay ??  'none'));
                     
                     // track pause events
                     player.addEventListener('pause', function() {

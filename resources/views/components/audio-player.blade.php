@@ -5,7 +5,7 @@
     data-title="{{ $title ?? 'Audio Track' }}"
     data-artist="{{ $artist ?? 'Unknown Artist' }}"
     data-artwork="{{ $artwork ?? '' }}">
-    <audio id="audio-{{ $id }}" class="slide__audio-player media-player" preload="auto" src="{{ Storage::url('content/'.$file) }}" voice="{{ $id }}"></audio>
+    <audio id="audio-{{ $id }}" class="slide__audio-player media-player" preload="auto" src="{{ Storage::url('content/'.$file) }}" voice="{{ $id }}" data-voice-display="{{ $voiceDisplay }}"></audio>
     <div class="audio__controls">
         <svg version="1.1" id="circle" width="300px" height="300px" viewBox="-5 -5 110 110">
             <path id="track" fill="none" stroke-meterlimit="10" d="M50,2.9L50,2.9C76,2.9,97.1,24,97.1,50v0C97.1,76,76,97.1,50,97.1h0C24,97.1,2.9,76,2.9,50v0C2.9,24,24,2.9,50,2.9z"/>

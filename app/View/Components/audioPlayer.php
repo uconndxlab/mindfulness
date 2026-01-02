@@ -8,7 +8,6 @@ use Illuminate\View\Component;
 
 class audioPlayer extends Component
 {
-    
     public $file;
     public $id;
     public $allowSeek;
@@ -16,11 +15,12 @@ class audioPlayer extends Component
     public $title;
     public $artist;
     public $artwork;
+    public $voiceDisplay;
 
     /**
      * Create a new component instance.
      */
-    public function __construct($file, $id = null, $allowSeek = false, $allowPlaybackRate = false, $title = null, $artist = null, $artwork = null)
+    public function __construct($file, $id = null, $allowSeek = false, $allowPlaybackRate = false, $title = null, $artist = null, $artwork = null, $voiceDisplay = null)
     {
         $this->file = $file;
         $this->id = $id;
@@ -29,6 +29,7 @@ class audioPlayer extends Component
         $this->title = $title;
         $this->artist = $artist;
         $this->artwork = $artwork;
+        $this->voiceDisplay = $voiceDisplay;
     }
 
     /**

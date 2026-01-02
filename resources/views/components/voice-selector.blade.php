@@ -8,13 +8,19 @@
         </button>
         <ul class="dropdown-menu" id="voice_dropdown">
             @foreach ($voices as $voice => $_)
+                @php
+                    $voiceSlug = 'audio-'.\Illuminate\Support\Str::slug($voice);
+                @endphp
                 <li>
-                    <button class="dropdown-item" type="button" value="{{ $voice }}" data-voice="{{ $voice }}">
+                    <button class="dropdown-item" type="button" value="{{ $voice }}" data-voice="{{ $voiceSlug }}">
                         {{ $voice }}
                     </button>
                 </li>
             @endforeach
         </ul>
-        <input type="hidden" id="voice_select" name="voice_select" value="{{ $defaultVoice }}">
+        @php
+            $defaultVoiceSlug = 'audio-'.\Illuminate\Support\Str::slug($defaultVoice);
+        @endphp
+        <input type="hidden" id="voice_select" name="voice_select" value="{{ $defaultVoice }}" data-voice="{{ $defaultVoiceSlug }}">
     </div>
 </div>

@@ -904,7 +904,7 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     border:2px solid var(--light-green)
 }
 
-.completion-message{
+.completion-message {
     margin-top:20px;
 }
 
