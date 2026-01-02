@@ -31,8 +31,6 @@ function initActivityPage() {
                 behavior: 'smooth'
             });
         }, 200);
-        // do not show buttons if completed
-        if (status === 'completed') return;
         redirectDiv.querySelectorAll('.redirect-btn').forEach(btn => {
             btn.classList.remove('d-none');
             btn.classList.remove('disabled');
