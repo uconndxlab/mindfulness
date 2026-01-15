@@ -23,6 +23,7 @@ class ReflectionTable extends Component
         'subject' => ['label' => 'Subject', 'sortable' => false],
         'reflection_type' => ['label' => 'Type', 'sortable' => true],
         'answers' => ['label' => 'Answers', 'sortable' => false],
+        'detailed_answers' => ['label' => 'Details', 'sortable' => false],
         'created_at' => ['label' => 'Created At', 'sortable' => true],
         'updated_at' => ['label' => 'Updated At', 'sortable' => true],
     ];
@@ -46,7 +47,7 @@ class ReflectionTable extends Component
         // build query with eager loading
         $query = QuizAnswers::with([
             'user:id,hh_id',
-            'quiz:id,title',
+            'quiz:id,title,question_options',
             'activity:id,title',
             'subject'
         ]);

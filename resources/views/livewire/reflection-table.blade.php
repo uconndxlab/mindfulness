@@ -95,6 +95,17 @@
                                 @case('answers')
                                     <td>{{ $this->formatAnswers($reflection->answers) }}</td>
                                     @break
+
+                                @case('detailed_answers')
+                                    <td>
+                                        <button class="btn btn-info btn-sm" data-open-modal data-modal-label="Answer Details" data-modal-body-from="#details-{{ $reflection->id }}">
+                                            <i class="bi bi-eye"></i> View
+                                        </button>
+                                        <div id="details-{{ $reflection->id }}" class="d-none">
+                                            <x-detailed-answers :reflection="$reflection" />
+                                        </div>
+                                    </td>
+                                    @break
                                 
                                 @case('created_at')
                                     <td>{{ $reflection->created_at?->format('Y-m-d H:i:s') }}</td>
@@ -119,5 +130,3 @@
         </div>
     </div>
 </div>
-
-

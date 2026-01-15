@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\QuizAnswers;
+
 class QuizAnswerFormatter
 {
     // format quiz answers
@@ -86,6 +88,184 @@ class QuizAnswerFormatter
         }
         
         return (string) $value;
+    }
+
+    // formatting the detailed answers
+    public static function getQuestionsWithAnswers(QuizAnswers $reflection): array
+    {
+        $quiz = $reflection->quiz;
+        
+        if (!$quiz || !$quiz->question_options) {
+            return [];
+        }
+
+        $answers = $reflection->answers ?? [];
+        $questionOptions = $quiz->question_options;
+        $result = [];
+
+        // iterate through question options
+        foreach ($questionOptions as $index => $questionData) {
+            // get user answer
+            $questionNumber = $questionData['number'] ?? ($index + 1);
+            $answerKey = array_keys($answers)[$index] ?? null;
+            $userAnswer = $answerKey !== null ? $answers[$answerKey] : null;
+
+            // save formatted result
+            $result[] = [
+                'number' => $questionNumber,
+                'question' => $questionData['question'] ?? 'No question text',
+                'type' => $questionData['type'] ?? 'unknown',
+                'options' => $questionData['options'] ?? [],
+                'user_answer' => $userAnswer,
+                'formatted_answer' => self::formatAnswerByType(
+                    $questionData['type'] ?? 'unknown',
+                    $userAnswer,
+                    $questionData['options'] ?? []
+                )
+            ];
+        }
+
+        return $result;
+    }
+
+    private static function formatAnswerByType(string $type, $answer, array $options): array
+    {
+        if (is_null($answer)) {
+            return [
+                'type' => $type,
+                'display' => 'No answer provided',
+                'items' => []
+            ];
+        }
+
+        // format answer based on type
+        switch ($type) {
+            case 'slider':
+                return self::formatSliderAnswer($answer, $options);
+            
+            case 'checkbox':
+                return self::formatCheckboxAnswer($answer, $options);
+            
+            case 'radio':
+                return self::formatRadioAnswer($answer, $options);
+            
+            default:
+                return [
+                    'type' => $type,
+                    'display' => 'Unknown question type',
+                    'items' => []
+                ];
+        }
+    }
+
+    private static function formatSliderAnswer($answer, array $options): array
+    {
+        $items = [];
+
+        if (!is_array($answer)) {
+            return ['type' => 'slider', 'display' => 'Invalid answer format', 'items' => []];
+        }
+
+        foreach ($answer as $keyValuePair) {
+            $optionId = (string)array_key_first($keyValuePair);
+            $value = $keyValuePair[$optionId];
+
+            // get slider option
+            $option = self::findOptionById($options, $optionId);
+            
+            // get question and answer
+            if ($option) {
+                $items[] = [
+                    'text' => $option['text'] ?? 'Unknown',
+                    'value' => is_numeric($value) ? $value : 0
+                ];
+            }
+        }
+
+        return [
+            'type' => 'slider',
+            'display' => count($items) . ' slider response(s)',
+            'items' => $items
+        ];
+    }
+
+    private static function formatCheckboxAnswer($answer, array $options): array
+    {
+        $items = [];
+
+        if (!is_array($answer)) {
+            return ['type' => 'checkbox', 'display' => 'Invalid answer format', 'items' => []];
+        }
+
+        foreach ($answer as $selection) {
+            if (is_array($selection)) {
+                foreach ($selection as $optionId => $value) {
+                    $option = self::findOptionById($options, $optionId);
+                    $items[] = self::getAnswerItem($option, $value);
+                }
+            }
+        }
+
+        return [
+            'type' => 'checkbox',
+            'display' => count($items) . ' option(s) selected',
+            'items' => $items
+        ];
+    }
+
+    private static function formatRadioAnswer($answer, array $options): array
+    {
+        $items = [];
+
+        if (!is_array($answer)) {
+            return ['type' => 'radio', 'display' => 'Invalid answer format', 'items' => []];
+        }
+
+        foreach ($answer as $optionId => $value) {
+            $option = self::findOptionById($options, $optionId);
+            $items[] = self::getAnswerItem($option, $value);
+            
+            return [
+                'type' => 'radio',
+                'display' => $option['text'] ?? "Option $optionId",
+                'items' => $items
+            ];
+        }
+
+        return [
+            'type' => 'radio',
+            'display' => 'No selection',
+            'items' => []
+        ];
+    }
+
+    private static function getAnswerItem(array $option, $value): array
+    {
+        if ($option) {
+            if (is_null($value)) {
+                return [
+                    'text' => $option['text'] ?? "Option $optionId",
+                    'selected' => true
+                ];
+            }
+            elseif ($option['allow_other']) {
+                return [
+                    'text' => '**'.$option['text'].':** '.$value,
+                    'selected' => true
+                ];
+            }
+        }
+        return null;
+    }
+
+    private static function findOptionById(array $options, $id)
+    {
+        foreach ($options as $option) {
+            if (isset($option['id']) && $option['id'] == $id) {
+                return $option;
+            }
+        }
+        return null;
     }
 }
 
