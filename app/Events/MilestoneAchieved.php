@@ -11,8 +11,12 @@ class MilestoneAchieved
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(
-        public User $user,
-        public MilestoneType $type
-    ) {}
+    public User $user;
+    public string $milestoneType;
+
+    public function __construct(User $user, MilestoneType $type)
+    {
+        $this->user = $user;
+        $this->milestoneType = $type->value;
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Enums\MilestoneType;
 use App\Events\MilestoneAchieved;
 use App\Mail\MilestoneAchievedMail;
 use App\Models\UserMilestone;
@@ -12,9 +13,11 @@ class RecordMilestone implements ShouldQueue
 {
     public function handle(MilestoneAchieved $event): void
     {
+        $type = MilestoneType::from($event->milestoneType);
+
         // record milestone
         $milestone = UserMilestone::firstOrCreate(
-            ['user_id' => $event->user->id, 'type' => $event->type],
+            ['user_id' => $event->user->id, 'type' => $type],
             ['achieved_at' => now()]
         );
         
@@ -26,7 +29,7 @@ class RecordMilestone implements ShouldQueue
         // notify admin
         $adminEmail = config('mail.contact_email');
         if ($adminEmail) {
-            Mail::to($adminEmail)->send(new MilestoneAchievedMail($event->user, $event->type));
+            Mail::to($adminEmail)->send(new MilestoneAchievedMail($event->user, $type));
             $milestone->update(['admin_notified_at' => now()]);
         }
     }
