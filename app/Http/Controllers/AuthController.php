@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MilestoneType;
+use App\Events\MilestoneAchieved;
 use App\Rules\ValidEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
@@ -199,6 +201,9 @@ class AuthController extends Controller
                 ->causedBy($user)
                 ->log('Registered');
 
+            // record milestone
+            event(new MilestoneAchieved($user, MilestoneType::Registered));
+            
             return $skipEmailValidation ? redirect()->route('explore.home') : redirect()->route('verification.notice');
         }
         catch (\Exception $e) {

@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Enums\MilestoneType;
 use App\Events\DayCompleted;
+use App\Events\MilestoneAchieved;
 use App\Models\Activity;
 use App\Models\Day;
 use App\Models\Module;
@@ -54,6 +56,11 @@ class ProgressService
         ]);
         $result['activity_completed'] = true;
         // activity completion logged in activity controller
+
+        $firstActivity = Activity::where('optional', false)->orderBy('order')->first();
+        if ($activity->id === $firstActivity->id) {
+            event(new MilestoneAchieved($user, MilestoneType::FirstActivity));
+        }
 
         // if activity is not optional
         if (!$activity->optional) {
@@ -259,6 +266,9 @@ class ProgressService
                 'module' => $module->name,
             ])
             ->log('Module completed');
+
+        // record milestone
+        event(new MilestoneAchieved($user, MilestoneType::forModule($module->order)));
 
         // get next module
         $nextModule = Module::where('order', '>', $module->order)->orderBy('order')->first();
