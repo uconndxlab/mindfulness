@@ -23,6 +23,27 @@ enum MilestoneType: string
         };
     }
 
+    public function color(): string
+    {
+        return match ($this) {
+            self::Registered => 'info',
+            self::FirstActivity => 'warning',
+            default => 'success',
+        };
+    }
+
+    public function badgeLabel(): string
+    {
+        return match ($this) {
+            self::Registered => 'Registered',
+            self::FirstActivity => 'First Activity',
+            self::Module1 => 'Module 1',
+            self::Module2 => 'Module 2',
+            self::Module3 => 'Module 3',
+            self::Module4 => 'Module 4',
+        };
+    }
+
     public static function forModule(int $moduleOrder): ?self
     {
         return match ($moduleOrder) {

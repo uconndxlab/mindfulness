@@ -1073,7 +1073,7 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 
 /* nowrap on table cols */
 .table-nowrap th,
-.table-nowrap td:not(.email-column) {
+.table-nowrap td:not(.email-column, .milestones-column) {
     white-space: nowrap !important;
 }
 
@@ -1083,6 +1083,11 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     width: 150px;
     word-break: break-word;
     overflow-wrap: break-word;
+    white-space: normal !important;
+}
+
+.milestones-column {
+    min-width: 200px;
     white-space: normal !important;
 }
 

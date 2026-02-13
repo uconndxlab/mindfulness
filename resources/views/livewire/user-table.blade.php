@@ -62,6 +62,13 @@
                                         </span>
                                     </td>
                                     @break
+                                @case('milestones')
+                                    <td class="milestones-column">
+                                        @foreach ($user->milestones->sortBy('achieved_at') as $milestone)
+                                            <span class="badge bg-{{ $milestone->type->color() }} mb-1">{{ $milestone->type->badgeLabel() }}</span>
+                                        @endforeach
+                                    </td>
+                                    @break
                                 @case('created_at')
                                     <td>{{ $user->created_at->format('M d, Y') }}</td>
                                     @break
