@@ -139,7 +139,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function activities()
     {
         return $this->belongsToMany(Activity::class, 'user_activity')
-            ->withPivot('completed', 'unlocked', 'favorited');
+            ->withPivot('completed', 'unlocked', 'favorited', 'completed_at');
     }
 
     public function days()
@@ -151,7 +151,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function modules()
     {
         return $this->belongsToMany(Module::class, 'user_module')
-            ->withPivot('completed', 'unlocked');
+            ->withPivot('completed', 'unlocked', 'completed_at');
     }
 
     // activity progress functions

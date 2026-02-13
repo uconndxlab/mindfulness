@@ -13,11 +13,15 @@ class RecordMilestone implements ShouldQueue
     public function handle(MilestoneAchieved $event): void
     {
         // record milestone
-        $milestone = UserMilestone::create([
-            'user_id' => $event->user->id,
-            'type' => $event->type,
-            'achieved_at' => now(),
-        ]);
+        $milestone = UserMilestone::firstOrCreate(
+            ['user_id' => $event->user->id, 'type' => $event->type],
+            ['achieved_at' => now()]
+        );
+        
+        // if it was not just created, return
+        if (!$milestone->wasRecentlyCreated) {
+            return;
+        }
 
         // notify admin
         $adminEmail = config('mail.contact_email');
