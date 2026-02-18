@@ -8,7 +8,7 @@
         <form id="quizForm" method="POST" class="pt-3" data-quiz-id="{{ $quiz->id }}" data-answers='@json($quiz->answers)' data-average="{{ $quiz->average }}">
             @csrf
             @foreach ($quiz->question_options as $question)
-                @include('components.quiz.question', ['question' => $question, 'isFirst' => $question['number'] == 1])
+                @include('components.quiz.question', ['question' => $question, 'isFirst' => $question['number'] == 1, 'quizType' => $quiz->type, 'part' => $quiz->activity->day->module->id])
             @endforeach
             
             @include('components.quiz.navigation', ['hasMultipleQuestions' => $quiz->question_count > 1])
