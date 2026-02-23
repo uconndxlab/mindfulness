@@ -51,50 +51,7 @@
         <hr>
         <label class="form-label">
             <div class="quiz-slider-label">
-                @if ($quizType === 'check_in')
-                    {{-- markdown class can probably be removed and replaced with other styling, now that questions are hardcoded --}}
-                    {{-- consider the styles applied to .markdown --}}
-                    {{-- removed inline styles too, they will not work --}}
-                    {{-- prior system was style by ".markdown p" or ".markdown blockquote" --}}
-                    <div class="markdown">
-                        @switch($option['id'])
-                            @case('1')
-                                <p>When my mind wandered to things in the past or future, I tried to bring my attention back to the present moment, gently and with firm intention.</p>
-                                @break
-                            @case('2')
-                                <p>When I became aware of difficult feelings or memories, I recalled what I learned about the COMPASS attitudes, so I was able to be in touch with how I felt in the present moment.</p>
-                                <blockquote>
-                                    <p><em>Reminder: COMPASS = Curiosity, Openness, Mercy, Patience, Agency, Surrender, and Savoring.</em></p>
-                                </blockquote>
-                                @break
-                        @endswitch
-                    </div>
-                @elseif ($quizType === 'rate_my_awareness')
-                    <div class="markdown">
-                        @switch($option['id'])
-                            @case('1')
-                                <p>During practice, I attempted to return to my present-moment experience, whether unpleasant, pleasant, or neutral.</p>
-                                @break
-                            @case('2')
-                                <p>During practice, I attempted to return to each experience, no matter how difficult, with a sense that "It's OK to experience this".</p>
-                                @break
-                            @case('3')
-                                <p>During practice, I attempted to feel each experience as bare sensations in the body (tension in throat, movement in belly, etc.).</p>
-                                @break
-                            @case('4')
-                                <p>During practice, I was struggling against having certain experiences (e.g., unpleasant thoughts, emotions, bodily sensations).</p>
-                                @break
-                            @case('5')
-                                <p>During practice, I was actively avoiding or "pushing away" certain experiences.</p>
-                                @break
-                            @case('6')
-                                <p>During practice, I was actively trying to fix or change certain experiences, in order to get to a "better place".</p>
-                                @break
-                        @endswitch
-                    </div>
-                @else
-                    @markdown($option['text'])
-                @endif
+                @markdown($option['text'])
             </div>
         </label>
         <div class="quiz-slider slider-container noui-custom-pips">
