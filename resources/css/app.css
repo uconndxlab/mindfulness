@@ -1226,6 +1226,29 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 .quiz-slider-label .markdown {
     font-size: 20px;
 }
+
+.quiz-survey-label .markdown {
+    font-size: 20px;
+}
+
+/* Horizontal survey radio group: value above label, centered, with dividers */
+.quiz-survey {
+    gap: 0;
+}
+.quiz-survey .vr {
+    min-height: 2.5rem;
+}
+.survey-option-cell {
+    min-width: 4.5rem;
+    cursor: pointer;
+}
+.survey-option-cell input[type="radio"] {
+    cursor: pointer;
+}
+.survey-option-value {
+    line-height: 1.2;
+}
+
 /*
 .activity-instructions .markdown {
 }
