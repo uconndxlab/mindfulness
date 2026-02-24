@@ -86,7 +86,7 @@ class ShowDayCompletedModal
             $bodyMessage .= "\n\n You have unlocked **{$nextDayName}**! Click [here]({$checkInRoute}) to complete **{$nextDayName}** before moving on to Part {$nextPartOrder}.";
         }
         if ($hasBonus) {
-            $bonusRoute = route('explore.module', ['module_id' => $day->module_id, 'activity_id' => $day->activities->where('optional', true)->first()->id]);
+            $bonusRoute = route('explore.bonus', ['activity_id' => $day->activities->where('optional', true)->first()->id]);
             $bodyMessage .= "\n\nYou have also unlocked bonus activities for this day! Click [here]({$bonusRoute}) to view them.";
         }
 
