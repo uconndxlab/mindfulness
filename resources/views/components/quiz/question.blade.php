@@ -2,7 +2,7 @@
      class="quiz-div {{ $isFirst ? '' : 'd-none'}}" 
      data-number="{{ $question['number'] }}" 
      data-type="{{ $question['type'] }}" 
-     @if ($question['type'] == 'slider') data-question-json='@json($question)' @endif>
+     @if (in_array($question['type'], ['slider', 'survey'])) data-question-json='@json($question)' @endif>
      
     <div class="d-flex align-items-center gap-2 quiz-question mb-3">
         @markdown($question['question'])

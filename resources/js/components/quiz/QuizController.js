@@ -1,6 +1,7 @@
 import QuizRadioQuestion from './questions/QuizRadioQuestion.js';
 import QuizCheckboxQuestion from './questions/QuizCheckboxQuestion.js';
 import QuizSliderQuestion from './questions/QuizSliderQuestion.js';
+import QuizSurveyQuestion from './questions/QuizSurveyQuestion.js';
 
 /**
  * QuizController - handle quiz logic and navigation
@@ -101,6 +102,14 @@ class QuizController {
                 );
             } else if (questionType === 'slider') {
                 questionComponent = new QuizSliderQuestion(
+                    questionDiv, 
+                    questionNumber, 
+                    (qNum, isAnswered) => this.onQuestionAnswerChange(qNum, isAnswered),
+                    this.average
+                );
+            }
+            else if (questionType === 'survey') {
+                questionComponent = new QuizSurveyQuestion(
                     questionDiv, 
                     questionNumber, 
                     (qNum, isAnswered) => this.onQuestionAnswerChange(qNum, isAnswered),

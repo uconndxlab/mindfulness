@@ -99,7 +99,7 @@
                 @markdown($option['text'])
             </div>
         </label>
-        <div class="quiz-survey mb-3 d-flex justify-content-center align-items-start flex-wrap">
+        <div id="survey_{{ $question['number'] }}_{{ $option['id'] }}" class="quiz-survey mb-3 d-flex justify-content-center align-items-start flex-wrap">
             @foreach ($option['survey_config']['options'] ?? [] as $value => $label)
                 @if (!$loop->first)
                     <div class="vr flex-shrink-0 mx-2 align-self-stretch"></div>
@@ -121,7 +121,7 @@
         @endif
     @endforeach
     <div class="d-flex justify-content-end">
-        <div id="survey_average_display_{{ $question['number'] }}" class="text-muted d-none">
+        <div id="survey_average_display_{{ $question['number'] }}" class="text-muted">
             <strong class="text-link"
                 role="button"
                 tabindex="0"
@@ -133,8 +133,8 @@
                 data-bs-content="This percentage reflects how consistently you returned to your present-moment experience during the practice. A higher score indicates you spent more time being aware and accepting, rather than avoiding or pushing away experiences.">
                 <i class="bi bi-info-circle" ></i> 
                 Practice Quality:
-            </strong> 
-            <span id="survey_average_value_{{ $question['number'] }}" class="pq-score">--</span>
+            </strong>
+            <span id="survey_average_value_{{ $question['number'] }}" class="pq-score">---</span>
         </div>
     </div>
 @endif
