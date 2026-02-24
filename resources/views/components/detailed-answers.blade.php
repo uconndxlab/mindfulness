@@ -17,12 +17,12 @@
                     </div>
                     <div class="answer-section">
                         <h6 class="text-muted">Answer:</h6>
-                        @if($qa['type'] === 'slider')
+                        @if($qa['type'] === 'slider' || $qa['type'] === 'survey')
                             @foreach($qa['formatted_answer']['items'] as $item)
                                 <div class="mb-3 p-3 bg-light rounded">
                                     <div class="mb-2">@markdown($item['text'])</div>
                                     <div class="d-flex align-items-center justify-content-center">
-                                        <span class="stat-value">{{ $item['value'] }}%</span>
+                                        <span class="stat-value">{{ $item['value'] }}</span>
                                     </div>
                                 </div>
                             @endforeach

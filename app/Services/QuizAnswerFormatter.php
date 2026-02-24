@@ -142,6 +142,9 @@ class QuizAnswerFormatter
         switch ($type) {
             case 'slider':
                 return self::formatSliderAnswer($answer, $options);
+
+            case 'survey':
+                return self::formatSurveyAnswer($answer, $options);
             
             case 'checkbox':
                 return self::formatCheckboxAnswer($answer, $options);
@@ -163,7 +166,7 @@ class QuizAnswerFormatter
         $items = [];
 
         if (!is_array($answer)) {
-            return ['type' => 'slider', 'display' => 'Invalid answer format', 'items' => []];
+            return ['type' => 'survey', 'display' => 'Invalid answer format', 'items' => []];
         }
 
         foreach ($answer as $keyValuePair) {
@@ -183,8 +186,44 @@ class QuizAnswerFormatter
         }
 
         return [
-            'type' => 'slider',
-            'display' => count($items) . ' slider response(s)',
+            'type' => 'survey',
+            'display' => count($items) . ' survey response(s)',
+            'items' => $items
+        ];
+    }
+
+    private static function formatSurveyAnswer($answer, array $options): array
+    {
+        $items = [];
+
+        if (!is_array($answer)) {
+            return ['type' => 'survey', 'display' => 'Invalid answer format', 'items' => []];
+        }
+
+        foreach ($answer as $keyValuePair) {
+            // option id pulls the question
+            $optionId = (string)array_key_first($keyValuePair);
+            // value is the answer - can use to get the text answer
+            $value = $keyValuePair[$optionId];
+
+            // get slider option
+            $option = self::findOptionById($options, $optionId);
+
+            // get text answer
+            $textAnswer = $option['survey_config']['options'][(string)$value] ?? 'Unknown';
+
+            // get question and answer
+            if ($option) {
+                $items[] = [
+                    'text' => $option['text'] ?? 'Unknown',
+                    'value' => $value.': '.$textAnswer
+                ];
+            }
+        }
+
+        return [
+            'type' => 'survey',
+            'display' => count($items) . ' survey response(s)',
             'items' => $items
         ];
     }
