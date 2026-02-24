@@ -76,6 +76,11 @@ class QuizAnswersValidRule implements ValidationRule
             case 'slider':
                 \Log::info('Validating slider answer');
                 return $this->validateSliderAnswer($answerValue, $options);
+
+            case 'survey':
+                \Log::info('Validating survey answer');
+                // use the slider validations, but with a max value of 4
+                return $this->validateSliderAnswer($answerValue, $options, 4);
             
             default:
                 $this->errorMessage = "Unknown question type: {$type}.";
@@ -147,10 +152,10 @@ class QuizAnswersValidRule implements ValidationRule
         return true;
     }
 
-    protected function validateSliderAnswer(mixed $answer, array $options): bool
+    protected function validateSliderAnswer(mixed $answer, array $options, int $maxValue = 100): bool
     {
         if (!is_array($answer)) {
-            $this->errorMessage = "Slider answer must be an array.";
+            $this->errorMessage = "Answer must be an array.";
             return false;
         }
 
@@ -158,7 +163,7 @@ class QuizAnswersValidRule implements ValidationRule
 
         foreach ($answer as $answerItem) {
             if (!is_array($answerItem) || count($answerItem) !== 1) {
-                $this->errorMessage = "Invalid slider answer format.";
+                $this->errorMessage = "Invalid answer format.";
                 return false;
             }
 
@@ -167,13 +172,13 @@ class QuizAnswersValidRule implements ValidationRule
 
             // Validate option ID exists
             if (!in_array($optionId, $validOptionIds)) {
-                $this->errorMessage = "Invalid option ID for slider question.";
+                $this->errorMessage = "Invalid option ID.";
                 return false;
             }
 
             // validate numeric value
             if (!is_numeric($value)) {
-                $this->errorMessage = "Slider value must be numeric.";
+                $this->errorMessage = "Value must be numeric.";
                 return false;
             }
 
@@ -186,7 +191,7 @@ class QuizAnswersValidRule implements ValidationRule
             $max = $sliderConfig['max'] ?? 100;
 
             if ($numericValue < $min || $numericValue > $max) {
-                $this->errorMessage = "Slider value must be between {$min} and {$max}.";
+                $this->errorMessage = "Value must be between {$min} and {$max}.";
                 return false;
             }
         }

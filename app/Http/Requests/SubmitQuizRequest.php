@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Quiz;
 use App\Rules\QuizAccessRule;
 use App\Rules\QuizAnswersValidRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -19,11 +20,15 @@ class SubmitQuizRequest extends FormRequest
     public function rules(): array
     {
         $quizId = $this->input('quiz_id') ?? $this->route('quiz_id');
+        $quiz = $quizId ? Quiz::find($quizId) : null;
+        $expectsAverage = $quiz && in_array($quiz->type, ['check_in', 'rate_my_awareness'], true);
 
         return [
             'quiz_id' => ['required', 'integer', new QuizAccessRule()],
             'answers' => ['required', 'json', new QuizAnswersValidRule($quizId)],
-            'average' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'average' => $expectsAverage
+                ? ['required', 'numeric', 'min:0', 'max:4']
+                : ['prohibited'],
         ];
     }
 
@@ -36,7 +41,8 @@ class SubmitQuizRequest extends FormRequest
             'answers.json' => 'Answers must be valid JSON.',
             'average.numeric' => 'Average must be a number.',
             'average.min' => 'Average must be at least 0.',
-            'average.max' => 'Average must not exceed 100.',
+            'average.max' => 'Average must not exceed 4.',
+            'average.prohibited' => 'Average is not accepted for this quiz type.',
         ];
     }
 
