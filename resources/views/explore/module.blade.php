@@ -21,7 +21,7 @@
                 <li class="list-check{{ $module->completedCheckInActivities == $module->totalCheckInActivities ? '-filled' : '' }}">{{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins</li>
             @endif
             @if ($module->totalCheckInDays > 0)
-                <li class="list-check{{ $module->completedCheckInDays == $module->totalCheckInDays ? '-filled' : '' }}">{{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Rate My Awareness</li>
+                <li class="list-check{{ $module->completedCheckInDays == $module->totalCheckInDays ? '-filled' : '' }}">{{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Part {{ $module->order }} Check-In</li>
             @endif
         </ul>
     </div>

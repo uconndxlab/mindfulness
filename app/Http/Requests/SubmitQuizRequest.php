@@ -22,13 +22,25 @@ class SubmitQuizRequest extends FormRequest
         $quizId = $this->input('quiz_id') ?? $this->route('quiz_id');
         $quiz = $quizId ? Quiz::find($quizId) : null;
         $expectsAverage = $quiz && in_array($quiz->type, ['check_in', 'rate_my_awareness'], true);
+        $quizType = $quiz ? ($quiz->question_options[0]['type'] ?? null) : null;
+
+        if ($quizType) {
+            if ($quizType === 'survey') {
+                $averageRule = ['required', 'numeric', 'min:1', 'max:5'];
+            } elseif ($quizType === 'slider') {
+                $averageRule = ['required', 'numeric', 'min:0', 'max:100'];
+            } else {
+                $averageRule = ['prohibited'];
+            }
+        }
+        else {
+            $averageRule = ['prohibited'];
+        }
 
         return [
             'quiz_id' => ['required', 'integer', new QuizAccessRule()],
             'answers' => ['required', 'json', new QuizAnswersValidRule($quizId)],
-            'average' => $expectsAverage
-                ? ['required', 'numeric', 'min:0', 'max:4']
-                : ['prohibited'],
+            'average' => $averageRule,
         ];
     }
 
@@ -41,7 +53,7 @@ class SubmitQuizRequest extends FormRequest
             'answers.json' => 'Answers must be valid JSON.',
             'average.numeric' => 'Average must be a number.',
             'average.min' => 'Average must be at least 0.',
-            'average.max' => 'Average must not exceed 4.',
+            'average.max' => 'Average exceeds the maximum value.',
             'average.prohibited' => 'Average is not accepted for this quiz type.',
         ];
     }
