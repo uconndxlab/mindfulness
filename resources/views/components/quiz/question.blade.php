@@ -4,7 +4,7 @@
      data-type="{{ $question['type'] }}" 
      @if ($question['type'] == 'slider') data-question-json='@json($question)' @endif>
      
-    <div class="text-left quiz-question mb-3">
+    <div class="d-flex align-items-center gap-2 quiz-question mb-3">
         @markdown($question['question'])
     </div>
 
