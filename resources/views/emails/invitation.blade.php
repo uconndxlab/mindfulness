@@ -6,7 +6,7 @@
     <h1 style="color: #1a492d; margin-bottom: 20px;">Welcome to {{ config('app.name') }}!</h1>
 
     <p style="margin-bottom: 15px;">
-        You've been invited to join <strong>{{ config('app.name') }}</strong>, a mindfulness and wellness platform designed to support your journey toward healing and personal growth.
+        <strong>We'd love to invite you to join <em>Healing Hearts</em>, a web app designed to support parents after a recent divorce or separation. It offers guidance and tools to help you feel more confident, grounded, and at peace in your everyday life.</strong>
     </p>
 
     <p style="margin-bottom: 15px;">
