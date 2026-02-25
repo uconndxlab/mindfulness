@@ -7,6 +7,9 @@ class QuizSurveyQuestion {
 
         this.radioElements = new Map();   // optionId -> (value -> radio element)
         this.selectedValues = new Map();  // optionId -> selected value (string)
+        this.inverseOptions = new Map();  // optionId -> boolean (inverse scoring)
+        this.scaleMin = 1;
+        this.scaleMax = 5;
         this.answered = false;
 
         const questionDataJson = this.questionDiv.getAttribute('data-question-json');
@@ -30,9 +33,17 @@ class QuizSurveyQuestion {
         this.averageDisplayDiv = document.getElementById(`survey_average_display_${this.questionNumber}`);
         this.averageValueSpan = document.getElementById(`survey_average_value_${this.questionNumber}`);
 
-        // iterate over the survey questions
+        // determine scale range from first option's survey_config.options keys
+        if (options.length > 0 && options[0].survey_config?.options) {
+            const keys = Object.keys(options[0].survey_config.options).map(Number);
+            this.scaleMin = Math.min(...keys);
+            this.scaleMax = Math.max(...keys);
+        }
+
         for (const option of options) {
             const optionId = option.id;
+            const isInverse = option.inverse_score ?? false;
+            this.inverseOptions.set(optionId, isInverse);
 
             // get the survey div for this option
             const surveyDiv = document.getElementById(`survey_${this.questionNumber}_${optionId}`);
@@ -69,8 +80,13 @@ class QuizSurveyQuestion {
 
         let total = 0;
         let count = 0;
-        for (const [, value] of this.selectedValues) {
-            total += value ? parseInt(value, 10) : 0;
+
+        for (const [optionId, value] of this.selectedValues) {
+            let score = parseInt(value, 10) || 0;
+            if (this.inverseOptions.get(optionId)) {
+                score = this.scaleMax + this.scaleMin - score;
+            }
+            total += score;
             count++;
         }
 
