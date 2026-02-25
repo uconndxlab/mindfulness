@@ -398,8 +398,8 @@ class PageNavController extends Controller
     public function librarySearch(Request $request) {
         // get users unlocked activities
         $user = Auth::user();
-        $query = $user->unlockedActivities();
-        $rand_query = $user->unlockedActivities();
+        $query = $user->activities()->wherePivot('unlocked', true);
+        $rand_query = $user->activities()->wherePivot('unlocked', true);
         
         //base param
         $empty_page = null;
