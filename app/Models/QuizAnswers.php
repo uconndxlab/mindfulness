@@ -54,15 +54,15 @@ class QuizAnswers extends Model
         return $query->where('reflection_type', 'check_in');
     }
 
-    // get rate my awareness reflections
-    public function scopeRateMyAwareness($query)
+    // get self rating reflections
+    public function scopeSelfRatings($query)
     {
-        return $query->where('reflection_type', 'rate_my_awareness');
+        return $query->where('reflection_type', 'self_rating');
     }
 
-    // all slider reflections
+    // all survey/slider reflections
     public function scopeReflections($query)
     {
-        return $query->whereIn('reflection_type', ['check_in', 'rate_my_awareness']);
+        return $query->whereIn('reflection_type', ['check_in', 'self_rating']);
     }
 }

@@ -125,7 +125,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $qas = $this->quiz_answers()->reflections();
         $qas_check_ins = (clone $qas)->where('reflection_type', 'check_in');
-        $qas_rmas = (clone $qas)->where('reflection_type', 'rate_my_awareness');
+        $qas_rmas = (clone $qas)->where('reflection_type', 'self_rating');
         return [
             'pq_check_ins' => $qas_check_ins->avg('average'),
             'count_check_ins' => $qas_check_ins->count(),

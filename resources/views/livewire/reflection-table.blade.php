@@ -84,8 +84,8 @@
                                     <td>
                                         @if($reflection->reflection_type === 'check_in')
                                             <span class="badge bg-primary">Quick Check-In</span>
-                                        @elseif($reflection->reflection_type === 'rate_my_awareness')
-                                            <span class="badge bg-success">Part Check-In</span>
+                                        @elseif($reflection->reflection_type === 'self_rating')
+                                            <span class="badge bg-success">Self-Rating</span>
                                         @else
                                             <span class="badge bg-secondary text-black">Other</span>
                                         @endif

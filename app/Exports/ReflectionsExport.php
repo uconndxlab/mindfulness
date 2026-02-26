@@ -51,7 +51,7 @@ class ReflectionsExport implements FromCollection, WithHeadings, WithMapping
         // format reflection type
         $reflectionType = match($reflection->reflection_type) {
             'check_in' => 'Quick Check-In',
-            'rate_my_awareness' => 'Part Check-In',
+            'self_rating' => 'Self Rating',
             default => 'Other',
         };
 

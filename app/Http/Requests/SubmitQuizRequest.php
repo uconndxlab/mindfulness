@@ -21,7 +21,7 @@ class SubmitQuizRequest extends FormRequest
     {
         $quizId = $this->input('quiz_id') ?? $this->route('quiz_id');
         $quiz = $quizId ? Quiz::find($quizId) : null;
-        $expectsAverage = $quiz && in_array($quiz->type, ['check_in', 'rate_my_awareness'], true);
+        $expectsAverage = $quiz && in_array($quiz->type, ['check_in', 'self_rating'], true);
         $quizType = $quiz ? ($quiz->question_options[0]['type'] ?? null) : null;
 
         if ($quizType) {
