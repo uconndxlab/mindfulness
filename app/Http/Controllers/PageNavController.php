@@ -24,6 +24,11 @@ class PageNavController extends Controller
 {
     public function welcomePage()
     {
+        $user = Auth::user();
+        if (!$user->has_seen_welcome) {
+            $user->has_seen_welcome = true;
+            $user->save();
+        }
         return view("auth.welcome");
     }
 

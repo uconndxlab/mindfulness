@@ -70,7 +70,10 @@ class AuthController extends Controller
                 ->causedBy(Auth::user())
                 ->log('Authenticated');
 
-            return redirect()->intended('/home');
+            if (!Auth::user()->has_seen_welcome) {
+                return redirect()->route('welcome');
+            }
+            return redirect()->route('explore.home');
         }
       
         return back()->withErrors(['login' => 'Invalid credentials.'])->withInput();
@@ -204,7 +207,7 @@ class AuthController extends Controller
             // record milestone
             event(new MilestoneAchieved($user, MilestoneType::Registered));
             
-            return $skipEmailValidation ? redirect()->route('explore.home') : redirect()->route('verification.notice');
+            return $skipEmailValidation ? redirect()->route('welcome') : redirect()->route('verification.notice');
         }
         catch (\Exception $e) {
             return back()->withErrors(['error' => 'An error occurred. Please try again.']);
