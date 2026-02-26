@@ -35,7 +35,7 @@
             <div class="stats-container col-xl-6 col-lg-6 col-md-8">
                 <div class="stat-item">
                     <span class="stat-label">Average Quick Check-In Score</span>
-                    <span class="stat-value">{{ $stats['pq_check_ins'] ? number_format($stats['pq_check_ins'], 1) : 'N/A' }}</span>
+                    <span class="stat-value">{{ $stats['pq_check_ins'] ? number_format($stats['pq_check_ins'], 1) : 'N/A' }}%</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Total Quick Check-Ins</span>
@@ -43,7 +43,7 @@
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Average Part Check-In Score</span>
-                    <span class="stat-value">{{ $stats['pq_rmas'] ? number_format($stats['pq_rmas'], 1) : 'N/A' }}</span>
+                    <span class="stat-value">{{ $stats['pq_rmas'] ? number_format($stats['pq_rmas'], 1) : 'N/A' }}%</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Total Part Check-Ins</span>
@@ -51,7 +51,7 @@
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Overall Average Score</span>
-                    <span class="stat-value">{{ $stats['pq_avg'] ? number_format($stats['pq_avg'], 1) : 'N/A' }}</span>
+                    <span class="stat-value">{{ $stats['pq_avg'] ? number_format($stats['pq_avg'], 1) : 'N/A' }}%</span>
                 </div>
             </div>
         </div>

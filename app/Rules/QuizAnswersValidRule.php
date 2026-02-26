@@ -79,8 +79,8 @@ class QuizAnswersValidRule implements ValidationRule
 
             case 'survey':
                 \Log::info('Validating survey answer');
-                // use the slider validations, but with a max value of 4
-                return $this->validateSliderAnswer($answerValue, $options, 4);
+                // use the slider validations, but with a max value of 5
+                return $this->validateSliderAnswer($answerValue, $options, 'survey');
             
             default:
                 $this->errorMessage = "Unknown question type: {$type}.";
@@ -152,7 +152,7 @@ class QuizAnswersValidRule implements ValidationRule
         return true;
     }
 
-    protected function validateSliderAnswer(mixed $answer, array $options, int $maxValue = 100): bool
+    protected function validateSliderAnswer(mixed $answer, array $options, string $type = 'slider'): bool
     {
         if (!is_array($answer)) {
             $this->errorMessage = "Answer must be an array.";
@@ -185,10 +185,14 @@ class QuizAnswersValidRule implements ValidationRule
             $numericValue = (float)$value;
             
             // validate value is within config range
-            $option = collect($options)->firstWhere('id', (int)$optionId);
-            $sliderConfig = $option['slider_config'] ?? [];
-            $min = $sliderConfig['min'] ?? 0;
-            $max = $sliderConfig['max'] ?? 100;
+            if ($type === 'survey') {
+                $min = 1;
+                $max = 5;
+            }
+            else {
+                $min = 0;
+                $max = 100;
+            }
 
             if ($numericValue < $min || $numericValue > $max) {
                 $this->errorMessage = "Value must be between {$min} and {$max}.";

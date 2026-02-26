@@ -134,7 +134,7 @@
                 <i class="bi bi-info-circle" ></i> 
                 Practice Quality:
             </strong>
-            <span id="survey_average_value_{{ $question['number'] }}" class="pq-score">---</span>
+            <span id="survey_average_value_{{ $question['number'] }}" class="pq-score">--</span>%
         </div>
     </div>
 @endif

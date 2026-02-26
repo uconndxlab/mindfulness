@@ -25,9 +25,7 @@ class SubmitQuizRequest extends FormRequest
         $quizType = $quiz ? ($quiz->question_options[0]['type'] ?? null) : null;
 
         if ($quizType) {
-            if ($quizType === 'survey') {
-                $averageRule = ['required', 'numeric', 'min:1', 'max:5'];
-            } elseif ($quizType === 'slider') {
+            if ($quizType === 'survey' || $quizType === 'slider') {
                 $averageRule = ['required', 'numeric', 'min:0', 'max:100'];
             } else {
                 $averageRule = ['prohibited'];

@@ -80,21 +80,24 @@ class QuizSurveyQuestion {
 
         let total = 0;
         let count = 0;
+        let range = this.scaleMax - this.scaleMin;
 
         for (const [optionId, value] of this.selectedValues) {
             let score = parseInt(value, 10) || 0;
             if (this.inverseOptions.get(optionId)) {
                 score = this.scaleMax + this.scaleMin - score;
             }
+            // convert to percentage
+            score = ((score - this.scaleMin) / range) * 100;
             total += score;
             count++;
         }
 
         if (count > 0) {
             this.average = (total / count).toFixed(2);
-            this.averageValueSpan.textContent = this.average;
+            this.averageValueSpan.textContent = Math.round(this.average);
         } else if (this.average !== null && this.average !== undefined) {
-            this.averageValueSpan.textContent = this.average;
+            this.averageValueSpan.textContent = Math.round(this.average);
         }
     }
 
