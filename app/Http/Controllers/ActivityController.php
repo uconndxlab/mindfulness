@@ -61,10 +61,7 @@ class ActivityController extends Controller
         $next_activity = $activity->nextActivity();
         $last_activity_in_module = $activity->day->module->lastActivity();
         // slider questions follow practice, or are last activity in module
-        if ($next_activity
-            && ($activity->type === 'practice' || $next_activity->id === $last_activity_in_module->id)
-            && $next_activity->quiz
-            && $next_activity->quiz->question_options[0]['type'] === 'slider') 
+        if ($next_activity?->is_check_in) 
         {
             $redirect_url = route('explore.activity', ['activity_id' => $next_activity->id]);
         }
