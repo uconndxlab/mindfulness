@@ -21,7 +21,7 @@
                             <li class="list-check{{ $module->completedCheckInActivities == $module->totalCheckInActivities ? '-filled fw-bold' : '' }}">{{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins</li>
                         @endif
                         @if ($module->totalCheckInDays > 0)
-                            <li class="list-check{{ $module->completedCheckInDays == $module->totalCheckInDays ? '-filled fw-bold' : '' }}">{{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Rate My Awareness</li>
+                            <li class="list-check{{ $module->completedCheckInDays == $module->totalCheckInDays ? '-filled fw-bold' : '' }}">{{ $module->completedCheckInDays }}/{{ $module->totalCheckInDays }} Self-Rating</li>
                         @endif
                     </ul>
             </div>
@@ -35,15 +35,23 @@
             <div class="stats-container col-xl-6 col-lg-6 col-md-8">
                 <div class="stat-item">
                     <span class="stat-label">Average Quick Check-In Score</span>
-                    <span class="stat-value">{{ $stats['pq_check_ins'] ? number_format($stats['pq_check_ins'], 1) : 'N/A' }}%</span>
+                    <span>
+                        <span class="stat-value">{{ $stats['pq_check_ins'] ? number_format($stats['pq_check_ins'], 1) : '--' }}%</span>
+                        <span class="text-muted small">({{ $stats['count_check_ins'] }} check-in{{ $stats['count_check_ins'] != 1 ? 's' : '' }})</span>
+                    </span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Total Quick Check-Ins</span>
-                    <span class="stat-value">{{ $stats['count_check_ins'] }}</span>
+                    <span class="stat-label">Average Self-Rating Score</span>
+                    <span>
+                        <span class="stat-value">{{ $stats['pq_rmas'] ? number_format($stats['pq_rmas'], 1) : '--' }}%</span>
+                        <span class="text-muted small">({{ $stats['count_rmas'] }} self-rating{{ $stats['count_rmas'] != 1 ? 's' : '' }})</span>
+                    </span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Average Part Check-In Score</span>
-                    <span class="stat-value">{{ $stats['pq_rmas'] ? number_format($stats['pq_rmas'], 1) : 'N/A' }}%</span>
+                    <span class="stat-label">Overall Average Practice Quality</span>
+                    <span>
+                        <span class="stat-value">{{ $stats['pq_avg'] ? number_format($stats['pq_avg'], 1) : '--' }}%</span>
+                    </span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Total Part Check-Ins</span>
