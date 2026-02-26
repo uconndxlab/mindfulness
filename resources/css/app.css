@@ -1231,22 +1231,54 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     font-size: 20px;
 }
 
-/* Horizontal survey radio group: value above label, centered, with dividers */
-.quiz-survey {
-    gap: 0;
+/* Survey button group styling */
+.survey-btn-group {
+    border: 1px solid var(--blue-grey);
+    border-radius: 10px;
+    overflow: hidden;
 }
-.quiz-survey .vr {
-    min-height: 2.5rem;
-}
-.survey-option-cell {
-    min-width: 4.5rem;
+.survey-btn {
     cursor: pointer;
+    border-right: 1px solid rgba(0,0,0,0.1);
 }
-.survey-option-cell input[type="radio"] {
-    cursor: pointer;
+.survey-btn:last-child {
+    border-right: none;
 }
-.survey-option-value {
+.survey-btn-inner {
+    background: var(--blue-grey);
+    transition: background 0.15s, color 0.15s;
+}
+.survey-btn:has(:checked) .survey-btn-inner {
+    background: var(--dark-green);
+    color: #fff;
+}
+.survey-btn-value {
     line-height: 1.2;
+}
+
+/* Survey legend row below buttons */
+.survey-legend {
+    margin-top: 0.25rem;
+}
+.survey-legend-item {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    width: 20%;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Hide middle labels (positions 2 and 4) on mobile, keep 1, 3, 5 */
+@media (max-width: 576px) {
+    .survey-legend-middle {
+        visibility: hidden;
+    }
+    .survey-btn-inner {
+        padding: 0.4rem 0.25rem !important;
+    }
+    .survey-legend-item {
+        white-space: nowrap;
+    }
 }
 
 /*

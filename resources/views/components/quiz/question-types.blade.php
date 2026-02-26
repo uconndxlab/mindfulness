@@ -99,22 +99,27 @@
                 @markdown($option['text'])
             </div>
         </label>
-        <div id="survey_{{ $question['number'] }}_{{ $option['id'] }}" class="quiz-survey mb-3 d-flex justify-content-center align-items-start flex-wrap">
-            @foreach ($option['survey_config']['options'] ?? [] as $value => $label)
-                @if (!$loop->first)
-                    <div class="vr flex-shrink-0 mx-2 align-self-stretch"></div>
-                @endif
-                <label class="survey-option-cell d-flex flex-column align-items-center text-center px-3 py-2"
-                    for="survey_{{ $question['number'] }}_{{ $option['id'] }}_{{ $value }}">
-                    <span class="survey-option-value fw-bold small text-secondary">{{ $value }}</span>
-                    <span class="survey-option-label small">{{ $label }}</span>
-                    <input class="form-check-input mt-1"
-                        type="radio"
-                        name="answer_{{ $question['number'] }}[{{ $option['id'] }}]"
-                        id="survey_{{ $question['number'] }}_{{ $option['id'] }}_{{ $value }}"
-                        value="{{ $value }}">
-                </label>
-            @endforeach
+        <div id="survey_{{ $question['number'] }}_{{ $option['id'] }}" class="quiz-survey mb-3">
+            <div class="survey-btn-group d-flex" role="group">
+                @foreach ($option['survey_config']['options'] ?? [] as $value => $label)
+                    <label class="survey-btn flex-fill text-center">
+                        <input type="radio" class="btn-check" 
+                               name="answer_{{ $question['number'] }}[{{ $option['id'] }}]"
+                               id="survey_{{ $question['number'] }}_{{ $option['id'] }}_{{ $value }}"
+                               value="{{ $value }}" autocomplete="off">
+                        <span class="survey-btn-inner d-block py-2 px-1">
+                            <span class="survey-btn-value d-block fw-bold">{{ $value }}</span>
+                        </span>
+                    </label>
+                @endforeach
+            </div>
+            <div class="survey-legend d-flex">
+                @foreach ($option['survey_config']['options'] ?? [] as $value => $label)
+                    <span class="survey-legend-item flex-fill text-center small text-muted @if(!$loop->first && !$loop->last && $loop->iteration != 3) survey-legend-middle @endif">
+                        {{ $label }}
+                    </span>
+                @endforeach
+            </div>
         </div>
         @if ($index === count($question['options']) - 1)
             <hr>
