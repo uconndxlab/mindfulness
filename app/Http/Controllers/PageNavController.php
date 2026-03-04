@@ -51,12 +51,12 @@ class PageNavController extends Controller
             $stats = $module->getStats($user);
             $module->unlocked = $stats['unlocked'];
             $module->completed = $stats['completed'];
-            $module->daysCompleted = $stats['daysCompleted'];
             $module->totalDays = $stats['totalDays'];
-            $module->completedCheckInActivities = $stats['completedCheckInActivities'];
+            $module->daysCompleted = $stats['daysCompleted'];
+            $module->totalSelfRatings = $stats['totalSelfRatings'];
+            $module->completedSelfRatings = $stats['completedSelfRatings'];
             $module->totalCheckInActivities = $stats['totalCheckInActivities'];
-            $module->completedCheckInDays = $stats['completedCheckInDays'];
-            $module->totalCheckInDays = $stats['totalCheckInDays'];
+            $module->completedCheckInActivities = $stats['completedCheckInActivities'];
         }
 
         $bonusInfo = $user->getBonusStats();
@@ -637,12 +637,12 @@ class PageNavController extends Controller
         $modules = Module::orderBy('order', 'asc')->get();
         foreach ($modules as $module) {
             $stats = $module->getStats(Auth::user() ?? null);
-            $module->daysCompleted = $stats['daysCompleted'];
             $module->totalDays = $stats['totalDays'];
-            $module->completedCheckInActivities = $stats['completedCheckInActivities'];
+            $module->daysCompleted = $stats['daysCompleted'];
+            $module->totalSelfRatings = $stats['totalSelfRatings'];
+            $module->completedSelfRatings = $stats['completedSelfRatings'];
             $module->totalCheckInActivities = $stats['totalCheckInActivities'];
-            $module->completedCheckInDays = $stats['completedCheckInDays'];
-            $module->totalCheckInDays = $stats['totalCheckInDays'];
+            $module->completedCheckInActivities = $stats['completedCheckInActivities'];
         }
 
         $stats = Auth::user()->getStats();

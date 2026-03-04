@@ -353,6 +353,10 @@ class ProgressService
             $this->checkDayCompletionUpTo($user, $latestCompleted->day);
             $this->checkModuleCompletionUpTo($user, $latestCompleted->day->module);
         }
+        else {
+            // unlock first activity
+            unlockFirst($user->id);
+        }
     }
 
     /*

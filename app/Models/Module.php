@@ -45,30 +45,35 @@ class Module extends Model
             return 0;
         }
         $completedDays = 0;
-        $completedCheckInDays = 0;
+        $totalSelfRatings = 0;
+        $completedSelfRatings = 0;
         $totalCheckInActivities = 0;
         $completedCheckInActivities = 0;
 
-        $days = $this->days->load('activities');
+        $days = $this->days->load(['activities', 'activities.quiz']);
         foreach ($days as $day) {
-            if ($day->isCompletedBy($user)) {
-                if ($day->is_check_in) {
-                    $completedCheckInDays++;
-                } else {
-                    $completedDays++;
-                }
+            if ($day->isCompletedBy($user) && !$day->is_check_in) {
+                $completedDays++;
             }
 
             foreach ($day->activities as $activity) {
                 if ($activity->is_check_in) {
-                    $totalCheckInActivities++;
-                    if ($activity->isCompletedBy($user)) {
-                        $completedCheckInActivities++;
+                    if ($activity->quiz?->type == 'check_in') {
+                        $totalCheckInActivities++;
+                        if ($activity->isCompletedBy($user)) {
+                            $completedCheckInActivities++;
+                        }
+                    }
+                    else if ($activity->quiz?->type == 'self_rating') {
+                        $totalSelfRatings++;
+                        if ($activity->isCompletedBy($user)) {
+                            $completedSelfRatings++;
+                        }
                     }
                 }
             }
         }
-        return [$completedDays, $completedCheckInDays, $totalCheckInActivities, $completedCheckInActivities];
+        return [$completedDays, $totalSelfRatings, $completedSelfRatings, $totalCheckInActivities, $completedCheckInActivities];
     }
 
     // when progress is actually checked, it does NOT use this
@@ -77,17 +82,16 @@ class Module extends Model
     {
         $unlocked = $this->canBeAccessedBy($user);
         $completed = $this->isCompletedBy($user);
-        [$daysCompleted, $completedCheckInDays, $totalCheckInActivities, $completedCheckInActivities] = $this->numberDaysCompletedBy($user);
+        [$daysCompleted, $totalSelfRatings, $completedSelfRatings, $totalCheckInActivities, $completedCheckInActivities] = $this->numberDaysCompletedBy($user);
         $totalDays = $this->days->where('is_check_in', false)->count();
-        $totalCheckInDays = $this->days->count() - $totalDays;
 
         return [
             'unlocked' => $unlocked,
             'completed' => $completed,
-            'daysCompleted' => $daysCompleted,
             'totalDays' => $totalDays,
-            'completedCheckInDays' => $completedCheckInDays,
-            'totalCheckInDays' => $totalCheckInDays,
+            'daysCompleted' => $daysCompleted,
+            'totalSelfRatings' => $totalSelfRatings,
+            'completedSelfRatings' => $completedSelfRatings,
             'totalCheckInActivities' => $totalCheckInActivities,
             'completedCheckInActivities' => $completedCheckInActivities,
         ];
