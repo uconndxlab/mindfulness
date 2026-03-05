@@ -113,11 +113,18 @@
                     </label>
                 @endforeach
             </div>
-            <div class="survey-legend d-flex">
+            <div class="survey-legend d-flex d-md-none">
+                {{-- Mobile: short labels --}}
+                <span class="survey-legend-item">(None)</span>
+                <span class="survey-legend-item">(Little)</span>
+                <span class="survey-legend-item">(Some)</span>
+                <span class="survey-legend-item">(Much)</span>
+                <span class="survey-legend-item">(Very much)</span>
+            </div>
+            <div class="survey-legend d-none d-md-flex">
+                {{-- Desktop: full labels from JSON --}}
                 @foreach ($option['survey_config']['options'] ?? [] as $value => $label)
-                    <span class="survey-legend-item flex-fill text-center small text-muted @if(!$loop->first && !$loop->last && $loop->iteration != 3) survey-legend-middle @endif">
-                        {{ $label }}
-                    </span>
+                    <span class="survey-legend-item">{{ $label }}</span>
                 @endforeach
             </div>
         </div>
