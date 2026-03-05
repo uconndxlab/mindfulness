@@ -118,21 +118,23 @@
             </div>
         </div>
     </div>
-    <div class="mt-1" id="redirect_div">
-        @if (isset($page_info['redirect_route']))
-            <a id="redirect_button" class="btn btn-primary btn-tertiary redirect-btn disabled d-none" href="{{ $page_info['redirect_route'] }}">
-                {{ $page_info['redirect_label'] }}
-            </a>
-        @endif
-        @php
-            $comp_late_btn_disp = !$activity->skippable ? 'none' : 'block';
-        @endphp
-        <div class="d-flex justify-content-center">
-            <button id="complete-later" class="btn btn-outline-primary rounded-pill px-4 {{ !$activity->skippable ? 'd-none' : '' }}" type="button">
-                <i class="bi bi-bookmark me-2"></i>
-                I will do this later
-            </button>
+    @if (!$activity->optional)
+        <div class="mt-1" id="redirect_div">
+            @if (isset($page_info['redirect_route']))
+                <a id="redirect_button" class="btn btn-primary btn-tertiary redirect-btn disabled d-none" href="{{ $page_info['redirect_route'] }}">
+                    {{ $page_info['redirect_label'] }}
+                </a>
+            @endif
+            @php
+                $comp_late_btn_disp = !$activity->skippable ? 'none' : 'block';
+            @endphp
+            <div class="d-flex justify-content-center">
+                <button id="complete-later" class="btn btn-outline-primary rounded-pill px-4 {{ !$activity->skippable ? 'd-none' : '' }}" type="button">
+                    <i class="bi bi-bookmark me-2"></i>
+                    I will do this later
+                </button>
+            </div>
         </div>
-    </div>
+    @endif
 @endsection
 

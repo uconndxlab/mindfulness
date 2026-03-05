@@ -157,7 +157,13 @@ class PageNavController extends Controller
             ];
         });
 
-        $accordion_activity = $activity_id ? Activity::find($activity_id) : null;
+        $accordion_activity = $activity_id
+            ? Activity::find($activity_id)
+            : Activity::where('optional', true)
+                ->orderBy('order')
+                ->get()
+                ->first(fn($activity) => $activity->canBeAccessedBy($user));
+        \Log::info($accordion_activity);
         $accordion_activity_id = null;
 
         // progress info
