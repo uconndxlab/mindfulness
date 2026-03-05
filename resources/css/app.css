@@ -1091,6 +1091,10 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     white-space: normal !important;
 }
 
+.milestones-column .badge {
+    cursor: pointer;
+}
+
 /* sortable styling for cols */
 .sortable-header {
     cursor: pointer;

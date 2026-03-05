@@ -48,7 +48,10 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping
             $user->name,
             $user->email,
             $user->role,
-            $user->milestones->map(fn($m) => $m->type->badgeLabel())->join(', '),
+            $user->milestones
+                ->sortBy('achieved_at')
+                ->map(fn($m) => $m->type->badgeLabel().' ['. $m->achieved_at->format('M d, Y g:i A') .' (UTC)]')
+                ->join(', '),
             $currentActivity?->title ?? 'None',
             $currentDay?->name ?? 'None',
             $currentModule ? 'Part '.$currentModule->order.' - '.$currentModule->name : 'None',

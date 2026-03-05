@@ -65,7 +65,12 @@
                                 @case('milestones')
                                     <td class="milestones-column">
                                         @foreach ($user->milestones->sortBy('achieved_at') as $milestone)
-                                            <span class="badge bg-{{ $milestone->type->color() }} mb-1">{{ $milestone->type->badgeLabel() }}</span>
+                                            <span class="badge bg-{{ $milestone->type->color() }} mb-1"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                title="Achieved: {{ $milestone->achieved_at->format('M d, Y g:i A') }} (UTC)">
+                                                {{ $milestone->type->badgeLabel() }}
+                                            </span>
                                         @endforeach
                                     </td>
                                     @break
