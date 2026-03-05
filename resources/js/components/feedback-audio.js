@@ -16,6 +16,13 @@ function initFeedbackAudio() {
 
         if (!audio || !play || !icon) return;
 
+        // wait for metadata to be loaded
+        audio.addEventListener('loadedmetadata', function() {
+            const maxTime = block.querySelector('#max-time');
+            if (maxTime) {
+                maxTime.innerHTML = formatTime(audio.duration);
+            }
+        });
         if (audio.duration) {
             const maxTime = block.querySelector('#max-time');
             if (maxTime) {
