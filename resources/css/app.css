@@ -1283,8 +1283,8 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 /* teacher styling help page */
 .teacher-image-container {
     position: relative;
-    padding-top: 75%;
     overflow: hidden;
+    border-radius: 0.375rem 0 0 0.375rem; /* round left corners */
 }
 
 .teacher-image {
@@ -1298,21 +1298,16 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 
 @media (max-width: 767.98px) {
     .teacher-image-container {
-        max-width: 200px;
+        max-width: 250px;
         margin: 1rem auto;
+        border-radius: 0.375rem;
+        padding-top: 100%;
     }
 }
 
 @media (min-width: 768px) {
     .teacher-image-container {
-        height: 100%;
-        padding-top: 0;
-    }
-
-    .teacher-image {
-        position: static;
-        height: 100%;
-        object-fit: cover;
+        padding-top: 133%;
     }
 
     .card .row {
