@@ -17,8 +17,9 @@ class InvitationTable extends Component
     #[Url(except: '')]
     public $search = '';
     
-    #[Url(except: 'all')]
-    public $statusFilter = 'all';
+    #[Url(except: [])]
+    public $statuses = [];
+    public $showFilters = false;
     
     public $sortColumn = 'last_sent_at';
     public $sortDirection = 'desc';
@@ -47,6 +48,22 @@ class InvitationTable extends Component
         $this->resetPage();
     }
 
+    public function toggleFilters()
+    {
+        $this->showFilters = !$this->showFilters;
+    }
+
+    public function applyFilters()
+    {
+        $this->resetPage();
+    }
+
+    public function clearFilters()
+    {
+        $this->statuses = [];
+        $this->resetPage();
+    }
+
     public function updatedStatusFilter()
     {
         $this->resetPage();
@@ -63,9 +80,9 @@ class InvitationTable extends Component
         $invitationsQuery = Invitation::with(['invitedBy', 'registeredUser'])
             ->orderBy($this->sortColumn, $this->sortDirection);
 
-        // filter
-        if ($this->statusFilter !== 'all') {
-            $invitationsQuery->where('status', $this->statusFilter);
+        // filter by status
+        if (!empty($this->statuses)) {
+            $invitationsQuery->whereIn('status', $this->statuses);
         }
 
         // search
@@ -83,7 +100,13 @@ class InvitationTable extends Component
         $invitations = $invitationsQuery->paginate(10);
 
         return view('livewire.invitation-table', [
-            'invitations' => $invitations
+            'invitations' => $invitations,
+            'statusOptions' => [
+                'pending' => 'Pending',
+                'accepted' => 'Accepted',
+                'expired' => 'Expired',
+                'revoked' => 'Revoked'
+            ]
         ]);
     }
 

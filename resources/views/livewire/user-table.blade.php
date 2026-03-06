@@ -1,10 +1,42 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="col-md-4">
-            <input type="text" class="form-control" placeholder="Search..." wire:model.live="search">
+        <div class="d-flex gap-2 align-items-center">
+            <div class="position-relative">
+                <button class="btn btn-outline-secondary d-flex align-items-center gap-1 table-btn m-0" 
+                    wire:click="toggleFilters"
+                    type="button">
+                    <i class="bi bi-sliders"></i>
+                    <span>Filter</span>
+                    <i class="bi bi-chevron-{{ $showFilters ? 'up' : 'down' }} ms-1"></i>
+                </button>
+                @if($showFilters)
+                    <div class="position-absolute bg-white border rounded shadow-sm p-3 mt-1 table-filter-container" wire:click.outside="toggleFilters">
+                        <div class="mb-3">
+                            <div class="fw-bold mb-2">Milestones</div>
+                            @foreach ($milestoneTypes as $milestoneType)
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input" 
+                                        type="checkbox" 
+                                        wire:model="milestones"
+                                        id="milestone_{{ $milestoneType->value }}" 
+                                        value="{{ $milestoneType->value }}">
+                                    <label class="form-check-label" for="milestone_{{ $milestoneType->value }}">
+                                        {{ $milestoneType->label() }}
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
+                        <button wire:click="applyFilters" type="button" class="btn btn-primary">Apply Filter</button>
+                        <button wire:click="clearFilters" type="button" class="btn btn-link text-center mt-1 mb-2 text-dark">Clear Filters</button>
+                    </div>
+                @endif
+            </div>
+            <div>
+                <input type="text" class="form-control" placeholder="Search..." wire:model.live="search">
+            </div>
         </div>
         <div>
-            <a href="{{ route('admin.users.export') }}" class="btn btn-info btn-sm m-0">Export to CSV</a>
+            <a href="{{ route('admin.users.export') }}" class="btn btn-info btn-sm table-btn m-0">Export to CSV</a>
         </div>
     </div>
     <div class="table-responsive">

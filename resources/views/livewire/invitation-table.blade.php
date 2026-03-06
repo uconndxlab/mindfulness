@@ -1,16 +1,39 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="col-md-4">
-            <input type="text" class="form-control" placeholder="Search email or invited by..." wire:model.live="search">
-        </div>
-        <div class="col-md-3">
-            <select class="form-select" wire:model.live="statusFilter">
-                <option value="all">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="accepted">Accepted</option>
-                <option value="expired">Expired</option>
-                <option value="revoked">Revoked</option>
-            </select>
+        <div class="d-flex gap-2 align-items-center">
+            <div class="position-relative">
+                <button class="btn btn-outline-secondary d-flex align-items-center gap-1 table-btn m-0" 
+                    wire:click="toggleFilters"
+                    type="button">
+                    <i class="bi bi-sliders"></i>
+                    <span>Filter</span>
+                    <i class="bi bi-chevron-{{ $showFilters ? 'up' : 'down' }} ms-1"></i>
+                </button>
+                @if($showFilters)
+                    <div class="position-absolute bg-white border rounded shadow-sm p-3 mt-1 table-filter-container" wire:click.outside="toggleFilters">
+                        <div class="mb-3">
+                            <div class="fw-bold mb-2">Status</div>
+                            @foreach ($statusOptions as $value => $label)
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input" 
+                                        type="checkbox" 
+                                        wire:model="statuses"
+                                        id="status_{{ $value }}" 
+                                        value="{{ $value }}">
+                                    <label class="form-check-label" for="status_{{ $value }}">
+                                        {{ $label }}
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
+                        <button wire:click="applyFilters" type="button" class="btn btn-primary">Apply Filter</button>
+                        <button wire:click="clearFilters" type="button" class="btn btn-link text-center mt-1 mb-2 text-dark">Clear Filters</button>
+                    </div>
+                @endif
+            </div>
+            <div>
+                <input type="text" class="form-control" placeholder="Search..." wire:model.live="search">
+            </div>
         </div>
     </div>
     <div class="table-responsive">

@@ -105,6 +105,18 @@ a {
     transition: none !important;
 }
 
+.table-btn {
+    height: 38px;
+}
+.table-filter-container {
+    z-index: 1000;
+    min-width: 280px;
+}
+.table-filter-container input,
+.table-filter-container label {
+    cursor: pointer;
+}
+
 /*forms*/
 .form-control {
     border-radius:100px!important;

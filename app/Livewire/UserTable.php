@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\User;
+use App\Enums\MilestoneType;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
@@ -17,6 +18,10 @@ class UserTable extends Component
     public $search = '';
     public $sortColumn = 'created_at';
     public $sortDirection = 'desc';
+    
+    #[Url(except: [])]
+    public $milestones = [];
+    public $showFilters = false;
 
     public $columns = [
         'hh_id' => ['label' => 'ID', 'sortable' => true],
@@ -48,12 +53,35 @@ class UserTable extends Component
         $this->resetPage();
     }
 
+    public function toggleFilters()
+    {
+        $this->showFilters = !$this->showFilters;
+    }
+
+    public function applyFilters()
+    {
+        $this->resetPage();
+    }
+
+    public function clearFilters()
+    {
+        $this->milestones = [];
+        $this->resetPage();
+    }
+
     public function render()
     {
         // query
         $usersQuery = User::select('id', 'hh_id', 'name', 'email', 'role', 'created_at', 'lock_access', 'email_verified_at', 'last_active_at', 'last_reminded_at')
             ->with(['favoritedActivities' => fn($query) => $query->orderBy('order', 'asc'), 'favoritedActivities.day.module', 'milestones'])
             ->orderBy($this->sortColumn, $this->sortDirection);
+
+        // apply filters
+        if (!empty($this->milestones)) {
+            $usersQuery->whereHas('milestones', function($query) {
+                $query->whereIn('type', $this->milestones);
+            });
+        }
 
         // search - cannot query search because of current activity
         if (!empty($this->search)) {
@@ -79,9 +107,9 @@ class UserTable extends Component
             $users = $usersQuery->paginate(10);
         }
 
-
         return view('livewire.user-table', [
-            'users' => $users
+            'users' => $users,
+            'milestoneTypes' => MilestoneType::cases()
         ]);
     }
 
