@@ -658,8 +658,9 @@ class PageNavController extends Controller
 
     public function helpPage()
     {
-        $faqs = Faq::all();
+        $categories = \App\Enums\FaqCategory::sorted();
+        $faqs = Faq::ordered()->get()->groupBy(fn($faq) => $faq->category->value);
         $teachers = Teacher::all();
-        return view("other.help", compact('faqs', 'teachers'));
+        return view("other.help", compact('categories', 'faqs', 'teachers'));
     }
 }

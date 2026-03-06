@@ -71,22 +71,61 @@
         
         <section id="FAQ">
             <h4 class="text-center fw-bold mt-4">FAQ</h4>
-            <div class="accordion accordion-flush mb-3" id="filter_accordion">
-                @foreach ($faqs as $index => $faq)
-                    <div class="form-group accordion-item border mb-2">
-                        <h2 class="accordion-header" id="headingFAQ_{{ $index }}">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFAQ_{{ $index }}" aria-expanded="true" aria-controls="collapseFAQ_{{ $index }}">
-                                {{ $faq->question }}
-                            </button>
-                        </h2>
-                        <div id="collapseFAQ_{{ $index }}" class="accordion-collapse collapse" aria-labelledby="headingFAQ_{{ $index }}">
-                            <div class="accordion-body faq-body">
-                                <div class="faq-answer">
-                                    @markdown(is_string($faq->answer ?? null) ? $faq->answer : '')
+            <div class="accordion accordion-flush mb-3" id="faq_categories">
+                @foreach ($categories as $category)
+                    @php
+                        $categoryFaqs = $faqs->get($category->value);
+                        $faqCount = $categoryFaqs ? $categoryFaqs->count() : 0;
+                    @endphp
+                    
+                    @if($faqCount > 0)
+                        <div class="accordion-item border mb-2">
+                            <h2 class="accordion-header" id="heading_{{ $category->value }}">
+                                <button class="accordion-button collapsed" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse_{{ $category->value }}" 
+                                    aria-expanded="false"
+                                    aria-controls="collapse_{{ $category->value }}">
+                                    {{ $category->label() }}
+                                </button>
+                            </h2>
+                            
+                            <div id="collapse_{{ $category->value }}" 
+                                class="accordion-collapse collapse m-3" 
+                                aria-labelledby="heading_{{ $category->value }}"
+                                data-bs-parent="#faq_categories">
+                                <div class="accordion-body p-0">
+                                    <div class="accordion accordion-flush" id="faq_{{ $category->value }}">
+                                        @foreach ($categoryFaqs as $faq)
+                                            <div class="form-group accordion-item border {{ !$loop->last ? 'mb-2' : '' }}">
+                                                <h3 class="accordion-header" id="heading_faq_{{ $faq->id }}">
+                                                    <button class="accordion-button collapsed" 
+                                                        type="button" 
+                                                        data-bs-toggle="collapse" 
+                                                        data-bs-target="#collapse_faq_{{ $faq->id }}" 
+                                                        aria-expanded="false"
+                                                        aria-controls="collapse_faq_{{ $faq->id }}">
+                                                        {{ $faq->question }}
+                                                    </button>
+                                                </h3>
+                                                <div id="collapse_faq_{{ $faq->id }}" 
+                                                    class="accordion-collapse collapse" 
+                                                    aria-labelledby="heading_faq_{{ $faq->id }}"
+                                                    data-bs-parent="#faq_{{ $category->value }}">
+                                                    <div class="accordion-body faq-body">
+                                                        <div class="faq-answer">
+                                                            @markdown(is_string($faq->answer ?? null) ? $faq->answer : '')
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                 @endforeach
             </div>
         </section>

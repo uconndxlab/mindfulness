@@ -14,6 +14,8 @@ class FaqSeeder extends Seeder
      */
     public function run(): void
     {
+        // truncate
+        Faq::truncate();
         $faqs = json_decode(file_get_contents(database_path('data/faqs.json')), true);
         foreach ($faqs as $item) {
             $item['answer'] = str_replace(
@@ -31,6 +33,7 @@ class FaqSeeder extends Seeder
                 [
                     'question' => $item['question'],
                     'answer' => $item['answer'],
+                    'category' => $item['category'] ?? 'general_information',
                 ]
             );
         }

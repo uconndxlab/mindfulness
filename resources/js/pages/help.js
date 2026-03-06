@@ -11,11 +11,24 @@ function initHelpPage() {
 
     function updateActiveLink() {
         const fromTop = window.scrollY + getOffset();
-        const currentSection = sections.find((section) => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.offsetHeight;
-            return fromTop >= sectionTop && fromTop < sectionTop + sectionHeight;
-        });
+        
+        // Check if we're at the bottom of the page
+        const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10;
+        
+        let currentSection;
+        
+        if (isAtBottom) {
+            // If at bottom, activate the last section
+            currentSection = sections[sections.length - 1];
+        } else {
+            // Find the current section based on scroll position
+            currentSection = sections.find((section) => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                return fromTop >= sectionTop && fromTop < sectionTop + sectionHeight;
+            });
+        }
+        
         if (navbar && currentSection) {
             const newActiveLink = navbar.querySelector(`a[href="#${currentSection.id}"]`);
             if (newActiveLink && !newActiveLink.classList.contains('active')) {
@@ -34,7 +47,7 @@ function initHelpPage() {
             const targetId = this.getAttribute('href');
             const targetSection = document.querySelector(targetId);
             const offset = targetId === 'contactUs' ? getOffset(false) : getOffset(true);
-            const targetPosition = targetSection.offsetTop - offset + 125;
+            const targetPosition = targetSection.offsetTop - offset + 105;
             window.scrollTo({ top: targetPosition, behavior: 'smooth' });
         });
     });
