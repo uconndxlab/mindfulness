@@ -247,6 +247,10 @@ function initActivityPage() {
         } else if (hasJournal) {
             console.log('Type: journal');
         }
+        else {
+            // todo remove
+            activityComplete();
+        }
     })();
 
     // ENGAGEMENT METRICS
