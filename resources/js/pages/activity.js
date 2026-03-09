@@ -592,7 +592,7 @@ function initActivityPage() {
 
     // Secret skip
     document.addEventListener('keydown', function(event) {
-        if (event.ctrlKey && event.key.toLowerCase() === 'm') {
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'm') {
             event.preventDefault();
             console.log('Secret skip');
             activityComplete();
