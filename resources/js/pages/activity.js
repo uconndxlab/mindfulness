@@ -249,7 +249,7 @@ function initActivityPage() {
         }
         else {
             // todo remove
-            activityComplete();
+            setTimeout(() => activityComplete(), 0);
         }
     })();
 
