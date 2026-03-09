@@ -17,6 +17,7 @@ function initActivityPage() {
     let completed = status === 'completed';
     let type = null;
     const hasAudioVideo = type === 'audio' || type === 'video';
+    const contentAvailable = hasContent || hasQuiz || hasJournal;
 
     function unlockRedirect() {
         if (!redirectDiv) return;
@@ -247,10 +248,6 @@ function initActivityPage() {
         } else if (hasJournal) {
             console.log('Type: journal');
         }
-        else {
-            // todo remove
-            setTimeout(() => activityComplete(), 0);
-        }
     })();
 
     // ENGAGEMENT METRICS
@@ -285,6 +282,8 @@ function initActivityPage() {
         // favorited
         startFavorited: startFavorited,
         endFavorited: null,
+        // content status
+        noContentAvailable: false,
         // for calculating engagement metrics
         sessionStart: performance.now(),
         lastInteractionTime: performance.now(),
@@ -378,6 +377,7 @@ function initActivityPage() {
                 activity_skipped: engagementMetrics.activitySkipped,
                 activity_completed: engagementMetrics.completed,
                 already_completed: engagementMetrics.alreadyCompleted,
+                no_content_available: engagementMetrics.noContentAvailable,
                 // other completion metrics done conditionally
                 
                 // favorites
@@ -420,6 +420,13 @@ function initActivityPage() {
                 const responseData = response.data;
                 if (responseData?.status === 'success' && responseData?.log_id) {
                     engagementMetrics.startLogId = responseData.log_id;
+
+                    // handling no content available
+                    if (!contentAvailable) {
+                        console.log('No content available - auto-completing activity');
+                        engagementMetrics.noContentAvailable = true;
+                        activityComplete();
+                    }
                 }
             }).catch(error => {
                 console.error('There was an error logging the interaction:', error);
