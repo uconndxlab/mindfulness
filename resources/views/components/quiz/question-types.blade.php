@@ -113,7 +113,7 @@
                     </label>
                 @endforeach
             </div>
-            <div class="survey-legend d-flex d-md-none">
+            <div class="survey-legend d-flex">
                 {{-- Mobile: short labels --}}
                 <span class="survey-legend-item">(None)</span>
                 <span class="survey-legend-item">(Little)</span>
@@ -121,7 +121,7 @@
                 <span class="survey-legend-item">(Much)</span>
                 <span class="survey-legend-item">(Very much)</span>
             </div>
-            <div class="survey-legend d-none d-md-flex">
+            <div class="survey-legend d-none d-none">
                 {{-- Desktop: full labels from JSON --}}
                 @foreach ($option['survey_config']['options'] ?? [] as $value => $label)
                     <span class="survey-legend-item">{{ $label }}</span>
