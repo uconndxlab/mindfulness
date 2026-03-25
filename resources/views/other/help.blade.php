@@ -52,7 +52,10 @@
                                     </div>
                                     <div class="col-12 col-md-8 col-lg-9">
                                         <div class="card-body">
-                                            <h5 class="card-title" id="teacher-name-{{ $loop->index }}">{{ $teacher->name }}</h5>
+                                            <h4 class="card-title" id="teacher-name-{{ $loop->index }}">{{ $teacher->name }}</h4>
+                                            <div class="mb-1">
+                                                @markdown($teacher->title)
+                                            </div>
                                             <p class="card-text d-none d-md-block">{{ $teacher->bio }}</p>
                                             <div class="card-text d-md-none">
                                                 <div class="short-bio">{{ Str::limit($teacher->bio, 150) }}</div>
