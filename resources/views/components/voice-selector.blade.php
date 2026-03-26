@@ -16,8 +16,8 @@
                     $isAI = $voiceKey === 'ai';
                     $teacher = $teachers[$voiceKey] ?? null;
                     $profilePicture = $isAI 
-                        ? asset('flowers/Flower-5.svg') 
-                        : ($teacher ? asset('profile_pictures/sq/' . $teacher->profile_picture) : asset('flowers/Flower-5.svg'));
+                        ? Storage::url('flowers/Flower-5.svg') 
+                        : ($teacher ? Storage::url('profile_pictures/sq/' . $teacher->profile_picture) : Storage::url('flowers/Flower-5.svg'));
                     $isDefault = $voice === $defaultVoice;
                 @endphp
                 <div class="voice-option text-center">

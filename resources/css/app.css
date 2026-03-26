@@ -1296,7 +1296,7 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 .teacher-image-container {
     position: relative;
     overflow: hidden;
-    border-radius: 0.375rem 0 0 0.375rem; /* round left corners */
+    border-radius: 0.375rem;
 }
 
 .teacher-image {
