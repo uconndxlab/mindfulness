@@ -17,7 +17,7 @@
                     $teacher = $teachers[$voiceKey] ?? null;
                     $profilePicture = $isAI 
                         ? asset('flowers/Flower-5.svg') 
-                        : ($teacher ? asset('profile_pictures/' . $teacher->profile_picture) : asset('flowers/Flower-5.svg'));
+                        : ($teacher ? asset('profile_pictures/sq/' . $teacher->profile_picture) : asset('flowers/Flower-5.svg'));
                     $isDefault = $voice === $defaultVoice;
                 @endphp
                 <div class="voice-option text-center">

@@ -45,7 +45,7 @@
                                 <div class="row g-0 flex-column flex-md-row">
                                     <div class="col-12 col-md-4 col-lg-3">
                                         <div class="teacher-image-container">
-                                            <img src="{{ Storage::url('profile_pictures/'.$teacher->profile_picture) }}" 
+                                            <img src="{{ asset('profile_pictures/34/'.$teacher->profile_picture) }}" 
                                                 alt="{{ $teacher->name }}" 
                                                 class="teacher-image">
                                         </div>
