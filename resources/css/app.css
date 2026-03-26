@@ -1652,3 +1652,50 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     overflow-wrap: break-word;
     white-space: normal;
 }
+
+/* voice selector */
+.voice-option {
+    flex: 0 0 auto;
+}
+
+.voice-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 100%;
+    border: 3px solid transparent;
+    padding: 0;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 4px 4px rgba(0,0,0,0.1);
+}
+
+.voice-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.voice-btn.active {
+    border-color: var(--light-green);
+    border-width: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.voice-profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+.voice-btn.active + .voice-label {
+    color: var(--dark-green);
+    font-weight: 800;
+    transition: all 0.05s ease;
+}

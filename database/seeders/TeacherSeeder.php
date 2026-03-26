@@ -20,6 +20,7 @@ class TeacherSeeder extends Seeder
                 [
                     'name' => $item['name'],
                     'title' => $item['title'] ?? null,
+                    'voice_key' => $item['voice_key'] ?? null,
                     'bio' => $item['bio'],
                     'profile_picture' => $item['profile_picture'],
                 ]

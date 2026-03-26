@@ -1,10 +1,9 @@
 function initVoiceSelector() {
     const optionsDiv = document.getElementById('audio-options-div');
-    const dropdown = document.getElementById('voice_dropdown');
-    const dropdownButton = document.getElementById('voice_dropdown_button');
+    const buttonGroup = document.getElementById('voice_button_group');
     const hiddenInput = document.getElementById('voice_select');
 
-    if (!optionsDiv || !dropdown || !dropdownButton || !hiddenInput) return;
+    if (!optionsDiv || !buttonGroup || !hiddenInput) return;
 
     // show the options
     optionsDiv.classList.remove('d-none');
@@ -16,13 +15,20 @@ function initVoiceSelector() {
             try { audio.pause(); } catch (_) {}
         });
     }
+    
     function selectVoice(voice, voiceSlug) {
-        // update dropdown text
-        dropdownButton.textContent = voice;
-
         // update hidden input with slug (used for DOM operations)
         hiddenInput.value = voice;
         hiddenInput.dataset.voice = voiceSlug;
+
+        // update active state on buttons
+        document.querySelectorAll('.voice-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        const activeBtn = document.querySelector(`.voice-btn[data-voice="${voiceSlug}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+        }
 
         // pause all audio players
         pauseAllAudioPlayers();
@@ -50,10 +56,10 @@ function initVoiceSelector() {
     }
 
     // delegate click handling to avoid inline JS
-    dropdown.addEventListener('click', function (e) {
-        const btn = e.target.closest('.dropdown-item');
+    buttonGroup.addEventListener('click', function (e) {
+        const btn = e.target.closest('.voice-btn');
         if (!btn) return;
-        const voice = btn.value;
+        const voice = btn.dataset.voiceName;
         const voiceSlug = btn.dataset.voice;
         if (voice && voiceSlug) selectVoice(voice, voiceSlug);
     });
