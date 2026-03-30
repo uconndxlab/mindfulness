@@ -2,7 +2,7 @@
     "name": "Healing Hearts",
     "short_name": "Healing Hearts",
     "description": "A mindfulness app for divorced and separated parents",
-    "start_url": "/about",
+    "start_url": "/home",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#48745D",
