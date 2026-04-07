@@ -8,7 +8,7 @@
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div id="pdfModalContent" class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title" id="pdfModalLabel">Workbook: {{ $wbName }}</h3>
+                <h3 class="modal-title" id="pdfModalLabel">{{ $wbName }}</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div id="pdfModalBody" class="modal-body">
