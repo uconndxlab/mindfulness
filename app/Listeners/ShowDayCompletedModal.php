@@ -72,7 +72,7 @@ class ShowDayCompletedModal
     {
         $converter = app(\League\CommonMark\CommonMarkConverter::class);
         
-        $moduleName = e($day->module->name);
+        $moduleName = e($day->module->partName());
         $dayName = e($day->name);
         
         $bodyMessage = $day->completion_message ?? "Congratulations on completing **{$moduleName}: {$dayName}**!";

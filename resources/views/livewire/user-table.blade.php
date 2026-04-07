@@ -113,7 +113,7 @@
                                     @if ($user->currentActivity())
                                         <td>
                                             {{ $user->currentActivity()->title }}<br>
-                                            <small>{{ $user->currentActivity()->day->name }}, {{ $user->currentActivity()->day->module->name }}</small>
+                                            <small>{{ $user->currentActivity()->day->name }}, {{ $user->currentActivity()->day->module->partName() }}</small>
                                         </td>
                                     @else
                                         <td>None</td>
@@ -139,7 +139,7 @@
                                                 @endphp
                                                 <div class="border rounded p-3 bg-light favorite-list-container">
                                                     @foreach ($groupedByModule as $moduleId => $activitiesInModule)
-                                                        <strong>{{ $activitiesInModule->first()->day->module->name }}</strong>
+                                                        <strong>{{ $activitiesInModule->first()->day->module->partName() }}</strong>
                                                         @php
                                                             $groupedByDay = $activitiesInModule->groupBy('day.id');
                                                         @endphp

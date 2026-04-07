@@ -47,7 +47,7 @@ class ActivityController extends Controller
                 ->withProperties([
                     'activity' => $activity->title,
                     'day' => $activity->day->name,
-                    'module' => $activity->day->module->name,
+                    'module' => $activity->day->module->partName(),
                     'activity_type' => $activity->type,
                     'time_to_complete' => $time_to_complete,
                 ])
@@ -162,7 +162,7 @@ class ActivityController extends Controller
         $properties = [
             'activity' => $activity->title,
             'day' => $activity->day->name,
-            'module' => $activity->day->module->name,
+            'module' => $activity->day->module->partName(),
             'activity_type' => $activity->type,
         ];
         

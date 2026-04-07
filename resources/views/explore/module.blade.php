@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
-@section('title', $module->name)
+@section('title', $module->partName())
 @section('page_id', 'module')
 
 @section('content')
 <div class="col-md-8">
     <div class="text-left mb-3">
-        <h1 class="display fw-bold mb-1">Part {{ $module->order }} - {{ $module->name }}</h1>
+        <h1 class="display fw-bold mb-1">{{ $module->partName() }}</h1>
         <p>{{ $module->description }}</p>
         @if ($module->workbook_path)
-            <x-pdf-viewer fpath="{{ Storage::url($module->workbook_path) }}" wbName="{{ $module->name }}" />
+            <x-pdf-viewer fpath="{{ Storage::url($module->workbook_path) }}" wbName="Healing Hearts Workbook" />
         @endif
     </div>
 

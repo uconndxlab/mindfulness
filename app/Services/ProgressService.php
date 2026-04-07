@@ -152,7 +152,7 @@ class ProgressService
             ->causedBy($user)
             ->withProperties([
                 'day' => $day->name,
-                'module' => $day->module->name,
+                'module' => $day->module->partName(),
             ])
             ->log('Day completed');
         
@@ -263,7 +263,7 @@ class ProgressService
             ->performedOn($module)
             ->causedBy($user)
             ->withProperties([
-                'module' => $module->name,
+                'module' => $module->partName(),
             ])
             ->log('Module completed');
 
@@ -481,7 +481,7 @@ class ProgressService
             ->causedBy($user)
             ->withProperties([
                 'day' => $day->name,
-                'module' => $day->module->name,
+                'module' => $day->module->partName(),
             ])
             ->log('Day completed in App Update');
     }
@@ -526,7 +526,7 @@ class ProgressService
             ->performedOn($module)
             ->causedBy($user)
             ->withProperties([
-                'module' => $module->name,
+                'module' => $module->partName(),
             ])
             ->log('Module completed in App Update');
     }

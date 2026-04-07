@@ -71,14 +71,14 @@
                                                     @break
                                                 @case('Activity')
                                                     <strong>{{ $event->subject->title }}</strong><br>
-                                                    <small>{{ $event->subject->day->name }}, {{ $event->subject->day->module->name }}</small>
+                                                    <small>{{ $event->subject->day->name }}, {{ $event->subject->day->module->partName() }}</small>
                                                     @break
                                                 @case('Day')
                                                     <strong>{{ $event->subject->name }}</strong><br>
-                                                    <small>{{ $event->subject->module->name }}</small>
+                                                    <small>{{ $event->subject->module->partName() }}</small>
                                                     @break
                                                 @case('Module')
-                                                    <strong>{{ $event->subject->name }}</strong>
+                                                    <strong>{{ $event->subject->partName() }}</strong>
                                                     @break
                                                 @default
                                                     {{ class_basename($event->subject) }} #{{ $event->subject->id }}

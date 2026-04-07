@@ -68,7 +68,7 @@ class NoteController extends Controller
                     'activity_id' => $request->activity_id
                 ],[
                     'note' => $request->note,
-                    'topic' => '['.$act->title.'](/explore/activity/'.$act->id.') - '.$act->day->name.', '.$act->day->module->name,
+                    'topic' => '['.$act->title.'](/explore/activity/'.$act->id.') - '.$act->day->name.', '.$act->day->module->partName(),
                 ]);
             }
             else {

@@ -11,7 +11,7 @@
         <div class="prior-note">
             <div class="grey-note">
                 <h5 class="fw-bold">
-                    <span>Part {{ $module->order }} - {{ $module->name }}</span>
+                    <span>{{ $module->partName() }}</span>
                 </h5>
                 <ul class="text-muted ps-2 mb-0">
                     @if($module->totalDays > 0)

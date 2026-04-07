@@ -19,7 +19,7 @@
                                 <a id="moduleLink" href="{{ route('explore.module', ['module_id' => $module->id]) }}" class="stretched-link w-100 module-link">
                                     <img src="{{ Storage::url('flowers/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon">
                                     <div class="col">
-                                        <h6 class="mb-0">Part {{ $module->order }} - {{ $module->name }}</h6>
+                                        <h6 class="mb-0">{{ $module->partName() }}</h6>
                                         <ul class="text-muted ps-2 mb-0">
                                             <li class="list-check{{ $module->daysCompleted == $module->totalDays ? '-filled' : '' }}">{{ $module->daysCompleted }}/{{ $module->totalDays }} Days</li>
                                             @if ($module->totalCheckInActivities > 0)
@@ -32,10 +32,10 @@
                                     </div>
                                 </a>
                             @else
-                                <a href="#" class="stretched-link w-100 module-link disabled locked-module-link" data-module-name="Part {{ $module->order }} - {{ $module->name }}">
+                                <a href="#" class="stretched-link w-100 module-link disabled locked-module-link" data-module-name="{{ $module->partName() }}">
                                     <img src="{{ Storage::url('flowers/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon">
                                     <div class="col">
-                                        <h6 class="mb-0">Part {{ $module->order }} - {{ $module->name }}</h6>
+                                        <h6 class="mb-0">{{ $module->partName() }}</h6>
                                         <ul class="text-muted ps-2 mb-0">
                                             <li class="list-check">{{ $module->daysCompleted }}/{{ $module->totalDays }} Days</li>
                                             @if ($module->totalCheckInActivities > 0)

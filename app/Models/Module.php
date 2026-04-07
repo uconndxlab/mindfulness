@@ -108,4 +108,8 @@ class Module extends Model
     {
         return $this->days()->orderBy('order', 'desc')->first()->activities()->where('optional', false)->orderBy('order', 'desc')->first();
     }
+
+    public function partName(): string {
+        return 'Part '.$this->order.($this->name ? ' - '.$this->name : '');
+    }
 }
