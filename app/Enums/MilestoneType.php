@@ -16,10 +16,10 @@ enum MilestoneType: string
         return match ($this) {
             self::Registered => 'Registered',
             self::FirstActivity => 'Completed First Activity',
-            self::Module1 => 'Completed Module 1',
-            self::Module2 => 'Completed Module 2',
-            self::Module3 => 'Completed Module 3',
-            self::Module4 => 'Completed Module 4',
+            self::Module1 => 'Completed Part 1',
+            self::Module2 => 'Completed Part 2',
+            self::Module3 => 'Completed Part 3',
+            self::Module4 => 'Completed Part 4',
         };
     }
 
@@ -37,10 +37,10 @@ enum MilestoneType: string
         return match ($this) {
             self::Registered => 'Registered',
             self::FirstActivity => 'First Activity',
-            self::Module1 => 'Module 1',
-            self::Module2 => 'Module 2',
-            self::Module3 => 'Module 3',
-            self::Module4 => 'Module 4',
+            self::Module1 => 'Part 1',
+            self::Module2 => 'Part 2',
+            self::Module3 => 'Part 3',
+            self::Module4 => 'Part 4',
         };
     }
 

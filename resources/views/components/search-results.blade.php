@@ -16,7 +16,7 @@
         <div class="card module p-2 mb-2">
             <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $random->id, 'library' => true]) }}">
                 <p class="activity-font mb-0">{{ $random->title }}</p> 
-                <p class="sub-activity-font">{{ $random->day->name.', '.$random->day->module->name}}</p>
+                <p class="sub-activity-font">{{ $random->day->name.', '.$random->day->module->partName()}}</p>
                 @if ($random->type)
                     <span class="sub-activity-font activity-tag-{{ $random->type }}">{{ ucfirst($random->type) }}</span>
                 @endif
@@ -52,7 +52,7 @@
                     <div class="card module p-2 mb-2">
                         <a class="stretched-link w-100" href="{{ route('explore.activity', ['activity_id' => $activity->id, 'library' => true]) }}">
                             <p class="activity-font mb-0">{{ $activity->title }}</p> 
-                            <p class="sub-activity-font">{{ $activity->day->name.', '.$activity->day->module->name}}</p>
+                            <p class="sub-activity-font">{{ $activity->day->name.', '.$activity->day->module->partName()}}</p>
                             @if ($activity->type)
                                 <span class="sub-activity-font activity-tag-{{ $activity->type }}">{{ ucfirst($activity->type) }}</span>
                             @endif

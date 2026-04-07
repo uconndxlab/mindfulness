@@ -13,10 +13,10 @@
                     // voice is original capitalized name (label)
                     $voiceKey = \Illuminate\Support\Str::slug($voice);
                     $audioSlug = 'audio-' . $voiceKey;
-                    $isAI = $voiceKey === 'ai';
+                    $isAI = $voiceKey === 'ai-female' || $voiceKey === 'ai-male';
                     $teacher = $teachers[$voiceKey] ?? null;
                     $profilePicture = $isAI 
-                        ? Storage::url('flowers/Flower-5.svg') 
+                        ? ($voiceKey === 'ai-female' ? Storage::url('profile_pictures/icon-w.png') : Storage::url('profile_pictures/icon-m.png')) 
                         : ($teacher ? Storage::url('profile_pictures/sq/' . $teacher->profile_picture) : Storage::url('flowers/Flower-5.svg'));
                     $isDefault = $voice === $defaultVoice;
                 @endphp

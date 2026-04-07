@@ -36,7 +36,7 @@
             <p class="text-center">
                 The development and testing of the Healing Hearts program was made possible through the generous support of the National Institute of Health (K01MH122502). We gratefully acknowledge their funding. We also extend our heartfelt thanks to our dedicated team members from UConn Digital Experience Group, research assistants, mindfulness teachers, consultants, and collaborators for their invaluable contributions to this project. We are also grateful to the participants who provided valuable feedback during the development and testing phase, helping us to continuously improve the Healing Hearts experience. 
             </p>
-            <h5 class="text-center fw-bold mt-4">Our Teachers</h5>
+            <h5 class="text-center fw-bold mt-4">{{ config('app.name') }} Team</h5>
             <div class="container">
                 @foreach ($teachers as $teacher)
                     <div class="row mb-4">
