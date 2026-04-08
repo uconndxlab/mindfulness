@@ -90,19 +90,20 @@
                                     @break
                                 @case('status')
                                     <td class="text-center">
-                                        @php
-                                            $statusColors = [
-                                                'pending' => 'warning',
-                                                'accepted' => 'success',
-                                                'expired' => 'secondary',
-                                                'revoked' => 'danger'
-                                            ];
-                                            $badgeColor = $statusColors[$invitation->status] ?? 'secondary';
-                                            $text = $badgeColor === 'secondary' ? 'text-black' : '';
-                                        @endphp
-                                        <span class="badge bg-{{ $badgeColor }} {{ $text }}">
-                                            {{ ucfirst($invitation->status) }}
-                                        </span>
+                                        @if($invitation->status === 'accepted')
+                                            <span class="badge bg-success">Accepted</span>
+                                        @elseif($invitation->user_exists)
+                                            <span class="badge bg-info">Active ({{ ucfirst($invitation->status) }})</span>
+                                            <br><small class="text-muted">Registered independently</small>
+                                        @elseif($invitation->status === 'pending' && $invitation->expires_at->isFuture())
+                                            <span class="badge bg-warning text-black">Pending</span>
+                                        @elseif($invitation->status === 'expired' || $invitation->expires_at->isPast())
+                                            <span class="badge bg-secondary text-black">Expired</span>
+                                        @elseif($invitation->status === 'revoked')
+                                            <span class="badge bg-danger">Revoked</span>
+                                        @else
+                                            <span class="badge bg-dark">{{ ucfirst($invitation->status) }}</span>
+                                        @endif
                                     </td>
                                     @break
                                 @case('last_sent_at')

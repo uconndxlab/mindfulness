@@ -4,7 +4,9 @@ namespace App\Livewire;
 
 use App\Mail\InvitationEmail;
 use App\Models\Invitation;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -76,8 +78,14 @@ class InvitationTable extends Component
             ->where('expires_at', '<', Carbon::now())
             ->update(['status' => 'expired']);
 
-        // build query
+        // build query - add user_exists column (check if user exists for email)
         $invitationsQuery = Invitation::with(['invitedBy', 'registeredUser'])
+            ->addSelect([
+                'invitations.*',
+                'user_exists' => User::select(DB::raw(1))
+                    ->whereColumn('users.email', 'invitations.email')
+                    ->limit(1)
+            ])
             ->orderBy($this->sortColumn, $this->sortDirection);
 
         // filter by status

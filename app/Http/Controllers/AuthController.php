@@ -139,27 +139,31 @@ class AuthController extends Controller
         }
         
         try {
-            // check if invitation-only mode is enabled and validate invitation
+            // check for invitation token (regardless of mode)
             $invitation = null;
             $skipEmailValidation = false;
-            if (getConfig('invitation_only_mode', false)) {
-                $invitationToken = $request->input('invitation_token');
+            $invitationToken = $request->input('invitation_token');
+            
+            if ($invitationToken) {
+                $invitation = Invitation::where('token', $invitationToken)
+                    ->where('email', $request->input('email'))
+                    ->first();
                 
-                if (!$invitationToken) {
-                    return back()->withErrors(['error' => 'An invitation is required to register.']);
+                // only validate/require if invitation-only mode is ON
+                if (getConfig('invitation_only_mode', false)) {
+                    if (!$invitation) {
+                        return back()->withErrors(['error' => 'Invalid invitation token.']);
+                    }
+                    
+                    if (!$invitation->isValid()) {
+                        return back()->withErrors(['error' => 'This invitation has expired or is no longer valid.']);
+                    }
+                    
+                    $skipEmailValidation = true;
                 }
-                
-                $invitation = Invitation::where('token', $invitationToken)->first();
-                
-                if (!$invitation || !$invitation->isValid()) {
-                    return back()->withErrors(['error' => 'Invalid or expired invitation.']);
-                }
-                
-                // verify email matches invitation
-                if ($invitation->email !== $request->input('email')) {
-                    return back()->withErrors(['error' => 'Email must match the invitation email.']);
-                }
-                $skipEmailValidation = true;
+            } elseif (getConfig('invitation_only_mode', false)) {
+                // invitation-only mode is ON but no token provided
+                return back()->withErrors(['error' => 'An invitation is required to register.']);
             }
             
             //create user
@@ -173,12 +177,14 @@ class AuthController extends Controller
                 'terms_version' => config('terms.current_version'),
             ]);
             
-            // mark invitation as used if it exists
-            if ($invitation) {
+            // mark invitation as used if it exists and is valid
+            // marks regardless of mode if invitation is used
+            if ($invitation && $invitation->isValid()) {
                 $invitation->markAsUsed($user);
 
                 $user->email_verified_at = Carbon::now();
                 $user->save();
+                $skipEmailValidation = true;
             }
             
             //unlocking first module/day/activity
