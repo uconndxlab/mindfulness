@@ -1,5 +1,6 @@
 @php
     $teachers = App\Models\Teacher::all()->keyBy('voice_key');
+    $teacherVoiceKeys = array_keys($teachers);
 @endphp
 
 <div class="col-12 mt-1" id="audio-options-div">
@@ -13,7 +14,7 @@
                     // voice is original capitalized name (label)
                     $voiceKey = \Illuminate\Support\Str::slug($voice);
                     $audioSlug = 'audio-' . $voiceKey;
-                    $isAI = $voiceKey === 'ai-female' || $voiceKey === 'ai-male';
+                    $isAI = !in_array($voiceKey, $teacherVoiceKeys);
                     $teacher = $teachers[$voiceKey] ?? null;
                     $profilePicture = $isAI 
                         ? ($voiceKey === 'ai-female' ? Storage::url('profile_pictures/icon-w.png') : Storage::url('profile_pictures/icon-m.png')) 
