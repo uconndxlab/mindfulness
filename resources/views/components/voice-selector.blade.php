@@ -1,6 +1,6 @@
 @php
     $teachers = App\Models\Teacher::all()->keyBy('voice_key');
-    $teacherVoiceKeys = array_keys($teachers);
+    $teacherVoiceKeys = $teachers->keys()->toArray();
 @endphp
 
 <div class="col-12 mt-1" id="audio-options-div">
