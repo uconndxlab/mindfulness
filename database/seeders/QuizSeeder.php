@@ -28,6 +28,8 @@ class QuizSeeder extends Seeder
                     'type' => $quiz['type'],
                     'question_count' => $quiz['question_count'],
                     'question_options' => $quiz['question_options'],
+                    'pq_label' => $quiz['pq_label'] ?? null,
+                    'pq_content' => $quiz['pq_content'] ?? null,
                     'subject_id' => $quiz['subject_id'],
                     'subject_type' => $quiz['subject_type'],
                 ]

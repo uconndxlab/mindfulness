@@ -20,7 +20,7 @@
         @endif
     </div>
 
-    @include('components.quiz.question-types', ['question' => $question])
+    @include('components.quiz.question-types', ['question' => $question, 'pqLabel' => $pqLabel, 'pqContent' => $pqContent])
 
     @if ($question['type'] == 'radio')
         @include('components.quiz.feedback', ['question' => $question])

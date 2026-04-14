@@ -142,9 +142,9 @@
                 data-bs-placement="top"
                 data-bs-html="true"
                 data-bs-title="Practice Quality"
-                data-bs-content="This percentage reflects how consistently you returned to your present-moment experience during the practice. A higher score indicates you spent more time being aware and accepting, rather than avoiding or pushing away experiences.">
+                data-bs-content="{{ $pqContent ?? 'This percentage reflects how consistently you returned to your present-moment experience during the practice. A higher score indicates you spent more time being aware and accepting, rather than avoiding or pushing away experiences.' }}">
                 <i class="bi bi-info-circle" ></i> 
-                Practice Quality:
+                {{ $pqLabel ?? 'Practice Quality:' }}
             </strong>
             <span id="survey_average_value_{{ $question['number'] }}" class="pq-score">--</span>%
         </div>
