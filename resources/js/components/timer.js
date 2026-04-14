@@ -3,6 +3,7 @@ function initTimer() {
     if (!timerContainer) return;
 
     const presetTime = parseInt(timerContainer.getAttribute('data-preset-time')) || null;
+    const completeOnFinish = timerContainer.getAttribute('data-complete-on-finish') === 'true';
 
     let selectedMinutes = presetTime || 5;
     let timeRemaining = selectedMinutes * 60;
@@ -31,16 +32,27 @@ function initTimer() {
         if (!playPauseIcon) return;
         if (isRunning) {
             playPauseIcon.className = 'bi bi-pause';
-            // playPauseButton.classList.add('playing');
         } else {
             playPauseIcon.className = 'bi bi-play';
-            // playPauseButton.classList.remove('playing');
+        }
+    }
+
+    function showResetButton() {
+        if (resetButton) {
+            resetButton.classList.remove('d-none');
+        }
+    }
+
+    function hideResetButton() {
+        if (resetButton) {
+            resetButton.classList.add('d-none');
         }
     }
 
     function startTimer() {
         if (isRunning) return;
         isRunning = true;
+        hideResetButton();
         updatePlayPauseIcon();
         if (timeSelector) timeSelector.disabled = true;
 
@@ -52,7 +64,11 @@ function initTimer() {
                 clearInterval(timerInterval);
                 isRunning = false;
                 updatePlayPauseIcon();
-                completeActivity();
+                showResetButton();
+                
+                if (completeOnFinish) {
+                    completeActivity();
+                }
             }
         }, 1000);
     }
@@ -78,6 +94,7 @@ function initTimer() {
         timeRemaining = selectedMinutes * 60;
         updateDisplay();
         updatePlayPauseIcon();
+        hideResetButton();
         if (timeSelector) timeSelector.disabled = false;
     }
 

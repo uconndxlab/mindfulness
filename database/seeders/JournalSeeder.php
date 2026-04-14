@@ -21,6 +21,8 @@ class JournalSeeder extends Seeder
                 [
                     'activity_id' => $item['activity_id'],
                     'prompts' => $item['prompts'],
+                    'has_timer' => $item['has_timer'] ?? false,
+                    'image_path' => $item['image_path'] ?? null,
                 ]
             );
         }

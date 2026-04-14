@@ -1,6 +1,6 @@
 @if (isset($journal))
     <form id="journalForm" method="POST" class="pt-3" data-has-activity="{{ isset($journal->activity) ? 'true' : 'false' }}" data-activity-id="{{ $journal->activity ? $journal->activity->id : '' }}">
-        <p><em>For your data safety, please don’t write any sensitive personal information here such as your home address, government ID numbers, or financial details.</em></p>
+        <p><em>For your data safety, please don't write any sensitive personal information here such as your home address, government ID numbers, or financial details.</em></p>
         @csrf
         <div id="success-message" class="alert alert-success note-err-message d-none">
             Journal saved!
@@ -35,6 +35,19 @@
                 <input type="hidden" name="topic" id="topic" value="no-topic">
             </div>
             <div id="error-messages-word" class="text-danger note-err-message d-none"></div>
+        @endif
+        @if ($journal->image_path)
+            <div class="d-flex justify-content-center align-items-center content-view-image mb-3">
+                <span class="text-center">
+                    <img src="{{ Storage::url('content/'.$journal->image_path) }}" alt="Journal Image">
+                    <br>
+                </span>
+            </div>
+        @endif
+        @if ($journal->has_timer)
+            <div class="d-flex justify-content-center align-items-center mb-3">
+                <x-timer :presetTime="$journal->time ?? 5" :completeOnFinish="false" />
+            </div>
         @endif
         <textarea class="form-control" id="note" name="note" rows="5">{{ $journal->answer }}</textarea>
         <div id="error-messages-note" class="text-danger note-err-message d-none"></div>
