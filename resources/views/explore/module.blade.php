@@ -87,7 +87,7 @@
                                             </div>
                                         </a>
                                         @if ($activity->unlocked && $activity->description)
-                                            <div class="activity-description-accordion col-md-4">
+                                            <div class="activity-description-accordion col-md-8 col-lg-6 col-xl-5 col-xxl-4">
                                                 <div class="accordion-item border-0 activity-description-item">
                                                     <h2 class="accordion-header">
                                                         <button class="accordion-button activity-description-button {{ $accordion_activity_id == $activity->id ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_description_{{ $activity->id }}" aria-expanded="false" aria-controls="collapse_description_{{ $activity->id }}">
