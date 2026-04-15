@@ -1520,6 +1520,36 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     color: var(--dark-green);
 }
 
+.stats-subset {
+    margin-top: -0.25rem;
+    margin-bottom: 0.35rem;
+    padding-left: 0.75rem;
+    border-left: 2px solid rgba(108, 117, 125, 0.2);
+}
+
+.stats-subset-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #8c959e;
+    margin: 0.1rem 0 0.15rem;
+}
+
+.stats-subset .stat-item {
+    padding: 0.4rem 0;
+    border-bottom: 1px dashed rgba(108, 117, 125, 0.18);
+}
+
+.stats-subset .stat-item:last-child {
+    border-bottom: none;
+}
+
+.stats-subset .stat-label {
+    font-size: 0.88rem;
+    color: #7b848c;
+}
+
 /* activity description accordion */
 .activity-description-accordion {
     position: relative;

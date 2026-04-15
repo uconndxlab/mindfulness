@@ -35,23 +35,40 @@
             <div class="stats-container col-xl-6 col-lg-6 col-md-8">
                 <div class="stat-item">
                     <span class="stat-label">Average Quick Check-In Score</span>
-                    <span>
-                        <span class="stat-value">{{ $stats['pq_check_ins'] ? number_format($stats['pq_check_ins'], 1) : '--' }}%</span>
-                        <span class="text-muted small">({{ $stats['count_check_ins'] }} check-in{{ $stats['count_check_ins'] != 1 ? 's' : '' }})</span>
-                    </span>
+                    <div class="text-end">
+                        <div class="stat-value">{{ $stats['check_ins']['average'] ? number_format($stats['check_ins']['average'], 1) : '--' }}%</div>
+                        <div class="text-muted small">Over <span class="fw-bold">{{ $stats['check_ins']['count'] }}</span> check-in{{ $stats['check_ins']['count'] != 1 ? 's' : '' }}</div>
+                    </div>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Average Self-Rating Score</span>
-                    <span>
-                        <span class="stat-value">{{ $stats['pq_rmas'] ? number_format($stats['pq_rmas'], 1) : '--' }}%</span>
-                        <span class="text-muted small">({{ $stats['count_rmas'] }} self-rating{{ $stats['count_rmas'] != 1 ? 's' : '' }})</span>
-                    </span>
+                    <div class="text-end">
+                        <div class="stat-value">{{ $stats['self_ratings']['average'] ? number_format($stats['self_ratings']['average'], 1) : '--' }}%</div>
+                        <div class="text-muted small">Over <span class="fw-bold">{{ $stats['self_ratings']['count'] }}</span> self-rating{{ $stats['self_ratings']['count'] != 1 ? 's' : '' }}</div>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-label">Overall Average Practice Quality</span>
-                    <span>
-                        <span class="stat-value">{{ $stats['pq_avg'] ? number_format($stats['pq_avg'], 1) : '--' }}%</span>
-                    </span>
+                <div class="stats-subset">
+                    <div class="stat-item stat-item-child">
+                        <span class="stat-label">Rate My Emotions</span>
+                        <div class="text-end">
+                            <div class="stat-value">{{ $stats['self_ratings']['emotions']['average'] ? number_format($stats['self_ratings']['emotions']['average'], 1) : '--' }}%</div>
+                            <div class="text-muted small">Over <span class="fw-bold">{{ $stats['self_ratings']['emotions']['count'] }}</span> self-rating{{ $stats['self_ratings']['emotions']['count'] != 1 ? 's' : '' }}</div>
+                        </div>
+                    </div>
+                    <div class="stat-item stat-item-child">
+                        <span class="stat-label">Rate My Presence in Parenting</span>
+                        <div class="text-end">
+                            <div class="stat-value">{{ $stats['self_ratings']['parenting']['average'] ? number_format($stats['self_ratings']['parenting']['average'], 1) : '--' }}%</div>
+                            <div class="text-muted small">Over <span class="fw-bold">{{ $stats['self_ratings']['parenting']['count'] }}</span> self-rating{{ $stats['self_ratings']['parenting']['count'] != 1 ? 's' : '' }}</div>
+                        </div>
+                    </div>
+                    <div class="stat-item stat-item-child">
+                        <span class="stat-label">Rate My Awareness</span>
+                        <div class="text-end">
+                            <div class="stat-value">{{ $stats['self_ratings']['awareness']['average'] ? number_format($stats['self_ratings']['awareness']['average'], 1) : '--' }}%</div>
+                            <div class="text-muted small">Over <span class="fw-bold">{{ $stats['self_ratings']['awareness']['count'] }}</span> self-rating{{ $stats['self_ratings']['awareness']['count'] != 1 ? 's' : '' }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -125,13 +125,45 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $qas = $this->quiz_answers()->reflections();
         $qas_check_ins = (clone $qas)->where('reflection_type', 'check_in');
-        $qas_rmas = (clone $qas)->where('reflection_type', 'self_rating');
+        $qas_self_ratings = (clone $qas)->where('reflection_type', 'self_rating');
+
+        $qas_emotions = (clone $qas_self_ratings)
+            ->join('activities', 'quiz_answers.activity_id', '=', 'activities.id')
+            ->where('activities.title', 'Rate My Emotions');
+
+        $qas_awareness = (clone $qas_self_ratings)
+            ->join('activities', 'quiz_answers.activity_id', '=', 'activities.id')
+            ->where('activities.title', 'Rate My Awareness');
+
+        $qas_parenting = (clone $qas_self_ratings)
+            ->join('activities', 'quiz_answers.activity_id', '=', 'activities.id')
+            ->where('activities.title', 'Rate My Presence in Parenting');
+
         return [
-            'pq_check_ins' => $qas_check_ins->avg('average'),
-            'count_check_ins' => $qas_check_ins->count(),
-            'pq_rmas' => $qas_rmas->avg('average'),
-            'count_rmas' => $qas_rmas->count(),
-            'pq_avg' => $qas->avg('average'),
+            'overall' => [
+                'average' => $qas->avg('average'),
+                'count' => $qas->count(),
+            ],
+            'check_ins' => [
+                'average' => $qas_check_ins->avg('average'),
+                'count' => $qas_check_ins->count(),
+            ],
+            'self_ratings' => [
+                'average' => $qas_self_ratings->avg('average'),
+                'count' => $qas_self_ratings->count(),
+                'emotions' => [
+                    'average' => $qas_emotions->avg('quiz_answers.average'),
+                    'count' => $qas_emotions->count(),
+                ],
+                'awareness' => [
+                    'average' => $qas_awareness->avg('quiz_answers.average'),
+                    'count' => $qas_awareness->count(),
+                ],
+                'parenting' => [
+                    'average' => $qas_parenting->avg('quiz_answers.average'),
+                    'count' => $qas_parenting->count(),
+                ],
+            ],
         ];
     }
 
