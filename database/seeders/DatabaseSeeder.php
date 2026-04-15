@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
@@ -26,5 +26,13 @@ class DatabaseSeeder extends Seeder
             EmailSeeder::class,
             TeacherSeeder::class,
         ]);
+
+        Artisan::call('activities:audit-obsolete-records');
+
+        if ($this->command) {
+            $this->command->newLine();
+            $this->command->info('Post-seed activity audit:');
+            $this->command->line(Artisan::output());
+        }
     }
 }
