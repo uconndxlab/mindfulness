@@ -62,6 +62,21 @@ html {
     pointer-events: none;
     opacity: 0.5;
 }
+
+/* Bonus page: accordion-style header, non-interactive (no chevron) */
+.bonus-accordion-static {
+    cursor: default;
+    box-shadow: none !important;
+}
+.bonus-accordion-static::after {
+    display: none !important;
+}
+
+/* Locked activities should still be clickable to show the "locked" modal */
+a.activity-link.disabled {
+    pointer-events: auto;
+    cursor: pointer;
+}
 /* end main */
 
 a {
