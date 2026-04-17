@@ -11,15 +11,17 @@ class VoiceSelector extends Component
     public $voices;
     public $defaultVoice;
     public $showDropdown;
+    public $multipleVoices;
 
     /**
      * Create a new component instance.
      */
-    public function __construct(array $voices = [], string $defaultVoice = '', bool $showDropdown = false)
+    public function __construct(array $voices = [], string $defaultVoice = '', bool $showDropdown = false, $multipleVoices = false)
     {
         $this->voices = $voices;
         $this->defaultVoice = $defaultVoice;
         $this->showDropdown = $showDropdown;
+        $this->multipleVoices = $multipleVoices;
     }
 
     /**

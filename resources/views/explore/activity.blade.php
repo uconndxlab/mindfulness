@@ -54,7 +54,7 @@
             
             <!-- voice selection dropdown -->
             @if ($hasAudioOptions)
-                <x-voice-selector :voices="$content->audio_options" :defaultVoice="$defaultVoice" :showDropdown="$multipleVoices"/>
+                <x-voice-selector :voices="$content->audio_options" :defaultVoice="$defaultVoice" :showDropdown="true" :multipleVoices="$multipleVoices"/>
 
                 <!-- audio content views -->
                 <div class="mt-4">
