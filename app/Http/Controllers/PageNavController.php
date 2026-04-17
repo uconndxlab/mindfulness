@@ -141,13 +141,19 @@ class PageNavController extends Controller
             return redirect()->route('explore.home');
         }
 
-        $activities = $user->bonusActivities()
+        // include bonus activities even if still locked
+        $activities = Activity::where('optional', true)
             ->with('day')
             ->join('days', 'activities.day_id', '=', 'days.id')
             ->orderBy('days.order', 'asc')
             ->orderBy('activities.order', 'asc')
             ->select('activities.*')
             ->get();
+
+        foreach ($activities as $activity) {
+            $activity->unlocked = $activity->canBeAccessedBy($user);
+            $activity->completed = $activity->isCompletedBy($user);
+        }
         
         // group activities by day
         $activitiesByDay = $activities->groupBy('day_id')->map(function ($dayActivities) {
@@ -159,33 +165,8 @@ class PageNavController extends Controller
 
         $accordion_activity = $activity_id
             ? Activity::find($activity_id)
-            : Activity::where('optional', true)
-                ->orderBy('order')
-                ->get()
-                ->first(fn($activity) => $activity->canBeAccessedBy($user));
-        \Log::info($accordion_activity);
-        $accordion_activity_id = null;
-
-        // progress info
-        foreach ($activitiesByDay as $groupKey => $group) {
-            $day = $group['day'];
-            $day->unlocked = $day->canBeAccessedBy($user);
-            $day->completed = $day->isCompletedBy($user);
-            
-            // set active day if accordion_activity matches
-            if ($accordion_activity && $day->id == $accordion_activity->day_id) {
-                $accordion_activity_id = $accordion_activity->id;
-                $day->active = true;
-            } else {
-                $day->active = false;
-            }
-            
-            // activity statuses
-            foreach ($group['activities'] as $activity) {
-                $activity->unlocked = $activity->canBeAccessedBy($user);
-                $activity->completed = $activity->isCompletedBy($user);
-            }
-        }
+            : $activities->first(fn($activity) => $activity->unlocked);
+        $accordion_activity_id = $accordion_activity?->id;
 
         // page info
         $page_info = [];
