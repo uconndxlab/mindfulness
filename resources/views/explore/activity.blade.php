@@ -81,7 +81,6 @@
                 <!-- default video, image -->
                 <div id="content_main" class="content-main d-flex justify-content-center align-items-center flex-column" data-type="{{ $content->type }}">
                     @if ($content->type === 'image')
-                        <h6 class="fw-normal text-center col-md-8 col-lg-6 col-sm-10">Take your time with this activity. Please start the timer, the activity will complete when the timer runs out.</h6>
                         <x-timer :presetTime="$activity->time ?? 5" :completeOnFinish="true" />
                     @endif
                     <div class="mt-3">
