@@ -45,6 +45,8 @@ class AuditObsoleteActivityRecords extends Command
             ['journal']
         );
 
+        $ghostActivities = $this->findGhostActivities($activityTypesById);
+
         $this->info('Activity type audit');
         $this->table(
             ['Entity', 'Activity count', 'DB record count', 'Status'],
@@ -60,6 +62,29 @@ class AuditObsoleteActivityRecords extends Command
         $this->line('Obsolete quiz IDs: ' . $this->formatIds($obsoleteQuizIds));
         $this->line('Obsolete journal IDs: ' . $this->formatIds($obsoleteJournalIds));
 
+        $this->newLine();
+        $this->info('Ghost Activities (in DB but not in database/data/activities.json):');
+
+        if ($ghostActivities === null) {
+            $this->error('  Could not load database/data/activities.json. Skipping ghost activity check.');
+        } elseif ($ghostActivities->isEmpty()) {
+            $this->line('  None. All DB activities are accounted for in the seed file.');
+        } else {
+            $this->warn('  Found ' . $ghostActivities->count() . ' activity record(s) not present in the seed file:');
+            $this->table(
+                ['ID', 'Type', 'Title', 'Day ID'],
+                $ghostActivities
+                    ->map(fn ($activity) => [
+                        $activity->id,
+                        $activity->type,
+                        $activity->title,
+                        $activity->day_id,
+                    ])
+                    ->all()
+            );
+            $this->line('  Ghost Activity IDs: ' . $ghostActivities->pluck('id')->implode(', '));
+        }
+
         if (
             $obsoleteContentIds->isNotEmpty() ||
             $obsoleteQuizIds->isNotEmpty() ||
@@ -71,6 +96,49 @@ class AuditObsoleteActivityRecords extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    private function findGhostActivities(Collection $activityTypesById): ?Collection
+    {
+        $path = database_path('data/activities.json');
+
+        if (!is_file($path)) {
+            return null;
+        }
+
+        $contents = file_get_contents($path);
+
+        if ($contents === false) {
+            return null;
+        }
+
+        $decoded = json_decode($contents, true);
+
+        if (!is_array($decoded)) {
+            return null;
+        }
+
+        $seedIds = collect($decoded)
+            ->pluck('id')
+            ->filter(fn ($id) => $id !== null)
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        $seedIdLookup = array_flip($seedIds);
+
+        $missingIds = $activityTypesById
+            ->keys()
+            ->reject(fn ($id) => array_key_exists((int) $id, $seedIdLookup))
+            ->values();
+
+        if ($missingIds->isEmpty()) {
+            return collect();
+        }
+
+        return Activity::query()
+            ->whereIn('id', $missingIds)
+            ->orderBy('id')
+            ->get(['id', 'day_id', 'title', 'type']);
     }
 
     private function findObsoleteIds(Collection $records, Collection $activityTypesById, array $expectedTypes): Collection
