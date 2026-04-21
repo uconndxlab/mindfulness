@@ -27,7 +27,7 @@
         <section id="tutorial">
             <h4 class="text-center fw-bold mt-4">Tutorial</h4>
             <div class="container tutorial-container">
-                <x-contentView id="welcome_video" type="video" file="Healing Hearts App Tutorial 12 5.mp4" controlsList="noplaybackrate nodownload noseek"/>
+                <x-contentView id="tutorial_video" type="video" file="{{ config('tutorial.video_file') }}" controlsList="noplaybackrate nodownload noseek"/>
             </div>
         </section>
         <section id="info">

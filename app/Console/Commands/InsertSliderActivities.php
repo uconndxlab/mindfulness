@@ -174,7 +174,7 @@ class InsertSliderActivities extends Command
             ],
             'question_2' => [
                 'number' => 2,
-                'question' => 'During practice, I was actively avoiding or “pushing away” certain experiences.',
+                'question' => 'During practice, I was actively avoiding or "pushing away" certain experiences.',
                 'type' => 'slider',
                 "options_feedback" => $this->getSliderOptions()
             ],
@@ -216,7 +216,7 @@ class InsertSliderActivities extends Command
             ],
             'question_6' => [
                 'number' => 6,
-                'question' => 'During my practices in Part '.$order.', I was actively avoiding or “pushing away” certain experiences.',
+                'question' => 'During my practices in Part '.$order.', I was actively avoiding or "pushing away" certain experiences.',
                 'type' => 'slider',
                 "options_feedback" => $this->getSliderOptions()
             ],

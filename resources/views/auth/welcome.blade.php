@@ -10,7 +10,7 @@
     </div>
     <div class="text-center">
         <div class="container tutorial-container">
-            <x-contentView id="welcome_video" type="video" file="Healing Hearts App Tutorial 12 5.mp4" controlsList="noplaybackrate nodownload noseek"/>
+            <x-contentView id="tutorial_video" type="video" file="{{ config('tutorial.video_file') }}" controlsList="noplaybackrate nodownload noseek"/>
         </div>
         <br><br>
         <a href="{{ route('explore.home') }}" class="btn btn-primary">NEXT</a>
