@@ -31,8 +31,7 @@ function showPdfError(container, message) {
     container.appendChild(errorElement);
 }
 
-async function renderPdfInto(container, pdfUrl) {
-    const pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
+async function renderPdfPages(container, pdfDoc, onFirstPage) {
     for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
         const page = await pdfDoc.getPage(pageNum);
         const viewport = page.getViewport({ scale: 1.5 });
@@ -49,10 +48,17 @@ async function renderPdfInto(container, pdfUrl) {
         pageDiv.appendChild(canvas);
         container.appendChild(pageDiv);
 
-        const renderContext = { canvasContext: context, viewport };
-        await page.render(renderContext).promise;
+        await page.render({ canvasContext: context, viewport }).promise;
+
+        if (pageNum === 1 && typeof onFirstPage === 'function') {
+            onFirstPage();
+        }
     }
-    return pdfDoc;
+}
+
+function hidePdfLoading() {
+    const loading = document.getElementById('pdfLoading');
+    if (loading) loading.classList.add('is-hidden');
 }
 
 async function resolvePageNumber(pdfDoc, dest) {
@@ -167,37 +173,58 @@ async function buildBookmarks(pdfDoc) {
     }
 }
 
-function initPdfViewer() {
+function pickErrorMessage(error) {
+    const msg = error && error.message ? error.message : '';
+    if (
+        msg.includes('Setting up fake worker failed') ||
+        msg.includes('worker') ||
+        msg.includes('setup')
+    ) {
+        return 'PDF viewer is temporarily unavailable. Please try refreshing the page.';
+    }
+    if (msg.includes('Invalid PDF')) {
+        return 'The PDF file appears to be corrupted or invalid.';
+    }
+    if (msg.includes('Missing PDF')) {
+        return 'The requested PDF file could not be found.';
+    }
+    return 'Unable to display PDF document.';
+}
+
+async function initPdfViewer() {
     const container = document.getElementById('pdfContainer');
     if (!container) return;
 
     const pdfUrl = container.getAttribute('data-pdf-url');
     if (!pdfUrl) {
+        hidePdfLoading();
         showPdfError(container, 'No PDF file specified.');
         return;
     }
 
-    renderPdfInto(container, pdfUrl)
-        .then((pdfDoc) => buildBookmarks(pdfDoc))
-        .catch((error) => {
-            console.error('PDF rendering error:', error);
+    try {
+        const pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
 
-            let errorMessage = 'Unable to display PDF document.';
+        let firstPageResolve;
+        const firstPageReady = new Promise((resolve) => { firstPageResolve = resolve; });
 
-            if (error.message && (
-                error.message.includes('Setting up fake worker failed') ||
-                error.message.includes('worker') ||
-                error.message.includes('setup')
-            )) {
-                errorMessage = 'PDF viewer is temporarily unavailable. Please try refreshing the page.';
-            } else if (error.message && error.message.includes('Invalid PDF')) {
-                errorMessage = 'The PDF file appears to be corrupted or invalid.';
-            } else if (error.message && error.message.includes('Missing PDF')) {
-                errorMessage = 'The requested PDF file could not be found.';
-            }
-
-            showPdfError(container, errorMessage);
+        // kick these off in parallel - bookmarks don't need pages to be rendered
+        const bookmarksPromise = buildBookmarks(pdfDoc).catch((err) => {
+            console.error('Bookmark build error:', err);
         });
+        const renderPromise = renderPdfPages(container, pdfDoc, firstPageResolve);
+
+        // reveal the viewer once the first page is visible and bookmarks are ready
+        await Promise.all([firstPageReady, bookmarksPromise]);
+        hidePdfLoading();
+
+        // let remaining pages keep rendering in the background
+        await renderPromise;
+    } catch (error) {
+        console.error('PDF rendering error:', error);
+        hidePdfLoading();
+        showPdfError(container, pickErrorMessage(error));
+    }
 }
 
 if (document.readyState === 'loading') {

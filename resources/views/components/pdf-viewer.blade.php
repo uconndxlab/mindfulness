@@ -22,6 +22,10 @@
                     </div>
                 </aside>
                 <div id="pdfContainer" class="pdf-container" data-pdf-url="{{ $fpath }}"></div>
+                <div id="pdfLoading" class="pdf-loading" role="status" aria-live="polite">
+                    <div class="spinner-border" aria-hidden="true"></div>
+                    <span class="pdf-loading-text">Loading workbook&hellip;</span>
+                </div>
                 <template id="pdfErrorTemplate">
                     <div class="pdf-error-container">
                         <div class="pdf-error-content">
