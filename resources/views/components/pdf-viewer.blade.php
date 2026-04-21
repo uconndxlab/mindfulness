@@ -11,7 +11,16 @@
                 <h3 class="modal-title" id="pdfModalLabel">{{ $wbName }}</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div id="pdfModalBody" class="modal-body">
+            <div id="pdfModalBody" class="modal-body pdf-modal-body">
+                <aside id="pdfBookmarks" class="pdf-bookmarks d-none" aria-hidden="true">
+                    <button type="button" id="pdfBookmarksToggle" class="pdf-bookmarks-tab" aria-label="Toggle bookmarks" aria-expanded="false" aria-controls="pdfBookmarks">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div class="pdf-bookmarks-inner">
+                        <div class="pdf-bookmarks-header">Bookmarks</div>
+                        <nav class="pdf-bookmarks-list"></nav>
+                    </div>
+                </aside>
                 <div id="pdfContainer" class="pdf-container" data-pdf-url="{{ $fpath }}"></div>
                 <template id="pdfErrorTemplate">
                     <div class="pdf-error-container">
