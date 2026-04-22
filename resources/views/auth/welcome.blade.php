@@ -6,7 +6,7 @@
 <div class="col-md-6 dark-background">
     <div class="text-left">
         <h1 class="display-3 fs-1 fw-bold mb-1">Welcome!</h1>
-        <p class="">Welcome text goes here. It can wrap on to the following line like this. The following video is just a placeholder. It will be changed.</p>
+        <p class="">Watch this 8 minute video to set up the app on your smartphone and take a tour in the app. After the video, you can get started whenever you are ready. Enjoy!</p>
     </div>
     <div class="text-center">
         <div class="container tutorial-container">
