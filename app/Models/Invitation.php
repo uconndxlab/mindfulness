@@ -89,12 +89,12 @@ class Invitation extends Model
 
     public function markAsPending(): void
     {
-        $time = Carbon::now();
+        $now = Carbon::now();
         $this->update([
             'status' => 'pending',
             'token' => self::generateUniqueToken(),
-            'expires_at' => $time->addDays((int) config('invitations.expiration_days', 7)),
-            'last_sent_at' => $time,
+            'expires_at' => $now->copy()->addDays((int) config('invitations.expiration_days', 7)),
+            'last_sent_at' => $now,
             'resend_count' => $this->resend_count + 1,
         ]);
     }
