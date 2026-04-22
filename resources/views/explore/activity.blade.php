@@ -55,7 +55,9 @@
             <!-- voice selection dropdown -->
             @if ($hasAudioOptions)
                 <x-voice-selector :voices="$content->audio_options" :defaultVoice="$defaultVoice" :showDropdown="true" :multipleVoices="$multipleVoices"/>
+            @endif
 
+            @if ($hasAudioOptions && $content->type == 'audio')
                 <!-- audio content views -->
                 <div class="mt-4">
                     @foreach ($content->audio_options as $voice => $file_path)

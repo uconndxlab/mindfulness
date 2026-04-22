@@ -303,7 +303,7 @@ class PageNavController extends Controller
             $quiz->average = $temp_answers ? $temp_answers->average : null;
         }
         //decode the audio options
-        else if ($content && $content->type == 'audio' && $content->audio_options) {
+        else if ($content && ($content->type == 'audio' || $content->type == 'video') && $content->audio_options) {
             $content->audio_options = json_decode($content->audio_options, true);
         }
         else if ($journal) {
