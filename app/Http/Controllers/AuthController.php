@@ -91,11 +91,16 @@ class AuthController extends Controller
     public function registrationPage(Request $request)
     {
         $invitation = null;
-        
-        // if invitation token in session (from middleware), get inv details
-        if ($request->session()->has('invitation_token')) {
-            $token = $request->session()->get('invitation_token');
-            $invitation = Invitation::where('token', $token)->first();
+
+        // prefer the token from the URL (so multiple tabs stay independent),
+        // fall back to session for users who navigate back without the link
+        $token = $request->query('token') ?? $request->session()->get('invitation_token');
+
+        if ($token) {
+            $invitation = Invitation::where('token', $token)
+                ->where('status', 'pending')
+                ->where('expires_at', '>', now())
+                ->first();
         }
         
         return view('auth.register', compact('invitation'));

@@ -14,12 +14,10 @@
             </div>
         @enderror
 
-        @if(session('invitation_token') && isset($invitation))
-            @if($invitation->expires_at->diffInHours() < 24)
-                <div class="alert alert-warning" role="alert">
-                    <i class="bi bi-clock"></i> Your invitation expires {{ $invitation->expires_at->diffForHumans() }}.
-                </div>
-            @endif
+        @if(isset($invitation) && $invitation->expires_at->diffInHours() < 24)
+            <div class="alert alert-warning" role="alert">
+                <i class="bi bi-clock"></i> Your invitation expires {{ $invitation->expires_at->diffForHumans() }}.
+            </div>
         @endif
 
         <div class="text-left fs-5 fw-bold mb-3">
@@ -38,12 +36,12 @@
 
         <div class="form-group mb-3">
             <label class="fw-bold mb-1" for="email">Email</label>
-            @if(session('invitation_email'))
+            @if(isset($invitation))
                 <input id="email" type="email"
                     class="form-control" 
-                    value="{{ session('invitation_email') }}" 
+                    value="{{ $invitation->email }}" 
                     readonly disabled>
-                <input type="hidden" name="email" value="{{ session('invitation_email') }}">
+                <input type="hidden" name="email" value="{{ $invitation->email }}">
                 <small class="text-muted">Email is pre-filled from your invitation.</small>
             @else
                 <input id="email" type="email"
@@ -92,8 +90,8 @@
         </div>
         
         <input type="hidden" name="timezone" id="timezone">
-        @if(session('invitation_token'))
-            <input type="hidden" name="invitation_token" value="{{ session('invitation_token') }}">
+        @if(isset($invitation))
+            <input type="hidden" name="invitation_token" value="{{ $invitation->token }}">
         @endif
 
         <div class="form-group text-center mb-3">
