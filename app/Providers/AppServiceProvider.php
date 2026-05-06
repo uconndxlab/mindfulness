@@ -8,7 +8,10 @@ use App\Observers\ModuleObserver;
 use App\Services\ProgressService;
 use Event;
 use Illuminate\Auth\SessionGuard;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Livewire\Livewire;
@@ -41,6 +44,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->configureRateLimiters();
+
         Module::observe(ModuleObserver::class);
 
         Livewire::addPersistentMiddleware([
@@ -60,7 +65,7 @@ class AppServiceProvider extends ServiceProvider
             return $guard;
         });
 
-        if(config('app.env') === 'production') {
+        if (config('app.env') === 'production') {
             \URL::forceScheme('https');
         }
 
@@ -83,6 +88,34 @@ class AppServiceProvider extends ServiceProvider
                 
                 echo "<div class=\"markdown\">" . $htmlContent . "</div>"; 
             ?>';
+        });
+    }
+
+    private function configureRateLimiters(): void
+    {
+        $local = app()->isLocal();
+
+        // Unauthenticated endpoints only.
+        // We disable in local dev to avoid fighting the limiter during testing.
+
+        // 10 attempts per minute per IP (login)
+        RateLimiter::for('login', function (Request $request) use ($local) {
+            return $local ? Limit::none() : Limit::perMinute(10)->by($request->ip());
+        });
+
+        // 4 attempts per minute per IP (registration)
+        RateLimiter::for('register', function (Request $request) use ($local) {
+            return $local ? Limit::none() : Limit::perMinute(4)->by($request->ip());
+        });
+
+        // 4 attempts per minute per IP (password reset email)
+        RateLimiter::for('password-reset', function (Request $request) use ($local) {
+            return $local ? Limit::none() : Limit::perMinute(4)->by($request->ip());
+        });
+
+        // 4 attempts per minute per IP (resend verification email)
+        RateLimiter::for('verify-email', function (Request $request) use ($local) {
+            return $local ? Limit::none() : Limit::perMinute(4)->by($request->ip());
         });
     }
 }

@@ -28,14 +28,14 @@ Route::middleware('web')->group(function () {
     //login page
     Route::get('/login', [AuthController::class, 'loginPage'])->name('login');
     //login request
-    Route::post('/login', [AuthController::class,'authenticate'])->middleware('throttle:10,1')->name('login.submit');
+    Route::post('/login', [AuthController::class,'authenticate'])->middleware('throttle:login')->name('login.submit');
     
     //REGISTRATION
     Route::middleware(['registration.lock', 'invitation.required'])->group(function () { 
         //registration page
         Route::get('/account-creation', [AuthController::class, 'registrationPage'])->name('register');
-        //registration request - throttled in controller
-        Route::post('/account-creation', [AuthController::class,'register'])->name('register.submit');
+        //registration request
+        Route::post('/account-creation', [AuthController::class,'register'])->middleware('throttle:register')->name('register.submit');
     });
     
     //EMAIL VERIFICATION
@@ -47,7 +47,7 @@ Route::middleware('web')->group(function () {
             }
             return view('auth.verify');
         })->name('verification.notice');
-        Route::post('/email/verification-notification', [AuthController::class, 'sendVerifyEmail'])->middleware('throttle:4,1')->name('verification.send'); // throttled in controller too
+        Route::post('/email/verification-notification', [AuthController::class, 'sendVerifyEmail'])->middleware('throttle:verify-email')->name('verification.send');
         Route::get('/check-verification', [AuthController::class, 'checkVerification'])->name('verification.check');
     });
     // verify email button in email
@@ -87,8 +87,7 @@ Route::middleware('web')->group(function () {
     
     //FORGOT PASSWORD
     Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-    // throttled in controller
-    Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:password-reset')->name('password.email');
     Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
     Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
     
@@ -96,7 +95,7 @@ Route::middleware('web')->group(function () {
     //AUTH protected routes
     Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock', 'session.policy'])->group(function () {
         //logout
-        Route::post('/logout', [AuthController::class,'logout'])->middleware('throttle:20,1')->name('logout');
+        Route::post('/logout', [AuthController::class,'logout'])->name('logout');
 
         //NEW EXPLORE
         Route::get('/home', [PageNavController::class, 'exploreHome'])->name('explore.home');

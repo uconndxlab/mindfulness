@@ -8,7 +8,6 @@ use App\Rules\ValidEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
@@ -109,17 +108,6 @@ class AuthController extends Controller
     //account registration
     public function register(Request $request) : RedirectResponse
     {
-        // throttling registration attempts
-        // make key, and check if too many attempts
-        $key = sha1('register|'.$request->ip());
-        $limit = ['attempts' => 4, 'decay' => 3600]; // 3 successes per hour
-        if (RateLimiter::tooManyAttempts($key, $limit['attempts'])) {
-            $seconds = RateLimiter::availableIn($key);
-            $timeLeft = Carbon::now()->addSeconds($seconds)->diffForHumans(null, true);
-
-            return back()->withErrors(['error' => "Too many registration attempts. Please try again in {$timeLeft}."]);
-        }
-        
         //validate inputs
         try {
             $request->validate([
@@ -206,8 +194,6 @@ class AuthController extends Controller
             
             // clear invitation session data
             $request->session()->forget(['invitation_token', 'invitation_email']);
-            
-            RateLimiter::hit($key, $limit['decay']);
           
             // log registration
             activity('auth')
@@ -227,22 +213,12 @@ class AuthController extends Controller
 
     public function sendVerifyEmail(Request $request)
     {
-        // throttle
-        $key = sha1('send_verify_email|'.$request->ip());
-        $limit = ['attempts' => 4, 'decay' => 60]; // 4 successes per minute
-        if (RateLimiter::tooManyAttempts($key, $limit['attempts'])) {
-            $seconds = RateLimiter::availableIn($key);
-            $timeLeft = Carbon::now()->addSeconds($seconds)->diffForHumans(null, true);
-            return back()->withErrors(['error' => "Too many attempts. Please try again in {$timeLeft}."]);
-        }
-
         $user = Auth::user();
-        $user->sendEmailVerificationNotification();
         if ($user->email_verified_at) {
             return redirect()->intended('/');
         }
 
-        RateLimiter::hit($key, $limit['decay']);
+        $user->sendEmailVerificationNotification();
         return back()->with('message', 'Verification link sent!');
     }
 
