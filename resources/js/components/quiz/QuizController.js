@@ -28,6 +28,7 @@ class QuizController {
         this.prevQBtn = document.getElementById('prev_q_button');
         this.nextQBtn = document.getElementById('next_q_button');
         this.submitBtn = document.getElementById('submitButton');
+        this.submitInFlight = false;
         
         // map qs to components
         this.questionComponents = new Map();
@@ -227,10 +228,17 @@ class QuizController {
     }
 
     submitAnswers() {
+        if (this.submitInFlight) return Promise.resolve(false);
+        this.submitInFlight = true;
+
         const newFormatAnswers = this.collectAnswers();
         if (this.submitBtn) {
             this.submitBtn.blur();
         }
+
+        // prevent double submits while request is in-flight
+        this.submitBtn?.setAttribute('disabled', '');
+        this.nextQBtn?.setAttribute('disabled', '');
         
         // create formdata
         const formData = new FormData();
@@ -258,6 +266,11 @@ class QuizController {
                     const errorMessages = error.response?.data?.error_message || 'An unknown error occurred.';
                     if (window.showError) window.showError(errorMessages);
                     reject(false);
+                })
+                .finally(() => {
+                    this.submitInFlight = false;
+                    // restore disabled state based on current answers/position
+                    this.updateNavigationButtons();
                 });
         });
     }

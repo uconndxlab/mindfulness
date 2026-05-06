@@ -258,6 +258,20 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->isActivityFavorited($activity);
     }
 
+    public function setFavoriteActivity(?Activity $activity, bool $favorited): bool
+    {
+        if (!$activity) {
+            return false;
+        }
+
+        // should exist if unlocked?
+        $this->activities()->updateExistingPivot($activity->id, [
+            'favorited' => $favorited,
+        ]);
+
+        return $this->isActivityFavorited($activity);
+    }
+
     // day progress functions
     public function isDayCompleted(Day $day)
     {

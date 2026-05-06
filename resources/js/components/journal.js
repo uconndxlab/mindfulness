@@ -15,15 +15,19 @@ function initJournal() {
     const noteErrDiv = document.getElementById('error-messages-note');
     const wordErrDiv = document.getElementById('error-messages-word');
     const noteSuccessDiv = document.getElementById('success-message');
+    let submitInFlight = false;
 
     journalForm.addEventListener('submit', function(event) {
         event.preventDefault(); 
-        console.log('Submitting');
+        if (submitInFlight) return;
         submitNote();
     });
     
     // SUBMISSION
     function submitNote() {
+        submitInFlight = true;
+        submitBtn?.setAttribute('disabled', '');
+
         var body = null;
         if (hasActivity) {
             body = {
@@ -65,7 +69,6 @@ function initJournal() {
                     wordOtdInput.value = 'no-topic';
                     // using global id reference like the original inline script
                     if (window.note) window.note.value = '';
-                    unlockSubmit();
                 }
                 resolve(true);
             })
@@ -86,6 +89,10 @@ function initJournal() {
                     errDiv.classList.remove('d-none');
                 }
                 reject(false);
+            })
+            .finally(() => {
+                submitInFlight = false;
+                unlockSubmit();
             });
         });
     }

@@ -17,12 +17,18 @@ class UserController extends Controller
         $user = Auth::user();
         $activity = Activity::findOrFail($request->activity_id) ?? null;
 
-        $status = $user->toggleFavoriteActivity($activity);
-        if ($status) {
-            return response()->json(['message' => 'Activity favorited'], 200);
+        $favorited = $request->boolean('favorited', null);
+
+        // Preferred: set explicitly (idempotent) so clients can coalesce rapid clicks.
+        // Backward compatible: if `favorited` not provided, fall back to toggle.
+        if ($request->has('favorited')) {
+            $status = $user->setFavoriteActivity($activity, $favorited);
+        } else {
+            $status = $user->toggleFavoriteActivity($activity);
         }
-        else {
-            return response()->json(['message' => 'Activity unfavorited'], 200);
-        }
+
+        return response()->json([
+            'favorited' => (bool) $status,
+        ], 200);
     }
 }

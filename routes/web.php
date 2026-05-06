@@ -105,13 +105,12 @@ Route::middleware('web')->group(function () {
         Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
         // use for when skipping warning modal
         Route::get('/explore/activity/{activity_id}/fast', [PageNavController::class, 'exploreActivityBypass'])->name('explore.activity.bypass');
-        Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->middleware('throttle:30,1')->name('quiz.submit');
+        Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
         Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
 
-        // activity completion (add light rate-limiting)
-        Route::post('/activities/complete', [ActivityController::class, 'complete'])->middleware('throttle:30,1')->name('activities.complete');
-        Route::post('/activities/skip', [ActivityController::class, 'skip'])->middleware('throttle:30,1')->name('activities.skip');
-        Route::post('/activities/log-interaction', [ActivityController::class, 'logInteraction'])->middleware('throttle:60,1')->name('activities.log_interaction');
+        Route::post('/activities/complete', [ActivityController::class, 'complete'])->name('activities.complete');
+        Route::post('/activities/skip', [ActivityController::class, 'skip'])->name('activities.skip');
+        Route::post('/activities/log-interaction', [ActivityController::class, 'logInteraction'])->name('activities.log_interaction');
         
         //NAVIGATION
         //Page Navigation - the controller is not totally necessary
@@ -137,16 +136,14 @@ Route::middleware('web')->group(function () {
         //User updates
         Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
         
-        //favorites
-        Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->middleware('throttle:30,1')->name('favorite.toggle');
+        Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->name('favorite.toggle');
         
-        //NOTES - throttled in controller + guard API spam
-        Route::resource('note', NoteController::class)->middleware('throttle:30,1');
+        Route::resource('note', NoteController::class);
         
         //ADMIN ONLY
         Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
             Route::get('/dashboard', [AdminUserController::class, 'dashboard'])->name('dashboard');
-            Route::post('/lock-registration-access', [AdminUserController::class, 'lockRegistrationAccess'])->middleware('throttle:10,1')->name('lock-registration-access');
+            Route::post('/lock-registration-access', [AdminUserController::class, 'lockRegistrationAccess'])->name('lock-registration-access');
             Route::get('/users', [AdminUserController::class, 'index'])->name('users');
             Route::get('/users/export/csv', [AdminUserController::class, 'exportUsers'])->name('users.export');
             Route::get('/events', [AdminEventController::class, 'index'])->name('events');
@@ -158,10 +155,10 @@ Route::middleware('web')->group(function () {
             
             // Invitations
             Route::get('/invitations', [AdminInvitationController::class, 'index'])->name('invitations');
-            Route::post('/invitations', [AdminInvitationController::class, 'store'])->middleware('throttle:20,1')->name('invitations.store');
-            Route::post('/invitations/{id}/resend', [AdminInvitationController::class, 'resend'])->middleware('throttle:10,1')->name('invitations.resend');
-            Route::post('/invitations/{id}/revoke', [AdminInvitationController::class, 'revoke'])->middleware('throttle:10,1')->name('invitations.revoke');
-            Route::post('/invitations/toggle', [AdminInvitationController::class, 'toggleInvitationMode'])->middleware('throttle:10,1')->name('invitations.toggle');
+            Route::post('/invitations', [AdminInvitationController::class, 'store'])->name('invitations.store');
+            Route::post('/invitations/{id}/resend', [AdminInvitationController::class, 'resend'])->name('invitations.resend');
+            Route::post('/invitations/{id}/revoke', [AdminInvitationController::class, 'revoke'])->name('invitations.revoke');
+            Route::post('/invitations/toggle', [AdminInvitationController::class, 'toggleInvitationMode'])->name('invitations.toggle');
         });
     }); 
 });

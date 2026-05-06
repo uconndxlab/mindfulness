@@ -2,6 +2,8 @@ import { escapeHtml } from '../utils/escapeHtml.js';
 
 function initActivityPage() {
     const root = document.querySelector('[data-activity-root]') || document.body;
+    if (root?.dataset?.activityInitialized === 'true') return;
+    if (root?.dataset) root.dataset.activityInitialized = 'true';
     const activityId = parseInt(root.getAttribute('data-activity-id') || '0', 10);
     const dayName = root.getAttribute('data-day-name') || '';
     const status = root.getAttribute('data-status') || 'unlocked';
@@ -103,30 +105,59 @@ function initActivityPage() {
 
     // Favorites handling
     const favButton = document.getElementById('favorite_btn');
-    let isFavorited = (root.getAttribute('data-is-favorited') === 'true');
-    const startFavorited = isFavorited;
+    // Server-confirmed favorite state and desired UI state.
+    // We coalesce rapid clicks: the user can click freely, and we only send as many
+    // requests as needed to bring the server to the final desired state.
+    let serverFavorited = (root.getAttribute('data-is-favorited') === 'true');
+    let desiredFavorited = serverFavorited;
+    const startFavorited = serverFavorited;
     const favIcon = document.getElementById('favorite_icon');
-    if (isFavorited && favIcon) favIcon.className = 'bi bi-star-fill';
-    function toggleFavorite() {
-        const currentState = isFavorited;
-        isFavorited = !isFavorited;
-        if (favIcon) favIcon.className = isFavorited ? 'bi bi-star-fill' : 'bi bi-star';
-        return new Promise((resolve, reject) => {
-            window.axios.post(favoriteToggleRoute, {
-                activity_id: activityId
-            }).then(response => {
-                resolve(true);
-            }).catch(error => {
-                // console.error('There was an error toggling favorite', error);
-                isFavorited = currentState;
-                if (favIcon) favIcon.className = isFavorited ? 'bi bi-star-fill' : 'bi bi-star';
-                reject(false);
-            });
+    function renderFavorite() {
+        if (favIcon) favIcon.className = desiredFavorited ? 'bi bi-star-fill' : 'bi bi-star';
+    }
+    renderFavorite();
+
+    let favoriteInFlight = false;
+    function flushFavorite() {
+        if (favoriteInFlight) {
+            return;
+        }
+        if (desiredFavorited === serverFavorited) {
+            return;
+        }
+
+        favoriteInFlight = true;
+        const target = desiredFavorited;
+
+        window.axios.post(favoriteToggleRoute, {
+            activity_id: activityId,
+            favorited: target,
+        }).then(response => {
+            // Prefer server truth if returned.
+            if (typeof response?.data?.favorited === 'boolean') {
+                serverFavorited = response.data.favorited;
+            } else {
+                serverFavorited = target;
+            }
+        }).catch(() => {
+            // If the request fails, fall back UI to last known server state.
+            desiredFavorited = serverFavorited;
+            renderFavorite();
+        }).finally(() => {
+            favoriteInFlight = false;
+            // If the user clicked during the request, bring server to the final state.
+            flushFavorite();
         });
+    }
+
+    function onFavoriteClick() {
+        desiredFavorited = !desiredFavorited;
+        renderFavorite();
+        flushFavorite();
     }
     if (favButton) {
         favButton.addEventListener('click', function() {
-            toggleFavorite();
+            onFavoriteClick();
         });
     }
 
@@ -348,7 +379,7 @@ function initActivityPage() {
         // add engagement metrics for exited event
         if (eventType === 'exited') {
             // get favorite status
-            engagementMetrics.endFavorited = isFavorited;
+            engagementMetrics.endFavorited = serverFavorited;
             // calculate time to exit after completion
             if (engagementMetrics.completionTime) {
                 engagementMetrics.timeToExit = Math.round((performance.now() - engagementMetrics.completionTime) / 1000);
