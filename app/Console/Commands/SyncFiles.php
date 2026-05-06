@@ -79,6 +79,9 @@ class SyncFiles extends Command
         // delete files that are not present in the copied directory
         $switches[] = '-delete';
 
+        $switches[] = '-resumesupport=off';
+        $switches[] = '-criteria=time';
+
         // add mirror to replace files in the data directory
         if ($target === 'data') {
             $switches[] = '-mirror';
@@ -97,7 +100,7 @@ class SyncFiles extends Command
 
         // build final command
         return sprintf(
-            '%s /command "option batch on" "option confirm off" "open %s -privatekey=%s -hostkey=*" "%s" "exit"',
+            '%s /ini=nul /command "option batch continue" "option confirm off" "open %s -privatekey=%s -hostkey=*" "%s" "exit"',
             $winscpPath,
             $session,
             $privateKey,

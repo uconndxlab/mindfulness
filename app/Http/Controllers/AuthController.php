@@ -55,7 +55,7 @@ class AuthController extends Controller
                 Auth::logout();
                 return back()->withErrors([
                     'error' => 'Your account is locked. If you have any questions, feel free to contact us at <a href="mailto:'.config('mail.contact_email').'">'.config('mail.contact_email').'</a>.',
-                ]);
+                ])->with('account_locked', true);
             }
 
             // update active and timezone

@@ -16,9 +16,13 @@
         @if ($errors->has('credentials') || $errors->has('error'))
             <div class="alert alert-danger" role="alert">
                 <ul class="mb-0 ps-3">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
+                    @if (session('account_locked'))
+                        <li>Your account is locked. If you have any questions, feel free to contact us at <a href="mailto:{{ config('mail.contact_email') }}">{{ config('mail.contact_email') }}</a>.</li>
+                    @else
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    @endif
                 </ul>
             </div>
         @endif
