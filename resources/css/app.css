@@ -12,6 +12,8 @@
     --light-grey:#F2F2F2;
     --dark-grey:#e2e2e2;
     --blue-grey:#F2F2F2;
+    --survey-track-start: #f5f5f5;
+    --survey-track-end: #c8c8c8;
     --purple:#3B477B;
     --light-purple:#723B7B;
     --sidebar-width: 280px;
@@ -1429,23 +1431,28 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 
 /* Survey button group styling */
 .survey-btn-group {
-    border: 1px solid var(--blue-grey);
+    border: 1px solid var(--dark-grey);
     border-radius: 10px;
     overflow: hidden;
+    background: linear-gradient(
+        90deg,
+        var(--survey-track-start) 0%,
+        var(--survey-track-end) 100%
+    );
 }
 .survey-btn {
     cursor: pointer;
-    border-right: 1px solid rgba(0,0,0,0.1);
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
 }
 .survey-btn:last-child {
     border-right: none;
 }
 .survey-btn-inner {
-    background: var(--blue-grey);
+    background: transparent;
     transition: background 0.15s, color 0.15s;
 }
 .survey-btn:has(:checked) .survey-btn-inner {
-    background: var(--dark-green);
+    background: var(--purple);
     color: #fff;
 }
 .survey-btn-value {

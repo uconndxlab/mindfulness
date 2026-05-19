@@ -66,13 +66,61 @@ class QuizSurveyQuestion {
 
     handleRadioClick(optionId, radio) {
         this.selectedValues.set(optionId, radio.value);
+        this.clearRowValidationError(optionId);
         // update average if fully answered
         const nowAnswered = this.isAnswered();
         if (nowAnswered) {
             this.updateAverage();
+            this.clearValidationErrors();
         }
         this.onAnswerChange(this.questionNumber, nowAnswered);
         console.log(`Survey question ${this.questionNumber} option ${optionId} answered:`, radio.value);
+    }
+
+    getUnansweredOptionIds() {
+        const options = this.questionData?.options || [];
+        return options
+            .filter((option) => !this.selectedValues.has(option.id))
+            .map((option) => option.id);
+    }
+
+    clearRowValidationError(optionId) {
+        const field = document.getElementById(`survey_field_${this.questionNumber}_${optionId}`);
+        field?.classList.remove('is-invalid');
+    }
+
+    clearValidationErrors() {
+        this.questionDiv.querySelectorAll('.quiz-survey-field.is-invalid').forEach((field) => {
+            field.classList.remove('is-invalid');
+        });
+        const alert = document.getElementById(`survey_validation_alert_${this.questionNumber}`);
+        alert?.classList.add('d-none');
+    }
+
+    validateForSubmit() {
+        const unanswered = this.getUnansweredOptionIds();
+
+        if (unanswered.length === 0) {
+            return {
+                valid: true,
+                unansweredCount: 0,
+                firstUnansweredOptionId: null,
+            };
+        }
+
+        for (const optionId of unanswered) {
+            const field = document.getElementById(`survey_field_${this.questionNumber}_${optionId}`);
+            field?.classList.add('is-invalid');
+        }
+
+        const alert = document.getElementById(`survey_validation_alert_${this.questionNumber}`);
+        alert?.classList.remove('d-none');
+
+        return {
+            valid: false,
+            unansweredCount: unanswered.length,
+            firstUnansweredOptionId: unanswered[0],
+        };
     }
 
     updateAverage() {

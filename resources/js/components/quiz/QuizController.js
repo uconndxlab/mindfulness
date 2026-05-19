@@ -178,10 +178,17 @@ class QuizController {
     }
 
     // update nav based on current question state
+    getCurrentQuestionType() {
+        const questionDiv = this.questionElements.get(this.questionNumber);
+        return questionDiv?.getAttribute('data-type') || null;
+    }
+
     updateNavigationButtons() {
         const isAnswered = this.isCurrentQuestionAnswered();
         const isFirstQuestion = this.questionNumber === 1;
         const isLastQuestion = this.questionNumber === this.questionCount;
+        const isSurveyQuestion = this.getCurrentQuestionType() === 'survey';
+        const canAttemptSubmit = isAnswered || (isLastQuestion && isSurveyQuestion);
 
         if (isFirstQuestion) {
             this.prevQBtn?.classList.add('invisible');
@@ -202,12 +209,77 @@ class QuizController {
         }
 
         const endBtn = isLastQuestion ? this.submitBtn : this.nextQBtn;
-        if (isAnswered) {
+        if (canAttemptSubmit) {
             endBtn?.removeAttribute('disabled');
         }
         else {
             endBtn?.setAttribute('disabled', '');
         }
+    }
+
+    validateBeforeSubmit() {
+        this.clearSubmitValidationErrors();
+
+        let firstTarget = null;
+        let missingCount = 0;
+
+        for (const [questionNumber, component] of this.questionComponents) {
+            if (typeof component.validateForSubmit === 'function') {
+                const result = component.validateForSubmit();
+                if (!result.valid) {
+                    missingCount += result.unansweredCount;
+                    if (!firstTarget) {
+                        firstTarget = {
+                            questionNumber,
+                            optionId: result.firstUnansweredOptionId,
+                        };
+                    }
+                }
+            } else if (!component.isAnswered()) {
+                missingCount += 1;
+                if (!firstTarget) {
+                    firstTarget = { questionNumber, optionId: null };
+                }
+            }
+        }
+
+        return {
+            valid: missingCount === 0,
+            firstTarget,
+            missingCount,
+        };
+    }
+
+    showSubmitValidationErrors({ firstTarget, missingCount }) {
+        if (!firstTarget) {
+            return;
+        }
+
+        if (this.questionNumber !== firstTarget.questionNumber) {
+            this.changeQuestion(firstTarget.questionNumber);
+        }
+
+        if (firstTarget.optionId) {
+            requestAnimationFrame(() => {
+                const row = document.getElementById(
+                    `survey_${firstTarget.questionNumber}_${firstTarget.optionId}`
+                );
+                row?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        } else {
+            const questionDiv = this.questionElements.get(firstTarget.questionNumber);
+            questionDiv?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    clearSubmitValidationErrors() {
+        for (const component of this.questionComponents.values()) {
+            if (typeof component.clearValidationErrors === 'function') {
+                component.clearValidationErrors();
+            }
+        }
+        const errorDiv = document.getElementById('error-messages');
+        errorDiv?.classList.add('d-none');
     }
     
     changeQuestion(q_no) {
@@ -229,6 +301,14 @@ class QuizController {
 
     submitAnswers() {
         if (this.submitInFlight) return Promise.resolve(false);
+
+        const validation = this.validateBeforeSubmit();
+        if (!validation.valid) {
+            this.showSubmitValidationErrors(validation);
+            return Promise.resolve(false);
+        }
+
+        this.clearSubmitValidationErrors();
         this.submitInFlight = true;
 
         const newFormatAnswers = this.collectAnswers();

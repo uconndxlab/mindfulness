@@ -107,7 +107,7 @@
                 </div>
             </label>
             <div id="survey_{{ $question['number'] }}_{{ $option['id'] }}"
-                class="quiz-survey">
+                class="quiz-survey quiz-survey-row">
                 <div class="survey-btn-group d-flex" role="group">
                     @foreach ($option['survey_config']['options'] ?? [] as $value => $label)
                         <label class="survey-btn flex-fill text-center">
