@@ -92,41 +92,53 @@
         </div>
     </div>
 @elseif ($question['type'] === 'survey')
+    <div id="survey_validation_alert_{{ $question['number'] }}"
+        class="alert alert-danger d-none survey-validation-alert mb-3"
+        role="alert"
+        aria-live="polite">
+        <strong>Please complete every question below.</strong> Unanswered items are highlighted.
+    </div>
     @foreach ($question['options'] as $index => $option)
         <hr>
-        <label class="form-label">
-            <div class="quiz-survey-label">
-                @markdown($option['text'])
+        <div class="quiz-survey-field mb-3" id="survey_field_{{ $question['number'] }}_{{ $option['id'] }}">
+            <label class="form-label">
+                <div class="quiz-survey-label">
+                    @markdown($option['text'])
+                </div>
+            </label>
+            <div id="survey_{{ $question['number'] }}_{{ $option['id'] }}"
+                class="quiz-survey">
+                <div class="survey-btn-group d-flex" role="group">
+                    @foreach ($option['survey_config']['options'] ?? [] as $value => $label)
+                        <label class="survey-btn flex-fill text-center">
+                            <input type="radio" class="btn-check" 
+                                name="answer_{{ $question['number'] }}[{{ $option['id'] }}]"
+                                id="survey_{{ $question['number'] }}_{{ $option['id'] }}_{{ $value }}"
+                                value="{{ $value }}" autocomplete="off">
+                            <span class="survey-btn-inner d-block py-2 px-1">
+                                <span class="survey-btn-value d-block fw-bold">{{ $value }}</span>
+                            </span>
+                        </label>
+                    @endforeach
+                </div>
+                <div class="survey-legend d-flex">
+                    {{-- Mobile: short labels --}}
+                    <span class="survey-legend-item">(None)</span>
+                    <span class="survey-legend-item">(Little)</span>
+                    <span class="survey-legend-item">(Some)</span>
+                    <span class="survey-legend-item">(Much)</span>
+                    <span class="survey-legend-item">(Very much)</span>
+                </div>
+                <div class="survey-legend d-none d-none">
+                    {{-- Desktop: full labels from JSON --}}
+                    @foreach ($option['survey_config']['options'] ?? [] as $value => $label)
+                        <span class="survey-legend-item">{{ $label }}</span>
+                    @endforeach
+                </div>
             </div>
-        </label>
-        <div id="survey_{{ $question['number'] }}_{{ $option['id'] }}" class="quiz-survey mb-3">
-            <div class="survey-btn-group d-flex" role="group">
-                @foreach ($option['survey_config']['options'] ?? [] as $value => $label)
-                    <label class="survey-btn flex-fill text-center">
-                        <input type="radio" class="btn-check" 
-                               name="answer_{{ $question['number'] }}[{{ $option['id'] }}]"
-                               id="survey_{{ $question['number'] }}_{{ $option['id'] }}_{{ $value }}"
-                               value="{{ $value }}" autocomplete="off">
-                        <span class="survey-btn-inner d-block py-2 px-1">
-                            <span class="survey-btn-value d-block fw-bold">{{ $value }}</span>
-                        </span>
-                    </label>
-                @endforeach
-            </div>
-            <div class="survey-legend d-flex">
-                {{-- Mobile: short labels --}}
-                <span class="survey-legend-item">(None)</span>
-                <span class="survey-legend-item">(Little)</span>
-                <span class="survey-legend-item">(Some)</span>
-                <span class="survey-legend-item">(Much)</span>
-                <span class="survey-legend-item">(Very much)</span>
-            </div>
-            <div class="survey-legend d-none d-none">
-                {{-- Desktop: full labels from JSON --}}
-                @foreach ($option['survey_config']['options'] ?? [] as $value => $label)
-                    <span class="survey-legend-item">{{ $label }}</span>
-                @endforeach
-            </div>
+            <span class="invalid-feedback survey-row-invalid-feedback" role="alert">
+                <strong>Please select a rating for this question.</strong>
+            </span>
         </div>
         @if ($index === count($question['options']) - 1)
             <hr>

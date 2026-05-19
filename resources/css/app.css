@@ -1452,6 +1452,22 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     line-height: 1.2;
 }
 
+/* Survey validation (submit with unanswered rows) */
+.quiz-survey-field.is-invalid {
+    border-left: 3px solid var(--bs-danger);
+    padding-left: 0.75rem;
+    margin-left: -0.75rem;
+}
+.quiz-survey-field.is-invalid .survey-btn-group {
+    box-shadow: 0 0 0 1px rgba(var(--bs-danger-rgb), 0.35);
+}
+.survey-row-invalid-feedback {
+    display: none;
+}
+.quiz-survey-field.is-invalid .survey-row-invalid-feedback {
+    display: block;
+}
+
 /* Survey legend row below buttons */
 .survey-legend {
     margin-top: 0.25rem;
