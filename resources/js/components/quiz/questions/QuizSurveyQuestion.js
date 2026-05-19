@@ -76,8 +76,6 @@ class QuizSurveyQuestion {
     }
 
     updateAverage() {
-        if (!this.averageDisplayDiv || !this.averageValueSpan) return;
-
         let total = 0;
         let count = 0;
         let range = this.scaleMax - this.scaleMin;
@@ -95,9 +93,6 @@ class QuizSurveyQuestion {
 
         if (count > 0) {
             this.average = (total / count).toFixed(2);
-            this.averageValueSpan.textContent = Math.round(this.average);
-        } else if (this.average !== null && this.average !== undefined) {
-            this.averageValueSpan.textContent = Math.round(this.average);
         }
     }
 
