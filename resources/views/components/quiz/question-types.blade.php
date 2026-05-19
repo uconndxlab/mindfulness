@@ -132,7 +132,7 @@
             <hr>
         @endif
     @endforeach
-    <div class="d-flex justify-content-end">
+    <div class="d-flex justify-content-end d-none">
         <div id="survey_average_display_{{ $question['number'] }}" class="text-muted">
             <strong class="text-link"
                 role="button"
