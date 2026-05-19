@@ -620,21 +620,10 @@ class PageNavController extends Controller
         $page_info = [];
         $page_info['hide_account_link'] = true;
 
-        //calculating progress
         $modules = Module::orderBy('order', 'asc')->get();
-        foreach ($modules as $module) {
-            $stats = $module->getStats(Auth::user() ?? null);
-            $module->totalDays = $stats['totalDays'];
-            $module->daysCompleted = $stats['daysCompleted'];
-            $module->totalSelfRatings = $stats['totalSelfRatings'];
-            $module->completedSelfRatings = $stats['completedSelfRatings'];
-            $module->totalCheckInActivities = $stats['totalCheckInActivities'];
-            $module->completedCheckInActivities = $stats['completedCheckInActivities'];
-        }
+        $progress = Auth::user()->getAccountProgress($modules);
 
-        $stats = Auth::user()->getStats();
-
-        return view("other.account", compact('page_info', 'modules', 'stats'));
+        return view('other.account', compact('page_info', 'progress'));
     }
 
     public function helpPage()

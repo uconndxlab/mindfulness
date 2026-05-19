@@ -121,49 +121,104 @@ class User extends Authenticatable implements MustVerifyEmail
         return $query;
     }
 
-    public function getStats()
+    protected function reflectionAnswersQuery()
     {
-        $qas = $this->quiz_answers()->reflections();
-        $qas_check_ins = (clone $qas)->where('reflection_type', 'check_in');
-        $qas_self_ratings = (clone $qas)->where('reflection_type', 'self_rating');
+        return $this->quiz_answers()->reflections();
+    }
 
-        $qas_emotions = (clone $qas_self_ratings)
-            ->join('activities', 'quiz_answers.activity_id', '=', 'activities.id')
-            ->where('activities.title', 'Rate My Emotions');
+    protected function reflectionAnswersForModule(Module $module)
+    {
+        return $this->reflectionAnswersQuery()
+            ->whereHas('activity.day', fn ($query) => $query->where('module_id', $module->id));
+    }
 
-        $qas_awareness = (clone $qas_self_ratings)
-            ->join('activities', 'quiz_answers.activity_id', '=', 'activities.id')
-            ->where('activities.title', 'Rate My Awareness');
+    protected function reflectionScoreSummary($query): array
+    {
+        return [
+            'average' => $query->avg('average'),
+            'count' => $query->count(),
+        ];
+    }
 
-        $qas_parenting = (clone $qas_self_ratings)
-            ->join('activities', 'quiz_answers.activity_id', '=', 'activities.id')
-            ->where('activities.title', 'Rate My Presence in Parenting');
+    protected function selfRatingBreakdown($query): array
+    {
+        $byTitle = function (string $title) use ($query) {
+            $scoped = (clone $query)
+                ->join('activities', 'quiz_answers.activity_id', '=', 'activities.id')
+                ->where('activities.title', $title);
+
+            return [
+                'average' => $scoped->avg('quiz_answers.average'),
+                'count' => $scoped->count(),
+            ];
+        };
 
         return [
-            'overall' => [
-                'average' => $qas->avg('average'),
-                'count' => $qas->count(),
-            ],
-            'check_ins' => [
-                'average' => $qas_check_ins->avg('average'),
-                'count' => $qas_check_ins->count(),
-            ],
-            'self_ratings' => [
-                'average' => $qas_self_ratings->avg('average'),
-                'count' => $qas_self_ratings->count(),
-                'emotions' => [
-                    'average' => $qas_emotions->avg('quiz_answers.average'),
-                    'count' => $qas_emotions->count(),
+            'emotions' => $byTitle('Rate My Emotions'),
+            'awareness' => $byTitle('Rate My Awareness'),
+            'parenting' => $byTitle('Rate My Presence in Parenting'),
+        ];
+    }
+
+    public function getAccountProgress(iterable $modules): array
+    {
+        $parts = [];
+        $totals = [
+            'days' => ['completed' => 0, 'total' => 0],
+            'check_ins' => ['completed' => 0, 'total' => 0],
+            'self_ratings' => ['completed' => 0, 'total' => 0],
+        ];
+
+        foreach ($modules as $module) {
+            $moduleProgress = $module->getStats($this);
+            $moduleReflections = $this->reflectionAnswersForModule($module);
+            $checkInScores = $this->reflectionScoreSummary((clone $moduleReflections)->checkIns());
+            $selfRatingScores = $this->reflectionScoreSummary((clone $moduleReflections)->selfRatings());
+
+            $parts[] = [
+                'order' => $module->order,
+                'name' => $module->partName(),
+                'short_name' => 'Part ' . $module->order,
+                'days' => [
+                    'completed' => $moduleProgress['daysCompleted'],
+                    'total' => $moduleProgress['totalDays'],
                 ],
-                'awareness' => [
-                    'average' => $qas_awareness->avg('quiz_answers.average'),
-                    'count' => $qas_awareness->count(),
+                'check_ins' => [
+                    'completed' => $moduleProgress['completedCheckInActivities'],
+                    'total' => $moduleProgress['totalCheckInActivities'],
+                    'average' => $checkInScores['average'],
+                    'count' => $checkInScores['count'],
                 ],
-                'parenting' => [
-                    'average' => $qas_parenting->avg('quiz_answers.average'),
-                    'count' => $qas_parenting->count(),
+                'self_ratings' => [
+                    'completed' => $moduleProgress['completedSelfRatings'],
+                    'total' => $moduleProgress['totalSelfRatings'],
+                    'average' => $selfRatingScores['average'],
+                    'count' => $selfRatingScores['count'],
                 ],
-            ],
+            ];
+
+            $totals['days']['completed'] += $moduleProgress['daysCompleted'];
+            $totals['days']['total'] += $moduleProgress['totalDays'];
+            $totals['check_ins']['completed'] += $moduleProgress['completedCheckInActivities'];
+            $totals['check_ins']['total'] += $moduleProgress['totalCheckInActivities'];
+            $totals['self_ratings']['completed'] += $moduleProgress['completedSelfRatings'];
+            $totals['self_ratings']['total'] += $moduleProgress['totalSelfRatings'];
+        }
+
+        $reflections = $this->reflectionAnswersQuery();
+        $checkIns = (clone $reflections)->checkIns();
+        $selfRatings = (clone $reflections)->selfRatings();
+
+        $totals['check_ins'] = array_merge($totals['check_ins'], $this->reflectionScoreSummary($checkIns));
+        $totals['self_ratings'] = array_merge(
+            $totals['self_ratings'],
+            $this->reflectionScoreSummary($selfRatings),
+            $this->selfRatingBreakdown($selfRatings)
+        );
+
+        return [
+            'parts' => $parts,
+            'totals' => $totals,
         ];
     }
 

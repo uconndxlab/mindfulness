@@ -3,70 +3,101 @@
 @section('title', 'Account')
 
 @section('content')
+@php
+    $formatAverage = fn (?float $average) => $average ? number_format($average, 1) . '%' : '--%';
+    $isComplete = fn (int $completed, int $total) => $total > 0 && $completed === $total;
+    $totals = $progress['totals'];
+@endphp
 <div class="col-md-8">
     <h4 class="text-center fw-bold mb-3">
         Progress
     </h4>
-    @foreach ($modules as $module)
-        <div class="prior-note">
-            <div class="grey-note">
-                <h5 class="fw-bold">
-                    <span>{{ $module->partName() }}</span>
-                </h5>
-                <ul class="text-muted ps-2 mb-0">
-                    @if($module->totalDays > 0)
-                        <li class="list-check{{ $module->daysCompleted == $module->totalDays ? '-filled fw-bold' : '' }}">{{ $module->daysCompleted }}/{{ $module->totalDays }} Days</li>
-                    @endif
-                    @if ($module->totalCheckInActivities > 0)
-                        <li class="list-check{{ $module->completedCheckInActivities == $module->totalCheckInActivities ? '-filled fw-bold' : '' }}">{{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins</li>
-                    @endif
-                    @if ($module->totalSelfRatings > 0)
-                        <li class="list-check{{ $module->completedSelfRatings == $module->totalSelfRatings ? '-filled fw-bold' : '' }}">{{ $module->completedSelfRatings }}/{{ $module->totalSelfRatings }} Self-Rating</li>
-                    @endif
-                </ul>
+
+    <div class="prior-note mb-4">
+        <div class="grey-note progress-dashboard">
+            <div class="progress-parts-grid">
+                @foreach ($progress['parts'] as $part)
+                    <div class="progress-part">
+                        <h6 class="progress-part-title fw-bold mb-2">{{ $part['short_name'] }}</h6>
+                        <ul class="text-muted ps-2 mb-0">
+                            @if ($part['days']['total'] > 0)
+                                <li class="list-check{{ $isComplete($part['days']['completed'], $part['days']['total']) ? '-filled fw-bold' : '' }}">
+                                    {{ $part['days']['completed'] }}/{{ $part['days']['total'] }} Days
+                                </li>
+                            @endif
+                            @if ($part['check_ins']['total'] > 0)
+                                <li class="list-check{{ $isComplete($part['check_ins']['completed'], $part['check_ins']['total']) ? '-filled fw-bold' : '' }}">
+                                    {{ $part['check_ins']['completed'] }}/{{ $part['check_ins']['total'] }} Quick Check-Ins
+                                </li>
+                            @endif
+                            @if ($part['self_ratings']['total'] > 0)
+                                <li class="list-check{{ $isComplete($part['self_ratings']['completed'], $part['self_ratings']['total']) ? '-filled fw-bold' : '' }}">
+                                    {{ $part['self_ratings']['completed'] }}/{{ $part['self_ratings']['total'] }} Self-Rating{{ $part['self_ratings']['total'] != 1 ? 's' : '' }}
+                                </li>
+                            @endif
+                        </ul>
+                        @if ($part['check_ins']['total'] > 0)
+                            <div class="progress-part-metric">
+                                <span class="progress-part-metric-label">Avg. check-in</span>
+                                <span class="progress-part-metric-value">{{ $formatAverage($part['check_ins']['average']) }}</span>
+                            </div>
+                        @endif
+                        @if ($part['self_ratings']['total'] > 0)
+                            <div class="progress-part-metric">
+                                <span class="progress-part-metric-label">Avg. self-rating</span>
+                                <span class="progress-part-metric-value">{{ $formatAverage($part['self_ratings']['average']) }}</span>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
             </div>
-        </div>
-    @endforeach
-    <div class="priority-note">
-        <div class="grey-note">
-            <h5 class="fw-bold">
-                <span>Stats</span>
-            </h5>
-            <div class="stats-container col-xl-6 col-lg-6 col-md-8">
-                <div class="stat-item">
-                    <span class="stat-label">Average Quick Check-In Score</span>
-                    <div class="text-end">
-                        <div class="stat-value">{{ $stats['check_ins']['average'] ? number_format($stats['check_ins']['average'], 1) : '--' }}%</div>
-                        <div class="text-muted small">Over <span class="fw-bold">{{ $stats['check_ins']['count'] }}</span> check-in{{ $stats['check_ins']['count'] != 1 ? 's' : '' }}</div>
-                    </div>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Average Self-Rating Score</span>
-                    <div class="text-end">
-                        <div class="stat-value">{{ $stats['self_ratings']['average'] ? number_format($stats['self_ratings']['average'], 1) : '--' }}%</div>
-                        <div class="text-muted small">Over <span class="fw-bold">{{ $stats['self_ratings']['count'] }}</span> self-rating{{ $stats['self_ratings']['count'] != 1 ? 's' : '' }}</div>
-                    </div>
-                </div>
-                <div class="stats-subset">
-                    <div class="stat-item stat-item-child">
-                        <span class="stat-label">Rate My Emotions</span>
+
+            <div class="progress-totals">
+                <h6 class="progress-totals-title fw-bold mb-2">Totals</h6>
+                @if ($totals['days']['total'] > 0)
+                    <div class="stat-item">
+                        <span class="stat-label">Days</span>
                         <div class="text-end">
-                            <div class="stat-value">{{ $stats['self_ratings']['emotions']['average'] ? number_format($stats['self_ratings']['emotions']['average'], 1) : '--' }}%</div>
-                            <div class="text-muted small">Over <span class="fw-bold">{{ $stats['self_ratings']['emotions']['count'] }}</span> self-rating{{ $stats['self_ratings']['emotions']['count'] != 1 ? 's' : '' }}</div>
+                            <div class="stat-value">{{ $totals['days']['completed'] }}/{{ $totals['days']['total'] }}</div>
                         </div>
                     </div>
-                    <div class="stat-item stat-item-child">
-                        <span class="stat-label">Rate My Presence in Parenting</span>
+                @endif
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <span class="stat-label">Average Quick Check-In Score</span>
                         <div class="text-end">
-                            <div class="stat-value">{{ $stats['self_ratings']['parenting']['average'] ? number_format($stats['self_ratings']['parenting']['average'], 1) : '--' }}%</div>
-                            <div class="text-muted small">Over <span class="fw-bold">{{ $stats['self_ratings']['parenting']['count'] }}</span> self-rating{{ $stats['self_ratings']['parenting']['count'] != 1 ? 's' : '' }}</div>
+                            <div class="stat-value">{{ $formatAverage($totals['check_ins']['average']) }}</div>
+                            <div class="text-muted small">Over <span class="fw-bold">{{ $totals['check_ins']['count'] }}</span> check-in{{ $totals['check_ins']['count'] != 1 ? 's' : '' }}</div>
                         </div>
                     </div>
-                    <div class="stat-item stat-item-child">
-                        <span class="stat-label">Rate My Awareness</span>
+                    <div class="stat-item">
+                        <span class="stat-label">Average Self-Rating Score</span>
                         <div class="text-end">
-                            <div class="stat-value">{{ $stats['self_ratings']['awareness']['average'] ? number_format($stats['self_ratings']['awareness']['average'], 1) : '--' }}%</div>
-                            <div class="text-muted small">Over <span class="fw-bold">{{ $stats['self_ratings']['awareness']['count'] }}</span> self-rating{{ $stats['self_ratings']['awareness']['count'] != 1 ? 's' : '' }}</div>
+                            <div class="stat-value">{{ $formatAverage($totals['self_ratings']['average']) }}</div>
+                            <div class="text-muted small">Over <span class="fw-bold">{{ $totals['self_ratings']['count'] }}</span> self-rating{{ $totals['self_ratings']['count'] != 1 ? 's' : '' }}</div>
+                        </div>
+                    </div>
+                    <div class="stats-subset">
+                        <div class="stat-item stat-item-child">
+                            <span class="stat-label">Rate My Emotions</span>
+                            <div class="text-end">
+                                <div class="stat-value">{{ $formatAverage($totals['self_ratings']['emotions']['average']) }}</div>
+                                <div class="text-muted small">Over <span class="fw-bold">{{ $totals['self_ratings']['emotions']['count'] }}</span> self-rating{{ $totals['self_ratings']['emotions']['count'] != 1 ? 's' : '' }}</div>
+                            </div>
+                        </div>
+                        <div class="stat-item stat-item-child">
+                            <span class="stat-label">Rate My Presence in Parenting</span>
+                            <div class="text-end">
+                                <div class="stat-value">{{ $formatAverage($totals['self_ratings']['parenting']['average']) }}</div>
+                                <div class="text-muted small">Over <span class="fw-bold">{{ $totals['self_ratings']['parenting']['count'] }}</span> self-rating{{ $totals['self_ratings']['parenting']['count'] != 1 ? 's' : '' }}</div>
+                            </div>
+                        </div>
+                        <div class="stat-item stat-item-child">
+                            <span class="stat-label">Rate My Awareness</span>
+                            <div class="text-end">
+                                <div class="stat-value">{{ $formatAverage($totals['self_ratings']['awareness']['average']) }}</div>
+                                <div class="text-muted small">Over <span class="fw-bold">{{ $totals['self_ratings']['awareness']['count'] }}</span> self-rating{{ $totals['self_ratings']['awareness']['count'] != 1 ? 's' : '' }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
