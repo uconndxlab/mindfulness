@@ -108,6 +108,8 @@ Route::middleware('web')->group(function () {
         Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
         Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
 
+        Route::get('/session/ping', fn () => response()->json(['token' => csrf_token()]))->name('session.ping');
+
         Route::post('/activities/complete', [ActivityController::class, 'complete'])->name('activities.complete');
         Route::post('/activities/skip', [ActivityController::class, 'skip'])->name('activities.skip');
         Route::post('/activities/log-interaction', [ActivityController::class, 'logInteraction'])->name('activities.log_interaction');

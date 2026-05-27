@@ -16,7 +16,9 @@ function initActivityPage() {
 
     const redirectDiv = document.getElementById('redirect_div');
     const compLateBtn = document.getElementById('complete-later');
+    const errorDiv = document.getElementById('error-messages');
     let completed = status === 'completed';
+    let completeInFlight = false;
     let type = null;
     const hasAudioVideo = type === 'audio' || type === 'video';
     const contentAvailable = hasContent || hasQuiz || hasJournal;
@@ -48,36 +50,68 @@ function initActivityPage() {
         }
     }
 
-    function activityComplete(message = true, voice=null) {
-        console.log('activity completed');
-        completed = true;
-        if (voice) {
-            engagementMetrics.voice = voice;
-        }
-        
-        // completion time for metrics
-        if (!engagementMetrics.completionTime && !engagementMetrics.completed) {
-            engagementMetrics.completed = true;
-            engagementMetrics.completionTime = performance.now();
-            // console.log('Activity completion tracked for engagement metrics');
+    // handling save errors - expired session/csrf token refresh and retry
+    function hideSaveStatus() {
+        if (!errorDiv) return;
+        errorDiv.textContent = '';
+        errorDiv.classList.add('d-none');
+        errorDiv.classList.remove('alert-warning');
+        errorDiv.classList.add('alert-danger');
+    }
 
-            if (!userUnfocused) {
-                // if user is focused, should not set refocus time
-                engagementMetrics.timeToRefocus = 0;
-                // console.log('Time to refocus tracked for engagement metrics');
-            }
+    function showSaveRetrying() {
+        if (!errorDiv) return;
+        errorDiv.textContent = 'Taking longer than expected…';
+        errorDiv.classList.remove('d-none', 'alert-danger');
+        errorDiv.classList.add('alert-warning');
+    }
+
+    function showSaveFailure(retry) {
+        if (!errorDiv) return;
+        errorDiv.classList.remove('d-none', 'alert-warning');
+        errorDiv.classList.add('alert-danger');
+        errorDiv.textContent = '';
+        errorDiv.append(
+            document.createTextNode("We couldn't save your progress. Please try again or refresh the page. "),
+            (() => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-link p-0 align-baseline';
+                btn.textContent = 'Try again';
+                btn.addEventListener('click', () => { hideSaveStatus(); retry(); });
+                return btn;
+            })()
+        );
+    }
+
+    window.showError = function showError(errorMessage) {
+        if (!errorDiv) return;
+        errorDiv.textContent = errorMessage;
+        errorDiv.classList.remove('d-none', 'alert-warning');
+        errorDiv.classList.add('alert-danger');
+    };
+
+    function saveProgress() {
+        if (completeInFlight) return Promise.resolve();
+        completeInFlight = true;
+        hideSaveStatus();
+
+        const onCsrfRefresh = () => showSaveRetrying();
+        window.addEventListener('csrf:refreshing', onCsrfRefresh, { once: true });
+
+        const payload = { activity_id: activityId };
+        if (engagementMetrics.startLogId) {
+            payload.start_log_id = engagementMetrics.startLogId;
         }
-        
-        if (status === 'unlocked' || status === 'completed') {
-            window.axios.post('/activities/complete', {
-                activity_id: activityId,
-                start_log_id: engagementMetrics.startLogId
-            }).then(response => {
+
+        return window.axios.post('/activities/complete', payload)
+            .then((response) => {
+                window.removeEventListener('csrf:refreshing', onCsrfRefresh);
                 const data = response.data;
                 if (data?.success) {
-                    // console.log('ProgressService: ' + data.message);
+                    completed = true;
+                    hideSaveStatus();
                     if (data.redirect_url) {
-                        // log exit before nav
                         const duration = performance.now() - lastFocusTimestamp;
                         logInteraction('exited', duration);
                         window.location.href = data.redirect_url;
@@ -90,13 +124,37 @@ function initActivityPage() {
                             completeButton.classList.add('d-none');
                         }
                     }
-                    unlockRedirect(message);
+                    unlockRedirect(true);
                     showCompletionMessage();
                 }
-            }).catch(error => {
+            })
+            .catch((error) => {
+                window.removeEventListener('csrf:refreshing', onCsrfRefresh);
                 console.error('There was an error updating the progress:', error);
-                alert('Error: ' + (error?.message || 'Unknown error'));
+                showSaveFailure(saveProgress);
+            })
+            .finally(() => {
+                completeInFlight = false;
             });
+    }
+
+    function activityComplete(message = true, voice=null) {
+        console.log('activity completed');
+        if (voice) {
+            engagementMetrics.voice = voice;
+        }
+
+        if (!engagementMetrics.completionTime && !engagementMetrics.completed) {
+            engagementMetrics.completed = true;
+            engagementMetrics.completionTime = performance.now();
+
+            if (!userUnfocused) {
+                engagementMetrics.timeToRefocus = 0;
+            }
+        }
+
+        if (status === 'unlocked' || status === 'completed') {
+            saveProgress();
         }
     }
     document.addEventListener('activity:complete', function(event) {
@@ -624,13 +682,31 @@ function initActivityPage() {
         });
     }
 
-    // Error display
-    const errorDiv = document.getElementById('error-messages');
-    window.showError = function showError(errorMessage) {
-        if (!errorDiv) return;
-        errorDiv.textContent = errorMessage;
-        errorDiv.classList.remove('d-none');
-    };
+    // Session keepalive while activity is open (10 min) - refreshes csrf token
+    const KEEPALIVE_MS = 0.5 * 60 * 1000;
+    let keepaliveTimer = null;
+
+    function scheduleKeepalive() {
+        clearInterval(keepaliveTimer);
+        if (document.visibilityState === 'visible') {
+            keepaliveTimer = setInterval(() => window.refreshCsrfToken?.(), KEEPALIVE_MS);
+        }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            window.refreshCsrfToken?.();
+            scheduleKeepalive();
+        } else {
+            clearInterval(keepaliveTimer);
+        }
+    });
+
+    if ('onfreeze' in document) {
+        document.addEventListener('resume', () => window.refreshCsrfToken?.());
+    }
+
+    scheduleKeepalive();
 
     // Secret skip
     document.addEventListener('keydown', function(event) {

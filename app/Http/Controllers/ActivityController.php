@@ -22,7 +22,9 @@ class ActivityController extends Controller
         /** @var ?User $user */
         $user = Auth::user() ?? null;
         $activity = Activity::findOrFail($request->activity_id) ?? null;
-        $start_log = EventLog::findOrFail($request->start_log_id) ?? null;
+        $start_log = $request->start_log_id
+            ? EventLog::find($request->start_log_id)
+            : null;
 
         if (!$user) {
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
@@ -36,21 +38,20 @@ class ActivityController extends Controller
         $already_completed = $user->isActivityCompleted($activity);
 
         if (!$already_completed) {
-            // get time to complete and log activity
+            $properties = [
+                'activity' => $activity->title,
+                'day' => $activity->day->name,
+                'module' => $activity->day->module->partName(),
+                'activity_type' => $activity->type,
+            ];
             if ($start_log) {
-                $time_to_complete = $start_log->created_at->diffInSeconds(now());
+                $properties['time_to_complete'] = $start_log->created_at->diffInSeconds(now());
             }
             activity('activity')
                 ->event('activity_completed')
                 ->performedOn($activity)
                 ->causedBy($user)
-                ->withProperties([
-                    'activity' => $activity->title,
-                    'day' => $activity->day->name,
-                    'module' => $activity->day->module->partName(),
-                    'activity_type' => $activity->type,
-                    'time_to_complete' => $time_to_complete,
-                ])
+                ->withProperties($properties)
                 ->log('Activity completed');
             // day and module completion logged in ProgressService
         }
