@@ -683,7 +683,7 @@ function initActivityPage() {
     }
 
     // Session keepalive while activity is open (10 min) - refreshes csrf token
-    const KEEPALIVE_MS = 0.5 * 60 * 1000;
+    const KEEPALIVE_MS = 10 * 60 * 1000;
     let keepaliveTimer = null;
 
     function scheduleKeepalive() {
