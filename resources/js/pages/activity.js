@@ -244,12 +244,28 @@ function initActivityPage() {
                 } else if (type === 'video') {
                     const videoPlayer = document.getElementById('content_view');
                     if (videoPlayer) {
+                        const allowSeek = videoPlayer.getAttribute('data-allow-seek') === 'true';
+                        let watchedTime = 0;
+
                         videoPlayer.addEventListener('ended', activityComplete);
                         
                         // track pause events
                         videoPlayer.addEventListener('pause', function() {
                             if (!videoPlayer.ended) {
                                 engagementMetrics.pauseCount++;
+                            }
+                        });
+
+                        videoPlayer.addEventListener('seeking', function() {
+                            if (allowSeek) return;
+
+                            if (videoPlayer.currentTime > watchedTime) {
+                                const wasPlaying = !videoPlayer.paused;
+                                videoPlayer.pause();
+                                videoPlayer.currentTime = watchedTime;
+                                if (wasPlaying) {
+                                    videoPlayer.play().catch(() => {});
+                                }
                             }
                         });
                         
@@ -282,6 +298,10 @@ function initActivityPage() {
                                 }
                             }
                             lastVideoTime = currentTime;
+
+                            if (!allowSeek && !videoPlayer.seeking && currentTime > watchedTime) {
+                                watchedTime = currentTime;
+                            }
                         });
                     } else {
                         console.error('video player not found');
