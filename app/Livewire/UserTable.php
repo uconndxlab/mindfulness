@@ -136,13 +136,25 @@ class UserTable extends Component
             }
 
             if (!$user->canSendReminder()) {
-                session()->flash('error', 'User has been active or reminded within the limit.');
+                session()->flash('error', 'Reminder not available.');
                 return;
             }
 
             Mail::to($user->email)->send(new \App\Mail\InactivityReminder($user));
-            $user->last_reminded_at = Carbon::now();
-            $user->save();
+
+            // update last reminder day if goes through and has not been sent
+            $updates = ['last_reminded_at' => Carbon::now()];
+            $inactiveDays = $user->last_active_at->diffInDays(Carbon::now()->startOfDay());
+            $last = $user->last_inactivity_reminder_day ?? 0;
+
+            foreach ([3, 5, 7, 9, 11] as $day) {
+                if ($inactiveDays >= $day && $last < $day) {
+                    $updates['last_inactivity_reminder_day'] = $day;
+                    break;
+                }
+            }
+
+            $user->update($updates);
 
             session()->flash('message', 'Reminder email sent to ' . $user->email);
         } catch (\Exception $e) {

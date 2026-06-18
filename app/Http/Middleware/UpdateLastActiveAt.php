@@ -18,7 +18,10 @@ class UpdateLastActiveAt
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check()) {
-            Auth::user()->update(['last_active_at' => Carbon::now()]);
+            Auth::user()->update([
+                'last_active_at' => Carbon::now(),
+                'last_inactivity_reminder_day' => null,
+            ]);
         }
         return $next($request);
     }

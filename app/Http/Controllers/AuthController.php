@@ -60,7 +60,8 @@ class AuthController extends Controller
             // update active and timezone
             Auth::user()->update([
                 'last_active_at' => Carbon::now(),
-                'timezone' => $request->input('timezone') ?? config('app.timezone')
+                'timezone' => $request->input('timezone') ?? config('app.timezone'),
+                'last_inactivity_reminder_day' => null,
             ]);
             
             // log login

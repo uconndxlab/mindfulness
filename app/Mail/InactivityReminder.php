@@ -12,7 +12,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class InactivityReminder extends Mailable
+class InactivityReminder extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

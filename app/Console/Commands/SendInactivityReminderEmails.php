@@ -2,57 +2,109 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\InactivityContactNotification;
+use App\Mail\InactivityReminder;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Mail;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class SendInactivityReminderEmails extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+    public const USER_MILESTONES = [3, 5, 7, 9, 11];
+    public const CONTACT_MILESTONE = 12;
+    public const ALL_MILESTONES = [3, 5, 7, 9, 11, 12];
+
     protected $signature = 'emails:send-inactivity-reminders';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Send reminder emails to users who have been inactive';
+    protected $description = 'Send inactivity reminder emails at 3/5/7/9/11 days; notify contact on day 12';
 
-    /**
-     * Execute the console command.
-     */
-    public function handle()
+    public function handle(): int
     {
-        // email after 7 days inactivity with 7 day cooldown
-        $threshold = Carbon::now()->subDays(7);
-        $inactive_users = User::where('last_active_at', '<', $threshold)
-            ->where(function ($query) use ($threshold) {
-                $query->whereNull('last_reminded_at')
-                    ->orWhere('last_reminded_at', '<', $threshold);
-            })
-            ->get();
+        $today = Carbon::now()->startOfDay();
 
-        $count = 0;
-        foreach ($inactive_users as $user) {
-            //do not send email to locked accounts
-            if ($user->lock_access) {
+        // only email users who are have access to the app
+        $eligibleUsers = User::query()
+            ->where('lock_access', false)
+            ->whereNotNull('last_active_at')
+            ->get(['id', 'name', 'email', 'last_active_at', 'last_inactivity_reminder_day']);
+
+        $inactiveCounts = array_fill_keys(self::ALL_MILESTONES, 0);
+        $queuedUserReminders = 0;
+        $queuedContactNotifications = 0;
+
+        foreach ($eligibleUsers as $user) {
+            $inactiveDays = $user->last_active_at->copy()->startOfDay()->diffInDays($today);
+
+            // increment inactive counts for all milestones
+            foreach (self::ALL_MILESTONES as $threshold) {
+                if ($inactiveDays >= $threshold) {
+                    $inactiveCounts[$threshold]++;
+                }
+            }
+
+            // skip if user has not been inactive for at least 3 days
+            if ($inactiveDays < self::USER_MILESTONES[0]) {
                 continue;
             }
-            // send email
-            Mail::to($user->email)->send(new \App\Mail\InactivityReminder($user));
 
-            //update user email timestamp - set it to 12:00 EST to avoid delay
-            $user->last_reminded_at = Carbon::now()->setTime(12, 0);
-            $user->save();
-            $count++;
+            // skip if admin has already been notified
+            if (($user->last_inactivity_reminder_day ?? 0) >= self::CONTACT_MILESTONE) {
+                continue;
+            }
+
+            // get next milestone for user
+            $nextMilestone = $this->nextMilestoneFor($inactiveDays, $user->last_inactivity_reminder_day);
+            if ($nextMilestone === null) {
+                continue;
+            }
+
+            $user->update([
+                'last_inactivity_reminder_day' => $nextMilestone,
+                'last_reminded_at' => Carbon::now(),
+            ]);
+
+            if ($nextMilestone === self::CONTACT_MILESTONE) {
+                Mail::to(config('mail.contact_email'))->queue(
+                    new InactivityContactNotification($user, $inactiveDays)
+                );
+                $queuedContactNotifications++;
+            } else {
+                Mail::to($user->email)->queue(new InactivityReminder($user));
+                $queuedUserReminders++;
+            }
         }
-        $message = "Inactivity emails sent to { $count } users.";
-        \Log::info($message);
-        $this->info($message);
+
+        // log summary
+        $summary = sprintf(
+            'Inactivity reminders: inactive >=3: %d, >=5: %d, >=7: %d, >=9: %d, >=11: %d, >=12: %d. Queued %d user reminder(s), %d contact notification(s).',
+            $inactiveCounts[3],
+            $inactiveCounts[5],
+            $inactiveCounts[7],
+            $inactiveCounts[9],
+            $inactiveCounts[11],
+            $inactiveCounts[12],
+            $queuedUserReminders,
+            $queuedContactNotifications,
+        );
+
+        Log::info($summary);
+        $this->info($summary);
+
+        return self::SUCCESS;
+    }
+
+    private function nextMilestoneFor(int $inactiveDays, ?int $lastMilestone): ?int
+    {
+        $lastMilestone ??= 0;
+
+        foreach (self::ALL_MILESTONES as $milestone) {
+            if ($inactiveDays >= $milestone && $lastMilestone < $milestone) {
+                return $milestone;
+            }
+        }
+
+        return null;
     }
 }

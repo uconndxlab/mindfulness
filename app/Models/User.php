@@ -57,6 +57,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'lock_access' => 'boolean',
             'timezone' => 'string',
             'last_reminded_at' => 'datetime',
+            'last_inactivity_reminder_day' => 'integer',
         ];
     }
 
@@ -385,18 +386,16 @@ class User extends Authenticatable implements MustVerifyEmail
             ->first();
     }
 
-    public function canSendReminder()
+    public function canSendReminder(): bool
     {
-        $inactive_limit = (int) config('mail.remind_email_day_limit', 30);
-        $email_limit = 7;
-        $last_active = $this->last_active_at ? Carbon::parse($this->last_active_at) : null;
-        $last_reminded = $this->last_reminded_at ? Carbon::parse($this->last_reminded_at) : null;
-
-        if (($last_active && $last_active->diffInDays(Carbon::now()) < $inactive_limit) ||
-            ($last_reminded && $last_reminded->diffInDays(Carbon::now()) < $email_limit)) {
+        if (!$this->last_active_at) {
             return false;
         }
 
+        if ($this->last_reminded_at && $this->last_reminded_at->diffInDays(now()) < 3) {
+            return false;
+        }
+        
         return true;
     }
 }
