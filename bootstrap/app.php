@@ -33,7 +33,6 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withSchedule(function (Schedule $schedule) {
-        // uncomment to enable email reminders
-        // $schedule->command('emails:send-inactivity-reminders')->dailyAt('12:00');
+        $schedule->command('emails:send-inactivity-reminders')->dailyAt('12:00');
     })
     ->create();
