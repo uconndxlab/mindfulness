@@ -28,7 +28,7 @@ class SendInactivityReminderEmails extends Command
         $eligibleUsers = User::query()
             ->where('lock_access', false)
             ->whereNotNull('last_active_at')
-            ->get(['id', 'name', 'email', 'last_active_at', 'last_inactivity_reminder_day']);
+            ->get(['id', 'hh_id', 'name', 'email', 'last_active_at', 'last_inactivity_reminder_day']);
 
         $inactiveCounts = array_fill_keys(self::ALL_MILESTONES, 0);
         $queuedUserReminders = 0;
@@ -60,13 +60,18 @@ class SendInactivityReminderEmails extends Command
                 continue;
             }
 
+            if ($nextMilestone === self::CONTACT_MILESTONE && $this->inactivityAlertRecipients() === []) {
+                Log::warning('Skipping day-12 inactivity alert for user '.$user->id.': no admin recipients configured.');
+                continue;
+            }
+
             $user->update([
                 'last_inactivity_reminder_day' => $nextMilestone,
                 'last_reminded_at' => Carbon::now(),
             ]);
 
             if ($nextMilestone === self::CONTACT_MILESTONE) {
-                Mail::to(config('mail.contact_email'))->queue(
+                Mail::to($this->inactivityAlertRecipients())->queue(
                     new InactivityContactNotification($user, $inactiveDays)
                 );
                 $queuedContactNotifications++;
@@ -106,5 +111,23 @@ class SendInactivityReminderEmails extends Command
         }
 
         return null;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function inactivityAlertRecipients(): array
+    {
+        $configured = config('mail.inactivity_alert_emails', []);
+        if ($configured !== []) {
+            return $configured;
+        }
+
+        $contactEmail = config('mail.contact_email');
+        if (is_string($contactEmail) && $contactEmail !== '') {
+            return [$contactEmail];
+        }
+
+        return [];
     }
 }

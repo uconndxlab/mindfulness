@@ -21,7 +21,7 @@
 
         <div style="font-size: 14px; color: #666666;">
             <p style="margin-bottom: 10px; font-size: 12px;">
-                This email was sent to {{ config('mail.contact_email') }}
+                This email was sent to @yield('recipient_emails', config('mail.contact_email'))
             </p>
         </div>
     </div>

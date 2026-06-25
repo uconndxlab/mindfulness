@@ -20,6 +20,12 @@ return [
     'contact_email' => env('CONTACT_EMAIL'),
     'contact_phone' => env('CONTACT_PHONE'),
 
+    // comma-separated admin emails for day-12 inactivity dropout alerts
+    'inactivity_alert_emails' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', env('INACTIVITY_ALERT_EMAILS', '') ?: '')
+    ))),
+
     /*
     |--------------------------------------------------------------------------
     | Mailer Configurations
