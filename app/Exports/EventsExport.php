@@ -39,13 +39,18 @@ class EventsExport implements FromCollection, WithHeadings, WithMapping
         $subjectName = null;
         $subjectType = null;
         if ($event->subject_type) {
-            $subjectName = match ($event->subject_type) {
-                'App\Models\Activity' => $event->subject->title,
-                'App\Models\Day' => $event->subject->name,
-                'App\Models\Module' => $event->subject->name,
-                default => $event->subject->id,
-            };
             $subjectType = Str::afterLast($event->subject_type, '\\');
+
+            if ($event->subject) {
+                $subjectName = match ($event->subject_type) {
+                    'App\Models\Activity' => $event->subject->title,
+                    'App\Models\Day' => $event->subject->name,
+                    'App\Models\Module' => $event->subject->name,
+                    default => $event->subject->id,
+                };
+            } else {
+                $subjectName = $event->subject_id;
+            }
         }
 
         return [
