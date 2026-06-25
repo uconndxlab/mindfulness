@@ -29,6 +29,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'last_active_at',
+        'last_reminded_at',
+        'last_inactivity_reminder_day',
         'lock_access',
         'timezone',
     ];
