@@ -10,7 +10,7 @@
     </p>
 
     <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <p style="margin: 0 0 10px 0;"><strong>User:</strong> {{ $user->email }}</p>
+        <p style="margin: 0 0 10px 0;"><strong>User:</strong> {{ $user->hh_id }}</p>
         <p style="margin: 0;"><strong>Milestone:</strong> {{ $milestoneLabel }}</p>
     </div>
 
