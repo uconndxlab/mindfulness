@@ -8,17 +8,18 @@ use Illuminate\Support\Facades\Process;
 class SyncFiles extends Command
 {
     protected $signature = 'app:sync
-                            {--only=all : directory to sync (public-content, data)}
+                            {--only=all : directory to sync (content, data)}
                             {--direction=down : UPload or DOWNload)}
                             {--dry-run : simulate sync}';
 
-    protected $description = 'Syncs files between local and remote environments using WinSCP.';
+    protected $description = 'Syncs files between local and remote environments.';
 
     public function handle(): int
     {
         $config = config('deployment');
         $direction = $this->option('direction');
         $only = $this->option('only');
+        $driver = $this->resolveDriver($config);
 
         // validate config
         if (empty($config['user']) || empty($config['host'])) {
@@ -26,10 +27,20 @@ class SyncFiles extends Command
             return self::FAILURE;
         }
 
+        if (empty($config['key'])) {
+            $this->error('Deployment SSH key path not set.');
+            return self::FAILURE;
+        }
+
+        if ($driver === 'winscp' && empty($config['winscp_path'])) {
+            $this->error('WinSCP path not set for Windows sync.');
+            return self::FAILURE;
+        }
+
         // get targets and validate
         $syncMap = $config['sync'] ?? [];
         $targets = ($only === 'all') ? array_keys($syncMap) : [$only];
-        $this->info("Starting file sync using WinSCP (Direction: {$direction})...");
+        $this->info("Starting file sync using {$driver} (Direction: {$direction})...");
         if ($this->option('dry-run')) {
             $this->warn('DRY RUN: Calculating changes, no files will be transferred.');
         }
@@ -42,7 +53,7 @@ class SyncFiles extends Command
             $remotePath = $syncMap[$target]['remote'];
 
             // build command
-            $command = $this->buildWinScpCommand($config, $direction, $localPath, $remotePath, $target);
+            $command = $this->buildCommand($config, $driver, $direction, $localPath, $remotePath, $target);
 
             if ($this->getOutput()->isVerbose()) {
                 $this->info("Running command: " . $command);
@@ -54,12 +65,32 @@ class SyncFiles extends Command
             });
 
             if (!$process->successful()) {
-                $this->error("Failed to sync '{$target}'. Check WinSCP output above for details.");
+                $this->error("Failed to sync '{$target}'. Check command output above for details.");
             }
         }
 
         $this->info('Synchronization complete.');
         return self::SUCCESS;
+    }
+
+    private function resolveDriver(array $config): string
+    {
+        $configuredDriver = $config['driver'] ?? 'auto';
+
+        if ($configuredDriver !== 'auto') {
+            return $configuredDriver;
+        }
+
+        return PHP_OS_FAMILY === 'Windows' ? 'winscp' : 'rsync';
+    }
+
+    private function buildCommand(array $config, string $driver, string $direction, string $localPath, string $remotePath, string $target): string
+    {
+        return match ($driver) {
+            'winscp' => $this->buildWinScpCommand($config, $direction, $localPath, $remotePath, $target),
+            'rsync' => $this->buildRsyncCommand($config, $direction, $localPath, $remotePath),
+            default => throw new \InvalidArgumentException("Unsupported sync driver [{$driver}]."),
+        };
     }
 
     private function buildWinScpCommand(array $config, string $direction, string $localPath, string $remotePath, string $target): string
@@ -106,5 +137,55 @@ class SyncFiles extends Command
             $privateKey,
             $syncCommand
         );
+    }
+
+    private function buildRsyncCommand(array $config, string $direction, string $localPath, string $remotePath): string
+    {
+        $rsyncPath = $config['rsync_path'] ?: 'rsync';
+        $sshCommand = sprintf(
+            'ssh -i %s -o StrictHostKeyChecking=accept-new',
+            escapeshellarg($config['key'])
+        );
+
+        $source = $direction === 'down'
+            ? $this->buildRemoteRsyncPath($config['user'], $config['host'], $remotePath)
+            : $this->normalizeLocalPath($localPath);
+
+        $destination = $direction === 'down'
+            ? $this->normalizeLocalPath($localPath)
+            : $this->buildRemoteRsyncPath($config['user'], $config['host'], $remotePath);
+
+        $commandParts = [
+            escapeshellcmd($rsyncPath),
+            '--archive',
+            '--compress',
+            '--delete',
+            '--itemize-changes',
+            '--rsh=' . escapeshellarg($sshCommand),
+        ];
+
+        if ($this->option('dry-run')) {
+            $commandParts[] = '--dry-run';
+        }
+
+        $commandParts[] = escapeshellarg($source);
+        $commandParts[] = escapeshellarg($destination);
+
+        return implode(' ', $commandParts);
+    }
+
+    private function buildRemoteRsyncPath(string $user, string $host, string $path): string
+    {
+        return sprintf('%s@%s:%s', $user, $host, $this->ensureTrailingSlash($path));
+    }
+
+    private function normalizeLocalPath(string $path): string
+    {
+        return $this->ensureTrailingSlash($path);
+    }
+
+    private function ensureTrailingSlash(string $path): string
+    {
+        return rtrim($path, '/\\') . DIRECTORY_SEPARATOR;
     }
 }

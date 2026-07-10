@@ -6,15 +6,17 @@ return [
     | Deployment Configuration
     |--------------------------------------------------------------------------
     |
-    | These settings are for the WinSCP-based synchronization script.
-    | All paths should be in the standard Windows format (e.g., "C:/...").
+    | These settings are for the file synchronization script.
+    | Use DEPLOYMENT_SYNC_DRIVER=auto to select WinSCP on Windows and rsync elsewhere.
     |
     */
 
     'user' => env('DEPLOYMENT_USER'),
     'host' => env('DEPLOYMENT_HOST'),
+    'driver' => env('DEPLOYMENT_SYNC_DRIVER', 'auto'),
     
     'winscp_path' => env('DEPLOYMENT_WINSCP_PATH'),
+    'rsync_path' => env('DEPLOYMENT_RSYNC_PATH', 'rsync'),
     'key' => env('DEPLOYMENT_KEY_PATH'),
 
     'sync' => [
