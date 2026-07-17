@@ -28,7 +28,7 @@ class ModuleCompletedMail extends Mailable
         $report = $reportService->forUserAndPart($this->user, $partOrder);
         $chartData = $chartService->generateCharts($report);
 
-        return $this->subject("Your Healing Hearts Journey Report - Part {$partOrder} ({$report['module']->flowerColorName()} Flower)")
+        return $this->subject("Your ".config('app.name')." Journey Report - Part {$partOrder} ({$report['module']->flowerColorName()} Flower)")
             ->view('emails.module-completed')
             ->with([
                 'user' => $this->user,
