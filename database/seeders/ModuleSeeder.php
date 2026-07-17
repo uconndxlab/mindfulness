@@ -26,6 +26,7 @@ class ModuleSeeder extends Seeder
                     'description' => $module->description,
                     'workbook_path' => $module->workbook_path,
                     'order' => $module->order,
+                    'color' => $module->color ?? null,
                 ]
             );
         }

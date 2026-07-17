@@ -70,12 +70,12 @@ class ProgressService
                 ->where('optional', false)
                 ->orderBy('order')
                 ->first();
-    
+
             // it does not matter if this activity is completed or not
             // completion of current day will still check for day completion
             // no further day unlock necessary
             // means skip check is arbitrary
-    
+
             // if next act is completed, check day completion
             if ($nextAct && !$nextAct->isCompletedBy($user)) {
                 // unlock next activity within day
@@ -155,7 +155,7 @@ class ProgressService
                 'module' => $day->module->partName(),
             ])
             ->log('Day completed');
-        
+
         // unlock optional
         $optional = $day->activities()
             ->where('optional', true)
@@ -184,7 +184,7 @@ class ProgressService
             ->where('order', '>', $day->order)
             ->orderBy('order')
             ->first();
-        
+
         if ($nextDay) {
             // unlock day
             $dayResult = $this->unlockDay($user, $nextDay);
@@ -327,7 +327,7 @@ class ProgressService
     public function unlockAllUsersUpToLatestCompletion(): void
     {
         $users = User::all();
-        
+
         foreach ($users as $user) {
             $this->unlockUpToLatestCompletion($user);
         }
@@ -345,7 +345,7 @@ class ProgressService
         if ($latestCompleted) {
             // Unlock all activities up to and including the latest completed
             $this->unlockActivitiesUpTo($user, $latestCompleted);
-            
+
             // Unlock the next activity after the latest completed
             $this->unlockNextActivity($user, $latestCompleted);
 

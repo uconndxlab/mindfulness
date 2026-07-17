@@ -59,6 +59,7 @@ class ForceUserProgress extends Command
         DB::table('user_activity')->where('user_id', $user->id)->delete();
         DB::table('user_day')->where('user_id', $user->id)->delete();
         DB::table('user_module')->where('user_id', $user->id)->delete();
+        DB::table('user_milestones')->where('user_id', $user->id)->delete();
 
         // unlock first
         unlockFirst($user->id);

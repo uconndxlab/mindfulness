@@ -17,6 +17,8 @@
 
         @yield('content')
 
+        @hasSection('skip_footer')
+        @else
         <hr style="border: none; border-top: 1px solid #eee; margin: 25px 0;">
 
         <div style="font-size: 14px; color: #666666;">
@@ -29,6 +31,7 @@
                 This email was sent to {{ $user->email ?? '' }}
             </p>
         </div>
+        @endif
     </div>
 </body>
 </html> 

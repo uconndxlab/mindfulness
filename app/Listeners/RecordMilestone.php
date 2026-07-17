@@ -5,11 +5,12 @@ namespace App\Listeners;
 use App\Enums\MilestoneType;
 use App\Events\MilestoneAchieved;
 use App\Mail\MilestoneAchievedMail;
+use App\Mail\ModuleCompletedMail;
 use App\Models\UserMilestone;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-class RecordMilestone implements ShouldQueue
+class RecordMilestone
 {
     public function handle(MilestoneAchieved $event): void
     {
@@ -20,9 +21,14 @@ class RecordMilestone implements ShouldQueue
             ['user_id' => $event->user->id, 'type' => $type],
             ['achieved_at' => now()]
         );
-        
+
         // if it was not just created, return
         if (!$milestone->wasRecentlyCreated) {
+            Log::info('Milestone email skipped; already recorded.', [
+                'user_id' => $event->user->id,
+                'type' => $type->value,
+            ]);
+
             return;
         }
 
@@ -31,6 +37,11 @@ class RecordMilestone implements ShouldQueue
         if ($adminEmail) {
             Mail::to($adminEmail)->send(new MilestoneAchievedMail($event->user, $type));
             $milestone->update(['admin_notified_at' => now()]);
+        }
+
+        // send email to user
+        if ($type->isModule()) {
+            Mail::to($event->user->email)->send(new ModuleCompletedMail($event->user, $type));
         }
     }
 }

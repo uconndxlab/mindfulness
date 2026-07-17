@@ -9,7 +9,7 @@ class Module extends Model
 {
     use HasFactory;
     
-    protected $fillable = ['name', 'description', 'workbook_path', 'order'];
+    protected $fillable = ['name', 'description', 'workbook_path', 'order', 'color'];
 
     public function days()
     {
@@ -111,5 +111,16 @@ class Module extends Model
 
     public function partName(): string {
         return 'Part '.$this->order.($this->name ? ' - '.$this->name : '');
+    }
+
+    public function flowerColorName(): string
+    {
+        return match ($this->order) {
+            1 => 'Blue',
+            2 => 'Purple',
+            3 => 'Orange',
+            4 => 'Pink',
+            default => 'Flower',
+        };
     }
 }

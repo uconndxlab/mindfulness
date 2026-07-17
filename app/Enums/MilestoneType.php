@@ -44,6 +44,22 @@ enum MilestoneType: string
         };
     }
 
+    public function isModule(): bool
+    {
+        return in_array($this, [self::Module1, self::Module2, self::Module3, self::Module4]);
+    }
+
+    public function moduleOrder(): ?int
+    {
+        return match ($this) {
+            self::Module1 => 1,
+            self::Module2 => 2,
+            self::Module3 => 3,
+            self::Module4 => 4,
+            default => null,
+        };
+    }
+
     public static function forModule(int $moduleOrder): ?self
     {
         return match ($moduleOrder) {
