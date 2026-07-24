@@ -30,17 +30,29 @@
 
     @if (!empty($chartData['emotions']))
         <h2 style="color: {{ $accentColor }}; font-size: 18px; margin: 24px 0 12px;">1. Rate My Emotions</h2>
-        <img src="{{ $message->embedData($chartData['emotions'], 'emotions.png', 'image/png') }}" alt="Rate My Emotions" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
+        @if (!empty($forPdf))
+            <img src="data:image/png;base64,{{ base64_encode($chartData['emotions']) }}" alt="Rate My Emotions" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
+        @else
+            <img src="{{ $message->embedData($chartData['emotions'], 'emotions.png', 'image/png') }}" alt="Rate My Emotions" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
+        @endif
     @endif
 
     @if (!empty($chartData['presence']))
         <h2 style="color: {{ $accentColor }}; font-size: 18px; margin: 24px 0 12px;">2. Rate My Presence in Parenting</h2>
-        <img src="{{ $message->embedData($chartData['presence'], 'presence.png', 'image/png') }}" alt="Rate My Presence in Parenting" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
+        @if (!empty($forPdf))
+            <img src="data:image/png;base64,{{ base64_encode($chartData['presence']) }}" alt="Rate My Presence in Parenting" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
+        @else
+            <img src="{{ $message->embedData($chartData['presence'], 'presence.png', 'image/png') }}" alt="Rate My Presence in Parenting" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
+        @endif
     @endif
 
     @if (!empty($chartData['awareness_quality']))
         <h2 style="color: {{ $accentColor }}; font-size: 18px; margin: 24px 0 12px;">3. Quality of awareness</h2>
-        <img src="{{ $message->embedData($chartData['awareness_quality'], 'awareness-quality.png', 'image/png') }}" alt="Daily Check-Ins and Final Awareness Score" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
+        @if (!empty($forPdf))
+            <img src="data:image/png;base64,{{ base64_encode($chartData['awareness_quality']) }}" alt="Daily Check-Ins and Final Awareness Score" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
+        @else
+            <img src="{{ $message->embedData($chartData['awareness_quality'], 'awareness-quality.png', 'image/png') }}" alt="Daily Check-Ins and Final Awareness Score" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
+        @endif
     @endif
 
     <h2 style="color: {{ $accentColor }}; font-size: 18px; margin: 24px 0 12px;">What do these scores mean?</h2>

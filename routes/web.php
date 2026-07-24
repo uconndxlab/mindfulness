@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\ReflectionController as AdminReflectionController;
 use App\Http\Controllers\Admin\NoteController as AdminNoteController;
 use App\Http\Controllers\Admin\InvitationController as AdminInvitationController;
+use App\Http\Controllers\Admin\CompletionReportController as AdminCompletionReportController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -154,6 +155,9 @@ Route::middleware('web')->group(function () {
             Route::get('/reflections/export/csv', [AdminReflectionController::class, 'exportReflections'])->name('reflections.export');
             Route::get('/journals', [AdminNoteController::class, 'index'])->name('journals');
             Route::get('/journals/export/csv', [AdminNoteController::class, 'exportNotes'])->name('notes.export');
+            Route::get('/completion-reports', [AdminCompletionReportController::class, 'index'])->name('completion-reports');
+            Route::get('/completion-reports/{hh_id}/pdf', [AdminCompletionReportController::class, 'showPdf'])->name('completion-reports.pdf');
+            Route::get('/completion-reports/{hh_id}/download', [AdminCompletionReportController::class, 'download'])->name('completion-reports.download');
             
             // Invitations
             Route::get('/invitations', [AdminInvitationController::class, 'index'])->name('invitations');

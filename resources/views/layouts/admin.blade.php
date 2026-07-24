@@ -54,6 +54,12 @@
                         Journals
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.completion-reports*') ? 'active' : '' }}" href="{{ route('admin.completion-reports') }}">
+                        <i class="bi bi-file-earmark-check me-2"></i>
+                        Completion Reports
+                    </a>
+                </li>
             </ul>
         </div>
     </div>

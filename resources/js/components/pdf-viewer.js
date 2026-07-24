@@ -7,7 +7,7 @@ const getWorkerSrc = () => {
         // dev - use worker from node_modules
         return new URL('pdfjs-dist/build/pdf.worker.mjs', import.meta.url).href;
     }
-    
+
     // prod - use copied worker file
     return '/build/assets/pdf.worker.js';
 };
@@ -22,7 +22,7 @@ function showPdfError(container, message) {
         return;
     }
     const errorElement = template.content.cloneNode(true);
-    
+
     const messageElement = errorElement.querySelector('.pdf-error-message');
     if (messageElement) {
         messageElement.textContent = message;
@@ -56,9 +56,26 @@ async function renderPdfPages(container, pdfDoc, onFirstPage) {
     }
 }
 
+function showPdfLoading() {
+    const loading = document.getElementById('pdfLoading');
+    if (loading) loading.classList.remove('is-hidden');
+}
+
 function hidePdfLoading() {
     const loading = document.getElementById('pdfLoading');
     if (loading) loading.classList.add('is-hidden');
+}
+
+function resetBookmarksUi() {
+    const listEl = document.querySelector('#pdfBookmarks .pdf-bookmarks-list');
+    const drawer = document.getElementById('pdfBookmarks');
+    const toggleBtn = document.getElementById('pdfBookmarksToggle');
+    const modalBody = document.getElementById('pdfModalBody');
+
+    if (listEl) listEl.innerHTML = '';
+    if (drawer) drawer.classList.add('d-none');
+    if (toggleBtn) toggleBtn.classList.add('d-none');
+    if (modalBody) modalBody.classList.remove('bookmarks-open');
 }
 
 async function resolvePageNumber(pdfDoc, dest) {
@@ -137,13 +154,12 @@ async function buildBookmarks(pdfDoc) {
         drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
     };
 
-    toggleBtn.addEventListener('click', () => {
+    toggleBtn.onclick = () => {
         setOpen(!modalBody.classList.contains('bookmarks-open'));
         toggleBtn.blur();
-    });
+    };
 
-    // handle list item clicks
-    listEl.addEventListener('click', (event) => {
+    listEl.onclick = (event) => {
         const target = event.target.closest('.pdf-bookmark-item');
         if (!target) return;
         event.preventDefault();
@@ -155,21 +171,11 @@ async function buildBookmarks(pdfDoc) {
         if (window.innerWidth < DESKTOP_BREAKPOINT) {
             setOpen(false);
         }
-    });
+    };
 
     // auto-open on desktop-sized screens
     if (window.innerWidth >= DESKTOP_BREAKPOINT) {
         setOpen(true);
-    }
-
-    // reset drawer state when modal closes so reopening is clean
-    const modalEl = document.getElementById('pdfModal');
-    if (modalEl) {
-        modalEl.addEventListener('hidden.bs.modal', () => {
-            setOpen(window.innerWidth >= DESKTOP_BREAKPOINT);
-            const container = document.getElementById('pdfContainer');
-            if (container) container.scrollTop = 0;
-        });
     }
 }
 
@@ -191,11 +197,15 @@ function pickErrorMessage(error) {
     return 'Unable to display PDF document.';
 }
 
-async function initPdfViewer() {
+export async function loadPdf(pdfUrl) {
     const container = document.getElementById('pdfContainer');
     if (!container) return;
 
-    const pdfUrl = container.getAttribute('data-pdf-url');
+    container.innerHTML = '';
+    container.setAttribute('data-pdf-url', pdfUrl || '');
+    resetBookmarksUi();
+    showPdfLoading();
+
     if (!pdfUrl) {
         hidePdfLoading();
         showPdfError(container, 'No PDF file specified.');
@@ -225,6 +235,42 @@ async function initPdfViewer() {
         hidePdfLoading();
         showPdfError(container, pickErrorMessage(error));
     }
+}
+
+function bindDynamicPdfTriggers() {
+    document.addEventListener('click', (event) => {
+        const trigger = event.target.closest('.js-view-completion-pdf');
+        if (!trigger) return;
+
+        const pdfUrl = trigger.dataset.pdfUrl;
+        const pdfTitle = trigger.dataset.pdfTitle;
+        const titleEl = document.getElementById('pdfModalLabel');
+        if (titleEl && pdfTitle) {
+            titleEl.textContent = pdfTitle;
+        }
+
+        loadPdf(pdfUrl);
+    });
+
+    const modalEl = document.getElementById('pdfModal');
+    if (modalEl) {
+        modalEl.addEventListener('hidden.bs.modal', () => {
+            const container = document.getElementById('pdfContainer');
+            if (container) container.scrollTop = 0;
+        });
+    }
+}
+
+async function initPdfViewer() {
+    const container = document.getElementById('pdfContainer');
+    if (!container) return;
+
+    bindDynamicPdfTriggers();
+
+    const pdfUrl = container.getAttribute('data-pdf-url');
+    if (!pdfUrl) return;
+
+    await loadPdf(pdfUrl);
 }
 
 if (document.readyState === 'loading') {

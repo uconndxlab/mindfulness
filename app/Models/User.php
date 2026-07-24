@@ -109,6 +109,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(UserMilestone::class);
     }
 
+    public function completionReport()
+    {
+        return $this->hasOne(CompletionReport::class);
+    }
+
     public function quiz_answers($quiz_id = null)
     {
         $query = $this->hasMany(QuizAnswers::class);

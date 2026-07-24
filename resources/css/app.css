@@ -1204,6 +1204,10 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 }
 /* end modal */
 
+.livewire-modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
 .feedback-div .text-info {
     color:var(--darker-green)!important;
 }

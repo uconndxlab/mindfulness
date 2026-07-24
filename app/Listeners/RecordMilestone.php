@@ -5,13 +5,17 @@ namespace App\Listeners;
 use App\Enums\MilestoneType;
 use App\Events\MilestoneAchieved;
 use App\Mail\MilestoneAchievedMail;
-use App\Mail\ModuleCompletedMail;
 use App\Models\UserMilestone;
+use App\Services\CompletionReportService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class RecordMilestone
 {
+    public function __construct(
+        private CompletionReportService $completionReportService,
+    ) {}
+
     public function handle(MilestoneAchieved $event): void
     {
         $type = MilestoneType::from($event->milestoneType);
@@ -39,9 +43,9 @@ class RecordMilestone
             $milestone->update(['admin_notified_at' => now()]);
         }
 
-        // send email to user
-        if ($type->isModule()) {
-            Mail::to($event->user->email)->send(new ModuleCompletedMail($event->user, $type));
+        // use service to generate report for user
+        if ($type === MilestoneType::Module4) {
+            $this->completionReportService->createForUser($event->user);
         }
     }
 }

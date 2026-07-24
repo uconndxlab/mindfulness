@@ -18,6 +18,7 @@ class SecurityHeaders
         'admin.journals',
         'admin.reflection',
         'admin.invitations',
+        'admin.completion-reports',
         'account',
         'help'
     ];
