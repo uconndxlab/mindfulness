@@ -25,10 +25,9 @@ class ModuleEmailReportService
                 'chart_title' => "Rate My Presence Measure",
                 'sections' => $this->presenceSections($user, $completedPartOrder),
             ],
-            'awareness_quality' => [
-                'chart_title' => 'Daily Check-Ins & Final Awareness Score',
-                'check_ins' => $this->dailyCheckInSeries($user, $completedPartOrder),
-                'awareness' => $this->endOfPartAwareness($user, $completedPartOrder),
+            'awareness' => [
+                'chart_title' => 'Rate My Awareness Measure',
+                'sections' => $this->awarenessSections($user, $completedPartOrder),
             ],
         ];
     }
@@ -50,7 +49,7 @@ class ModuleEmailReportService
             $this->selfRatingAnswer($user, 'Rate My Emotions', beginning: true)
         );
         if ($beginning !== null) {
-            $sections[] = array_merge(['label' => 'Beginning of Part 1'], $beginning);
+            $sections[] = array_merge(['label' => 'Beginning of Part 1', 'part_order' => 0], $beginning);
         }
 
         for ($partOrder = 1; $partOrder <= $completedPartOrder; $partOrder++) {
@@ -58,7 +57,7 @@ class ModuleEmailReportService
                 $this->selfRatingAnswer($user, 'Rate My Emotions', beginning: false, partOrder: $partOrder)
             );
             if ($end !== null) {
-                $sections[] = array_merge(['label' => "End of Part {$partOrder}"], $end);
+                $sections[] = array_merge(['label' => "End of Part {$partOrder}", 'part_order' => $partOrder], $end);
             }
         }
 
@@ -73,6 +72,7 @@ class ModuleEmailReportService
         if ($beginningAverage !== null) {
             $sections[] = [
                 'label' => 'Beginning of Part 1',
+                'part_order' => 0,
                 'value' => $this->scaleToLikert($beginningAverage),
             ];
         }
@@ -82,6 +82,7 @@ class ModuleEmailReportService
             if ($endAverage !== null) {
                 $sections[] = [
                     'label' => "End of Part {$partOrder}",
+                    'part_order' => $partOrder,
                     'value' => $this->scaleToLikert($endAverage),
                 ];
             }
@@ -90,45 +91,31 @@ class ModuleEmailReportService
         return $sections;
     }
 
-    private function dailyCheckInSeries(User $user, int $partOrder): array
+    private function awarenessSections(User $user, int $completedPartOrder): array
     {
-        $module = Module::where('order', $partOrder)->first();
-        if (!$module) {
-            return [];
+        $sections = [];
+
+        $beginningAverage = $this->beginningSelfRatingAverage($user, 'Rate My Awareness');
+        if ($beginningAverage !== null) {
+            $sections[] = [
+                'label' => 'Beginning of Part 1',
+                'part_order' => 0,
+                'value' => $this->scaleToLikert($beginningAverage),
+            ];
         }
 
-        $points = [];
-        $days = $module->days()->where('is_check_in', false)->orderBy('order')->get();
-
-        foreach ($days as $index => $day) {
-            $average = $this->averageForQuery(
-                $user->quiz_answers()
-                    ->checkIns()
-                    ->whereHas('activity.day', fn ($query) => $query->where('id', $day->id))
-            );
-
-            if ($average !== null) {
-                $points[] = [
-                    'label' => (string) ($index + 1),
-                    'value' => $this->scaleToLikert($average),
+        for ($partOrder = 1; $partOrder <= $completedPartOrder; $partOrder++) {
+            $endAverage = $this->endOfPartSelfRatingAverage($user, 'Rate My Awareness', $partOrder);
+            if ($endAverage !== null) {
+                $sections[] = [
+                    'label' => "End of Part {$partOrder}",
+                    'part_order' => $partOrder,
+                    'value' => $this->scaleToLikert($endAverage),
                 ];
             }
         }
 
-        return $points;
-    }
-
-    private function endOfPartAwareness(User $user, int $partOrder): ?array
-    {
-        $average = $this->endOfPartSelfRatingAverage($user, 'Rate My Awareness', $partOrder);
-        if ($average === null) {
-            return null;
-        }
-
-        return [
-            'label' => "End of Part {$partOrder}",
-            'value' => $this->scaleToLikert($average),
-        ];
+        return $sections;
     }
 
     private function selfRatingAnswer(

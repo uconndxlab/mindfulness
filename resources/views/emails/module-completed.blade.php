@@ -10,6 +10,15 @@
         $accentColor = $module->color ?? '#642F83';
         $flowerColor = strtolower($module->flowerColorName());
         $contactEmail = config('mail.contact_email');
+        $chartHeadingStyle = !empty($forPdf)
+            ? "color: {$accentColor}; font-size: 18px; margin: 14px 0 4px;"
+            : "color: {$accentColor}; font-size: 18px; margin: 24px 0 12px;";
+        $chartImageStyle = !empty($forPdf)
+            ? 'max-width: 100%; height: auto; display: block; margin-bottom: 8px;'
+            : 'max-width: 100%; height: auto; display: block; margin-bottom: 24px;';
+        $chartBlockStyle = !empty($forPdf)
+            ? 'page-break-inside: avoid; break-inside: avoid;'
+            : '';
     @endphp
 
     <h1 style="color: {{ $accentColor }}; font-size: 24px; margin-bottom: 20px;">
@@ -24,35 +33,51 @@
 
     <p style="margin-bottom: 20px;">
         Let's take a look at your journey so far. What did you tell us about your levels of pleasant and unpleasant
-        emotions, presence in parenting, and quality of awareness in the Quick Check-Ins and Rate My Awareness? Below is a
-        summary of your scores.
+        emotions, presence in parenting, and quality of awareness across each part? Below is a summary of your scores.
     </p>
 
-    @if (!empty($chartData['emotions']))
-        <h2 style="color: {{ $accentColor }}; font-size: 18px; margin: 24px 0 12px;">1. Rate My Emotions</h2>
-        @if (!empty($forPdf))
-            <img src="data:image/png;base64,{{ base64_encode($chartData['emotions']) }}" alt="Rate My Emotions" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
-        @else
-            <img src="{{ $message->embedData($chartData['emotions'], 'emotions.png', 'image/png') }}" alt="Rate My Emotions" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
-        @endif
+    @if (!empty($chartData['emotions_pleasant']))
+        <div style="{{ $chartBlockStyle }}">
+            <h2 style="{{ $chartHeadingStyle }}">1. Rate My Emotions — Pleasant</h2>
+            @if (!empty($forPdf))
+                <img src="data:image/png;base64,{{ base64_encode($chartData['emotions_pleasant']) }}" alt="Rate My Emotions — Pleasant" width="560" style="{{ $chartImageStyle }}">
+            @else
+                <img src="{{ $message->embedData($chartData['emotions_pleasant'], 'emotions-pleasant.png', 'image/png') }}" alt="Rate My Emotions — Pleasant" width="560" style="{{ $chartImageStyle }}">
+            @endif
+        </div>
+    @endif
+
+    @if (!empty($chartData['emotions_unpleasant']))
+        <div style="{{ $chartBlockStyle }}">
+            <h2 style="{{ $chartHeadingStyle }}">Rate My Emotions — Unpleasant</h2>
+            @if (!empty($forPdf))
+                <img src="data:image/png;base64,{{ base64_encode($chartData['emotions_unpleasant']) }}" alt="Rate My Emotions — Unpleasant" width="560" style="{{ $chartImageStyle }}">
+            @else
+                <img src="{{ $message->embedData($chartData['emotions_unpleasant'], 'emotions-unpleasant.png', 'image/png') }}" alt="Rate My Emotions — Unpleasant" width="560" style="{{ $chartImageStyle }}">
+            @endif
+        </div>
     @endif
 
     @if (!empty($chartData['presence']))
-        <h2 style="color: {{ $accentColor }}; font-size: 18px; margin: 24px 0 12px;">2. Rate My Presence in Parenting</h2>
-        @if (!empty($forPdf))
-            <img src="data:image/png;base64,{{ base64_encode($chartData['presence']) }}" alt="Rate My Presence in Parenting" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
-        @else
-            <img src="{{ $message->embedData($chartData['presence'], 'presence.png', 'image/png') }}" alt="Rate My Presence in Parenting" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
-        @endif
+        <div style="{{ $chartBlockStyle }}">
+            <h2 style="{{ $chartHeadingStyle }}">2. Rate My Presence in Parenting</h2>
+            @if (!empty($forPdf))
+                <img src="data:image/png;base64,{{ base64_encode($chartData['presence']) }}" alt="Rate My Presence in Parenting" width="560" style="{{ $chartImageStyle }}">
+            @else
+                <img src="{{ $message->embedData($chartData['presence'], 'presence.png', 'image/png') }}" alt="Rate My Presence in Parenting" width="560" style="{{ $chartImageStyle }}">
+            @endif
+        </div>
     @endif
 
-    @if (!empty($chartData['awareness_quality']))
-        <h2 style="color: {{ $accentColor }}; font-size: 18px; margin: 24px 0 12px;">3. Quality of awareness</h2>
-        @if (!empty($forPdf))
-            <img src="data:image/png;base64,{{ base64_encode($chartData['awareness_quality']) }}" alt="Daily Check-Ins and Final Awareness Score" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
-        @else
-            <img src="{{ $message->embedData($chartData['awareness_quality'], 'awareness-quality.png', 'image/png') }}" alt="Daily Check-Ins and Final Awareness Score" width="560" style="max-width: 100%; height: auto; display: block; margin-bottom: 24px;">
-        @endif
+    @if (!empty($chartData['awareness']))
+        <div style="{{ $chartBlockStyle }}">
+            <h2 style="{{ $chartHeadingStyle }}">3. Rate My Awareness</h2>
+            @if (!empty($forPdf))
+                <img src="data:image/png;base64,{{ base64_encode($chartData['awareness']) }}" alt="Rate My Awareness" width="560" style="{{ $chartImageStyle }}">
+            @else
+                <img src="{{ $message->embedData($chartData['awareness'], 'awareness.png', 'image/png') }}" alt="Rate My Awareness" width="560" style="{{ $chartImageStyle }}">
+            @endif
+        </div>
     @endif
 
     <h2 style="color: {{ $accentColor }}; font-size: 18px; margin: 24px 0 12px;">What do these scores mean?</h2>

@@ -2,23 +2,23 @@
 
 namespace App\Services;
 
+use App\Models\Module;
+
 class ModuleChartService
 {
     private const WIDTH = 560;
 
-    private const HEIGHT = 320;
+    private const HEIGHT = 260;
 
     private const MARGIN_RIGHT = 20;
 
-    private const MARGIN_TOP = 48;
+    private const MARGIN_TOP = 12;
 
-    private const MARGIN_BOTTOM = 100;
+    private const MARGIN_BOTTOM = 72;
 
     private const SECTION_LABEL_OFFSET = 8;
 
     private const X_LABEL_OFFSET = 36;
-
-    private const LEGEND_OFFSET = 52;
 
     private const Y_LABEL_COLUMN = 18;
 
@@ -30,15 +30,11 @@ class ModuleChartService
 
     private const PRIMARY_COLOR = '#3A7BB8';
 
-    private const SECONDARY_COLOR = '#DE6434';
-
-    private const TITLE_SIZE = 11;
+    private const APP_PRIMARY_COLOR = '#48745D';
 
     private const AXIS_LABEL_SIZE = 9;
 
     private const TICK_SIZE = 9;
-
-    private const LEGEND_SIZE = 8;
 
     private const SECTION_LABEL_SIZE = 8;
 
@@ -46,107 +42,90 @@ class ModuleChartService
 
     private ?string $fontBold = null;
 
+    /** @var array<int, string>|null */
+    private ?array $moduleColorsByOrder = null;
+
     /**
      * @return array<string, string> PNG binary strings keyed by chart name
      */
     public function generateCharts(array $report): array
     {
         $charts = [];
-        $primaryColor = $report['module']->color ?? self::PRIMARY_COLOR;
 
         if (!empty($report['emotions']['sections'])) {
-            $charts['emotions'] = $this->renderEmotionsChart(
-                $report['emotions']['chart_title'],
+            $pleasantChart = $this->renderEmotionSeriesChart(
                 $report['emotions']['sections'],
-                $primaryColor
+                'pleasant'
             );
+            if ($pleasantChart !== null) {
+                $charts['emotions_pleasant'] = $pleasantChart;
+            }
+
+            $unpleasantChart = $this->renderEmotionSeriesChart(
+                $report['emotions']['sections'],
+                'unpleasant'
+            );
+            if ($unpleasantChart !== null) {
+                $charts['emotions_unpleasant'] = $unpleasantChart;
+            }
         }
 
         if (!empty($report['presence']['sections'])) {
-            $charts['presence'] = $this->renderPresenceChart(
-                $report['presence']['chart_title'],
-                $report['presence']['sections'],
-                $primaryColor
-            );
+            $charts['presence'] = $this->renderSectionSeriesChart($report['presence']['sections']);
         }
 
-        if (!empty($report['awareness_quality']['check_ins']) || !empty($report['awareness_quality']['awareness'])) {
-            $charts['awareness_quality'] = $this->renderAwarenessQualityChart(
-                $report['awareness_quality']['chart_title'],
-                $report['awareness_quality']['check_ins'] ?? [],
-                $report['awareness_quality']['awareness'] ?? null,
-                $primaryColor
-            );
+        if (!empty($report['awareness']['sections'])) {
+            $charts['awareness'] = $this->renderSectionSeriesChart($report['awareness']['sections']);
         }
 
         return array_filter($charts);
     }
 
-    private function renderEmotionsChart(string $title, array $sections, string $primaryColor): ?string
+    private function renderEmotionSeriesChart(array $sections, string $field): ?string
     {
-        $image = $this->createCanvas($title);
-        $plot = $this->plotArea();
-        $this->drawAxes($image, $plot, 'Section', 'Score');
+        $seriesSections = [];
 
-        $groupCount = count($sections);
-        $groupWidth = $plot['width'] / max($groupCount, 1);
-        $barWidth = (int) min(28, ($groupWidth / 2) - 8);
-        $pleasantColor = $this->allocateHexColor($image, $primaryColor);
-        $unpleasantColor = $this->allocateHexColor($image, $this->muteHex($primaryColor));
-
-        foreach ($sections as $index => $section) {
-            $centerX = (int) ($plot['left'] + ($groupWidth * $index) + ($groupWidth / 2));
-
-            if ($section['pleasant'] !== null) {
-                $this->drawBar(
-                    $image,
-                    $centerX - (int) ($barWidth / 2) - 2,
-                    $barWidth,
-                    (float) $section['pleasant'],
-                    $plot,
-                    $pleasantColor
-                );
+        foreach ($sections as $section) {
+            if (($section[$field] ?? null) === null) {
+                continue;
             }
 
-            if ($section['unpleasant'] !== null) {
-                $this->drawBar(
-                    $image,
-                    $centerX + 2,
-                    $barWidth,
-                    (float) $section['unpleasant'],
-                    $plot,
-                    $unpleasantColor
-                );
-            }
-
-            $this->drawSectionLabel($image, $section['label'], $centerX, $plot['bottom'] + self::SECTION_LABEL_OFFSET);
+            $seriesSections[] = [
+                'label' => $section['label'],
+                'part_order' => $section['part_order'] ?? null,
+                'value' => $section[$field],
+            ];
         }
 
-        $this->drawLegend($image, $plot['bottom'] + self::LEGEND_OFFSET, [
-            ['label' => 'Pleasant', 'color' => $pleasantColor],
-            ['label' => 'Unpleasant', 'color' => $unpleasantColor],
-        ]);
+        if ($seriesSections === []) {
+            return null;
+        }
 
-        return $this->toPng($image);
+        return $this->renderSectionSeriesChart($seriesSections);
     }
 
-    private function renderPresenceChart(string $title, array $sections, string $primaryColor): ?string
+    private function renderSectionSeriesChart(array $sections): ?string
     {
-        $image = $this->createCanvas($title);
+        if ($sections === []) {
+            return null;
+        }
+
+        $image = $this->createCanvas();
         $plot = $this->plotArea();
         $this->drawAxes($image, $plot, 'Section', 'Score');
 
         $groupCount = count($sections);
         $groupWidth = $plot['width'] / max($groupCount, 1);
         $barWidth = (int) min(40, $groupWidth - 24);
-        $barColor = $this->allocateHexColor($image, $primaryColor);
 
         foreach ($sections as $index => $section) {
-            if ($section['value'] === null) {
+            if (($section['value'] ?? null) === null) {
                 continue;
             }
 
+            $barHex = $this->sectionColor($section);
             $centerX = (int) ($plot['left'] + ($groupWidth * $index) + ($groupWidth / 2));
+            $barColor = $this->allocateHexColor($image, $barHex);
             $this->drawBar($image, $centerX - (int) ($barWidth / 2), $barWidth, (float) $section['value'], $plot, $barColor);
             $this->drawSectionLabel($image, $section['label'], $centerX, $plot['bottom'] + self::SECTION_LABEL_OFFSET);
         }
@@ -154,63 +133,39 @@ class ModuleChartService
         return $this->toPng($image);
     }
 
-    private function renderAwarenessQualityChart(string $title, array $checkIns, ?array $awareness, string $primaryColor): ?string
+    private function sectionColor(array $section): string
     {
-        $image = $this->createCanvas($title);
-        $plot = $this->plotArea();
-        $this->drawAxes($image, $plot, 'Day', 'Score');
+        $partOrder = $section['part_order'] ?? null;
 
-        $slots = $checkIns;
-        if ($awareness !== null) {
-            $slots[] = $awareness;
+        if ($partOrder === 0) {
+            return self::APP_PRIMARY_COLOR;
         }
 
-        $slotCount = count($slots);
-        if ($slotCount === 0) {
-            imagedestroy($image);
-
-            return null;
+        if ($partOrder) {
+            return $this->moduleColorsByOrder()[$partOrder] ?? self::PRIMARY_COLOR;
         }
 
-        $slotWidth = $plot['width'] / $slotCount;
-        $barWidth = (int) min(36, $slotWidth - 16);
-        $checkInColor = $this->allocateHexColor($image, $this->muteHex($primaryColor));
-        $awarenessColor = $this->allocateHexColor($image, $primaryColor);
-
-        foreach ($slots as $index => $slot) {
-            if (($slot['value'] ?? null) === null) {
-                continue;
-            }
-
-            $isAwareness = $index === count($checkIns);
-            $centerX = (int) ($plot['left'] + ($slotWidth * $index) + ($slotWidth / 2));
-            $this->drawBar(
-                $image,
-                $centerX - (int) ($barWidth / 2),
-                $barWidth,
-                (float) $slot['value'],
-                $plot,
-                $isAwareness ? $awarenessColor : $checkInColor
-            );
-            $this->drawSectionLabel($image, $slot['label'], $centerX, $plot['bottom'] + self::SECTION_LABEL_OFFSET, 12);
-        }
-
-        $this->drawLegend($image, $plot['bottom'] + self::LEGEND_OFFSET, [
-            ['label' => 'Quick Check-In Score', 'color' => $checkInColor],
-            ['label' => 'Rate My Awareness Score', 'color' => $awarenessColor],
-        ]);
-
-        return $this->toPng($image);
+        return self::PRIMARY_COLOR;
     }
 
-    private function createCanvas(string $title)
+    /** @return array<int, string> */
+    private function moduleColorsByOrder(): array
+    {
+        if ($this->moduleColorsByOrder === null) {
+            $this->moduleColorsByOrder = Module::query()
+                ->orderBy('order')
+                ->pluck('color', 'order')
+                ->all();
+        }
+
+        return $this->moduleColorsByOrder;
+    }
+
+    private function createCanvas()
     {
         $image = imagecreatetruecolor(self::WIDTH, self::HEIGHT);
         $white = imagecolorallocate($image, 255, 255, 255);
         imagefill($image, 0, 0, $white);
-
-        $black = imagecolorallocate($image, 51, 51, 51);
-        $this->drawText($image, self::TITLE_SIZE, $this->plotArea()['left'], 26, $black, $title, bold: true);
 
         return $image;
     }
@@ -276,18 +231,6 @@ class ModuleChartService
                 $black,
                 $line
             );
-        }
-    }
-
-    private function drawLegend($image, int $y, array $items): void
-    {
-        $black = imagecolorallocate($image, 51, 51, 51);
-        $x = $this->plotArea()['left'];
-
-        foreach ($items as $item) {
-            imagefilledrectangle($image, $x, $y, $x + 12, $y + 12, $item['color']);
-            $this->drawText($image, self::LEGEND_SIZE, $x + 16, $y + 11, $black, $item['label']);
-            $x += 16 + $this->textWidth($item['label'], self::LEGEND_SIZE) + 24;
         }
     }
 
@@ -421,27 +364,5 @@ class ModuleChartService
             hexdec(substr($hex, 2, 2)),
             hexdec(substr($hex, 4, 2))
         );
-    }
-
-    private function muteHex(string $hexColor, float $weight = 0.45): string
-    {
-        $hex = ltrim($hexColor, '#');
-
-        if (strlen($hex) !== 6) {
-            return self::PRIMARY_COLOR;
-        }
-
-        $channels = [
-            hexdec(substr($hex, 0, 2)),
-            hexdec(substr($hex, 2, 2)),
-            hexdec(substr($hex, 4, 2)),
-        ];
-
-        $muted = array_map(
-            fn (int $channel) => (int) round(($channel * $weight) + (255 * (1 - $weight))),
-            $channels
-        );
-
-        return sprintf('#%02x%02x%02x', $muted[0], $muted[1], $muted[2]);
     }
 }
