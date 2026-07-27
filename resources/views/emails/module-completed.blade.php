@@ -22,7 +22,7 @@
     @endphp
 
     <h1 style="color: {{ $accentColor }}; font-size: 24px; margin-bottom: 20px;">
-        Your {{ config('app.name') }} Journey Report - Part {{ $partOrder }} ({{ $module->flowerColorName() }} Flower)
+        Your {{ config('app.name') }} Journey Report
     </h1>
 
     <p style="margin-bottom: 15px;">
