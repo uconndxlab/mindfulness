@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use App\Support\FlowerAssets;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Day extends Model
 {
     use HasFactory;
+
+    protected $casts = [
+        'num_petals' => 'integer',
+        'is_check_in' => 'boolean',
+    ];
 
     public function module()
     {
@@ -22,6 +28,24 @@ class Day extends Model
     public function finalActivity()
     {
         return $this->activities()->where('optional', false)->orderBy('order', 'desc')->first();
+    }
+
+    public function flowerAnimationData(): ?array
+    {
+        if ($this->num_petals === null) {
+            return null;
+        }
+
+        return FlowerAssets::animationData($this->module, $this->num_petals);
+    }
+
+    public function flowerFrameUrl(): ?string
+    {
+        if ($this->num_petals === null) {
+            return null;
+        }
+
+        return FlowerAssets::moduleFrameUrl($this->module, $this->num_petals);
     }
 
     // user progress functions

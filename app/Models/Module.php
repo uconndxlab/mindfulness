@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Module extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = ['name', 'description', 'workbook_path', 'order', 'color'];
 
     public function days()
@@ -96,7 +96,7 @@ class Module extends Model
             'completedCheckInActivities' => $completedCheckInActivities,
         ];
     }
-    
+
     public static function setNewOrder(array $order): void
     {
         foreach ($order as $i => $id) {
@@ -122,5 +122,17 @@ class Module extends Model
             4 => 'Pink',
             default => 'Flower',
         };
+    }
+
+    public function flowerColorSlug(): string
+    {
+        $slug = strtolower($this->flowerColorName());
+
+        return $slug === 'flower' ? 'default' : $slug;
+    }
+
+    public function flowerFrameUrl(int $petals): string
+    {
+        return \App\Support\FlowerAssets::moduleFrameUrl($this, $petals);
     }
 }

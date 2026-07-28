@@ -1,3 +1,5 @@
+import { playFlowerAnimation } from './flower-animation';
+
 function bindModalHandlers() {
     const modal = document.getElementById('appModal');
     if (!window.bootstrap) return;
@@ -7,12 +9,21 @@ function bindModalHandlers() {
     const myModal = modal ? new Modal(modal) : null;
 
     let currentCancelHandler = null;
+    let activeFlowerAnimation = null;
+
+    function stopFlowerAnimation() {
+        if (activeFlowerAnimation) {
+            activeFlowerAnimation.stop();
+            activeFlowerAnimation = null;
+        }
+    }
 
     function showModal(options = {}) {
         const {
             label = 'undefined',
             body = null,
             media = null,
+            flowerAnimation = null,
             route = null,
             method = 'POST',
             buttonLabel = 'Continue',
@@ -24,21 +35,34 @@ function bindModalHandlers() {
 
         if (!modal || !myModal) return;
 
+        stopFlowerAnimation();
+
         document.getElementById('appModalLabel').innerHTML = label;
         closeBtn.innerHTML = closeLabel;
 
+        const modalBody = document.getElementById('appModalBody');
         if (body) {
-            const modalBody = document.getElementById('appModalBody');
             modalBody.innerHTML = body;
             modalBody.classList.remove('d-none');
+        } else {
+            modalBody.innerHTML = '';
+            modalBody.classList.add('d-none');
         }
 
+        const modalFlower = document.getElementById('appModalFlower');
+        const modalFlowerFrame = document.getElementById('appModalFlowerFrame');
         const modalMedia = document.getElementById('appModalImg');
-        if (media) {
+
+        modalMedia.classList.add('d-none');
+        modalFlower.classList.add('d-none');
+
+        // if flower animation is provided, play it
+        if (flowerAnimation?.frames?.length) {
+            modalFlower.classList.remove('d-none');
+            activeFlowerAnimation = playFlowerAnimation(modalFlowerFrame, flowerAnimation);
+        } else if (media) {
             modalMedia.src = media;
             modalMedia.classList.remove('d-none');
-        } else {
-            modalMedia.classList.add('d-none');
         }
 
         const modalForm = document.getElementById('modalForm');
@@ -63,6 +87,7 @@ function bindModalHandlers() {
         }
 
         currentCancelHandler = () => {
+            stopFlowerAnimation();
             if (onCancel) onCancel();
             myModal.hide();
         };
@@ -71,7 +96,7 @@ function bindModalHandlers() {
 
         // confirm handler - call before form submission
         if (onConfirm) {
-            const confirmHandler = (e) => {
+            const confirmHandler = () => {
                 onConfirm();
             };
             modalForm.removeEventListener('submit', confirmHandler);
@@ -102,9 +127,10 @@ function bindModalHandlers() {
             modalFreezeBackground();
         });
         modal.addEventListener('hidden.bs.modal', function () {
+            stopFlowerAnimation();
             modalRestoreBackground();
         });
-        
+
         // accessibility issue: remove focus before hiding modal
         modal.addEventListener('hide.bs.modal', function () {
             // remove focus from element in modal
@@ -112,7 +138,7 @@ function bindModalHandlers() {
                 document.activeElement.blur();
             }
         });
-        
+
         // mousedown on backdrop
         modal.addEventListener('mousedown', function (event) {
             // if clicking directly on the modal backdrop (not on modal content)
@@ -135,7 +161,7 @@ function bindModalHandlers() {
             modalRestoreBackground();
         }
     });
-    
+
     // accessibility issue: remove focus before hiding modal
     document.addEventListener('hide.bs.modal', function (event) {
         // remove focus from element in modal
@@ -143,7 +169,7 @@ function bindModalHandlers() {
             document.activeElement.blur();
         }
     });
-    
+
     // mousedown for modal backdrop
     document.addEventListener('mousedown', function (event) {
         // check if clicking on a modal backdrop

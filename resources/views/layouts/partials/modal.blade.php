@@ -6,6 +6,9 @@
             </div>
             <div id="appModalBody" class="modal-body d-none">
             </div>
+            <div id="appModalFlower" class="flower-animation d-none">
+                <img id="appModalFlowerFrame" src="" alt="Flower progress" class="img-fluid d-block mx-auto">
+            </div>
             <img id="appModalImg" src="" alt="Example Image" class="img-fluid d-block mx-auto d-none">
             <div class="modal-footer d-flex justify-content-center">
                 <form id="modalForm" method="POST" class="w-100">

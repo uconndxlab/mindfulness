@@ -19,19 +19,19 @@
                         $audioSlug = 'audio-' . $voiceKey;
                         $isAI = !in_array($voiceKey, $teacherVoiceKeys);
                         $teacher = $teachers[$voiceKey] ?? null;
-                        $profilePicture = $isAI 
-                            ? ($voiceKey === 'ai-female' ? Storage::url('profile_pictures/icon-w.png') : Storage::url('profile_pictures/icon-m.png')) 
-                            : ($teacher ? Storage::url('profile_pictures/sq/' . $teacher->profile_picture) : Storage::url('flowers/Flower-5.svg'));
+                        $profilePicture = $isAI
+                            ? ($voiceKey === 'ai-female' ? Storage::url('profile_pictures/icon-w.png') : Storage::url('profile_pictures/icon-m.png'))
+                            : ($teacher ? Storage::url('profile_pictures/sq/' . $teacher->profile_picture) : \App\Support\FlowerAssets::frameUrl('default', 5));
                         $isDefault = $voice === $defaultVoice;
                     @endphp
                     <div class="voice-option text-center">
-                        <button type="button" 
-                            class="voice-btn {{ $isDefault ? 'active' : '' }}" 
+                        <button type="button"
+                            class="voice-btn {{ $isDefault ? 'active' : '' }}"
                             data-voice="{{ $audioSlug }}"
                             data-voice-name="{{ $voice }}"
                             aria-label="Select {{ $voice }} voice">
-                            <img src="{{ $profilePicture }}" 
-                                alt="{{ $voice }}" 
+                            <img src="{{ $profilePicture }}"
+                                alt="{{ $voice }}"
                                 class="voice-profile-img">
                         </button>
                         <div class="voice-label mt-1">{{ $voice }}</div>

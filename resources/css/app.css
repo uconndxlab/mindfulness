@@ -1551,6 +1551,13 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     height:50px;
     margin-right:10px;
 }
+.flower-animation {
+    padding: 0 1rem 1rem;
+}
+.flower-animation img {
+    width: min(220px, 70vw);
+    height: auto;
+}
 .module-content {
     display: flex;
     flex-direction: column;

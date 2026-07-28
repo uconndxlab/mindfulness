@@ -17,7 +17,7 @@
                         <div class="card p-2 module mb-2">
                             @if ($module->unlocked)
                                 <a id="moduleLink" href="{{ route('explore.module', ['module_id' => $module->id]) }}" class="stretched-link w-100 module-link">
-                                    <img src="{{ Storage::url('flowers/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon">
+                                    <img src="{{ $module->flowerFrameUrl($module->daysCompleted) }}" alt="Icon">
                                     <div class="col">
                                         <h6 class="mb-0">{{ $module->partName() }}</h6>
                                         <ul class="text-muted ps-2 mb-0">
@@ -33,7 +33,7 @@
                                 </a>
                             @else
                                 <a href="#" class="stretched-link w-100 module-link disabled locked-module-link" data-module-name="{{ $module->partName() }}">
-                                    <img src="{{ Storage::url('flowers/Flower-'. $module->daysCompleted .'.svg') }}" alt="Icon">
+                                    <img src="{{ $module->flowerFrameUrl($module->daysCompleted) }}" alt="Icon">
                                     <div class="col">
                                         <h6 class="mb-0">{{ $module->partName() }}</h6>
                                         <ul class="text-muted ps-2 mb-0">
@@ -64,7 +64,7 @@
                                 @php
                                     $petals = floor($bonusInfo['numberBonusCompleted'] / $bonusInfo['totalBonus'] * 5);
                                 @endphp
-                                <img src="{{ Storage::url('flowers/Flower-'.$petals.'.svg') }}" alt="Icon">
+                                <img src="{{ \App\Support\FlowerAssets::frameUrl('default', $petals) }}" alt="Icon">
                                 <div class="col">
                                     <h6 class="mb-0">Bonus Activities</h6>
                                     <ul class="text-muted ps-2 mb-0">

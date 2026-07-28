@@ -6,7 +6,6 @@ use App\Events\DayCompleted;
 use App\Models\Day;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Storage;
 
 class ShowDayCompletedModal
 {
@@ -42,14 +41,15 @@ class ShowDayCompletedModal
     {
         $label = "Congrats on completing ".e($day->name)."! 🎉";
         $body = $this->buildModalBody($day, $hasBonus, $nextDay);
-        $media = $day->media_path ? Storage::url('flowers/'.$day->media_path) : null;
+        $flowerAnimation = $day->flowerAnimationData();
         $route = '/home';
 
         $modalData = [
             'show_modal' => true,
             'label' => $label,
             'body' => $body,
-            'media' => $media,
+            'media' => null,
+            'flowerAnimation' => $flowerAnimation,
             'route' => $route,
             'method' => 'GET',
             'buttonLabel' => 'Home',
