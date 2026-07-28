@@ -121,5 +121,12 @@
             </div>
         @endif
     </div>
+
+    <div class="home-encouragement">
+        <p class="home-encouragement-stats">
+            You've returned to {{ config('app.name') }} for <span class="home-encouragement-highlight">XX</span> days and completed <span class="home-encouragement-highlight">XX</span> activities!
+        </p>
+        <p class="home-encouragement-thanks">Thank you for your commitment <i class="bi bi-heart-fill home-encouragement-heart"></i></p>
+    </div>
 </div>
 @endsection

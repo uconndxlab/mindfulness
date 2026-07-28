@@ -1901,6 +1901,38 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     pointer-events: none;
 }
 
+[data-page="home"] .home-encouragement {
+    margin-top: 1.5rem;
+    padding: 1rem 1.15rem;
+    border-radius: 12px;
+    background: var(--home-accent-light);
+    text-align: center;
+}
+
+[data-page="home"] .home-encouragement-stats {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: rgba(0, 0, 0, 0.75);
+    margin-bottom: 0.35rem;
+}
+
+[data-page="home"] .home-encouragement-highlight {
+    font-weight: 700;
+    color: var(--home-accent);
+}
+
+[data-page="home"] .home-encouragement-thanks {
+    font-size: 0.875rem;
+    color: rgba(0, 0, 0, 0.55);
+    margin-bottom: 0;
+}
+
+[data-page="home"] .home-encouragement-heart {
+    font-size: 0.85rem;
+    color: var(--home-accent);
+    vertical-align: -0.05em;
+}
+
 /* Account progress dashboard */
 .progress-dashboard {
     padding: 1rem 1.25rem 1.25rem;
