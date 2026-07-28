@@ -17,21 +17,21 @@
         <div class="grey-note progress-dashboard">
             <div class="progress-parts-grid">
                 @foreach ($progress['parts'] as $part)
-                    <div class="progress-part">
-                        <h6 class="progress-part-title fw-bold mb-2">{{ $part['short_name'] }}</h6>
-                        <ul class="text-muted ps-2 mb-0">
+                    <div class="progress-part progress-part--{{ $part['color_slug'] }}">
+                        <h6 class="progress-part-title">{{ $part['display_name'] }}</h6>
+                        <ul class="progress-part-stats">
                             @if ($part['days']['total'] > 0)
-                                <li class="list-check{{ $isComplete($part['days']['completed'], $part['days']['total']) ? '-filled fw-bold' : '' }}">
+                                <li class="list-check{{ $isComplete($part['days']['completed'], $part['days']['total']) ? '-filled list-check-filled--'.$part['color_slug'] : '' }}">
                                     {{ $part['days']['completed'] }}/{{ $part['days']['total'] }} Days
                                 </li>
                             @endif
                             @if ($part['check_ins']['total'] > 0)
-                                <li class="list-check{{ $isComplete($part['check_ins']['completed'], $part['check_ins']['total']) ? '-filled fw-bold' : '' }}">
+                                <li class="list-check{{ $isComplete($part['check_ins']['completed'], $part['check_ins']['total']) ? '-filled list-check-filled--'.$part['color_slug'] : '' }}">
                                     {{ $part['check_ins']['completed'] }}/{{ $part['check_ins']['total'] }} Quick Check-Ins
                                 </li>
                             @endif
                             @if ($part['self_ratings']['total'] > 0)
-                                <li class="list-check{{ $isComplete($part['self_ratings']['completed'], $part['self_ratings']['total']) ? '-filled fw-bold' : '' }}">
+                                <li class="list-check{{ $isComplete($part['self_ratings']['completed'], $part['self_ratings']['total']) ? '-filled list-check-filled--'.$part['color_slug'] : '' }}">
                                     {{ $part['self_ratings']['completed'] }}/{{ $part['self_ratings']['total'] }} Self-Rating{{ $part['self_ratings']['total'] != 1 ? 's' : '' }}
                                 </li>
                             @endif

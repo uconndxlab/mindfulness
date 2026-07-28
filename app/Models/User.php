@@ -183,6 +183,8 @@ class User extends Authenticatable implements MustVerifyEmail
                 'order' => $module->order,
                 'name' => $module->partName(),
                 'short_name' => 'Part ' . $module->order,
+                'display_name' => 'Part ' . $module->order . ': ' . $module->flowerColorName() . ' Flower',
+                'color_slug' => $module->flowerColorSlug(),
                 'days' => [
                     'completed' => $moduleProgress['daysCompleted'],
                     'total' => $moduleProgress['totalDays'],

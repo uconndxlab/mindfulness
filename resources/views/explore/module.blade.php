@@ -4,7 +4,10 @@
 @section('page_id', 'module')
 
 @section('content')
-<div class="col-md-8">
+@php
+    $colorSlug = $module->flowerColorSlug();
+@endphp
+<div class="col-md-8 module-page module-theme--{{ $colorSlug }}">
     <div class="text-left mb-3">
         <h1 class="display fw-bold mb-1">{{ $module->partName() }}</h1>
         <p>{{ $module->description }}</p>
@@ -16,12 +19,12 @@
     <div class="mb-2">
         <h5>Progress:</h5>
         <ul>
-            <li class="list-check{{ $module->daysCompleted == $module->totalDays ? '-filled' : '' }}">{{ $module->daysCompleted }}/{{ $module->totalDays }} Days</li>
+            <li class="list-check{{ $module->daysCompleted == $module->totalDays ? '-filled list-check-filled--'.$colorSlug : '' }}">{{ $module->daysCompleted }}/{{ $module->totalDays }} Days</li>
             @if ($module->totalCheckInActivities > 0)
-                <li class="list-check{{ $module->completedCheckInActivities == $module->totalCheckInActivities ? '-filled' : '' }}">{{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins</li>
+                <li class="list-check{{ $module->completedCheckInActivities == $module->totalCheckInActivities ? '-filled list-check-filled--'.$colorSlug : '' }}">{{ $module->completedCheckInActivities }}/{{ $module->totalCheckInActivities }} Quick Check-Ins</li>
             @endif
             @if ($module->totalSelfRatings > 0)
-                <li class="list-check{{ $module->completedSelfRatings == $module->totalSelfRatings ? '-filled' : '' }}">{{ $module->completedSelfRatings }}/{{ $module->totalSelfRatings }} Self-Rating</li>
+                <li class="list-check{{ $module->completedSelfRatings == $module->totalSelfRatings ? '-filled list-check-filled--'.$colorSlug : '' }}">{{ $module->completedSelfRatings }}/{{ $module->totalSelfRatings }} Self-Rating</li>
             @endif
         </ul>
     </div>
@@ -34,13 +37,13 @@
             <div class="accordion-item border mb-2" id="day_{{ $day->id }}">
                 <h2 class="accordion-header" id="heading_{{ $index }}">
                     <button class="accordion-button {{ $day->active ? '' : 'collapsed' }} {{ $disabled }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $index }}" aria-expanded="{{ $day->active ? 'true' : 'false' }}" aria-controls="collapse_{{ $index }}">
-                        <div class="d-flex w-100">                                
+                        <div class="d-flex w-100">
                             @if ($day->completed)
-                                <i class="bi bi-check-square-fill"></i>
+                                <i class="bi bi-check-circle-fill"></i>
                             @elseif($disabled)
                                 <i class="bi bi-lock-fill"></i>
                             @else
-                                <i class="bi bi-square-fill"></i>
+                                <i class="bi bi-circle-fill"></i>
                             @endif
                             <div class="flex-grow-1 pe-4">
                                 <div class="text-dark fw-bold">{{ $day->name }}</div>
@@ -49,7 +52,7 @@
                         </div>
                     </button>
                 </h2>
-                
+
                 <div id="collapse_{{ $index }}" class="accordion-collapse collapse {{ $day->active ? 'show' : '' }}" aria-labelledby="heading_{{ $index }}" data-bs-parent="#accordionDays">
                     <div class="accordion-body">
                         @if (!$disabled)
@@ -62,9 +65,9 @@
                                         <a id="moduleLink_{{ $activity->id }}" class="stretched-link w-100 activity-link {{ $disabled }} pb-1" data-id="{{ $activity->id }}" href="#">
                                             <div class="d-flex">
                                                 @if ($activity->completed)
-                                                    <i class="bi bi-check-square-fill"></i>
+                                                    <i class="bi bi-check-circle-fill"></i>
                                                 @else
-                                                    <i class="bi bi-square-fill"></i>
+                                                    <i class="bi bi-circle-fill"></i>
                                                 @endif
                                                 <div class="flex-grow-1">
                                                     <p class="activity-font mb-1">{{ $activity->title }}</p>

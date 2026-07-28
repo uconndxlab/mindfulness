@@ -13,8 +13,8 @@
     <div class="mb-2">
         <h5>Progress:</h5>
         <ul>
-            <li class="list-check{{ $stats['numberBonusUnlocked'] == $stats['totalBonus'] ? '-filled' : '' }}">{{ $stats['numberBonusUnlocked'] }}/{{ $stats['totalBonus'] }} Activities Unlocked</li>
-            <li class="list-check{{ $stats['numberBonusCompleted'] == $stats['totalBonus'] ? '-filled' : '' }}">{{ $stats['numberBonusCompleted'] }}/{{ $stats['totalBonus'] }} Activities Completed</li>
+            <li class="list-check{{ $stats['numberBonusUnlocked'] == $stats['totalBonus'] ? '-filled list-check-filled--default' : '' }}">{{ $stats['numberBonusUnlocked'] }}/{{ $stats['totalBonus'] }} Activities Unlocked</li>
+            <li class="list-check{{ $stats['numberBonusCompleted'] == $stats['totalBonus'] ? '-filled list-check-filled--default' : '' }}">{{ $stats['numberBonusCompleted'] }}/{{ $stats['totalBonus'] }} Activities Completed</li>
         </ul>
     </div>
     <div class="accordion accordion-flush mb-3" id="accordionDays" data-accordion-activity="{{ $accordion_activity_id ?? '' }}">
@@ -40,9 +40,9 @@
                                 <a id="moduleLink_{{ $activity->id }}" class="stretched-link w-100 activity-link {{ $disabled }} pb-1" data-id="{{ $activity->id }}" href="#">
                                     <div class="d-flex">
                                         @if ($activity->completed)
-                                            <i class="bi bi-check-square-fill"></i>
+                                            <i class="bi bi-check-circle-fill"></i>
                                         @else
-                                            <i class="bi bi-square-fill"></i>
+                                            <i class="bi bi-circle-fill"></i>
                                         @endif
                                         <div class="flex-grow-1">
                                             <p class="activity-font mb-1">{{ $activity->title }}</p>
