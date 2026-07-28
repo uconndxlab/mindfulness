@@ -26,14 +26,16 @@
     </h1>
 
     <p style="margin-bottom: 15px;">
-        Congratulations on completing Part {{ $partOrder }} of the {{ config('app.name') }} program and reaching a fully grown
-        {{ $flowerColor }} flower! This is a milestone that needs celebration! Be proud of the progress you have made and
-        the time you took for yourself and your family in this {{ config('app.name') }} journey!
+        Congratulations on completing the {{ config('app.name') }} program! You had fully grown four flowers!
+        This is a milestone that needs celebration! Each flower represents your effort to promote wellbeing for yourself,
+        your child, and your family! We are so proud of the progress you have made and the time you took for yourself and
+        your family in your {{ config('app.name') }} journey.
     </p>
 
     <p style="margin-bottom: 20px;">
-        Let's take a look at your journey so far. What did you tell us about your levels of pleasant and unpleasant
-        emotions, presence in parenting, and quality of awareness across each part? Below is a summary of your scores.
+        Let's take a look at your journey. Over time, what did you tell us about your levels of pleasant and unpleasant
+        emotions, presence in parenting, and quality of awareness in the Quick Check-Ins and Rate My Awareness?
+        Below is a summary of your scores at the Beginning (except for awareness score) and across Part 1, Part 2, Part 3, and Part 4.
     </p>
 
     @if (!empty($chartData['emotions_pleasant']))
@@ -83,10 +85,10 @@
     <h2 style="color: {{ $accentColor }}; font-size: 18px; margin: 24px 0 12px;">What do these scores mean?</h2>
 
     <p style="margin-bottom: 15px;">
-        These scores offer one snapshot of your experience, but they don't tell the whole story. Many people notice gradual
-        improvements over time, while others experience ups and downs from week to week—especially during a stressful life
-        transition such as divorce. Changes in mindfulness often begin with noticing thoughts and emotions more clearly,
-        which may not always be reflected in higher scores right away.
+        These scores offer one snapshot of your experience, but they don't tell the whole story. Many people
+        notice gradual improvements over time, while others experience ups and downs from week to week—especially
+        during a stressful life transition such as divorce. Changes in mindfulness often begin with noticing thoughts and
+        emotions more clearly, which may not always be reflected in higher scores right away.
     </p>
 
     <p style="margin-bottom: 10px;">As you review your journey, we encourage you to reflect on these questions:</p>
@@ -105,8 +107,8 @@
     <p style="margin-bottom: 10px; font-weight: bold;">Capture your story beyond the scores.</p>
 
     <p style="margin-bottom: 20px;">
-        Consider writing a brief journal entry about what you've learned, challenges you've faced, or moments that stood out
-        to you. Visit your journal here:
+        Celebrate your journey by writing a journal entry about what you've learned, challenges you've faced,
+        or moments that stood out to you. Visit your journal here:
         <a href="{{ url('/journal') }}" style="color: {{ $accentColor }};">{{ url('/journal') }}</a>
     </p>
 
@@ -116,7 +118,11 @@
     </p>
 
     <p style="margin-bottom: 15px;">
-        Keep carrying the {{ config('app.name') }} practices with you as you continue in this journey!
+        The {{ config('app.name') }} program is available when you need it. The skills can continue to grow if you keep practicing!
+    </p>
+
+    <p style="margin-bottom: 15px;">
+        We hope you will carry the {{ config('app.name') }} practices with you as you continue in this journey.
     </p>
 
     <p style="margin-bottom: 5px;">Warmly,</p>
