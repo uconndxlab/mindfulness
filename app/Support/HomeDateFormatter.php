@@ -61,7 +61,7 @@ class HomeDateFormatter
 
             // no next module
             if (! $nextModule) {
-                $color = strtolower($lastCompleted->flowerColorName());
+                $color = $lastCompleted->flowerColorName();
 
                 return 'Your '.$color.' Flower has Bloomed!';
             }
@@ -71,7 +71,7 @@ class HomeDateFormatter
                 $today->lt($starts[$nextModule->order])
                 && ! $this->scheduleService->hasModuleStarted($user, $nextModule)
             ) {
-                $color = strtolower($lastCompleted->flowerColorName());
+                $color = $lastCompleted->flowerColorName();
 
                 return 'Your '.$color.' Flower has Bloomed!';
             }
@@ -82,7 +82,7 @@ class HomeDateFormatter
         }
 
         $order = $currentModule->order;
-        $color = strtoupper($currentModule->flowerColorName());
+        $color = $currentModule->flowerColorName();
         $started = $this->scheduleService->hasModuleStarted($user, $currentModule);
 
         if (! $started) {

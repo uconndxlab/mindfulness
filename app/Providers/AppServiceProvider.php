@@ -44,6 +44,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (app()->isLocal() && ($fakeNow = env('FAKE_NOW'))) {
+            $fake = \Illuminate\Support\Carbon::parse($fakeNow);
+            // Date-only like "2026-08-04" → don't use midnight
+            if (! preg_match('/\d:\d/', $fakeNow)) {
+                $real = \Illuminate\Support\Carbon::now(); // real clock, before setTestNow
+                $fake->setTime($real->hour, $real->minute, $real->second);
+            }
+            \Illuminate\Support\Carbon::setTestNow($fake);
+        }
+
         $this->configureRateLimiters();
 
         Livewire::addPersistentMiddleware([

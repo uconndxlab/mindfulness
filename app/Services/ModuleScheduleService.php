@@ -46,6 +46,16 @@ class ModuleScheduleService
         $today = $this->today($user);
         $isNewDay = $this->isNewCalendarDay($user, $today);
 
+        // Registration sets last_active_at to today, so the first visit on day 1
+        // would otherwise skip the increment entirely.
+        if (
+            ! $isNewDay
+            && ($user->active_days_count ?? 0) === 0
+            && $today->equalTo($this->registrationDay($user))
+        ) {
+            $isNewDay = true;
+        }
+
         if ($isNewDay) {
             $user->active_days_count = ($user->active_days_count ?? 0) + 1;
         }
@@ -94,6 +104,7 @@ class ModuleScheduleService
         $starts = $this->computeStarts($user, $modules, $today);
 
         $completions = $this->computeCompletions($starts, $this->journeyGoalDate($user));
+        $completions = $this->adjustOverdueCompletions($user, $modules, $completions, $today);
         $journeyGoalDate = $this->journeyGoalDate($user);
 
         return [
@@ -208,6 +219,30 @@ class ModuleScheduleService
     }
 
     /**
+     * When a part is in progress but today is past its target finish date,
+     * slide the completion date to today (mirrors start-date sliding).
+     *
+     * @param  array<int, Carbon>  $completions
+     * @return array<int, Carbon>
+     */
+    private function adjustOverdueCompletions(User $user, Collection $modules, array $completions, Carbon $today): array
+    {
+        foreach ($modules as $module) {
+            $order = $module->order;
+
+            if (
+                $this->hasModuleStarted($user, $module)
+                && ! $module->isCompletedBy($user)
+                && $today->gt($completions[$order])
+            ) {
+                $completions[$order] = $today->copy();
+            }
+        }
+
+        return $completions;
+    }
+
+    /**
      * Compute start dates for parts 1–4 in order.
      *
      * @return array<int, Carbon>
@@ -251,9 +286,9 @@ class ModuleScheduleService
                 }
             }
 
-            // update next start to tomorrow, this should cover previous clause
-            if (! $prev->isCompletedBy($user) && $today->gte($starts[$n])) {
-                $starts[$n] = $today->copy()->addDay();
+            // Slide to today when past start date and not yet started (same as part 1)
+            if ($today->gte($starts[$n])) {
+                $starts[$n] = $today->copy();
                 $pushed[$n] = true;
             }
 
