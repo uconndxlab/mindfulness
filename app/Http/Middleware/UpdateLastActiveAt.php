@@ -2,27 +2,27 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\ModuleScheduleService;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class UpdateLastActiveAt
 {
+    public function __construct(
+        private ModuleScheduleService $moduleScheduleService,
+    ) {}
+
     /**
-     * Handle an incoming request.
-     *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check()) {
-            Auth::user()->update([
-                'last_active_at' => Carbon::now(),
-                'last_inactivity_reminder_day' => null,
-            ]);
+            $this->moduleScheduleService->syncForUser(Auth::user());
         }
+
         return $next($request);
     }
 }

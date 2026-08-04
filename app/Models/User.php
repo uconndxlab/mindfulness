@@ -29,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'last_active_at',
+        'active_days_count',
         'last_reminded_at',
         'last_inactivity_reminder_day',
         'lock_access',
@@ -56,6 +57,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'last_active_at' => 'datetime',
+            'active_days_count' => 'integer',
             'lock_access' => 'boolean',
             'timezone' => 'string',
             'last_reminded_at' => 'datetime',
@@ -244,7 +246,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function modules()
     {
         return $this->belongsToMany(Module::class, 'user_module')
-            ->withPivot('completed', 'unlocked', 'completed_at');
+            ->withPivot('completed', 'unlocked', 'completed_at', 'start_date', 'active_days_count');
     }
 
     // activity progress functions

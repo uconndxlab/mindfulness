@@ -20,7 +20,7 @@ class Module extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_module')
-            ->withPivot('completed', 'unlocked');
+            ->withPivot('completed', 'unlocked', 'start_date', 'active_days_count', 'completed_at');
     }
 
     public function isCompletedBy(?User $user)

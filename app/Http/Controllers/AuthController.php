@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use App\Models\Invitation;
 use App\Models\User;
+use App\Services\ModuleScheduleService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
@@ -179,6 +180,7 @@ class AuthController extends Controller
             //unlocking first module/day/activity
             lockAll($user->id);
             unlockFirst($user->id);
+            app(ModuleScheduleService::class)->initializeForUser($user);
           
             //login, redirect, event hits MustVerifyEmail which calls sendEmailVerificationNotification
             if (!$skipEmailValidation) {

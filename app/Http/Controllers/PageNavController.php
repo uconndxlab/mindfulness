@@ -13,6 +13,8 @@ use App\Models\QuizAnswers;
 use App\Models\Teacher;
 use App\Models\User;
 use App\Models\Faq;
+use App\Support\HomeDateFormatter;
+use App\Services\ModuleScheduleService;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Session;
@@ -38,8 +40,10 @@ class PageNavController extends Controller
     }
 
     //EXPLORE
-    public function exploreHome()
-    {
+    public function exploreHome(
+        ModuleScheduleService $scheduleService,
+        HomeDateFormatter $dateFormatter,
+    ) {
         //handle navigation
         Session::put('current_nav', ['route' => route('explore.home'), 'back' => 'Home']);
         Session::put('previous_explore', route('explore.home'));
@@ -60,8 +64,58 @@ class PageNavController extends Controller
         }
 
         $bonusInfo = $user->getBonusStats();
-    
-        return view("explore.home", compact('modules', 'bonusInfo'));
+
+        $schedule = $scheduleService->getSchedule($user);
+        $currentModule = $modules->first(fn ($m) => $m->unlocked && ! $m->completed)
+            ?? $modules->last(fn ($m) => $m->unlocked)
+            ?? $modules->first();
+
+        foreach ($modules as $module) {
+            $order = $module->order;
+            $module->scheduleStart = $schedule['starts'][$order];
+            $module->scheduleCompletion = $schedule['completions'][$order];
+            $module->scheduleStarted = $scheduleService->hasModuleStarted($user, $module);
+            $module->statusText = $dateFormatter->moduleStatusText(
+                $user,
+                $module,
+                $schedule['starts'][$order],
+                $schedule['completions'][$order],
+                $module->completed,
+                $module->unlocked,
+                $module->scheduleStarted,
+            );
+        }
+
+        $moduleProgress = $currentModule
+            ? $scheduleService->moduleActivityProgress($user, $currentModule)
+            : ['percent' => 0, 'percentLeft' => 100];
+
+        $homeIntro = 'You started the '.config('app.name').' journey on '
+            .$scheduleService->formatAbsoluteDate($scheduleService->registrationDay($user), $user).'.';
+
+        if ($schedule['showJourneyGoal']) {
+            $homeIntro .= ' Your goal is to finish the journey on '
+                .$scheduleService->formatAbsoluteDate($schedule['journeyGoalDate'], $user).'.';
+        }
+
+        $homeIntro .= ' Keep going! Every bit of practice counts!';
+
+        $todayGoal = $dateFormatter->gentleIntentionHeading($user, $schedule, $currentModule);
+        $totalActivitiesCompleted = $scheduleService->totalCompletedActivities($user);
+        $activeDaysCount = $user->active_days_count ?? 0;
+        $currentColorSlug = $currentModule->flowerColorSlug();
+
+        return view('explore.home', compact(
+            'modules',
+            'bonusInfo',
+            'homeIntro',
+            'todayGoal',
+            'moduleProgress',
+            'totalActivitiesCompleted',
+            'activeDaysCount',
+            'currentColorSlug',
+            'currentModule',
+        ));
     }
 
     public function exploreModule($module_id, $activity_id=null)
@@ -86,7 +140,7 @@ class PageNavController extends Controller
         $module->completedSelfRatings = $stats['completedSelfRatings'];
         $module->totalCheckInActivities = $stats['totalCheckInActivities'];
         $module->completedCheckInActivities = $stats['completedCheckInActivities'];
-        
+
         // check if module locked
         if (!$module->unlocked) {
             return redirect()->route('explore.home');
@@ -128,7 +182,7 @@ class PageNavController extends Controller
         //handle navigation
         Session::put('current_nav', ['route' => route('explore.module', ['module_id' => $module_id]), 'back' => 'Part '.$module_id]);
         Session::put('previous_explore', route('explore.module', ['module_id' => $module_id]));
-        
+
         return view("explore.module", compact('module', 'page_info', 'accordion_activity_id',));
     }
 
@@ -154,7 +208,7 @@ class PageNavController extends Controller
             $activity->unlocked = $activity->canBeAccessedBy($user);
             $activity->completed = $activity->isCompletedBy($user);
         }
-        
+
         // group activities by day
         $activitiesByDay = $activities->groupBy('day_id')->map(function ($dayActivities) {
             return [
@@ -176,7 +230,7 @@ class PageNavController extends Controller
         // navigation
         Session::put('current_nav', ['route' => route('explore.bonus'), 'back' => 'Bonus Activities']);
         Session::put('previous_explore', route('explore.bonus'));
-        
+
         return view("explore.bonus", compact('activitiesByDay', 'page_info', 'accordion_activity_id', 'stats'));
     }
 
@@ -185,7 +239,7 @@ class PageNavController extends Controller
         $user = Auth::user();
         $activity = Activity::findOrFail($activity_id) ?? null;
         $locked = !($user->canAccessActivity($activity));
-        
+
         // // check if locked
         if ($locked) {
             return response()->json(['locked' => true, 'modalContent' => [
@@ -197,7 +251,7 @@ class PageNavController extends Controller
         // check for quick progress warning
         $user = Auth::user();
         $explore_day = $activity->day;
-        
+
         // check for progress warning, last day completed id, and if day to explore is not completed
         // and if day to explore is not a check in day
         if ($user->quick_progress_warning && $user->last_day_completed_id && !$user->isDayCompleted($explore_day) && !$explore_day->is_check_in) {
@@ -210,11 +264,11 @@ class PageNavController extends Controller
                 $last_day_name = $completedDay->name;
 
                 $userTimezone = $user->timezone ?? config('app.timezone');
-                
+
                 // get local times
                 $lastCompletionLocal = Carbon::parse($lastCompleteTime)->setTimezone($userTimezone);
                 $now = now()->setTimezone($userTimezone);
-    
+
                 // if it is not yet the next day, return modal content (or less than two hours)
                 if ($lastCompletionLocal->isSameDay($now) || $lastCompletionLocal->diffInHours($now) < 2) {
                     return response()->json(['locked' => true, 'modalContent' => [
@@ -230,7 +284,7 @@ class PageNavController extends Controller
                     ]]);
                 }
             }
-            
+
         }
         return response()->json(['locked' => false]);
     }
@@ -254,18 +308,18 @@ class PageNavController extends Controller
             ->where('optional', false)
             ->orderBy('order')
             ->first() == null;
-        
+
         $activity->skippable = $activity->skippable && !$activity->final && !$activity->completed && isset($activity->type);
 
         //favoriting
         $activity->favorited = $user->isActivityFavorited($activity);
 
         $page_info = [];
-        
+
         //setting exit button
         $exit = Session::get('current_nav');
         $page_info['exit_route'] = $exit ? $exit['route'] : route('explore.home');
-        
+
         //NEXT/FINISH redirect
         //make sure that if doing next, the day is not changing
         if (!$request->library) {
@@ -292,7 +346,7 @@ class PageNavController extends Controller
         $page_info['back_route'] = $page_info['exit_route'];
 
         $page_info['hide_bottom_nav'] = true;
-    
+
         //get content
         $content = $activity->content;
         $quiz = $activity->quiz;
@@ -328,16 +382,16 @@ class PageNavController extends Controller
         try {
             // validation is already handled by SubmitQuizRequest
             $validated = $request->validated();
-            
+
             // get quiz (already validated to exist and be accessible)
             $quiz = Quiz::findOrFail($validated['quiz_id']);
-    
+
             // get validated answers
             $answers = $request->getAnswersArray();
-            
+
             // get average if provided (already validated to be 0-100)
             $average = $validated['average'] ?? null;
-    
+
             QuizAnswers::updateOrCreate([
                 'user_id' => Auth::id(),
                 'quiz_id' => $quiz->id
@@ -349,7 +403,7 @@ class PageNavController extends Controller
                 'answers' => $answers,
                 'average' => $average
             ]);
-            
+
             return response()->json(['success_message' => 'Quiz answers updated successfully.'], 200);
         }
         catch (\Throwable $e) {
@@ -362,7 +416,7 @@ class PageNavController extends Controller
             return response()->json(['error_message' => 'Failed to submit quiz answers.'], 500);
         }
     }
-        
+
     public function exploreBrowseButton(Request $request) {
             //browse nav button - check for previous explore page
             //active is for double click functionality
@@ -392,7 +446,7 @@ class PageNavController extends Controller
         $user = Auth::user();
         $query = $user->activities()->wherePivot('unlocked', true);
         $rand_query = $user->activities()->wherePivot('unlocked', true);
-        
+
         //base param
         $empty_page = null;
         if ($request->base_param) {
@@ -416,7 +470,7 @@ class PageNavController extends Controller
         // using query copy get random activity
         $rand_acts = $rand_query->where('type', 'practice')->get();
         $random_act = $rand_acts->count() > 0 ? $rand_acts->random() : null;
-        
+
         //handle search
         if ($request->has('search') && $request->search != '') {
             $query->where(function($in_query) use ($request) {
@@ -425,7 +479,7 @@ class PageNavController extends Controller
                     ->orWhere('time', 'like', '%' . $request->search . '%');
             });
         }
-        
+
         //handle categories
         $categories = $request->input('category', []);
         if (!empty($categories)) {
@@ -455,7 +509,7 @@ class PageNavController extends Controller
                 }
             });
         }
-        
+
         //handle modules
         $module_ids = $request->input('module', []);
         if (!empty($module_ids)) {
@@ -464,14 +518,14 @@ class PageNavController extends Controller
                 $in_query->whereIn('id', $module_ids);
             });
         }
-        
+
         //handle time
         if ($request->has(['start_time', 'end_time']) && ($request->start_time != 0 || $request->end_time != 30)) {
             $start = $request->start_time;
             $end = $request->end_time;
             $query->where('time', '<=', $end)->where('time', '>=', $start);
         }
-            
+
         $activities = $query->with('day.module')->orderBy('order')->paginate(6);
         $view = view('components.search-results', ['activities' => $activities, 'random' => $random_act])->render();
 
@@ -515,7 +569,7 @@ class PageNavController extends Controller
         Session::put('current_nav', ['route' => route('library.main'), 'back' => 'Search']);
         return view("other.library", compact('base_param', 'page_info', 'categories'));
     }
-    
+
     public function journal(Request $request)
     {
         //journal navbutton
@@ -614,7 +668,7 @@ class PageNavController extends Controller
         $view = view('components.journal-search-results', ['notes' => $notes])->render();
         return response()->json(['html' => $view]);
     }
-    
+
     public function accountPage()
     {
         $page_info = [];

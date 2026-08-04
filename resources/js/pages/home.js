@@ -1,7 +1,18 @@
 import { escapeHtml } from '../utils/escapeHtml.js';
 
+function initHomeProgressBar() {
+    const fill = document.querySelector('.home-progress-fill[data-progress]');
+    if (!fill) {
+        return;
+    }
+
+    const percent = Math.max(0, Math.min(100, Number(fill.dataset.progress) || 0));
+    fill.style.width = `${percent}%`;
+}
+
 function bindHomeHandlers() {
-    console.log('bindHomeHandlers');
+    initHomeProgressBar();
+
     // handle clicks on locked modules
     document.addEventListener('click', function (e) {
         const lockedModule = e.target.closest('.locked-module-link');

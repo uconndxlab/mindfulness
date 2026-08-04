@@ -4,20 +4,6 @@
 @section('page_id', 'home')
 
 @section('content')
-@php
-    $currentModule = $modules->first(fn ($m) => $m->unlocked && ! $m->completed)
-        ?? $modules->last(fn ($m) => $m->unlocked)
-        ?? $modules->first();
-    $currentColorSlug = $currentModule->flowerColorSlug();
-
-    $placeholderDates = [
-        1 => ['completed' => 'Completed: July 15, 2026'],
-        2 => ['active' => 'To Complete On: July 22, 2026'],
-        3 => ['locked' => 'Start: July 22, 2026'],
-        4 => ['locked' => 'Start: July 29, 2026'],
-    ];
-@endphp
-
 <div class="col-md-8 home-page home-theme--{{ $currentColorSlug }}">
     <div class="home-flowers">
         @foreach ($modules as $module)
@@ -30,22 +16,22 @@
     <h1 class="home-title">{{ config('app.name') }}</h1>
 
     <p class="home-intro">
-        You started the {{ config('app.name') }} journey on July 8, 2026. Your goal is to finish the journey on August 5, 2026.
+        {{ $homeIntro }}
     </p>
 
     <div class="home-goal">
         <p class="home-goal-label">Today's Goal</p>
-        <p class="home-goal-heading">Make progress in Part {{ $currentModule->order }}: {{ $currentModule->flowerColorName() }} Flower.</p>
+        <p class="home-goal-heading">{{ $todayGoal }}</p>
         <p class="home-goal-note">Set intention to come back to the app everyday.</p>
     </div>
 
     <div class="home-progress">
         <div class="home-progress-labels">
             <span>To Next Flower</span>
-            <span>10% left</span>
+            <span>{{ $moduleProgress['percentLeft'] }}% left</span>
         </div>
         <div class="home-progress-bar">
-            <div class="home-progress-fill"></div>
+            <div class="home-progress-fill" data-progress="{{ $moduleProgress['percent'] }}"></div>
         </div>
     </div>
 
@@ -54,14 +40,6 @@
             @php
                 $colorSlug = $module->flowerColorSlug();
                 $moduleTitle = 'Part '.$module->order.': '.$module->flowerColorName().' Flower';
-
-                if ($module->completed) {
-                    $statusText = $placeholderDates[$module->order]['completed'] ?? 'Completed: July 15, 2026';
-                } elseif ($module->unlocked) {
-                    $statusText = $placeholderDates[$module->order]['active'] ?? 'To Complete On: July 22, 2026';
-                } else {
-                    $statusText = $placeholderDates[$module->order]['locked'] ?? 'Start: July 22, 2026';
-                }
             @endphp
 
             <div class="home-module-card{{ $module->unlocked ? '' : ' home-module-card--locked' }}">
@@ -70,7 +48,7 @@
                         class="home-module-link stretched-link">
                         <div class="home-module-content">
                             <h6 class="home-module-title">{{ $moduleTitle }}</h6>
-                            <p class="home-module-status">{{ $statusText }}</p>
+                            <p class="home-module-status">{{ $module->statusText }}</p>
                             <ul class="home-module-stats">
                                 <li class="list-check{{ $module->daysCompleted == $module->totalDays ? '-filled list-check-filled--'.$colorSlug : '' }}">{{ $module->daysCompleted }}/{{ $module->totalDays }} Days</li>
                                 @if ($module->totalCheckInActivities > 0)
@@ -88,7 +66,7 @@
                         data-module-name="{{ $moduleTitle }}">
                         <div class="home-module-content">
                             <h6 class="home-module-title">{{ $moduleTitle }}</h6>
-                            <p class="home-module-status">{{ $statusText }}</p>
+                            <p class="home-module-status">{{ $module->statusText }}</p>
                             <ul class="home-module-stats">
                                 <li class="list-check">{{ $module->daysCompleted }}/{{ $module->totalDays }} Days</li>
                                 @if ($module->totalCheckInActivities > 0)
@@ -124,7 +102,7 @@
 
     <div class="home-encouragement">
         <p class="home-encouragement-stats">
-            You've returned to {{ config('app.name') }} for <span class="home-encouragement-highlight">XX</span> days and completed <span class="home-encouragement-highlight">XX</span> activities!
+            You've returned to {{ config('app.name') }} for <span class="home-encouragement-highlight">{{ $activeDaysCount }}</span> days and completed <span class="home-encouragement-highlight">{{ $totalActivitiesCompleted }}</span> activities!
         </p>
         <p class="home-encouragement-thanks">Thank you for your commitment <i class="bi bi-heart-fill home-encouragement-heart"></i></p>
     </div>
