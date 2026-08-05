@@ -70,7 +70,7 @@
                                             @if($reflection->subject_type === 'App\Models\Activity')
                                                 <strong>Activity:</strong> {{ $reflection->subject->title }}
                                             @elseif($reflection->subject_type === 'App\Models\Module')
-                                                <strong>Module:</strong> {{ $reflection->subject->name }}
+                                                <strong>Module:</strong> {{ $reflection->subject->partName() }}
                                             @else
                                                 -
                                             @endif

@@ -43,8 +43,8 @@ class ReflectionsExport implements FromCollection, WithHeadings, WithMapping
         if ($reflection->subject) {
             if (isset($reflection->subject->title)) {
                 $subjectName = 'Activity: ' . $reflection->subject->title;
-            } elseif (isset($reflection->subject->name)) {
-                $subjectName = 'Module: ' . $reflection->subject->name;
+            } elseif ($reflection->subject instanceof \App\Models\Module) {
+                $subjectName = 'Module: ' . $reflection->subject->partName();
             }
         }
 
