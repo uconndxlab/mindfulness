@@ -127,14 +127,22 @@ class QuizController {
     }
 
     populateAnswers(answers) {
-        // answer format = { "1": [{"1": null}, {"6": "other text"}], "2": [{"3": null}], "3": [92], "4": [0] }
+        // answer format = { "1": [{"1": null}, {"6": "other text"}], "notes": { "1": [{"1": "text"}] } }
         console.log(`Populating form with answers: ${answers}`);
+        const notesByQuestion = answers.notes ?? {};
+
         for (const [questionNumber, answerArray] of Object.entries(answers)) {
-            const questionComponent = this.questionComponents.get(parseInt(questionNumber));
-            
+            if (questionNumber === 'notes') continue;
+
+            const qNum = parseInt(questionNumber, 10);
+            const questionComponent = this.questionComponents.get(qNum);
+
             if (questionComponent) {
-                // component knows how to handle its own answers
                 questionComponent.setValue(answerArray);
+
+                if (typeof questionComponent.setNotes === 'function' && notesByQuestion[questionNumber]) {
+                    questionComponent.setNotes(notesByQuestion[questionNumber]);
+                }
             }
         }
     }
@@ -363,6 +371,14 @@ class QuizController {
         for (const [questionNumber, component] of this.questionComponents) {
             if (component.isAnswered()) {
                 answers[questionNumber] = component.getValue();
+
+                if (typeof component.getNotes === 'function') {
+                    const notes = component.getNotes();
+                    if (notes?.length) {
+                        if (!answers.notes) answers.notes = {};
+                        answers.notes[questionNumber] = notes;
+                    }
+                }
                 
                 // if this is a slider question, get its average
                 if (typeof component.getAverage === 'function') {

@@ -24,6 +24,9 @@
                                     <div class="d-flex align-items-center justify-content-center">
                                         <span class="stat-value">{{ $item['value'] }}</span>
                                     </div>
+                                    @if(!empty($item['note']))
+                                        <div class="mt-2 text-muted"><em>{{ $item['note'] }}</em></div>
+                                    @endif
                                 </div>
                             @endforeach
                         @elseif($qa['type'] === 'checkbox' || $qa['type'] === 'radio')

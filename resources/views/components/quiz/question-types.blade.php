@@ -1,11 +1,11 @@
 @if ($question['type'] === 'radio')
     @foreach ($question['options'] as $option)
         <div class="form-check type-radio mb-2">
-            <input class="form-check-input" 
-                   name="answer_{{ $question['number'] }}" 
-                   type="radio" 
-                   data-other="{{ $option['allow_other'] ? 'true' : 'false' }}" 
-                   id="option_{{ $question['number'] }}_{{ $option['id'] }}" 
+            <input class="form-check-input"
+                   name="answer_{{ $question['number'] }}"
+                   type="radio"
+                   data-other="{{ $option['allow_other'] ? 'true' : 'false' }}"
+                   id="option_{{ $question['number'] }}_{{ $option['id'] }}"
                    value="{{ $option['id'] }}"
                    above-behavior="{{ $option['special_behavior'] }}">
             <label class="form-check-label" for="option_{{ $question['number'] }}_{{ $option['id'] }}">
@@ -13,10 +13,10 @@
             </label>
             @if ($option['allow_other'])
                 <div class="other-div">
-                    <input type="text" 
-                           id="other_{{ $question['number'] }}_{{ $option['id'] }}" 
-                           class="form-control" 
-                           placeholder="Please describe more..." 
+                    <input type="text"
+                           id="other_{{ $question['number'] }}_{{ $option['id'] }}"
+                           class="form-control"
+                           placeholder="Please describe more..."
                            disabled>
                 </div>
             @endif
@@ -25,11 +25,11 @@
 @elseif ($question['type'] === 'checkbox')
     @foreach ($question['options'] as $option)
         <div class="form-check type-checkbox mb-2">
-            <input class="form-check-input" 
-                   name="answer_{{ $question['number'] }}[]" 
-                   type="checkbox" 
-                   data-other="{{ $option['allow_other'] ? 'true' : 'false' }}" 
-                   id="option_{{ $question['number'] }}_{{ $option['id'] }}" 
+            <input class="form-check-input"
+                   name="answer_{{ $question['number'] }}[]"
+                   type="checkbox"
+                   data-other="{{ $option['allow_other'] ? 'true' : 'false' }}"
+                   id="option_{{ $question['number'] }}_{{ $option['id'] }}"
                    value="{{ $option['id'] }}"
                    above-behavior="{{ $option['special_behavior'] }}">
             <label class="form-check-label" for="option_{{ $question['number'] }}_{{ $option['id'] }}">
@@ -37,10 +37,10 @@
             </label>
             @if ($option['allow_other'])
                 <div class="other-div">
-                    <input type="text" 
-                           id="other_{{ $question['number'] }}_{{ $option['id'] }}" 
-                           class="form-control" 
-                           placeholder="Please describe more..." 
+                    <input type="text"
+                           id="other_{{ $question['number'] }}_{{ $option['id'] }}"
+                           class="form-control"
+                           placeholder="Please describe more..."
                            disabled>
                 </div>
             @endif
@@ -61,13 +61,13 @@
                 </div>
             </div>
             <div class="position-relative">
-                <div id="quiz_slider_bubble_{{ $question['number'] }}_{{ $option['id'] }}" 
+                <div id="quiz_slider_bubble_{{ $question['number'] }}_{{ $option['id'] }}"
                     class="slider-bubble d-none">{{ $option['slider_config']['default'] ?? 50 }}</div>
                 <div id="slider_{{ $question['number'] }}_{{ $option['id'] }}" class="d-none no-interaction"></div>
             </div>
-            <input type="hidden" 
-                name="answer_{{ $question['number'] }}[{{ $option['id'] }}]" 
-                id="slider_input_{{ $question['number'] }}_{{ $option['id'] }}" 
+            <input type="hidden"
+                name="answer_{{ $question['number'] }}[{{ $option['id'] }}]"
+                id="slider_input_{{ $question['number'] }}_{{ $option['id'] }}"
                 value="{{ $option['slider_config']['default'] ?? 50 }}">
         </div>
         @if ($index === count($question['options']) - 1)
@@ -85,9 +85,9 @@
                 data-bs-html="true"
                 data-bs-title="Practice Quality"
                 data-bs-content="This percentage reflects how consistently you returned to your present-moment experience during the practice. A higher score indicates you spent more time being aware and accepting, rather than avoiding or pushing away experiences.">
-                <i class="bi bi-info-circle" ></i> 
+                <i class="bi bi-info-circle" ></i>
                 Practice Quality:
-            </strong> 
+            </strong>
             <span id="slider_average_value_{{ $question['number'] }}" class="pq-score">--</span>%
         </div>
     </div>
@@ -111,7 +111,7 @@
                 <div class="survey-btn-group d-flex" role="group">
                     @foreach ($option['survey_config']['options'] ?? [] as $value => $label)
                         <label class="survey-btn flex-fill text-center">
-                            <input type="radio" class="btn-check" 
+                            <input type="radio" class="btn-check"
                                 name="answer_{{ $question['number'] }}[{{ $option['id'] }}]"
                                 id="survey_{{ $question['number'] }}_{{ $option['id'] }}_{{ $value }}"
                                 value="{{ $value }}" autocomplete="off">
@@ -139,6 +139,20 @@
             <span class="invalid-feedback survey-row-invalid-feedback" role="alert">
                 <strong>Please select a rating for this question.</strong>
             </span>
+            @if (!empty($option['open_ended_config']))
+                <label class="form-label mt-3 mb-1">
+                    <div class="quiz-survey-label">
+                        @markdown($option['open_ended_config']['prompt'])
+                    </div>
+                </label>
+                <textarea class="form-control quiz-survey-open-ended"
+                    id="survey_open_ended_{{ $question['number'] }}_{{ $option['id'] }}"
+                    rows="{{ $option['open_ended_config']['rows'] ?? 5 }}"
+                    maxlength="{{ \App\Rules\QuizAnswersValidRule::MAX_NOTE_LENGTH }}"></textarea>
+                <span class="invalid-feedback survey-note-invalid-feedback" role="alert">
+                    <strong>Please enter a response for this question.</strong>
+                </span>
+            @endif
         </div>
         @if ($index === count($question['options']) - 1)
             <hr>

@@ -1482,7 +1482,19 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 .survey-row-invalid-feedback {
     display: none;
 }
-.quiz-survey-field.is-invalid .survey-row-invalid-feedback {
+.quiz-survey-field.is-invalid-rating .survey-row-invalid-feedback {
+    display: block;
+}
+
+.quiz-survey-open-ended {
+    margin-top: 0.25rem;
+}
+
+.survey-note-invalid-feedback {
+    display: none;
+}
+
+.quiz-survey-field.is-invalid-note .survey-note-invalid-feedback {
     display: block;
 }
 

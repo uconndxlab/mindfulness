@@ -85,7 +85,9 @@ class SubmitQuizRequest extends FormRequest
 
     public function getAnswersArray(): array
     {
-        return json_decode($this->validated()['answers'], true);
+        $answers = json_decode($this->validated()['answers'], true);
+
+        return QuizAnswersValidRule::normalizeAnswers(is_array($answers) ? $answers : []);
     }
 }
 

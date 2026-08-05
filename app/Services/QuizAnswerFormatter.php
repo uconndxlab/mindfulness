@@ -33,7 +33,10 @@ class QuizAnswerFormatter
         $questionNum = 1;
         
         foreach ($answers as $key => $value) {
-            $parts[] = "Q{$questionNum}: ".self::formatValue($value);
+            if ($key === 'notes') {
+                continue;
+            }
+            $parts[] = "Q{$questionNum}: ".self::formatValue($value, $answers['notes'][$key] ?? null);
             $questionNum++;
         }
         
@@ -44,7 +47,7 @@ class QuizAnswerFormatter
     // multiple select: [{"1":null},{"2":null},{"3":null},{"4":null},{"5":null},{"6":null}]
     // radio {"2":null} 
     // slider: [{"1":77},{"2":75},{"3":75},{"4":75},{"5":18},{"6":18}]
-    private static function formatValue($value): string
+    private static function formatValue($value, ?array $notes = null): string
     {
         if (is_null($value)) {
             return 'null';
@@ -52,6 +55,8 @@ class QuizAnswerFormatter
         
         if (is_array($value)) {
             $formatted = [];
+            $notesByOption = self::notesByOptionId($notes);
+
             foreach($value as $optionKey => $optionData) {
                 // Handle direct values: {"1": null} or {"1": 77}
                 if (is_null($optionData)) {
@@ -63,7 +68,11 @@ class QuizAnswerFormatter
                         if (is_null($innerValue)) {
                             $formatted[] = $innerKey;
                         } elseif (is_numeric($innerValue)) {
-                            $formatted[] = (string) $innerValue;
+                            $entry = (string) $innerValue;
+                            if (isset($notesByOption[$innerKey])) {
+                                $entry .= ' (' . self::truncateNote($notesByOption[$innerKey]) . ')';
+                            }
+                            $formatted[] = $entry;
                         } elseif (is_string($innerValue)) {
                             $formatted[] = $innerKey . ': ' . $innerValue;
                         } else {
@@ -72,7 +81,11 @@ class QuizAnswerFormatter
                     }
                 } elseif (is_numeric($optionData)) {
                     // Direct numeric: {"1": 77}
-                    $formatted[] = (string) $optionData;
+                    $entry = (string) $optionData;
+                    if (isset($notesByOption[$optionKey])) {
+                        $entry .= ' (' . self::truncateNote($notesByOption[$optionKey]) . ')';
+                    }
+                    $formatted[] = $entry;
                 } elseif (is_string($optionData)) {
                     // Direct string: {"1": "answer"}
                     $formatted[] = $optionKey . ': ' . $optionData;
@@ -100,6 +113,7 @@ class QuizAnswerFormatter
         }
 
         $answers = $reflection->answers ?? [];
+        $allNotes = $answers['notes'] ?? [];
         $questionOptions = $quiz->question_options;
         $result = [];
 
@@ -107,8 +121,8 @@ class QuizAnswerFormatter
         foreach ($questionOptions as $index => $questionData) {
             // get user answer
             $questionNumber = $questionData['number'] ?? ($index + 1);
-            $answerKey = array_keys($answers)[$index] ?? null;
-            $userAnswer = $answerKey !== null ? $answers[$answerKey] : null;
+            $userAnswer = $answers[$questionNumber] ?? $answers[(string) $questionNumber] ?? null;
+            $userNotes = $allNotes[$questionNumber] ?? $allNotes[(string) $questionNumber] ?? null;
 
             // save formatted result
             $result[] = [
@@ -120,7 +134,8 @@ class QuizAnswerFormatter
                 'formatted_answer' => self::formatAnswerByType(
                     $questionData['type'] ?? 'unknown',
                     $userAnswer,
-                    $questionData['options'] ?? []
+                    $questionData['options'] ?? [],
+                    $userNotes
                 )
             ];
         }
@@ -128,7 +143,7 @@ class QuizAnswerFormatter
         return $result;
     }
 
-    private static function formatAnswerByType(string $type, $answer, array $options): array
+    private static function formatAnswerByType(string $type, $answer, array $options, ?array $notes = null): array
     {
         if (is_null($answer)) {
             return [
@@ -144,7 +159,7 @@ class QuizAnswerFormatter
                 return self::formatSliderAnswer($answer, $options);
 
             case 'survey':
-                return self::formatSurveyAnswer($answer, $options);
+                return self::formatSurveyAnswer($answer, $options, $notes);
             
             case 'checkbox':
                 return self::formatCheckboxAnswer($answer, $options);
@@ -192,13 +207,15 @@ class QuizAnswerFormatter
         ];
     }
 
-    private static function formatSurveyAnswer($answer, array $options): array
+    private static function formatSurveyAnswer($answer, array $options, ?array $notes = null): array
     {
         $items = [];
 
         if (!is_array($answer)) {
             return ['type' => 'survey', 'display' => 'Invalid answer format', 'items' => []];
         }
+
+        $notesByOption = self::notesByOptionId($notes);
 
         foreach ($answer as $keyValuePair) {
             // option id pulls the question
@@ -214,10 +231,14 @@ class QuizAnswerFormatter
 
             // get question and answer
             if ($option) {
-                $items[] = [
+                $item = [
                     'text' => $option['text'] ?? 'Unknown',
                     'value' => $value.': '.$textAnswer
                 ];
+                if (isset($notesByOption[$optionId])) {
+                    $item['note'] = $notesByOption[$optionId];
+                }
+                $items[] = $item;
             }
         }
 
@@ -305,6 +326,34 @@ class QuizAnswerFormatter
             }
         }
         return null;
+    }
+
+    private static function notesByOptionId(?array $notes): array
+    {
+        if (!is_array($notes)) {
+            return [];
+        }
+
+        $byOption = [];
+        foreach ($notes as $noteItem) {
+            if (!is_array($noteItem) || count($noteItem) !== 1) {
+                continue;
+            }
+            $optionId = (string) array_key_first($noteItem);
+            $byOption[$optionId] = $noteItem[$optionId];
+        }
+
+        return $byOption;
+    }
+
+    private static function truncateNote(string $note, int $maxLength = 40): string
+    {
+        $note = trim($note);
+        if (strlen($note) <= $maxLength) {
+            return $note;
+        }
+
+        return substr($note, 0, $maxLength) . '...';
     }
 }
 

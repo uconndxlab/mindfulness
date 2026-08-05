@@ -1,4 +1,6 @@
 class QuizSurveyQuestion {
+    static MAX_NOTE_LENGTH = 3000;
+
     constructor(questionDiv, questionNumber, onAnswerChange, initialAverage = null) {
         this.questionDiv = questionDiv;
         this.questionNumber = questionNumber;
@@ -8,6 +10,9 @@ class QuizSurveyQuestion {
         this.radioElements = new Map();   // optionId -> (value -> radio element)
         this.selectedValues = new Map();  // optionId -> selected value (string)
         this.inverseOptions = new Map();  // optionId -> boolean (inverse scoring)
+        this.noteValues = new Map();      // optionId -> note text
+        this.openEndedOptionIds = new Set();
+        this.openEndedElements = new Map(); // optionId -> textarea element
         this.scaleMin = 1;
         this.scaleMax = 5;
         this.answered = false;
@@ -45,6 +50,16 @@ class QuizSurveyQuestion {
             const isInverse = option.inverse_score ?? false;
             this.inverseOptions.set(optionId, isInverse);
 
+            if (option.open_ended_config) {
+                this.openEndedOptionIds.add(optionId);
+                const textarea = document.getElementById(`survey_open_ended_${this.questionNumber}_${optionId}`);
+                if (textarea) {
+                    this.openEndedElements.set(optionId, textarea);
+                    textarea.maxLength = QuizSurveyQuestion.MAX_NOTE_LENGTH;
+                    textarea.addEventListener('input', () => this.handleNoteInput(optionId));
+                }
+            }
+
             // get the survey div for this option
             const surveyDiv = document.getElementById(`survey_${this.questionNumber}_${optionId}`);
 
@@ -67,14 +82,28 @@ class QuizSurveyQuestion {
     handleRadioClick(optionId, radio) {
         this.selectedValues.set(optionId, radio.value);
         this.clearRowValidationError(optionId);
-        // update average if fully answered
+        if (this.getUnansweredOptionIds().length === 0) {
+            this.updateAverage();
+        }
         const nowAnswered = this.isAnswered();
         if (nowAnswered) {
-            this.updateAverage();
             this.clearValidationErrors();
         }
         this.onAnswerChange(this.questionNumber, nowAnswered);
         console.log(`Survey question ${this.questionNumber} option ${optionId} answered:`, radio.value);
+    }
+
+    handleNoteInput(optionId) {
+        const textarea = this.openEndedElements.get(optionId);
+        const value = textarea?.value ?? '';
+        this.noteValues.set(optionId, value);
+        this.clearRowValidationError(optionId);
+
+        const nowAnswered = this.isAnswered();
+        if (nowAnswered) {
+            this.clearValidationErrors();
+        }
+        this.onAnswerChange(this.questionNumber, nowAnswered);
     }
 
     getUnansweredOptionIds() {
@@ -84,23 +113,46 @@ class QuizSurveyQuestion {
             .map((option) => option.id);
     }
 
+    getMissingNoteOptionIds() {
+        const missing = [];
+        for (const optionId of this.openEndedOptionIds) {
+            const note = this.noteValues.get(optionId)?.trim() ?? '';
+            if (note.length === 0) {
+                missing.push(optionId);
+            }
+        }
+        return missing;
+    }
+
+    getInvalidOptionIds() {
+        const unanswered = this.getUnansweredOptionIds();
+        const missingNotes = this.getMissingNoteOptionIds();
+        const combined = [...unanswered];
+        for (const optionId of missingNotes) {
+            if (!combined.includes(optionId)) {
+                combined.push(optionId);
+            }
+        }
+        return combined;
+    }
+
     clearRowValidationError(optionId) {
         const field = document.getElementById(`survey_field_${this.questionNumber}_${optionId}`);
-        field?.classList.remove('is-invalid');
+        field?.classList.remove('is-invalid', 'is-invalid-rating', 'is-invalid-note');
     }
 
     clearValidationErrors() {
-        this.questionDiv.querySelectorAll('.quiz-survey-field.is-invalid').forEach((field) => {
-            field.classList.remove('is-invalid');
+        this.questionDiv.querySelectorAll('.quiz-survey-field.is-invalid, .quiz-survey-field.is-invalid-rating, .quiz-survey-field.is-invalid-note').forEach((field) => {
+            field.classList.remove('is-invalid', 'is-invalid-rating', 'is-invalid-note');
         });
         const alert = document.getElementById(`survey_validation_alert_${this.questionNumber}`);
         alert?.classList.add('d-none');
     }
 
     validateForSubmit() {
-        const unanswered = this.getUnansweredOptionIds();
+        const invalid = this.getInvalidOptionIds();
 
-        if (unanswered.length === 0) {
+        if (invalid.length === 0) {
             return {
                 valid: true,
                 unansweredCount: 0,
@@ -108,9 +160,18 @@ class QuizSurveyQuestion {
             };
         }
 
-        for (const optionId of unanswered) {
+        for (const optionId of invalid) {
             const field = document.getElementById(`survey_field_${this.questionNumber}_${optionId}`);
             field?.classList.add('is-invalid');
+            if (!this.selectedValues.has(optionId)) {
+                field?.classList.add('is-invalid-rating');
+            }
+            if (this.openEndedOptionIds.has(optionId)) {
+                const note = this.noteValues.get(optionId)?.trim() ?? '';
+                if (note.length === 0) {
+                    field?.classList.add('is-invalid-note');
+                }
+            }
         }
 
         const alert = document.getElementById(`survey_validation_alert_${this.questionNumber}`);
@@ -118,8 +179,8 @@ class QuizSurveyQuestion {
 
         return {
             valid: false,
-            unansweredCount: unanswered.length,
-            firstUnansweredOptionId: unanswered[0],
+            unansweredCount: invalid.length,
+            firstUnansweredOptionId: invalid[0],
         };
     }
 
@@ -151,10 +212,17 @@ class QuizSurveyQuestion {
         for (const option of options) {
             if (!this.selectedValues.has(option.id)) return false;
         }
+        for (const optionId of this.openEndedOptionIds) {
+            const note = this.noteValues.get(optionId)?.trim() ?? '';
+            if (note.length === 0) return false;
+        }
         return true;
     }
 
     getAverage() {
+        if (this.selectedValues.size > 0) {
+            this.updateAverage();
+        }
         return this.average;
     }
 
@@ -165,6 +233,22 @@ class QuizSurveyQuestion {
             result.push({ [optionId]: parseInt(value, 10) });
         }
         return result;
+    }
+
+    getNotes() {
+        if (this.openEndedOptionIds.size === 0) {
+            return null;
+        }
+
+        const result = [];
+        for (const optionId of this.openEndedOptionIds) {
+            const note = this.noteValues.get(optionId)?.trim() ?? '';
+            if (note.length > 0) {
+                result.push({ [optionId]: note });
+            }
+        }
+
+        return result.length > 0 ? result : null;
     }
 
     // load saved answers
@@ -179,6 +263,24 @@ class QuizSurveyQuestion {
         this.answered = this.isAnswered();
         this.updateAverage();
         console.log(`Survey question ${this.questionNumber} values set to:`, JSON.stringify(values));
+    }
+
+    setNotes(notesArray) {
+        if (!Array.isArray(notesArray)) return;
+
+        for (const item of notesArray) {
+            const optionId = parseInt(Object.keys(item)[0], 10);
+            const note = Object.values(item)[0];
+            const trimmed = typeof note === 'string' ? note.trim() : '';
+            this.noteValues.set(optionId, trimmed);
+            const textarea = this.openEndedElements.get(optionId);
+            if (textarea) {
+                textarea.value = trimmed;
+            }
+        }
+
+        this.answered = this.isAnswered();
+        console.log(`Survey question ${this.questionNumber} notes set to:`, JSON.stringify(notesArray));
     }
 
     setSingleSurveyValue(optionId, value) {
@@ -201,6 +303,10 @@ class QuizSurveyQuestion {
             }
         }
         this.selectedValues.clear();
+        for (const textarea of this.openEndedElements.values()) {
+            textarea.value = '';
+        }
+        this.noteValues.clear();
         this.answered = false;
         this.onAnswerChange(this.questionNumber, false);
     }

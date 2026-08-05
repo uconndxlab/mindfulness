@@ -8,6 +8,8 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 class QuizAnswersValidRule implements ValidationRule
 {
+    public const MAX_NOTE_LENGTH = 3000;
+
     protected $quiz;
     protected $errorMessage = '';
 
@@ -31,11 +33,16 @@ class QuizAnswersValidRule implements ValidationRule
             return;
         }
 
+        $answers = self::normalizeAnswers($answers);
+
         $questionOptions = $this->quiz->question_options;
         if (!$questionOptions || !is_array($questionOptions)) {
             $fail("Quiz has invalid question structure.");
             return;
         }
+
+        $notes = $answers['notes'] ?? [];
+        unset($answers['notes']);
 
         // validate each answer against quiz structure
         foreach ($answers as $questionNumber => $answerValue) {
@@ -52,6 +59,11 @@ class QuizAnswersValidRule implements ValidationRule
                 $fail($this->errorMessage ?: "Invalid answer format for question {$questionNumber}.");
                 return;
             }
+        }
+
+        if (!$this->validateSurveyNotes($notes, $questionOptions, $answers)) {
+            $fail($this->errorMessage ?: "Invalid notes format.");
+            return;
         }
     }
 
@@ -202,5 +214,139 @@ class QuizAnswersValidRule implements ValidationRule
 
         return true;
     }
-}
 
+    protected function validateSurveyNotes(array $notes, array $questionOptions, array $ratingAnswers): bool
+    {
+        if (!is_array($notes)) {
+            $this->errorMessage = "Notes must be an object keyed by question number.";
+            return false;
+        }
+
+        foreach ($questionOptions as $question) {
+            if (($question['type'] ?? null) !== 'survey') {
+                continue;
+            }
+
+            $questionNumber = (string) ($question['number'] ?? '');
+            if ($questionNumber === '' || !array_key_exists($questionNumber, $ratingAnswers)) {
+                continue;
+            }
+
+            $openEndedOptionIds = collect($question['options'] ?? [])
+                ->filter(fn ($option) => !empty($option['open_ended_config']))
+                ->pluck('id')
+                ->map(fn ($id) => (string) $id)
+                ->toArray();
+
+            if ($openEndedOptionIds === []) {
+                continue;
+            }
+
+            $notesArray = $notes[$questionNumber] ?? [];
+            $submittedOptionIds = [];
+
+            foreach (is_array($notesArray) ? $notesArray : [] as $noteItem) {
+                if (is_array($noteItem) && count($noteItem) === 1) {
+                    $submittedOptionIds[] = (string) array_key_first($noteItem);
+                }
+            }
+
+            foreach ($openEndedOptionIds as $requiredOptionId) {
+                if (!in_array($requiredOptionId, $submittedOptionIds, true)) {
+                    $this->errorMessage = "Missing required note for option {$requiredOptionId}.";
+                    return false;
+                }
+            }
+        }
+
+        foreach ($notes as $questionNumber => $notesArray) {
+            $question = collect($questionOptions)->firstWhere('number', (int)$questionNumber);
+
+            if (!$question) {
+                $this->errorMessage = "Invalid question number in notes: {$questionNumber}.";
+                return false;
+            }
+
+            if (($question['type'] ?? null) !== 'survey') {
+                $this->errorMessage = "Notes are only valid for survey questions.";
+                return false;
+            }
+
+            if (!is_array($notesArray)) {
+                $this->errorMessage = "Notes for question {$questionNumber} must be an array.";
+                return false;
+            }
+
+            $options = $question['options'] ?? [];
+            $openEndedOptionIds = collect($options)
+                ->filter(fn ($option) => !empty($option['open_ended_config']))
+                ->pluck('id')
+                ->map(fn ($id) => (string) $id)
+                ->toArray();
+
+            $submittedOptionIds = [];
+
+            foreach ($notesArray as $noteItem) {
+                if (!is_array($noteItem) || count($noteItem) !== 1) {
+                    $this->errorMessage = "Invalid note format for question {$questionNumber}.";
+                    return false;
+                }
+
+                $optionId = (string) array_key_first($noteItem);
+                $noteText = is_string($noteItem[$optionId] ?? null)
+                    ? trim($noteItem[$optionId])
+                    : '';
+
+                if (!in_array($optionId, $openEndedOptionIds, true)) {
+                    $this->errorMessage = "Notes submitted for option {$optionId} without open-ended config.";
+                    return false;
+                }
+
+                if ($noteText === '') {
+                    $this->errorMessage = "Note for option {$optionId} must be a non-empty string.";
+                    return false;
+                }
+
+                if (mb_strlen($noteText) > self::MAX_NOTE_LENGTH) {
+                    $this->errorMessage = "Note for option {$optionId} must not exceed ".self::MAX_NOTE_LENGTH.' characters.';
+                    return false;
+                }
+
+                $submittedOptionIds[] = $optionId;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Trim survey note text before validation and persistence.
+     */
+    public static function normalizeAnswers(array $answers): array
+    {
+        if (! isset($answers['notes']) || ! is_array($answers['notes'])) {
+            return $answers;
+        }
+
+        foreach ($answers['notes'] as $questionNumber => $notesArray) {
+            if (! is_array($notesArray)) {
+                continue;
+            }
+
+            foreach ($notesArray as $index => $noteItem) {
+                if (! is_array($noteItem) || count($noteItem) !== 1) {
+                    continue;
+                }
+
+                $optionId = array_key_first($noteItem);
+                $noteText = $noteItem[$optionId];
+
+                if (is_string($noteText)) {
+                    $answers['notes'][$questionNumber][$index][$optionId] = trim($noteText);
+                }
+            }
+        }
+
+        return $answers;
+    }
+}
