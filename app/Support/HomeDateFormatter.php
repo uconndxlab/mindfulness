@@ -44,37 +44,18 @@ class HomeDateFormatter
         return 'To Start '.$this->absoluteDate($user, $startDate);
     }
 
+    public function featuredModule(User $user, array $schedule, ?Module $currentModule): ?Module
+    {
+        return $this->completedModuleAwaitingNextStart($user, $schedule) ?? $currentModule;
+    }
+
     public function gentleIntentionHeading(User $user, array $schedule, ?Module $currentModule): string
     {
-        $modules = $schedule['modules'];
         $today = $schedule['today'];
-        $starts = $schedule['starts'];
         $completions = $schedule['completions'];
 
-        $lastCompleted = $modules
-            ->filter(fn (Module $module) => $module->isCompletedBy($user))
-            ->sortByDesc('order')
-            ->first();
-
-        if ($lastCompleted) {
-            $nextModule = $modules->firstWhere('order', $lastCompleted->order + 1);
-
-            // no next module
-            if (! $nextModule) {
-                $color = $lastCompleted->flowerColorName();
-
-                return 'Your '.$color.' Flower has Bloomed!';
-            }
-
-            // next module does not start today, show completion if not started
-            if (
-                $today->lt($starts[$nextModule->order])
-                && ! $this->scheduleService->hasModuleStarted($user, $nextModule)
-            ) {
-                $color = $lastCompleted->flowerColorName();
-
-                return 'Your '.$color.' Flower has Bloomed!';
-            }
+        if ($featuredCompletedModule = $this->completedModuleAwaitingNextStart($user, $schedule)) {
+            return 'Your '.$featuredCompletedModule->flowerColorName().' Flower has Bloomed!';
         }
 
         if (! $currentModule) {
@@ -95,6 +76,37 @@ class HomeDateFormatter
         }
 
         return 'Keep Growing your '.$color.' Flower';
+    }
+
+    private function completedModuleAwaitingNextStart(User $user, array $schedule): ?Module
+    {
+        $modules = $schedule['modules'];
+        $today = $schedule['today'];
+        $starts = $schedule['starts'];
+
+        $lastCompleted = $modules
+            ->filter(fn (Module $module) => $module->isCompletedBy($user))
+            ->sortByDesc('order')
+            ->first();
+
+        if (! $lastCompleted) {
+            return null;
+        }
+
+        $nextModule = $modules->firstWhere('order', $lastCompleted->order + 1);
+
+        if (! $nextModule) {
+            return $lastCompleted;
+        }
+
+        if (
+            $today->lt($starts[$nextModule->order])
+            && ! $this->scheduleService->hasModuleStarted($user, $nextModule)
+        ) {
+            return $lastCompleted;
+        }
+
+        return null;
     }
 
     private function completedLabel(User $user, Carbon $date): string

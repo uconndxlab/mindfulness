@@ -86,8 +86,10 @@ class PageNavController extends Controller
             );
         }
 
-        $moduleProgress = $currentModule
-            ? $scheduleService->moduleActivityProgress($user, $currentModule)
+        $featuredModule = $dateFormatter->featuredModule($user, $schedule, $currentModule);
+
+        $moduleProgress = $featuredModule
+            ? $scheduleService->moduleActivityProgress($user, $featuredModule)
             : ['percent' => 0, 'percentLeft' => 100];
 
         $homeIntro = 'You started the '.config('app.name').' journey on '
@@ -103,7 +105,7 @@ class PageNavController extends Controller
         $todayGoal = $dateFormatter->gentleIntentionHeading($user, $schedule, $currentModule);
         $totalActivitiesCompleted = $scheduleService->totalCompletedActivities($user);
         $activeDaysCount = $user->active_days_count ?? 0;
-        $currentColorSlug = $currentModule->flowerColorSlug();
+        $currentColorSlug = $featuredModule?->flowerColorSlug() ?? 'default';
 
         return view('explore.home', compact(
             'modules',
