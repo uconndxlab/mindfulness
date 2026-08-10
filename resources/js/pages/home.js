@@ -2,12 +2,16 @@ import { escapeHtml } from '../utils/escapeHtml.js';
 
 function initHomeProgressBar() {
     const fill = document.querySelector('.home-progress-fill[data-progress]');
-    if (!fill) {
-        return;
+    if (fill) {
+        const percent = Math.max(0, Math.min(100, Number(fill.dataset.progress) || 0));
+        fill.style.width = `${percent}%`;
     }
 
-    const percent = Math.max(0, Math.min(100, Number(fill.dataset.progress) || 0));
-    fill.style.width = `${percent}%`;
+    const milestone = document.querySelector('.home-progress-milestone[data-milestone-percent]');
+    if (milestone) {
+        const percent = Math.max(0, Math.min(100, Number(milestone.dataset.milestonePercent) || 0));
+        milestone.style.left = `${percent}%`;
+    }
 }
 
 function bindHomeHandlers() {
@@ -17,11 +21,11 @@ function bindHomeHandlers() {
     document.addEventListener('click', function (e) {
         const lockedModule = e.target.closest('.locked-module-link');
         if (!lockedModule) return;
-        
+
         e.preventDefault();
-        
+
         const moduleName = lockedModule.getAttribute('data-module-name') || 'This module';
-        
+
         if (window.showModal) {
             window.showModal({
                 label: 'Module Locked',

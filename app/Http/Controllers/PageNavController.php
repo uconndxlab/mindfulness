@@ -90,7 +90,16 @@ class PageNavController extends Controller
 
         $moduleProgress = $featuredModule
             ? $scheduleService->moduleActivityProgress($user, $featuredModule)
-            : ['percent' => 0, 'percentLeft' => 100];
+            : [
+                'part' => null,
+                'completed' => 0,
+                'total' => 0,
+                'percent' => 0,
+                'percentLeft' => 100,
+                'milestonePercent' => null,
+                'milestoneIconUrl' => null,
+                'milestoneReached' => false,
+            ];
 
         $allModulesCompleted = $dateFormatter->allModulesCompleted($user, $schedule);
 

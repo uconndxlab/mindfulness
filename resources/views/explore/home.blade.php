@@ -34,11 +34,22 @@
 
     <div class="home-progress">
         <div class="home-progress-labels">
-            <span>To Next Flower</span>
-            <span>{{ $moduleProgress['percentLeft'] }}% left</span>
+            <span>To next milestone</span>
+            <span>{{ $moduleProgress['percent'] }}%</span>
         </div>
         <div class="home-progress-bar">
             <div class="home-progress-fill" data-progress="{{ $moduleProgress['percent'] }}"></div>
+            @if ($moduleProgress['milestonePercent'] !== null)
+                <span
+                    class="home-progress-milestone{{ $moduleProgress['milestoneReached'] ? ' home-progress-milestone--reached' : '' }}"
+                    data-milestone-percent="{{ $moduleProgress['milestonePercent'] }}">
+                    <img
+                        src="{{ $moduleProgress['milestoneIconUrl'] }}"
+                        alt="Flower milestone"
+                        class="home-progress-milestone-icon">
+                    <span class="home-progress-milestone-tick"></span>
+                </span>
+            @endif
         </div>
     </div>
 

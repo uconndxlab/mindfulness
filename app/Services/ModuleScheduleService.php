@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Models\Activity;
+use App\Models\Day;
 use App\Models\Module;
 use App\Models\User;
+use App\Support\FlowerAssets;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -130,24 +132,47 @@ class ModuleScheduleService
 
     public function moduleActivityProgress(User $user, Module $module): array
     {
-        $total = Activity::query()
+        $moduleActivities = Activity::query()
             ->where('optional', false)
-            ->whereHas('day', fn ($query) => $query->where('module_id', $module->id))
-            ->count();
+            ->whereHas('day', fn ($query) => $query->where('module_id', $module->id));
 
-        $completed = Activity::query()
-            ->where('optional', false)
-            ->whereHas('day', fn ($query) => $query->where('module_id', $module->id))
+        $total = (clone $moduleActivities)->count();
+
+        $completed = (clone $moduleActivities)
             ->whereHas('users', fn ($query) => $query
                 ->where('users.id', $user->id)
                 ->where('user_activity.completed', true))
             ->count();
 
+        $milestoneDays = Day::query()
+            ->where('module_id', $module->id)
+            ->where('is_check_in', false)
+            ->orderBy('order')
+            ->limit(FlowerAssets::MAX_PETALS)
+            ->withCount([
+                'activities as required_activities_count' => fn ($query) => $query->where('optional', false),
+            ])
+            ->get();
+
+        $milestoneDay = $milestoneDays->get(FlowerAssets::MAX_PETALS - 1);
+
+        $milestoneCompleted = 0;
+
+        if ($milestoneDay) {
+            $milestoneCompleted = (int) $milestoneDays->sum('required_activities_count');
+        }
+
         return [
+            'part' => $module->order,
             'completed' => $completed,
             'total' => $total,
             'percent' => $total > 0 ? (int) round(($completed / $total) * 100) : 0,
             'percentLeft' => $total > 0 ? (int) round(100 - (($completed / $total) * 100)) : 100,
+            'milestonePercent' => $total > 0 && $milestoneCompleted > 0
+                ? (int) round(($milestoneCompleted / $total) * 100)
+                : null,
+            'milestoneIconUrl' => $milestoneDay ? $module->flowerFrameUrl(FlowerAssets::MAX_PETALS) : null,
+            'milestoneReached' => $milestoneCompleted > 0 && $completed >= $milestoneCompleted,
         ];
     }
 

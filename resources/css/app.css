@@ -1844,18 +1844,53 @@ audio.feedback-audio::-webkit-media-controls-play-button{
 }
 
 [data-page="home"] .home-progress-bar {
+    position: relative;
     height: 0.65rem;
     border-radius: 999px;
     background: var(--home-accent-muted);
-    overflow: hidden;
+    overflow: visible;
 }
 
 [data-page="home"] .home-progress-fill {
+    position: relative;
+    z-index: 1;
     height: 100%;
     width: 0;
     border-radius: 999px;
     background: var(--home-accent);
     transition: width 0.3s ease;
+}
+
+[data-page="home"] .home-progress-milestone {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 0.5rem);
+    z-index: 2;
+    transform: translateX(-50%);
+}
+
+[data-page="home"] .home-progress-milestone-tick {
+    display: block;
+    width: 2px;
+    height: 0.85rem;
+    margin: 0 auto;
+    background: rgba(0, 0, 0, 0.28);
+    border-radius: 999px;
+}
+
+[data-page="home"] .home-progress-milestone-icon {
+    position: absolute;
+    right: calc(100% + 0.35rem);
+    top: 50%;
+    width: 1rem;
+    height: 1rem;
+    object-fit: contain;
+    transform: translateY(-50%);
+    filter: grayscale(1) opacity(0.45);
+}
+
+[data-page="home"] .home-progress-milestone--reached .home-progress-milestone-icon {
+    filter: none;
 }
 
 [data-page="home"] .home-modules {
