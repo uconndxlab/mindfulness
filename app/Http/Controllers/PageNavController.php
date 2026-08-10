@@ -92,10 +92,12 @@ class PageNavController extends Controller
             ? $scheduleService->moduleActivityProgress($user, $featuredModule)
             : ['percent' => 0, 'percentLeft' => 100];
 
+        $allFlowersHaveBloomed = $dateFormatter->allFlowersHaveBloomed($user, $schedule);
+
         $homeIntro = 'You started the '.config('app.name').' journey on '
             .$scheduleService->formatAbsoluteDate($scheduleService->registrationDay($user), $user).'.';
 
-        if ($schedule['showJourneyGoal']) {
+        if ($schedule['showJourneyGoal'] && ! $allFlowersHaveBloomed) {
             $homeIntro .= ' Your goal is to finish the journey on '
                 .$scheduleService->formatAbsoluteDate($schedule['journeyGoalDate'], $user).'.';
         }
@@ -116,6 +118,7 @@ class PageNavController extends Controller
             'totalActivitiesCompleted',
             'activeDaysCount',
             'currentColorSlug',
+            'allFlowersHaveBloomed',
             'currentModule',
         ));
     }

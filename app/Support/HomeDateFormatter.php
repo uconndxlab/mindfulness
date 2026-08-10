@@ -49,13 +49,22 @@ class HomeDateFormatter
         return $this->completedModuleAwaitingNextStart($user, $schedule) ?? $currentModule;
     }
 
+    public function allFlowersHaveBloomed(User $user, array $schedule): bool
+    {
+        return $schedule['modules']->every(fn (Module $module) => $module->isCompletedBy($user));
+    }
+
     public function gentleIntentionHeading(User $user, array $schedule, ?Module $currentModule): string
     {
         $today = $schedule['today'];
         $completions = $schedule['completions'];
 
+        if ($this->allFlowersHaveBloomed($user, $schedule)) {
+            return 'All Flowers Have Bloomed';
+        }
+
         if ($featuredCompletedModule = $this->completedModuleAwaitingNextStart($user, $schedule)) {
-            return 'Your '.$featuredCompletedModule->flowerColorName().' Flower has Bloomed!';
+            return 'Your '.$featuredCompletedModule->flowerColorName().' Flower Has Bloomed!';
         }
 
         if (! $currentModule) {

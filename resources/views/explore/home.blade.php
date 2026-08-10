@@ -22,7 +22,9 @@
     <div class="home-goal">
         <p class="home-goal-label">Today's Goal</p>
         <p class="home-goal-heading">{{ $todayGoal }}</p>
-        <p class="home-goal-note">Set intention to come back to the app everyday.</p>
+        @unless ($allFlowersHaveBloomed)
+            <p class="home-goal-note">Set intention to come back to the app everyday.</p>
+        @endunless
     </div>
 
     <div class="home-progress">
