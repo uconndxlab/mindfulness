@@ -12,19 +12,20 @@ use Illuminate\Support\Facades\Mail;
 
 class SendInactivityReminderEmails extends Command
 {
-    public const USER_MILESTONES = [3, 5, 7, 9, 11];
-    public const CONTACT_MILESTONE = 12;
-    public const ALL_MILESTONES = [3, 5, 7, 9, 11, 12];
+    public const USER_MILESTONES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+    public const CONTACT_MILESTONE = 15;
+    public const ALL_MILESTONES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
     protected $signature = 'emails:send-inactivity-reminders';
 
-    protected $description = 'Send inactivity reminder emails at 3/5/7/9/11 days; notify contact on day 12';
+    protected $description = 'Send inactivity reminder emails daily from days 2-14; notify contact on day 15';
 
     public function handle(): int
     {
         $today = Carbon::now()->startOfDay();
+        $alertRecipients = $this->inactivityAlertRecipients();
 
-        // only email users who are have access to the app
+        // only email users who have access to the app
         $eligibleUsers = User::query()
             ->where('lock_access', false)
             ->whereNotNull('last_active_at')
@@ -37,31 +38,30 @@ class SendInactivityReminderEmails extends Command
         foreach ($eligibleUsers as $user) {
             $inactiveDays = $user->last_active_at->copy()->startOfDay()->diffInDays($today);
 
-            // increment inactive counts for all milestones
+            // increment inactive counts for all thresholds
             foreach (self::ALL_MILESTONES as $threshold) {
                 if ($inactiveDays >= $threshold) {
                     $inactiveCounts[$threshold]++;
                 }
             }
 
-            // skip if user has not been inactive for at least 3 days
+            // skip if user has not been inactive for at least 2 days
             if ($inactiveDays < self::USER_MILESTONES[0]) {
                 continue;
             }
 
-            // skip if admin has already been notified
+            // skip if admin/contact has already been notified
             if (($user->last_inactivity_reminder_day ?? 0) >= self::CONTACT_MILESTONE) {
                 continue;
             }
 
-            // get next milestone for user
             $nextMilestone = $this->nextMilestoneFor($inactiveDays, $user->last_inactivity_reminder_day);
             if ($nextMilestone === null) {
                 continue;
             }
 
-            if ($nextMilestone === self::CONTACT_MILESTONE && $this->inactivityAlertRecipients() === []) {
-                Log::warning('Skipping day-12 inactivity alert for user '.$user->id.': no admin recipients configured.');
+            if ($nextMilestone === self::CONTACT_MILESTONE && $alertRecipients === []) {
+                Log::warning('Skipping day-15 inactivity alert for user '.$user->id.': no admin recipients configured.');
                 continue;
             }
 
@@ -71,7 +71,7 @@ class SendInactivityReminderEmails extends Command
             ]);
 
             if ($nextMilestone === self::CONTACT_MILESTONE) {
-                Mail::to($this->inactivityAlertRecipients())->queue(
+                Mail::to($alertRecipients)->queue(
                     new InactivityContactNotification($user, $inactiveDays)
                 );
                 $queuedContactNotifications++;
@@ -81,15 +81,13 @@ class SendInactivityReminderEmails extends Command
             }
         }
 
-        // log summary
+        $thresholdSummary = collect(self::ALL_MILESTONES)
+            ->map(fn (int $day): string => sprintf('>=%d: %d', $day, $inactiveCounts[$day]))
+            ->implode(', ');
+
         $summary = sprintf(
-            'Inactivity reminders: inactive >=3: %d, >=5: %d, >=7: %d, >=9: %d, >=11: %d, >=12: %d. Queued %d user reminder(s), %d contact notification(s).',
-            $inactiveCounts[3],
-            $inactiveCounts[5],
-            $inactiveCounts[7],
-            $inactiveCounts[9],
-            $inactiveCounts[11],
-            $inactiveCounts[12],
+            'Inactivity reminders: %s. Queued %d user reminder(s), %d contact notification(s).',
+            $thresholdSummary,
             $queuedUserReminders,
             $queuedContactNotifications,
         );
