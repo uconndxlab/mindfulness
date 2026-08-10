@@ -18,13 +18,16 @@ class UserTable extends Component
     public $search = '';
     public $sortColumn = 'created_at';
     public $sortDirection = 'desc';
-    
+    public $editingPidUserId = null;
+    public $editingPid = '';
+
     #[Url(except: [])]
     public $milestones = [];
     public $showFilters = false;
 
     public $columns = [
         'hh_id' => ['label' => 'ID', 'sortable' => true],
+        'pid' => ['label' => 'PID', 'sortable' => true],
         'name' => ['label' => 'Name', 'sortable' => true],
         'email' => ['label' => 'Email', 'sortable' => true],
         'role' => ['label' => 'Role', 'sortable' => false],
@@ -72,7 +75,7 @@ class UserTable extends Component
     public function render()
     {
         // query
-        $usersQuery = User::select('id', 'hh_id', 'name', 'email', 'role', 'created_at', 'lock_access', 'email_verified_at', 'last_active_at', 'last_reminded_at')
+        $usersQuery = User::select('id', 'hh_id', 'pid', 'name', 'email', 'role', 'created_at', 'lock_access', 'email_verified_at', 'last_active_at', 'last_reminded_at')
             ->with(['favoritedActivities' => fn($query) => $query->orderBy('order', 'asc'), 'favoritedActivities.day.module', 'milestones'])
             ->orderBy($this->sortColumn, $this->sortDirection);
 
@@ -89,12 +92,14 @@ class UserTable extends Component
             $filteredUsers = $allUsers->filter(function ($user) {
                 $currentActivity = $user->currentActivity();
                 $activityTitle = $currentActivity ? $currentActivity->title : '';
+                $search = strtolower($this->search);
 
-                return str_contains(strtolower($user->name), strtolower($this->search)) ||
-                    str_contains(strtolower($user->hh_id), strtolower($this->search)) ||
-                    str_contains(strtolower($user->email), strtolower($this->search)) ||
-                    str_contains(strtolower($user->role), strtolower($this->search)) ||
-                    str_contains(strtolower($activityTitle), strtolower($this->search));
+                return str_contains(strtolower($user->name), $search) ||
+                    str_contains(strtolower($user->hh_id), $search) ||
+                    str_contains(strtolower((string) ($user->pid ?? '')), $search) ||
+                    str_contains(strtolower($user->email), $search) ||
+                    str_contains(strtolower($user->role), $search) ||
+                    str_contains(strtolower($activityTitle), $search);
             });
             $users = new \Illuminate\Pagination\LengthAwarePaginator(
                 $filteredUsers->forPage($this->getPage(), 10),
@@ -111,6 +116,45 @@ class UserTable extends Component
             'users' => $users,
             'milestoneTypes' => MilestoneType::cases()
         ]);
+    }
+
+    public function promptPidEdit(int $userId): void
+    {
+        $user = User::findOrFail($userId);
+
+        $this->editingPidUserId = $user->id;
+        $this->editingPid = $user->pid ?? '';
+        $this->resetErrorBag();
+    }
+
+    public function cancelPidEdit(): void
+    {
+        $this->reset(['editingPidUserId', 'editingPid']);
+        $this->resetErrorBag();
+    }
+
+    public function savePid(): void
+    {
+        if (!$this->editingPidUserId) {
+            return;
+        }
+
+        $this->validate([
+            'editingPid' => ['nullable', 'string', 'max:255'],
+        ], [
+            'editingPid.max' => 'PID must be no longer than 255 characters.',
+        ]);
+
+        try {
+            $user = User::findOrFail($this->editingPidUserId);
+            $user->pid = filled($this->editingPid) ? trim($this->editingPid) : null;
+            $user->save();
+
+            session()->flash('message', 'PID updated for ' . $user->email);
+            $this->cancelPidEdit();
+        } catch (\Throwable $e) {
+            session()->flash('error', 'Failed to update PID.');
+        }
     }
 
     public function toggleAccess($userId)

@@ -27,6 +27,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'pid',
         'password',
         'last_active_at',
         'active_days_count',
@@ -55,6 +56,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
+            'pid' => 'string',
             'password' => 'hashed',
             'last_active_at' => 'datetime',
             'active_days_count' => 'integer',
@@ -66,7 +68,7 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     public function sendEmailVerificationNotification()
-    {        
+    {
         $this->notify(new VerifyEmail);
     }
 
@@ -406,7 +408,7 @@ class User extends Authenticatable implements MustVerifyEmail
         if ($this->last_reminded_at && $this->last_reminded_at->diffInDays(now()) < 3) {
             return false;
         }
-        
+
         return true;
     }
 }
