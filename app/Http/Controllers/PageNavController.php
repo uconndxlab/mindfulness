@@ -92,19 +92,24 @@ class PageNavController extends Controller
             ? $scheduleService->moduleActivityProgress($user, $featuredModule)
             : ['percent' => 0, 'percentLeft' => 100];
 
-        $allFlowersHaveBloomed = $dateFormatter->allFlowersHaveBloomed($user, $schedule);
+        $allModulesCompleted = $dateFormatter->allModulesCompleted($user, $schedule);
 
         $homeIntro = 'You started the '.config('app.name').' journey on '
             .$scheduleService->formatAbsoluteDate($scheduleService->registrationDay($user), $user).'.';
 
-        if ($schedule['showJourneyGoal'] && ! $allFlowersHaveBloomed) {
+        if ($schedule['showJourneyGoal'] && ! $allModulesCompleted) {
             $homeIntro .= ' Your goal is to finish the journey on '
                 .$scheduleService->formatAbsoluteDate($schedule['journeyGoalDate'], $user).'.';
         }
 
         $homeIntro .= ' Keep going! Every bit of practice counts!';
 
-        $todayGoal = $dateFormatter->gentleIntentionHeading($user, $schedule, $currentModule);
+        $todayGoalData = $dateFormatter->todayGoalData($user, $schedule, $currentModule, $modules);
+        $todayGoal = $todayGoalData['text'];
+        $todayGoalLinkText = $todayGoalData['linkText'];
+        $todayGoalLinkUrl = $todayGoalData['moduleId'] && $todayGoalData['activityId']
+            ? route('explore.module', ['module_id' => $todayGoalData['moduleId'], 'activity_id' => $todayGoalData['activityId']])
+            : null;
         $totalActivitiesCompleted = $scheduleService->totalCompletedActivities($user);
         $activeDaysCount = $user->active_days_count ?? 0;
         $currentColorSlug = $featuredModule?->flowerColorSlug() ?? 'default';
@@ -114,11 +119,13 @@ class PageNavController extends Controller
             'bonusInfo',
             'homeIntro',
             'todayGoal',
+            'todayGoalLinkText',
+            'todayGoalLinkUrl',
             'moduleProgress',
             'totalActivitiesCompleted',
             'activeDaysCount',
             'currentColorSlug',
-            'allFlowersHaveBloomed',
+            'allModulesCompleted',
             'currentModule',
         ));
     }

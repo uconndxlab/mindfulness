@@ -21,8 +21,13 @@
 
     <div class="home-goal">
         <p class="home-goal-label">Today's Goal</p>
-        <p class="home-goal-heading">{{ $todayGoal }}</p>
-        @unless ($allFlowersHaveBloomed)
+        <p class="home-goal-heading">
+            {{ $todayGoal }}
+            @if ($todayGoalLinkText && $todayGoalLinkUrl)
+                <a href="{{ $todayGoalLinkUrl }}" class="home-goal-link">{{ $todayGoalLinkText }}</a>
+            @endif
+        </p>
+        @unless ($allModulesCompleted)
             <p class="home-goal-note">Set intention to come back to the app everyday.</p>
         @endunless
     </div>

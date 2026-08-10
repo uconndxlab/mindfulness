@@ -49,26 +49,47 @@ class HomeDateFormatter
         return $this->completedModuleAwaitingNextStart($user, $schedule) ?? $currentModule;
     }
 
-    public function allFlowersHaveBloomed(User $user, array $schedule): bool
+    public function allModulesCompleted(User $user, array $schedule): bool
     {
         return $schedule['modules']->every(fn (Module $module) => $module->isCompletedBy($user));
     }
 
-    public function gentleIntentionHeading(User $user, array $schedule, ?Module $currentModule): string
+    public function todayGoalData(User $user, array $schedule, ?Module $currentModule, iterable $modules): array
     {
         $today = $schedule['today'];
         $completions = $schedule['completions'];
 
-        if ($this->allFlowersHaveBloomed($user, $schedule)) {
-            return 'All Flowers Have Bloomed';
+        // user has completed 5 days, is on self reflection
+        // flower has bloomed, still need to finish module
+        if ($reflectionPrompt = $this->reflectionPrompt($currentModule)) {
+            return $reflectionPrompt;
+        }
+
+        if ($this->allModulesCompleted($user, $schedule)) {
+            return [
+                'text' => 'All Flowers Have Bloomed',
+                'linkText' => null,
+                'moduleId' => null,
+                'activityId' => null,
+            ];
         }
 
         if ($featuredCompletedModule = $this->completedModuleAwaitingNextStart($user, $schedule)) {
-            return 'Your '.$featuredCompletedModule->flowerColorName().' Flower Has Bloomed!';
+            return [
+                'text' => 'Your '.$featuredCompletedModule->flowerColorName().' Flower Has Bloomed!',
+                'linkText' => null,
+                'moduleId' => null,
+                'activityId' => null,
+            ];
         }
 
         if (! $currentModule) {
-            return 'Keep Growing your flower';
+            return [
+                'text' => 'Keep Growing your flower',
+                'linkText' => null,
+                'moduleId' => null,
+                'activityId' => null,
+            ];
         }
 
         $order = $currentModule->order;
@@ -76,15 +97,47 @@ class HomeDateFormatter
         $started = $this->scheduleService->hasModuleStarted($user, $currentModule);
 
         if (! $started) {
-            return 'Start Growing your '.$color.' Flower';
+            return [
+                'text' => 'Start Growing your '.$color.' Flower',
+                'linkText' => null,
+                'moduleId' => null,
+                'activityId' => null,
+            ];
         }
 
         // if the flower is to be completed today
         if ($today->equalTo($completions[$order])) {
-            return 'Finish Growing your '.$color.' Flower';
+            return [
+                'text' => 'Finish Growing your '.$color.' Flower',
+                'linkText' => null,
+                'moduleId' => null,
+                'activityId' => null,
+            ];
         }
 
-        return 'Keep Growing your '.$color.' Flower';
+        return [
+            'text' => 'Keep Growing your '.$color.' Flower',
+            'linkText' => null,
+            'moduleId' => null,
+            'activityId' => null,
+        ];
+    }
+
+    private function reflectionPrompt(?Module $module): ?array
+    {
+        if (! $module || $module->completed || ($module->daysCompleted ?? 0) < FlowerAssets::MAX_PETALS) {
+            return null;
+        }
+
+        $reflectionDay = $module->days()->where('is_check_in', true)->orderBy('order')->first();
+        $reflectionActivity = $reflectionDay?->activities()->where('optional', false)->orderBy('order')->first();
+
+        return [
+            'text' => 'Your '.$module->flowerColorName().' Flower Has Bloomed!',
+            'linkText' => $reflectionActivity ? 'Please Reflect on Part '.$module->order : null,
+            'moduleId' => $reflectionActivity ? $module->id : null,
+            'activityId' => $reflectionActivity?->id,
+        ];
     }
 
     private function completedModuleAwaitingNextStart(User $user, array $schedule): ?Module

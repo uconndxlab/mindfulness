@@ -1815,6 +1815,15 @@ audio.feedback-audio::-webkit-media-controls-play-button{
     margin-bottom: 0.35rem;
 }
 
+[data-page="home"] .home-goal-link,
+[data-page="home"] .home-goal-link:visited,
+[data-page="home"] .home-goal-link:hover,
+[data-page="home"] .home-goal-link:focus {
+    color: var(--home-accent) !important;
+    text-decoration: underline;
+    text-underline-offset: 0.12em;
+}
+
 [data-page="home"] .home-goal-note {
     font-size: 0.875rem;
     color: rgba(0, 0, 0, 0.55);
