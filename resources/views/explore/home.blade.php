@@ -34,7 +34,7 @@
 
     <div class="home-progress">
         <div class="home-progress-labels">
-            <span>To next milestone</span>
+            <span>Progress towards the next milestone</span>
             <span>{{ $moduleProgress['percent'] }}%</span>
         </div>
         <div class="home-progress-bar">
