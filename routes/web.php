@@ -25,6 +25,9 @@ Route::middleware('web')->group(function () {
     Route::redirect("/","/home");
     Route::redirect('/study', config('app.study_url'));
 
+    // Guest-accessible CSRF refresh for stale tabs (login/register and axios 419 retry)
+    Route::get('/session/ping', fn () => response()->json(['token' => csrf_token()]))->name('session.ping');
+
     //AUTHENTICATION
     //login page
     Route::get('/login', [AuthController::class, 'loginPage'])->name('login');
@@ -108,8 +111,6 @@ Route::middleware('web')->group(function () {
         Route::get('/explore/activity/{activity_id}/fast', [PageNavController::class, 'exploreActivityBypass'])->name('explore.activity.bypass');
         Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
         Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
-
-        Route::get('/session/ping', fn () => response()->json(['token' => csrf_token()]))->name('session.ping');
 
         Route::post('/activities/complete', [ActivityController::class, 'complete'])->name('activities.complete');
         Route::post('/activities/skip', [ActivityController::class, 'skip'])->name('activities.skip');
