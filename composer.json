@@ -5,11 +5,11 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "barryvdh/laravel-dompdf": "^3.1",
         "doctrine/dbal": "^4.2",
-        "laravel/framework": "^11.0",
-        "laravel/tinker": "^2.9",
+        "laravel/framework": "^13.0",
+        "laravel/tinker": "^3.0",
         "laravel/ui": "^4.5",
         "league/commonmark": "^2.7",
         "livewire/livewire": "^3.6",
@@ -22,7 +22,7 @@
         "laravel/pint": "^1.13",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
-        "phpunit/phpunit": "^10.5",
+        "phpunit/phpunit": "^12.0",
         "spatie/laravel-ignition": "^2.4"
     },
     "autoload": {

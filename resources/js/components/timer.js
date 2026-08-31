@@ -5,10 +5,15 @@ function initTimer() {
     const presetTime = parseInt(timerContainer.getAttribute('data-preset-time')) || null;
     const completeOnFinish = timerContainer.getAttribute('data-complete-on-finish') === 'true';
 
-    let selectedMinutes = presetTime || 5;
-    let timeRemaining = selectedMinutes * 60;
+    const selectedMinutes = presetTime || 5;
+    const presetMs = selectedMinutes * 60 * 1000;
+    const TICK_MS = 250;
+
+    let remainingMs = presetMs;
+    let endsAt = null;
     let timerInterval = null;
     let isRunning = false;
+    let hasFinished = false;
 
     const timerDisplay = document.getElementById('timer-display');
     const playPauseButton = document.getElementById('timer-play-pause');
@@ -16,25 +21,29 @@ function initTimer() {
     const resetButton = document.getElementById('timer-reset');
     const timeSelector = document.getElementById('time-selector');
 
-    function formatTime(seconds) {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
+    function formatTime(ms) {
+        const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
         return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function getRemainingMs() {
+        if (isRunning && endsAt != null) {
+            return Math.max(0, endsAt - Date.now());
+        }
+        return remainingMs;
     }
 
     function updateDisplay() {
         if (timerDisplay) {
-            timerDisplay.textContent = formatTime(timeRemaining);
+            timerDisplay.textContent = formatTime(getRemainingMs());
         }
     }
 
     function updatePlayPauseIcon() {
         if (!playPauseIcon) return;
-        if (isRunning) {
-            playPauseIcon.className = 'bi bi-pause';
-        } else {
-            playPauseIcon.className = 'bi bi-play';
-        }
+        playPauseIcon.className = isRunning ? 'bi bi-pause' : 'bi bi-play';
     }
 
     function showResetButton() {
@@ -49,34 +58,58 @@ function initTimer() {
         }
     }
 
+    function stopTicker() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+
+    function startTicker() {
+        stopTicker();
+        timerInterval = setInterval(syncFromDeadline, TICK_MS);
+    }
+
+    function finishTimer() {
+        if (hasFinished) return;
+        hasFinished = true;
+        isRunning = false;
+        endsAt = null;
+        remainingMs = 0;
+        stopTicker();
+        updateDisplay();
+        updatePlayPauseIcon();
+        showResetButton();
+
+        if (completeOnFinish) {
+            completeActivity();
+        }
+    }
+
+    function syncFromDeadline() {
+        remainingMs = getRemainingMs();
+        updateDisplay();
+        if (isRunning && remainingMs <= 0) {
+            finishTimer();
+        }
+    }
+
     function startTimer() {
-        if (isRunning) return;
+        if (isRunning || remainingMs <= 0) return;
         isRunning = true;
+        endsAt = Date.now() + remainingMs;
         hideResetButton();
         updatePlayPauseIcon();
         if (timeSelector) timeSelector.disabled = true;
-
-        timerInterval = setInterval(() => {
-            timeRemaining--;
-            updateDisplay();
-
-            if (timeRemaining <= 0) {
-                clearInterval(timerInterval);
-                isRunning = false;
-                updatePlayPauseIcon();
-                showResetButton();
-                
-                if (completeOnFinish) {
-                    completeActivity();
-                }
-            }
-        }, 1000);
+        startTicker();
+        syncFromDeadline();
     }
 
     function pauseTimer() {
         if (!isRunning) return;
+        remainingMs = getRemainingMs();
+        endsAt = null;
         isRunning = false;
-        clearInterval(timerInterval);
+        stopTicker();
+        updateDisplay();
         updatePlayPauseIcon();
     }
 
@@ -90,12 +123,22 @@ function initTimer() {
 
     function resetTimer() {
         isRunning = false;
-        clearInterval(timerInterval);
-        timeRemaining = selectedMinutes * 60;
+        hasFinished = false;
+        endsAt = null;
+        remainingMs = presetMs;
+        stopTicker();
         updateDisplay();
         updatePlayPauseIcon();
         hideResetButton();
         if (timeSelector) timeSelector.disabled = false;
+    }
+
+    function handleWake() {
+        if (!isRunning) return;
+        syncFromDeadline();
+        if (isRunning) {
+            startTicker();
+        }
     }
 
     function completeActivity() {
@@ -113,7 +156,14 @@ function initTimer() {
         resetButton.addEventListener('click', resetTimer);
     }
 
-    // init display
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            handleWake();
+        }
+    });
+    window.addEventListener('pageshow', handleWake);
+    document.addEventListener('resume', handleWake);
+
     updateDisplay();
 }
 
