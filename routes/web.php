@@ -17,6 +17,7 @@ use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PageNavController;
 use App\Http\Controllers\UserController;
 use App\Models\User;
+use Illuminate\Auth\Events\Verified;
 
 use App\Models\QuizAnswers;
 
@@ -69,6 +70,7 @@ Route::middleware('web')->group(function () {
             // verify the user
             if (!$user->hasVerifiedEmail()) {
                 $user->markEmailAsVerified();
+                event(new Verified($user));
                 // log email verification
                 activity('auth')
                     ->event('verification')

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use App\Models\Invitation;
@@ -172,8 +173,9 @@ class AuthController extends Controller
             if ($invitation && $invitation->isValid()) {
                 $invitation->markAsUsed($user);
 
-                $user->email_verified_at = Carbon::now();
-                $user->save();
+                if ($user->markEmailAsVerified()) {
+                    event(new Verified($user));
+                }
                 $skipEmailValidation = true;
             }
             
