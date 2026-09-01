@@ -121,6 +121,8 @@ Route::middleware('web')->group(function () {
         //NAVIGATION
         //Page Navigation - the controller is not totally necessary
         Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
+        Route::post('/welcome/complete', [PageNavController::class, 'completeWelcome'])->name('welcome.complete');
+        Route::get('/start', [PageNavController::class, 'continueInApp'])->name('app.start');
         // Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
         
         Route::get('/journaltab', [PageNavController::class, 'journal'])->name('journal');

@@ -152,10 +152,14 @@ function bindModalHandlers() {
     }
 
     // Also handle ANY Bootstrap modal globally (e.g., #pdfModal)
-    document.addEventListener('shown.bs.modal', function () {
+    // #pdfModal: do not freeze the body. position:fixed on body collapses
+    // page height and unsticks the About nav. Overflow lock from .modal-open is enough.
+    document.addEventListener('shown.bs.modal', function (event) {
+        if (event.target?.id === 'pdfModal') return;
         modalFreezeBackground();
     });
-    document.addEventListener('hidden.bs.modal', function () {
+    document.addEventListener('hidden.bs.modal', function (event) {
+        if (event.target?.id === 'pdfModal') return;
         // Only restore if there are no other open modals
         if (!document.querySelector('.modal.show')) {
             modalRestoreBackground();

@@ -26,12 +26,27 @@ class PageNavController extends Controller
 {
     public function welcomePage()
     {
+        return view("auth.welcome");
+    }
+
+    public function continueInApp()
+    {
+        if (!Auth::user()->has_seen_welcome) {
+            return redirect()->route('welcome');
+        }
+
+        return redirect()->route('explore.home');
+    }
+
+    public function completeWelcome()
+    {
         $user = Auth::user();
         if (!$user->has_seen_welcome) {
             $user->has_seen_welcome = true;
             $user->save();
         }
-        return view("auth.welcome");
+
+        return redirect()->route('explore.home');
     }
 
     public function voiceSelectPage()
@@ -706,6 +721,7 @@ class PageNavController extends Controller
         $categories = \App\Enums\FaqCategory::sorted();
         $faqs = Faq::ordered()->get()->groupBy(fn($faq) => $faq->category->value);
         $teachers = Teacher::all();
-        return view("other.help", compact('categories', 'faqs', 'teachers'));
+        $page_info = ['hide_top_nav' => true];
+        return view("other.help", compact('categories', 'faqs', 'teachers', 'page_info'));
     }
 }

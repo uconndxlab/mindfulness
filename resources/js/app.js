@@ -6,8 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const imports = [];
 
     // Global UI behavior - not on auth pages
-    if (page !== 'auth') {
-        // page id is auth for all auth pages
+    if (!page?.startsWith('auth')) {
         imports.push(import('./misc'));
         imports.push(import('./components/modal'));
     }
@@ -17,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (page === 'home') imports.push(import('./pages/home'));
     if (page === 'auth-login-register') imports.push(import('./pages/auth-login-register'));
     if (page === 'auth-verify') imports.push(import('./pages/auth-verify'));
+    if (page === 'auth-welcome') imports.push(import('./pages/welcome'));
     if (page === 'module') imports.push(import('./pages/module'));
     if (page === 'bonus') imports.push(import('./pages/module'));
     if (page === 'activity') imports.push(import('./pages/activity'));
@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (document.getElementById('lock_button_reg')) imports.push(import('./components/registration-lock'));
     if (document.getElementById('invitation_toggle_btn')) imports.push(import('./components/invitation-toggle'));
     if (document.getElementById('pdf-viewer')) imports.push(import('./components/pdf-viewer'));
+    if (document.getElementById('welcomeLetterModal')) imports.push(import('./components/welcome-letter-modal'));
     if (document.getElementById('completion-reports-table')) imports.push(import('./components/completion-reports'));
     if (document.querySelector('.slide__audio.js-audio')) imports.push(import('./components/audio-player'));
     if (document.getElementById('timer-container')) imports.push(import('./components/timer'));

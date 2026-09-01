@@ -20,6 +20,7 @@
     }
 @endphp
 
+@if (!(isset($page_info['hide_top_nav']) && $page_info['hide_top_nav']))
 <nav class="navbar navbar-expand-lg navbar-light sticky-top top-nav">
     <div class="container-fluid container">
         <ul class="navbar-nav">
@@ -43,6 +44,7 @@
         @endif
     </div>
 </nav>
+@endif
 
 @if (!(isset($page_info['hide_bottom_nav']) && $page_info['hide_bottom_nav']))
     <nav class="navbar fixed-bottom navbar-expand-lg navbar-light lower-nav-full">

@@ -1,58 +1,67 @@
 function initHelpPage() {
     const navbar = document.getElementById('navbar-help');
+    const sections = Array.from(document.querySelectorAll('.about-page section[id]'));
+    const navLinks = navbar
+        ? Array.from(navbar.querySelectorAll('a.nav-link[href^="#"]'))
+        : [];
+    const tabsWrap = navbar?.querySelector('.about-tabs-wrap');
 
-    // Scrollspy-like behavior
-    const sections = Array.from(document.querySelectorAll('section'));
-    const navLinks = navbar ? Array.from(navbar.querySelectorAll('.nav-link')) : [];
-
-    function getOffset(fromNavLinks = false) {
-        return window.innerWidth <= 768 && !fromNavLinks ? 200 : 200;
+    function scrollToTarget(el) {
+        if (!el) return;
+        el.scrollIntoView({ block: 'start', behavior: 'auto' });
     }
 
     function updateActiveLink() {
-        const fromTop = window.scrollY + getOffset();
-        
-        // Check if we're at the bottom of the page
+        const offset = (navbar?.offsetHeight || 0) + 16;
+        const fromTop = window.scrollY + offset + 8;
         const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10;
-        
+
         let currentSection;
-        
         if (isAtBottom) {
-            // If at bottom, activate the last section
             currentSection = sections[sections.length - 1];
         } else {
-            // Find the current section based on scroll position
             currentSection = sections.find((section) => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.offsetHeight;
-                return fromTop >= sectionTop && fromTop < sectionTop + sectionHeight;
+                const top = section.getBoundingClientRect().top + window.scrollY;
+                const bottom = top + section.offsetHeight;
+                return fromTop >= top && fromTop < bottom;
             });
         }
-        
+
         if (navbar && currentSection) {
-            const newActiveLink = navbar.querySelector(`a[href="#${currentSection.id}"]`);
+            const newActiveLink = navbar.querySelector(`a.nav-link[href="#${currentSection.id}"]`);
             if (newActiveLink && !newActiveLink.classList.contains('active')) {
                 navLinks.forEach((link) => link.classList.remove('active'));
                 newActiveLink.classList.add('active');
+                if (tabsWrap) {
+                    const left = newActiveLink.offsetLeft - tabsWrap.clientWidth / 2 + newActiveLink.offsetWidth / 2;
+                    tabsWrap.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+                }
             }
         }
     }
 
     updateActiveLink();
-    window.addEventListener('scroll', updateActiveLink);
+    window.addEventListener('scroll', updateActiveLink, { passive: true });
 
     navLinks.forEach((link) => {
         link.addEventListener('click', function (e) {
+            const target = document.querySelector(this.getAttribute('href'));
+            if (!target) return;
             e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
-            const offset = targetId === 'contactUs' ? getOffset(false) : getOffset(true);
-            const targetPosition = targetSection.offsetTop - offset + 105;
-            window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+            scrollToTarget(target);
+            history.replaceState(null, '', this.getAttribute('href'));
         });
     });
 
-    // Teacher read-more logic
+    document.querySelectorAll('.about-resource a[href^="#"]').forEach((link) => {
+        link.addEventListener('click', function (e) {
+            const target = document.querySelector(this.getAttribute('href'));
+            if (!target) return;
+            e.preventDefault();
+            scrollToTarget(target);
+        });
+    });
+
     document.querySelectorAll('.read-more').forEach((button) => {
         button.addEventListener('click', function () {
             const cardBody = this.closest('.card-body');
@@ -65,23 +74,13 @@ function initHelpPage() {
                 fullBio.classList.remove('d-none');
                 this.textContent = 'Read Less';
                 const teacherName = document.querySelector(`#teacher-name-${teacherIndex}`);
-                if (teacherName) {
-                    const offset = 60;
-                    const elementPosition = teacherName.getBoundingClientRect().top;
-                    const offsetPosition = elementPosition + window.pageYOffset - offset;
-                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-                }
+                if (teacherName) scrollToTarget(teacherName);
             } else if (shortBio && fullBio) {
                 shortBio.classList.remove('d-none');
                 fullBio.classList.add('d-none');
                 this.textContent = 'Read More';
-                const teacherElement = this.closest('.card')?.querySelector('.teacher-image-container');
-                if (teacherElement) {
-                    const offset = 70;
-                    const elementPosition = teacherElement.getBoundingClientRect().top;
-                    const offsetPosition = elementPosition + window.pageYOffset - offset;
-                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-                }
+                const teacherElement = this.closest('.teacher-row')?.querySelector('.teacher-image-container');
+                if (teacherElement) scrollToTarget(teacherElement);
             }
         });
     });
@@ -92,5 +91,3 @@ if (document.readyState === 'loading') {
 } else {
     initHelpPage();
 }
-
-

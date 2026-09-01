@@ -10,7 +10,7 @@
 
 <!-- css/js via Vite -->
 @vite(['resources/css/app.css', 'resources/js/app.js'])
-@livewireStyles(['nonce' => $cspNonce ?? ''])
+@livewireStyles(['nonce' => $cspNonce])
 
 <!-- icons -->
 <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">

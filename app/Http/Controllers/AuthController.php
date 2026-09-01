@@ -75,7 +75,7 @@ class AuthController extends Controller
             if (!Auth::user()->has_seen_welcome) {
                 return redirect()->route('welcome');
             }
-            return redirect()->route('explore.home');
+            return redirect()->intended(route('explore.home'));
         }
       
         return back()->withErrors(['login' => 'Invalid credentials.'])->withInput();

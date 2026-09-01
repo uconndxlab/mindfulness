@@ -20,7 +20,8 @@ class SecurityHeaders
         'admin.invitations',
         'admin.completion-reports',
         'account',
-        'help'
+        'help',
+        'welcome',
     ];
 
     /**
@@ -110,6 +111,9 @@ class SecurityHeaders
             'default-src' => ["'self'"],
             'script-src' => $this->getScriptSrc($request, $nonce, $viteHosts, $isProd),
             'style-src' => $this->getStyleSrc($nonce, $viteHosts, $isProd),
+            // native <video controls> and some library UI set style attributes;
+            // nonce on style-src blocks those unless style-src-attr is separate
+            'style-src-attr' => ["'unsafe-inline'"],
             'img-src' => $this->getImgSrc($isProd),
             'font-src' => $this->getFontSrc($viteHosts, $isProd),
             'connect-src' => $this->getConnectSrc($viteHosts, $isProd),

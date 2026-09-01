@@ -12,7 +12,7 @@
         @endif
 
         <main class="container{{ $type !== 'auth' ? '-fluid' : '' }} {{ $type === 'app' ? 'manual-margins' : '' }}">
-            <div class="row @if($type !== 'admin') justify-content-center @endif"> 
+            <div class="row @if($type !== 'admin') justify-content-center @endif">
                 @yield('content')
             </div>
         </main>
@@ -24,4 +24,4 @@
         {{-- Standard Livewire scripts with CSP nonce --}}
         @livewireScripts(['nonce' => $cspNonce ?? ''])
     </body>
-</html> 
+</html>
