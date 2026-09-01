@@ -25,10 +25,14 @@ class SendInactivityReminderEmails extends Command
         $today = Carbon::now()->startOfDay();
         $alertRecipients = $this->inactivityAlertRecipients();
 
-        // only email users who have access to the app
+        // only email users who have access to the app and have not finished all 4 parts
         $eligibleUsers = User::query()
             ->where('lock_access', false)
             ->whereNotNull('last_active_at')
+            ->whereDoesntHave('modules', function ($query) {
+                $query->where('modules.order', 4)
+                    ->where('user_module.completed', true);
+            })
             ->get(['id', 'hh_id', 'name', 'email', 'last_active_at', 'last_inactivity_reminder_day']);
 
         $inactiveCounts = array_fill_keys(self::ALL_MILESTONES, 0);

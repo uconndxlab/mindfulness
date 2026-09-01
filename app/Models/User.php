@@ -399,9 +399,21 @@ class User extends Authenticatable implements MustVerifyEmail
             ->first();
     }
 
+    public function hasCompletedAllParts(): bool
+    {
+        return $this->modules()
+            ->where('modules.order', 4)
+            ->wherePivot('completed', true)
+            ->exists();
+    }
+
     public function canSendReminder(): bool
     {
         if (!$this->last_active_at) {
+            return false;
+        }
+
+        if ($this->hasCompletedAllParts()) {
             return false;
         }
 
