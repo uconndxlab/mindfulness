@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Account')
+@section('page_id', 'account')
 
 @section('content')
 @php

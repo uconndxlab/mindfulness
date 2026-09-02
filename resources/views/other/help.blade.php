@@ -5,34 +5,7 @@
 
 @section('content')
 <div class="col-12 about-page px-0">
-    <nav id="navbar-help" class="navbar about-top-nav sticky-top">
-        <div class="container-fluid about-top-nav-inner">
-            <div class="about-tabs-wrap">
-                <ul class="navbar-nav flex-row flex-nowrap">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#info">Info</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#resources">Resources</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#tutorial">Tutorial</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#FAQ">FAQ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contactUs">Contact</a>
-                    </li>
-                </ul>
-            </div>
-            <button type="button" id="logoutBtn" class="nav-link btn btn-nav about-logout-btn fw-semibold">
-                Logout <i class="bi bi-box-arrow-right"></i>
-            </button>
-        </div>
-    </nav>
-
-    <div class="container about-page-body py-4">
+    <div class="container about-page-body pb-4">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <section id="info" class="about-card">

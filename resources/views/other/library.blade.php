@@ -2,59 +2,17 @@
 
 @section('title', $page_info['title'])
 
+@php
+    $route_name = Request::route()->getName();
+    $is_favorites = $route_name == 'library.favorites';
+    $hide_search = $is_favorites;
+    $journal_hide = isset($page_info['journal']) && $page_info['journal'];
+@endphp
+
 @section('content')
-<div class="col-lg-8" id="library-root" data-library-search-route="{{ $page_info['search_route'] }}" data-library-base-param="{{ $base_param }}" data-library-favorites="{{ isset($is_favorites) && $is_favorites ? 'true' : 'false' }}" data-library-wipe-filters="{{ isset($wipe_filters) && $wipe_filters ? 'true' : 'false' }}">
-    @php
-        use Illuminate\Support\Facades\Request;
-        use Illuminate\Support\Str;
-
-        $route_name = Request::route()->getName();
-        $top_nav = [false, false];
-        if (isset($page_info['journal']) && $page_info['journal']) {
-            $journal_hide = true;
-            $tn_right_name = 'History';
-            $tn_right_route = route('journal.library');
-            $tn_left_name = 'Write';
-            $tn_left_route = route('journal.compose');
-            if ($route_name == 'journal.compose') {
-                $top_nav[0] = true;
-            }
-            else {
-                $top_nav[1] = true;
-            }
-        }
-        else {
-            $journal_hide = false;
-            $tn_right_name = 'Search';
-            $tn_right_route = route('library.main');
-            $tn_left_name = 'Favorites';
-            $tn_left_route = route('library.favorites');
-            if ($route_name == 'library.favorites') {
-                $top_nav[0] = true;
-                $hide_search = true;
-            }
-            else {
-                $top_nav[1] = true;
-            }
-        }
-        $is_favorites = $route_name == 'library.favorites';
-    @endphp
-
-    <nav class="navbar navbar-expand navbar-light top-nav">
-        <div class="tabs">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link {{ $top_nav[0] ? 'active disabled' : ''}}" href="{{ $top_nav[0] ? '' : $tn_left_route }}">{{ $tn_left_name }}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ $top_nav[1] ? 'active disabled' : ''}}" href="{{ $top_nav[1] ? '' : $tn_right_route }}">{{ $tn_right_name }}</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
+<div class="col-lg-8" id="library-root" data-library-search-route="{{ $page_info['search_route'] }}" data-library-base-param="{{ $base_param }}" data-library-favorites="{{ $is_favorites ? 'true' : 'false' }}" data-library-wipe-filters="{{ isset($wipe_filters) && $wipe_filters ? 'true' : 'false' }}">
     <div class="text-left">
-        <h1 class="display fw-bold mt-2">{{ $page_info['title'] }}</h1>
+        <h1 class="display fw-bold">{{ $page_info['title'] }}</h1>
     </div>
     <div class="">
         <form id="search_filter_form" method="GET">

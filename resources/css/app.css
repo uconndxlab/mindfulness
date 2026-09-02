@@ -36,6 +36,10 @@ html:has(body[data-page="help"]) {
 }
 .manual-margins {
     margin-bottom: calc(var(--bottom-nav-clearance) + env(safe-area-inset-bottom, 0px));
+    padding-top: 1.75rem;
+}
+body[data-page="home"] .manual-margins {
+    padding-top: 4rem;
 }
 .manual-margin-top {
     margin-top: 3rem;
@@ -2679,12 +2683,16 @@ body[data-page="help"] {
 .about-resource-title[id] {
     scroll-margin-top: 5.25rem;
 }
-.about-top-nav {
-    background-color: var(--dark-green);
+.about-top-nav,
+.app-top-nav {
+    --top-nav-accent: var(--dark-green);
+    background-color: var(--top-nav-accent);
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.2);
 }
 body.modal-open .about-top-nav,
-body.letter-modal-open .about-top-nav {
+body.letter-modal-open .about-top-nav,
+body.modal-open .app-top-nav,
+body.letter-modal-open .app-top-nav {
     position: fixed !important;
     top: 0;
     left: 0;
@@ -2692,14 +2700,21 @@ body.letter-modal-open .about-top-nav {
     width: 100%;
     z-index: 1040;
 }
-.about-top-nav-inner {
+.about-top-nav-inner,
+.app-top-nav-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
+}
+.about-top-nav-inner {
     max-width: 960px;
     margin: 0 auto;
     padding: 0.5rem 0.75rem;
+}
+.app-top-nav-inner {
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
 }
 .about-tabs-wrap {
     overflow-x: auto;
@@ -2707,28 +2722,42 @@ body.letter-modal-open .about-top-nav {
     min-width: 0;
     flex: 1;
 }
+.app-top-nav-tabs .nav-link,
 .about-top-nav .nav-link {
     color: rgba(255, 255, 255, 0.88) !important;
-    font-weight: 600;
+    font-weight: 600 !important;
     padding: 0.4rem 0.8rem !important;
     border-radius: 999px;
     white-space: nowrap;
     width: auto !important;
     margin: 0;
+    border-color: transparent !important;
+    background: transparent;
 }
+.app-top-nav-tabs .nav-link.active,
 .about-top-nav .nav-link.active {
     background: #fff;
-    color: var(--dark-green) !important;
+    color: var(--top-nav-accent) !important;
+    opacity: 1;
+    pointer-events: none;
 }
-.about-top-nav .about-logout-btn {
+.app-top-nav .app-nav-pill {
     width: auto !important;
     margin: 0 !important;
     padding: 10px 20px !important;
     flex-shrink: 0;
     background: #fff !important;
-    color: var(--dark-green) !important;
+    color: var(--top-nav-accent) !important;
     border-color: transparent !important;
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.2);
+    font-weight: 600 !important;
+    white-space: nowrap;
+}
+.app-top-nav .app-nav-pill:hover,
+.app-top-nav .app-nav-pill:active {
+    background: #fff !important;
+    color: var(--top-nav-accent) !important;
+    opacity: 0.92;
 }
 .about-card {
     background: #fff;

@@ -18,25 +18,78 @@
             $active_items[4] = true;
         }
     }
+
+    $page_info = $page_info ?? [];
+    $hideTopNav = !empty($page_info['hide_top_nav']) || $route_name === 'explore.home';
+    $showLogout = $route_name === 'account';
+    $navColor = $page_info['nav_color'] ?? null;
+    $isJournalNav = Str::startsWith($route_name, 'journal.');
+    $isLibraryNav = Str::startsWith($route_name, 'library.');
+    $isHelpNav = $route_name === 'help';
+    $hasBack = isset($page_info['back_route']) && isset($page_info['back_label']);
 @endphp
 
-@if (!(isset($page_info['hide_top_nav']) && $page_info['hide_top_nav']))
-<nav class="navbar navbar-expand-lg navbar-light sticky-top top-nav">
-    <div class="container-fluid container">
-        <ul class="navbar-nav">
-            @if(isset($page_info['back_route']) && isset($page_info['back_label']))
-                <li class="nav-item mr-auto">
-                    <a class="nav-link btn btn-nav" href="{{ $page_info['back_route'] }}" id="backButton">
-                        <i class="bi bi-arrow-left"></i>{{ $page_info['back_label'] }}
-                    </a>
-                </li>
-            @endif
-        </ul>
+@if (!$hideTopNav)
+<nav @if ($isHelpNav) id="navbar-help" @endif class="navbar navbar-expand-lg sticky-top top-nav app-top-nav"@if ($navColor) style="--top-nav-accent: {{ $navColor }}"@endif>
+    <div class="container-fluid container app-top-nav-inner">
+        @if ($isHelpNav)
+            <div class="about-tabs-wrap app-top-nav-tabs">
+                <ul class="navbar-nav flex-row flex-nowrap">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#info">Info</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#resources">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tutorial">Tutorial</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#FAQ">FAQ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contactUs">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        @elseif ($isJournalNav)
+            <div class="about-tabs-wrap app-top-nav-tabs">
+                <ul class="navbar-nav flex-row flex-nowrap">
+                    <li class="nav-item">
+                        <a class="nav-link {{ $route_name == 'journal.compose' ? 'active disabled' : '' }}" href="{{ $route_name == 'journal.compose' ? '' : route('journal.compose') }}">Write</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ $route_name == 'journal.library' ? 'active disabled' : '' }}" href="{{ $route_name == 'journal.library' ? '' : route('journal.library') }}">History</a>
+                    </li>
+                </ul>
+            </div>
+        @elseif ($isLibraryNav)
+            <div class="about-tabs-wrap app-top-nav-tabs">
+                <ul class="navbar-nav flex-row flex-nowrap">
+                    <li class="nav-item">
+                        <a class="nav-link {{ $route_name == 'library.favorites' ? 'active disabled' : '' }}" href="{{ $route_name == 'library.favorites' ? '' : route('library.favorites') }}">Favorites</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ $route_name == 'library.main' ? 'active disabled' : '' }}" href="{{ $route_name == 'library.main' ? '' : route('library.main') }}">Search</a>
+                    </li>
+                </ul>
+            </div>
+        @else
+            <ul class="navbar-nav">
+                @if ($hasBack)
+                    <li class="nav-item mr-auto">
+                        <a class="nav-link btn btn-nav app-nav-pill" href="{{ $page_info['back_route'] }}" id="backButton">
+                            <i class="bi bi-arrow-left"></i>{{ $page_info['back_label'] }}
+                        </a>
+                    </li>
+                @endif
+            </ul>
+        @endif
 
-        @if (!(isset($page_info['hide_bottom_nav']) && $page_info['hide_bottom_nav']))
+        @if ($showLogout)
             <ul class="navbar-nav">
                 <li class="nav-item ml-auto">
-                    <button id="logoutBtn" class="nav-link btn btn-nav fw-semibold">Logout
+                    <button id="logoutBtn" class="nav-link btn btn-nav app-nav-pill fw-semibold">Logout
                         <i class="bi bi-box-arrow-right"></i>
                     </button>
                 </li>
@@ -78,4 +131,4 @@
             </ul>
         </div>
     </nav>
-@endif 
+@endif

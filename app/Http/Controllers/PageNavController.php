@@ -138,6 +138,8 @@ class PageNavController extends Controller
         $activeDaysCount = $user->active_days_count ?? 0;
         $currentColorSlug = $featuredModule?->flowerColorSlug() ?? 'default';
 
+        $page_info = ['hide_top_nav' => true];
+
         return view('explore.home', compact(
             'modules',
             'bonusInfo',
@@ -151,6 +153,7 @@ class PageNavController extends Controller
             'currentColorSlug',
             'allModulesCompleted',
             'currentModule',
+            'page_info',
         ));
     }
 
@@ -214,6 +217,7 @@ class PageNavController extends Controller
         //set back route
         $page_info['back_label'] = " Back to Home";
         $page_info['back_route'] = route('explore.home');
+        $page_info['nav_color'] = $module->navColor();
 
         //handle navigation
         Session::put('current_nav', ['route' => route('explore.module', ['module_id' => $module_id]), 'back' => 'Part '.$module_id]);
@@ -380,6 +384,7 @@ class PageNavController extends Controller
         //setting back route
         $page_info['back_label'] = $exit ? ' Back to '.$exit['back'] : ' Back';
         $page_info['back_route'] = $page_info['exit_route'];
+        $page_info['nav_color'] = $activity->day?->module?->navColor();
 
         $page_info['hide_bottom_nav'] = true;
 
@@ -721,7 +726,6 @@ class PageNavController extends Controller
         $categories = \App\Enums\FaqCategory::sorted();
         $faqs = Faq::ordered()->get()->groupBy(fn($faq) => $faq->category->value);
         $teachers = Teacher::all();
-        $page_info = ['hide_top_nav' => true];
-        return view("other.help", compact('categories', 'faqs', 'teachers', 'page_info'));
+        return view("other.help", compact('categories', 'faqs', 'teachers'));
     }
 }

@@ -131,6 +131,15 @@ class Module extends Model
         return $slug === 'flower' ? 'default' : $slug;
     }
 
+    public function navColor(): string
+    {
+        $color = is_string($this->color) ? trim($this->color) : '';
+
+        return preg_match('/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $color)
+            ? $color
+            : '#48745D';
+    }
+
     public function flowerFrameUrl(int $petals): string
     {
         return \App\Support\FlowerAssets::moduleFrameUrl($this, $petals);

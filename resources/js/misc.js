@@ -27,7 +27,7 @@ if (window.sessionModalData && typeof window.showModal === 'function') {
 }
 
 // add shadow to top nav when scrolled
-const topNav = document.querySelector('.top-nav');
+const topNav = document.querySelector('.app-top-nav, .about-top-nav, .top-nav');
 if (topNav) {
     const handleScroll = () => {
         if (window.scrollY > 0) {
