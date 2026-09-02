@@ -2522,6 +2522,37 @@ body[data-page="auth-welcome"] main > .row {
     font-size: 0.95rem;
     line-height: 1.55;
 }
+.welcome-letter-body hr {
+    border: none;
+    border-top: 1px solid #c8c2b4;
+    margin: 1.15rem 0;
+}
+.welcome-letter-stats {
+    margin: 0.15rem 0 0.9rem 1.15rem;
+    padding: 0;
+    list-style: none;
+}
+.welcome-letter-stats li {
+    margin-bottom: 0.15rem;
+    font-size: 0.95rem;
+    line-height: 1.55;
+}
+.welcome-letter-quote {
+    background: var(--light-green);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    margin: 0.35rem 0 1rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+.welcome-letter-emphasis {
+    font-weight: 600;
+}
+.welcome-letter-learning {
+    margin-left: 0.75rem;
+    font-style: italic;
+}
 .welcome-letter-kicker {
     color: var(--darker-green);
     font-size: 1.15rem;
@@ -2537,6 +2568,9 @@ body[data-page="auth-welcome"] main > .row {
     font-size: 1.05rem;
     font-weight: 700;
     margin: 1.1rem 0 0.6rem;
+}
+.welcome-letter-body hr + h3 {
+    margin-top: 0;
 }
 .welcome-letter-overlay {
     display: none;
