@@ -384,7 +384,9 @@ class PageNavController extends Controller
         //setting back route
         $page_info['back_label'] = $exit ? ' Back to '.$exit['back'] : ' Back';
         $page_info['back_route'] = $page_info['exit_route'];
-        $page_info['nav_color'] = $activity->day?->module?->navColor();
+        if (!$activity->optional) {
+            $page_info['nav_color'] = $activity->day?->module?->navColor();
+        }
 
         $page_info['hide_bottom_nav'] = true;
 

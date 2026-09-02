@@ -68,10 +68,21 @@ function bindModalHandlers() {
         const modalForm = document.getElementById('modalForm');
         const additionalBtn = document.getElementById('additionalBtn');
         const methodInput = document.getElementById('modalMethod');
+        const csrfInput = modalForm?.querySelector('input[name="_token"]');
+        const httpMethod = String(method || 'POST').toUpperCase();
 
         if (route) {
             modalForm.action = route;
-            methodInput.value = method;
+            if (httpMethod === 'GET') {
+                modalForm.method = 'GET';
+                methodInput.disabled = true;
+                if (csrfInput) csrfInput.disabled = true;
+            } else {
+                modalForm.method = 'POST';
+                methodInput.disabled = false;
+                methodInput.value = httpMethod;
+                if (csrfInput) csrfInput.disabled = false;
+            }
             additionalBtn.innerHTML = buttonLabel;
             additionalBtn.classList.remove('d-none');
             additionalBtn.className = 'btn';
