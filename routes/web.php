@@ -25,6 +25,7 @@ Route::middleware('web')->group(function () {
     //default
     Route::redirect("/","/home");
     Route::redirect('/study', config('app.study_url'));
+    Route::redirect('/testimonial', config('app.testimonial_url'));
 
     // Guest-accessible CSRF refresh for stale tabs (login/register and axios 419 retry)
     Route::get('/session/ping', fn () => response()->json(['token' => csrf_token()]))->name('session.ping');
@@ -34,15 +35,15 @@ Route::middleware('web')->group(function () {
     Route::get('/login', [AuthController::class, 'loginPage'])->name('login');
     //login request
     Route::post('/login', [AuthController::class,'authenticate'])->middleware('throttle:login')->name('login.submit');
-    
+
     //REGISTRATION
-    Route::middleware(['registration.lock', 'invitation.required'])->group(function () { 
+    Route::middleware(['registration.lock', 'invitation.required'])->group(function () {
         //registration page
         Route::get('/account-creation', [AuthController::class, 'registrationPage'])->name('register');
         //registration request
         Route::post('/account-creation', [AuthController::class,'register'])->middleware('throttle:register')->name('register.submit');
     });
-    
+
     //EMAIL VERIFICATION
     Route::middleware('auth')->group(function () {
         //BUILT IN VERIFICATION FUNCTIONS
@@ -57,7 +58,7 @@ Route::middleware('web')->group(function () {
     });
     // verify email button in email
     Route::get('/email/verify/{id}/{hash}', function (Request $request) {
-    
+
         try {
             // find user
             $user = User::findOrFail($request->id);
@@ -66,7 +67,7 @@ Route::middleware('web')->group(function () {
             if (!hash_equals((string) $request->hash, sha1($user->email))) {
                 abort(403, 'Invalid verification link');
             }
-    
+
             // verify the user
             if (!$user->hasVerifiedEmail()) {
                 $user->markEmailAsVerified();
@@ -77,7 +78,7 @@ Route::middleware('web')->group(function () {
                     ->causedBy($user)
                     ->log('Verified');
             }
-          
+
             // if user is already logged in
             if (Auth::check() && Auth::id() == $user->id) {
                 return redirect('/welcome');
@@ -85,19 +86,19 @@ Route::middleware('web')->group(function () {
 
             // otherwise redirect to login
             return redirect('/login')->with('success', 'Email verified successfully. Please login.');
-    
+
         } catch (\Exception $e) {
             return redirect('/login')->with('error', 'Verification failed. Please try again.');
         }
     })->middleware('signed')->name('verification.verify');
-    
+
     //FORGOT PASSWORD
     Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
     Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:password-reset')->name('password.email');
     Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
     Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
-    
-    
+
+
     //AUTH protected routes
     Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock', 'session.policy'])->group(function () {
         //logout
@@ -117,20 +118,20 @@ Route::middleware('web')->group(function () {
         Route::post('/activities/complete', [ActivityController::class, 'complete'])->name('activities.complete');
         Route::post('/activities/skip', [ActivityController::class, 'skip'])->name('activities.skip');
         Route::post('/activities/log-interaction', [ActivityController::class, 'logInteraction'])->name('activities.log_interaction');
-        
+
         //NAVIGATION
         //Page Navigation - the controller is not totally necessary
         Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
         Route::post('/welcome/complete', [PageNavController::class, 'completeWelcome'])->name('welcome.complete');
         Route::get('/start', [PageNavController::class, 'continueInApp'])->name('app.start');
         // Route::get('/voice-select', [PageNavController::class, 'voiceSelectPage'])->name('voiceSelect');
-        
+
         Route::get('/journaltab', [PageNavController::class, 'journal'])->name('journal');
         Route::get('/journal', [PageNavController::class, 'journalCompose'])->name('journal.compose');
         Route::get('/journal-library', [PageNavController::class, 'journalLibrary'])->name('journal.library');
         // throttle??
         Route::get('/journal/search', [PageNavController::class, 'journalSearch'])->name('journal.search');
-        
+
         Route::get('/profile', [PageNavController::class, 'accountPage'])->name('account');
         Route::get('/about', [PageNavController::class, 'helpPage'])->name('help');
 
@@ -140,14 +141,14 @@ Route::middleware('web')->group(function () {
         Route::get('/library', [PageNavController::class, 'mainLibrary'])->name('library.main');
         // throttle??
         Route::get('/search', [PageNavController::class, 'librarySearch'])->name('library.search');
-        
+
         //User updates
         Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
-        
+
         Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->name('favorite.toggle');
-        
+
         Route::resource('note', NoteController::class);
-        
+
         //ADMIN ONLY
         Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
             Route::get('/dashboard', [AdminUserController::class, 'dashboard'])->name('dashboard');
@@ -163,7 +164,7 @@ Route::middleware('web')->group(function () {
             Route::get('/completion-reports', [AdminCompletionReportController::class, 'index'])->name('completion-reports');
             Route::get('/completion-reports/{hh_id}/pdf', [AdminCompletionReportController::class, 'showPdf'])->name('completion-reports.pdf');
             Route::get('/completion-reports/{hh_id}/download', [AdminCompletionReportController::class, 'download'])->name('completion-reports.download');
-            
+
             // Invitations
             Route::get('/invitations', [AdminInvitationController::class, 'index'])->name('invitations');
             Route::post('/invitations', [AdminInvitationController::class, 'store'])->name('invitations.store');
@@ -171,5 +172,5 @@ Route::middleware('web')->group(function () {
             Route::post('/invitations/{id}/revoke', [AdminInvitationController::class, 'revoke'])->name('invitations.revoke');
             Route::post('/invitations/toggle', [AdminInvitationController::class, 'toggleInvitationMode'])->name('invitations.toggle');
         });
-    }); 
+    });
 });

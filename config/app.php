@@ -124,4 +124,5 @@ return [
     ],
 
     'study_url' => env('APP_STUDY_URL', config('app.url')),
+    'testimonial_url' => env('APP_TESTIMONIAL_URL', config('app.url')),
 ];
