@@ -31,11 +31,13 @@
                                         @markdown($teacher->title)
                                     </div>
                                     <p class="card-text d-none d-md-block">{{ $teacher->bio }}</p>
-                                    <div class="card-text d-md-none">
-                                        <div class="short-bio">{{ Str::limit($teacher->bio, 150) }}</div>
-                                        <div class="full-bio d-none">{{ $teacher->bio }}</div>
-                                    </div>
-                                    <button type="button" class="btn btn-link read-more p-0 d-md-none" data-teacher-index="{{ $loop->index }}">Read More</button>
+                                    <p class="card-text d-md-none teacher-bio mb-0" data-teacher-bio>
+                                        <span data-teacher-bio-short>{{ Str::limit($teacher->bio, 150) }}</span>
+                                        <span class="d-none" data-teacher-bio-full>{{ $teacher->bio }}</span>
+                                        @if (strlen($teacher->bio) > 150)
+                                            <button type="button" class="read-more-link" data-teacher-bio-toggle aria-expanded="false">Read more</button>
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -70,7 +72,7 @@
 
                     <div class="about-resource">
                         <h3 class="about-resource-title">App Tutorial</h3>
-                        <p class="about-resource-desc">Watch this video to take a tour of the app.</p>
+                        <p class="about-resource-desc">A quick tour of the app and its main features.</p>
                         <div class="about-resource-actions">
                             <a class="btn btn-primary" href="#tutorial">Watch</a>
                         </div>

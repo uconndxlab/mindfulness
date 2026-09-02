@@ -20,7 +20,7 @@
     <ol style="margin: 0 0 8px; padding-left: 22px;">
         <li style="margin-bottom: 16px;">
             <strong style="color: #333;">App Tutorial (8.5 minutes)</strong>
-            <div style="font-size: 14px; color: #666; margin: 2px 0 6px; line-height: 1.35;">A quick tour of the app.</div>
+            <div style="font-size: 14px; color: #666; margin: 2px 0 6px; line-height: 1.35;">A quick tour of the app and its main features.</div>
             <a href="{{ route('help') }}#tutorial" style="color: #48745D; font-weight: bold; text-decoration: underline;">Watch the tutorial</a>
         </li>
         <li style="margin-bottom: 16px;">

@@ -62,26 +62,18 @@ function initHelpPage() {
         });
     });
 
-    document.querySelectorAll('.read-more').forEach((button) => {
-        button.addEventListener('click', function () {
-            const cardBody = this.closest('.card-body');
-            const shortBio = cardBody?.querySelector('.short-bio');
-            const fullBio = cardBody?.querySelector('.full-bio');
-            const teacherIndex = this.getAttribute('data-teacher-index');
+    document.querySelectorAll('[data-teacher-bio]').forEach((bio) => {
+        const shortBio = bio.querySelector('[data-teacher-bio-short]');
+        const fullBio = bio.querySelector('[data-teacher-bio-full]');
+        const toggle = bio.querySelector('[data-teacher-bio-toggle]');
+        if (!shortBio || !fullBio || !toggle) return;
 
-            if (shortBio && fullBio && !shortBio.classList.contains('d-none')) {
-                shortBio.classList.add('d-none');
-                fullBio.classList.remove('d-none');
-                this.textContent = 'Read Less';
-                const teacherName = document.querySelector(`#teacher-name-${teacherIndex}`);
-                if (teacherName) scrollToTarget(teacherName);
-            } else if (shortBio && fullBio) {
-                shortBio.classList.remove('d-none');
-                fullBio.classList.add('d-none');
-                this.textContent = 'Read More';
-                const teacherElement = this.closest('.teacher-row')?.querySelector('.teacher-image-container');
-                if (teacherElement) scrollToTarget(teacherElement);
-            }
+        toggle.addEventListener('click', () => {
+            const expanded = bio.classList.toggle('is-expanded');
+            shortBio.classList.toggle('d-none', expanded);
+            fullBio.classList.toggle('d-none', !expanded);
+            toggle.textContent = expanded ? 'Read less' : 'Read more';
+            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
         });
     });
 }

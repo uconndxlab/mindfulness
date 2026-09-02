@@ -10,7 +10,7 @@ function initWelcomeWizard() {
     const descriptions = [
         'Tap the letter and scroll it as you read.',
         'Meet the researcher.',
-        'Watch this short tour of the app, then begin whenever you are ready.',
+        'A quick tour of the app and its main features.',
     ];
     const steps = Array.from(root.querySelectorAll('.welcome-step'));
     const titleEl = document.getElementById('welcome-title');

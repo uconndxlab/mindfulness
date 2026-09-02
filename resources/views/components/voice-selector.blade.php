@@ -3,7 +3,7 @@
     $teacherVoiceKeys = $teachers->keys()->toArray();
 @endphp
 
-<div class="col-12 mt-1" id="audio-options-div">
+<div class="col-12 {{ $multipleVoices ? 'mt-1' : 'mt-4' }}" id="audio-options-div">
     @if ($showDropdown)
         <div class="form-group">
             @if ($multipleVoices)

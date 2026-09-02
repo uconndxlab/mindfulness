@@ -14,6 +14,62 @@ function initActivityPage() {
     const logInteractionRoute = root.getAttribute('data-log-interaction-route') || '/activities/log-interaction';
     const skipRoute = root.getAttribute('data-skip-route') || `/activities/${activityId}/skip`;
 
+    const blurb = root.querySelector('[data-activity-blurb]');
+    const blurbText = blurb?.querySelector('[data-activity-blurb-text]');
+    const blurbToggle = blurb?.querySelector('[data-activity-blurb-toggle]');
+    if (blurb && blurbText && blurbToggle) {
+        const fullBlurb = blurbText.textContent.trim();
+        const blurbFits = () => {
+            const lineHeight = parseFloat(getComputedStyle(blurb).lineHeight) || 20;
+            return blurb.scrollHeight <= lineHeight * 2 + 1;
+        };
+        const clampBlurb = () => {
+            blurbToggle.hidden = true;
+            blurbText.textContent = fullBlurb;
+            if (blurbFits()) return;
+
+            blurbToggle.hidden = false;
+            blurbToggle.textContent = 'Read more';
+            let lo = 0;
+            let hi = fullBlurb.length;
+            let best = 0;
+            while (lo <= hi) {
+                const mid = Math.floor((lo + hi) / 2);
+                blurbText.textContent = `${fullBlurb.slice(0, mid).trimEnd()}…`;
+                if (blurbFits()) {
+                    best = mid;
+                    lo = mid + 1;
+                } else {
+                    hi = mid - 1;
+                }
+            }
+            let cut = fullBlurb.slice(0, best).trimEnd();
+            const lastSpace = cut.lastIndexOf(' ');
+            if (lastSpace > 20) cut = cut.slice(0, lastSpace);
+            blurbText.textContent = `${cut}…`;
+            while (cut.length > 0 && !blurbFits()) {
+                const prevSpace = cut.lastIndexOf(' ');
+                cut = prevSpace > 0 ? cut.slice(0, prevSpace) : cut.slice(0, -1);
+                blurbText.textContent = `${cut}…`;
+            }
+        };
+        blurbToggle.addEventListener('click', () => {
+            const expanded = blurb.classList.toggle('is-expanded');
+            blurbToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            if (expanded) {
+                blurbText.textContent = fullBlurb;
+                blurbToggle.hidden = false;
+                blurbToggle.textContent = 'Read less';
+            } else {
+                clampBlurb();
+            }
+        });
+        clampBlurb();
+        window.addEventListener('resize', () => {
+            if (!blurb.classList.contains('is-expanded')) clampBlurb();
+        });
+    }
+
     const redirectDiv = document.getElementById('redirect_div');
     const compLateBtn = document.getElementById('complete-later');
     const errorDiv = document.getElementById('error-messages');

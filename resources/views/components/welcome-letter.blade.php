@@ -2,7 +2,7 @@
     $appName = config('app.name');
 @endphp
 <div class="welcome-letter-body">
-    <p>Hello! This letter includes important information; if you don’t have time to read carefully now, don’t worry. You will receive this letter in your email and can review it again anytime in the app on the About page.</p>
+    <p>Hello! This letter includes important information; if you don't have time to read carefully now, don't worry. You will receive this letter in your email and can review it again anytime in the app on the About page.</p>
 
     <hr>
 
@@ -14,13 +14,13 @@
         <li>only 6% take more than 15 minutes.</li>
     </ul>
     <p>We designed the app this way so that you will make steady progress over four weeks to cultivate a new habit. Each Part of the {{ $appName }} app takes about 2 hours cumulative time, and you have 4 Parts to do over four weeks.</p>
-    <p>You can just finish the minimum, and if you have extra time, we encourage you to repeat your favorite practices – the more you practice, the more benefits you feel.</p>
+    <p>You can just finish the minimum, and if you have extra time, we encourage you to repeat your favorite practices - the more you practice, the more benefits you feel.</p>
 
     <hr>
 
     <p>As a parent, when your family is affected by divorce or separation, you are holding a lot for yourself and your child. You may be managing difficult family transitions and the everyday work of parenting all at once. Divorce or separation may be part of your story, but it is not your entire story.</p>
     <p>{{ $appName }} is the first self-guided mindfulness app designed systematically for parents who are affected by divorce or separation. It was created to introduce mindfulness skills that remind you about that whole person that you are.</p>
-    <p>Don’t overthink the word “mindfulness”. It is not about forcing yourself to feel a certain way or denying how you are already feeling. It is simply a gentle invitation to rediscover your inner resources, including your capacity to pause, become aware, care for yourself, and bring intention to your next actions, including your interactions with your child and ex-partner.</p>
+    <p>Don't overthink the word “mindfulness”. It is not about forcing yourself to feel a certain way or denying how you are already feeling. It is simply a gentle invitation to rediscover your inner resources, including your capacity to pause, become aware, care for yourself, and bring intention to your next actions, including your interactions with your child and ex-partner.</p>
     <p>At times, this invitation may feel like another addition to your mental load.</p>
     <p>A former participant said this to us and it may be helpful to hear:</p>
     <blockquote class="welcome-letter-quote">“I think about how much time I spend on worrying or automatically scrolling on my phone, I could really spend that time on the activities in the app!”</blockquote>

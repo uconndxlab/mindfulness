@@ -29,8 +29,11 @@
         @if ($activity->time)
             <span class="sub-activity-font activity-tag-time"></i>{{ $activity->time.' min' }}</span>
         @endif
+        @if (filled($activity->content_note))
+            <p class="activity-blurb mb-0" data-activity-blurb><i class="bi bi-exclamation-triangle-fill activity-blurb-icon" aria-hidden="true"></i> <span data-activity-blurb-text>{{ $activity->content_note }}</span><button type="button" class="read-more-link" data-activity-blurb-toggle hidden aria-expanded="false">Read more</button></p>
+        @endif
     </div>
-    <div class={{ in_array($activity->type, ['reflection', 'journal']) ? 'mt-4' : 'manual-margin-top' }}>
+    <div class="{{ filled($activity->content_note) ? 'mt-2' : (in_array($activity->type, ['reflection', 'journal']) ? 'mt-4' : 'manual-margin-top') }}">
         <!-- audio -->
         @if (($activity->type == 'practice' || $activity->type == 'lesson') && $content)
             @if (isset($content->instructions))

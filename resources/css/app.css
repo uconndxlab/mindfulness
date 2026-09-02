@@ -767,6 +767,45 @@ i.bi-lock-fill{
     background:rgba(6, 130, 130,0.1);
 }
 
+.activity-blurb {
+    margin-top: 0.5rem;
+    max-width: 40rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+.activity-blurb [data-activity-blurb-text] {
+    white-space: pre-line;
+}
+.activity-blurb-icon {
+    color: #d39e00;
+    margin-right: 0.3em;
+    font-size: 0.95em;
+    vertical-align: -0.05em;
+}
+.read-more-link {
+    display: inline;
+    padding: 0;
+    margin: 0 0 0 0.25em;
+    border: 0;
+    background: none;
+    color: var(--dark-green);
+    font-weight: 600;
+    font-size: inherit;
+    line-height: inherit;
+    vertical-align: baseline;
+    white-space: nowrap;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.read-more-link:hover,
+.read-more-link:focus {
+    color: var(--darker-green);
+}
+.read-more-link[hidden] {
+    display: none !important;
+}
+
 /*audio circle*/
 .play-pause .bi-play, .play-pause .bi-pause{
 color:#000!important;

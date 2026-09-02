@@ -25,6 +25,7 @@ class ActivitySeeder extends Seeder
                     'day_id' => $activity->day_id,
                     'title' => $activity->title,
                     'description' => $activity->description ?? null,
+                    'content_note' => filled($activity->content_note ?? null) ? $activity->content_note : null,
                     'type' => $activity->type,
                     'time' => $activity->time,
                     'completion_message' => $activity->completion_message ?? null,

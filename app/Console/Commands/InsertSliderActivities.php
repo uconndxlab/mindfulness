@@ -128,7 +128,7 @@ class InsertSliderActivities extends Command
     {
         $this->info('Updating activities.json...');
         $activities = Activity::orderBy('order')->get([
-            'id', 'day_id', 'title', 'type', 'order', 'completion_message', 'skippable', 'time', 'optional'
+            'id', 'day_id', 'title', 'type', 'order', 'completion_message', 'skippable', 'time', 'optional', 'content_note'
         ])->toArray();
         $jsonContent = json_encode($activities, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         File::put(database_path('data/activities.json'), $jsonContent);
