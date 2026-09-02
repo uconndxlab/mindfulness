@@ -29,7 +29,7 @@
             <a href="{{ route('help') }}#welcome-letter" style="color: #48745D; font-weight: bold; text-decoration: underline;">Read the letter</a>
         </li>
         <li style="margin-bottom: 8px;">
-            <strong style="color: #333;">A Brief Welcome from the Researcher (1 minute)</strong>
+            <strong style="color: #333;">A Brief Welcome from the Researcher (2 minutes)</strong>
             <div style="font-size: 14px; color: #666; margin: 2px 0 6px; line-height: 1.35;">Meet the researcher in a video.</div>
             <a href="{{ route('help') }}#researcher" style="color: #48745D; font-weight: bold; text-decoration: underline;">Watch the video</a>
         </li>
