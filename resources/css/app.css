@@ -21,6 +21,7 @@
     --flower-orange: #DE6434;
     --flower-pink: #CD4590;
     --bottom-nav-clearance: 7.5rem;
+    --top-nav-height: 3.75rem;
     --sidebar-width: 280px;
 }
 
@@ -2598,10 +2599,10 @@ body[data-page="auth-welcome"] main > .row {
     border-radius: 16px;
     background: #f7f1e1;
 }
-html.letter-modal-open,
 body.letter-modal-open {
     overflow: hidden;
     overscroll-behavior: none;
+    width: 100%;
 }
 .welcome-letter-modal-close {
     position: absolute;
@@ -2689,16 +2690,17 @@ body[data-page="help"] {
     background-color: var(--top-nav-accent);
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.2);
 }
-body.modal-open .about-top-nav,
-body.letter-modal-open .about-top-nav,
-body.modal-open .app-top-nav,
-body.letter-modal-open .app-top-nav {
-    position: fixed !important;
+.app-top-nav {
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     width: 100%;
-    z-index: 1040;
+    z-index: 1020;
+}
+.app-top-nav-spacer {
+    height: var(--top-nav-height);
+    flex-shrink: 0;
 }
 .about-top-nav-inner,
 .app-top-nav-inner {

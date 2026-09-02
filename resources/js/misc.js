@@ -26,9 +26,14 @@ if (window.sessionModalData && typeof window.showModal === 'function') {
     window.showModal(window.sessionModalData);
 }
 
-// add shadow to top nav when scrolled
-const topNav = document.querySelector('.app-top-nav, .about-top-nav, .top-nav');
+const topNav = document.querySelector('.app-top-nav');
 if (topNav) {
+    const syncTopNavHeight = () => {
+        document.documentElement.style.setProperty('--top-nav-height', `${topNav.offsetHeight}px`);
+    };
+    syncTopNavHeight();
+    window.addEventListener('resize', syncTopNavHeight);
+
     const handleScroll = () => {
         if (window.scrollY > 0) {
             topNav.classList.add('scrolled');
@@ -36,8 +41,6 @@ if (topNav) {
             topNav.classList.remove('scrolled');
         }
     };
-
-    // scroll event listener
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
 }

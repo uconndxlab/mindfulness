@@ -5,14 +5,12 @@ function bindWelcomeLetterModal() {
     function openLetterModal() {
         overlay.hidden = false;
         overlay.classList.add('is-open');
-        document.documentElement.classList.add('letter-modal-open');
         document.body.classList.add('letter-modal-open');
     }
 
     function closeLetterModal() {
         overlay.classList.remove('is-open');
         overlay.hidden = true;
-        document.documentElement.classList.remove('letter-modal-open');
         document.body.classList.remove('letter-modal-open');
     }
 

@@ -30,7 +30,7 @@
 @endphp
 
 @if (!$hideTopNav)
-<nav @if ($isHelpNav) id="navbar-help" @endif class="navbar navbar-expand-lg sticky-top top-nav app-top-nav"@if ($navColor) style="--top-nav-accent: {{ $navColor }}"@endif>
+<nav @if ($isHelpNav) id="navbar-help" @endif class="navbar navbar-expand-lg top-nav app-top-nav"@if ($navColor) style="--top-nav-accent: {{ $navColor }}"@endif>
     <div class="container-fluid container app-top-nav-inner">
         @if ($isHelpNav)
             <div class="about-tabs-wrap app-top-nav-tabs">
@@ -97,6 +97,7 @@
         @endif
     </div>
 </nav>
+<div class="app-top-nav-spacer" aria-hidden="true"></div>
 @endif
 
 @if (!(isset($page_info['hide_bottom_nav']) && $page_info['hide_bottom_nav']))
