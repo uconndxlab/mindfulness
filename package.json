@@ -18,6 +18,9 @@
         "bootstrap": "^5.3.7",
         "bootstrap-icons": "^1.13.1",
         "nouislider": "^15.8.1",
-        "pdfjs-dist": "^5.4.54"
+        "pdfjs-dist": "^6.2"
+    },
+    "allowScripts": {
+        "esbuild@0.25.12": true
     }
 }
