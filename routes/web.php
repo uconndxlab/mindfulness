@@ -30,6 +30,20 @@ Route::middleware('web')->group(function () {
     // Guest-accessible CSRF refresh for stale tabs (login/register and axios 419 retry)
     Route::get('/session/ping', fn () => response()->json(['token' => csrf_token()]))->name('session.ping');
 
+    // Serve the PDF.js worker through Laravel so production COEP/CORP headers apply.
+    // /build/assets/pdf.worker.js is a static file and nginx/apache send it without
+    // Cross-Origin-Resource-Policy, which Chrome blocks under COEP require-corp.
+    Route::get('/pdfjs-worker', function () {
+        $path = public_path('build/assets/pdf.worker.js');
+        abort_unless(is_file($path), 404);
+
+        return response()->file($path, [
+            'Content-Type' => 'text/javascript; charset=utf-8',
+            'Cross-Origin-Embedder-Policy' => 'require-corp',
+            'Cross-Origin-Resource-Policy' => 'same-origin',
+        ]);
+    })->name('pdfjs.worker');
+
     //AUTHENTICATION
     //login page
     Route::get('/login', [AuthController::class, 'loginPage'])->name('login');

@@ -8,8 +8,8 @@ const getWorkerSrc = () => {
         return new URL('pdfjs-dist/build/pdf.worker.mjs', import.meta.url).href;
     }
 
-    // prod - use copied worker file
-    return '/build/assets/pdf.worker.js';
+    // prod - Laravel route so COEP/CORP headers are present (static /build/assets is blocked)
+    return '/pdfjs-worker';
 };
 
 // set worker source
