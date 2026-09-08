@@ -213,7 +213,10 @@ export async function loadPdf(pdfUrl) {
     }
 
     try {
-        const pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
+        const pdfDoc = await pdfjsLib.getDocument({
+            url: pdfUrl,
+            withCredentials: true,
+        }).promise;
 
         let firstPageResolve;
         const firstPageReady = new Promise((resolve) => { firstPageResolve = resolve; });
