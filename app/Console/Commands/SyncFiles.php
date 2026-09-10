@@ -158,6 +158,9 @@ class SyncFiles extends Command
         $commandParts = [
             escapeshellcmd($rsyncPath),
             '--archive',
+            // remote dirs/files are owned by the app user; the sync user can't chmod/chtime what it doesn't own
+            '--no-perms',
+            '--omit-dir-times',
             '--compress',
             '--delete',
             '--itemize-changes',
