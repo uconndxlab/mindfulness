@@ -125,8 +125,9 @@
                 @endforelse
             </tbody>
         </table>
-        <div class="mt-3">
-            {{ $reflections->links() }}
-        </div>
+    </div>
+
+    <div class="mt-3">
+        {{ $reflections->links() }}
     </div>
 </div>

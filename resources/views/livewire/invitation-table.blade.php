@@ -166,7 +166,9 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
 
+    <div class="mt-3">
         {{ $invitations->links() }}
     </div>
 </div>

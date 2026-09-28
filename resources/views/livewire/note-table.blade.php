@@ -93,7 +93,9 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
 
+    <div class="mt-3">
         {{ $notes->links() }}
     </div>
 </div>
