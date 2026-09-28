@@ -4,16 +4,14 @@ namespace App\Exports;
 
 use App\Models\QuizAnswers;
 use App\Services\QuizAnswerFormatter;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
 class ReflectionsExport implements FromCollection, WithHeadings, WithMapping
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function collection()
+    public function collection(): Collection
     {
         return QuizAnswers::with([
             'user:id,hh_id',
@@ -36,7 +34,7 @@ class ReflectionsExport implements FromCollection, WithHeadings, WithMapping
         ];
     }
 
-    public function map($reflection): array
+    public function map(mixed $reflection): array
     {
         // get subject name
         $subjectName = '-';

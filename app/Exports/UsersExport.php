@@ -7,14 +7,12 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use App\Models\User;
 use App\Enums\MilestoneType;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class UsersExport implements FromCollection, WithHeadings, WithMapping
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function collection()
+    public function collection(): Collection
     {
         return User::all();
     }
@@ -43,7 +41,7 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping
         ];
     }
 
-    public function map($user): array
+    public function map(mixed $user): array
     {
 
         $currentActivity = $user->currentActivity();

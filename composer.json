@@ -12,8 +12,8 @@
         "laravel/tinker": "^3.0",
         "laravel/ui": "^4.5",
         "league/commonmark": "^2.7",
-        "livewire/livewire": "^3.6",
-        "maatwebsite/excel": "^3.1",
+        "livewire/livewire": "^4.0",
+        "maatwebsite/excel": "^4.0",
         "spatie/laravel-activitylog": "^4.10"
     },
     "require-dev": {

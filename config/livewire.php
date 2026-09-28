@@ -33,12 +33,12 @@ return [
     | Layout
     |---------------------------------------------------------------------------
     | The view that will be used as the layout when rendering a single component
-    | as an entire page via `Route::get('/post/create', CreatePost::class);`.
+    | as an entire page via `Route::livewire('/post/create', CreatePost::class);`.
     | In this case, the view returned by CreatePost will render into $slot.
     |
     */
 
-    'layout' => 'components.layouts.app',
+    'component_layout' => 'components.layouts.app',
 
     /*
     |---------------------------------------------------------------------------
@@ -50,7 +50,7 @@ return [
     |
     */
 
-    'lazy_placeholder' => null,
+    'component_placeholder' => null,
 
     /*
     |---------------------------------------------------------------------------
@@ -157,4 +157,42 @@ return [
     */
 
     'pagination_theme' => 'bootstrap',
+
+    /*
+    |---------------------------------------------------------------------------
+    | Smart Wire Keys
+    |---------------------------------------------------------------------------
+    |
+    | Livewire uses loops and keys used within loops to generate smart keys that
+    | are applied to nested components that don't have them. This makes using
+    | nested components more reliable by ensuring that they all have keys.
+    |
+    */
+
+    'smart_wire_keys' => true,
+
+    /*
+    |---------------------------------------------------------------------------
+    | CSP Safe
+    |---------------------------------------------------------------------------
+    |
+    | Use Alpine's CSP build so Livewire pages do not need 'unsafe-eval'.
+    | Expressions here are simple method calls, which that build supports.
+    |
+    */
+
+    'csp_safe' => true,
+
+    /*
+    |---------------------------------------------------------------------------
+    | Payload Guards
+    |---------------------------------------------------------------------------
+    */
+
+    'payload' => [
+        'max_size' => 1024 * 1024,
+        'max_nesting_depth' => 10,
+        'max_calls' => 50,
+        'max_components' => 200,
+    ],
 ];

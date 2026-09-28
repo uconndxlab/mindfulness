@@ -8,10 +8,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SecurityHeaders
 {
-    // SECURITY NOTE: These routes have relaxed CSP restrictions
-    // - 'unsafe-eval' is required for Alpine.js (Livewire and Filament dependency)
-    // - 'unsafe-inline' is needed for some Filament styles, does not work with nonce
-    // - Risk mitigation: Admin routes should be behind strong authentication
+    // These routes load Livewire. script-src gets a nonce so Livewire's inline
+    // config script is allowed. CSP-safe mode covers expressions, so 'unsafe-eval'
+    // is not required. style-src has a nonce on every page for @livewireStyles.
     private const LIVEWIRE_ROUTES = [
         'admin.users',
         'admin.events',
@@ -183,14 +182,13 @@ class SecurityHeaders
      */
     private function getScriptSrc(Request $request, string $nonce, array $viteHosts, bool $isProd): array
     {
-        // 'unsafe-eval' is required for Livewire (required for Alpine.js expressions)
         $sources = ["'self'"];
 
         $routeName = $request->route()?->getName() ?? '';
 
-        // 'unsafe-eval' and nonce for livewire (required for Alpine.js)
+        // Allows the inline <script> from @livewireScripts. Same-origin
+        // livewire.js is already covered by 'self'.
         if (in_array($routeName, self::LIVEWIRE_ROUTES)) {
-            $sources[] = "'unsafe-eval'";
             $sources[] = "'nonce-{$nonce}'";
         }
         
@@ -208,7 +206,7 @@ class SecurityHeaders
     private function getStyleSrc(string $nonce, array $viteHosts, bool $isProd): array
     {
         $sources = ["'self'", "'nonce-{$nonce}'"];
-        // nonce is required for livewire (required for Alpine.js)
+        // Allows the inline <style> from @livewireStyles.
         
         // vite hosts included in development
         if (!$isProd) {

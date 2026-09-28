@@ -222,7 +222,7 @@
                             id="user-pid"
                             type="text"
                             class="form-control @error('editingPid') is-invalid @enderror"
-                            wire:model.defer="editingPid"
+                            wire:model="editingPid"
                             maxlength="255"
                         >
                         @error('editingPid')

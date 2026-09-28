@@ -3,17 +3,15 @@
 namespace App\Exports;
 
 use App\Models\EventLog;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Illuminate\Support\Str;
 
 class EventsExport implements FromCollection, WithHeadings, WithMapping
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function collection()
+    public function collection(): Collection
     {
         return EventLog::with('causer:id,hh_id', 'subject')->get();
     }
@@ -34,7 +32,7 @@ class EventsExport implements FromCollection, WithHeadings, WithMapping
         ];
     }
 
-    public function map($event): array
+    public function map(mixed $event): array
     {
         $subjectName = null;
         $subjectType = null;
