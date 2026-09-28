@@ -26,6 +26,7 @@ Route::middleware('web')->group(function () {
     Route::redirect("/","/home");
     Route::redirect('/study', config('app.study_url'));
     Route::redirect('/testimonial', config('app.testimonial_url'));
+    Route::redirect('/screener', config('app.screener_url'));
 
     // Guest-accessible CSRF refresh for stale tabs (login/register and axios 419 retry)
     Route::get('/session/ping', fn () => response()->json(['token' => csrf_token()]))->name('session.ping');
