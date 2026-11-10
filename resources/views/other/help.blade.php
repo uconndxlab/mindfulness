@@ -91,7 +91,7 @@
                         <p class="about-resource-desc">Hear from other parents who have used {{ config('app.name') }}.</p>
                         <div class="about-resource-actions">
                             <a class="btn btn-primary" href="{{ url('/study') }}">View</a>
-                            <a class="btn btn-primary" href="{{ config('app.testimonial_url') }}">Submit a testimonial</a>
+                            <a class="btn btn-primary" href="{{ config('app.testimonial_url') }}" target="_blank" rel="noopener noreferrer">Submit a testimonial</a>
                         </div>
                     </div>
                 </section>
