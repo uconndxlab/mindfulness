@@ -77,8 +77,6 @@ class CompletionReportService
         $relativePath = CompletionReport::pdfPathForHhId($user->hh_id);
 
         try {
-            Storage::makeDirectory('completion-reports');
-
             $viewData = array_merge($this->buildReportViewData($user), ['forPdf' => true]);
 
             $pdf = Pdf::loadView('emails.module-completed', $viewData)
