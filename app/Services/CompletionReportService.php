@@ -84,7 +84,9 @@ class CompletionReportService
             $pdf = Pdf::loadView('emails.module-completed', $viewData)
                 ->setPaper('a4');
 
-            Storage::put($relativePath, $pdf->output());
+            if (!Storage::put($relativePath, $pdf->output())) {
+                throw new \RuntimeException("Could not write {$relativePath}.");
+            }
 
             return $relativePath;
         } catch (\Throwable $e) {
