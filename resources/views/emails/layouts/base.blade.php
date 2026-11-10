@@ -6,9 +6,12 @@
     <title>@yield('title', config('app.name'))</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #E6F8E2; font-family: Arial, sans-serif; line-height: 1.6; color: #333333;">
+    {{-- DomPDF can't split a table cell across pages, so the PDF skips the email wrapper table --}}
+    @if(empty($forPdf))
     <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #E6F8E2;">
         <tr>
             <td align="center" style="padding: 24px 16px;">
+    @endif
                 <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: left;">
                     <div style="margin-bottom: 20px;">
                         <img src="{{ ($forPdf ?? false) ? public_path('icons/android-icon-72x72.png') : asset('icons/android-icon-72x72.png') }}"
@@ -37,8 +40,10 @@
                         @endif
                     @endif
                 </div>
+    @if(empty($forPdf))
             </td>
         </tr>
     </table>
+    @endif
 </body>
 </html>
