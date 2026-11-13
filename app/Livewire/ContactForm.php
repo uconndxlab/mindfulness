@@ -4,15 +4,14 @@ namespace App\Livewire;
 
 use App\Mail\InquiryReceived;
 use App\Models\Inquiry;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
-use Livewire\Component;
-use Livewire\Attributes\On;
-use Carbon\Carbon;
 use Livewire\Attributes\Validate;
-use Exception;
+use Livewire\Component;
 
 class ContactForm extends Component
 {
@@ -23,6 +22,7 @@ class ContactForm extends Component
     public string $message = '';
 
     public ?string $successMessage = null;
+
     public string $formKey;
 
     public function mount(): void
@@ -48,18 +48,19 @@ class ContactForm extends Component
 
         // throttle
         // $userIdentifier = Auth::check() ? Auth::user()->hh_id : request()->ip();
-        $key = 'contact_email|' . request()->ip();
+        $key = 'contact_email|'.request()->ip();
         $limit = ['attempts' => 3, 'decay' => 60]; // 3 successes per minute
 
         if (RateLimiter::tooManyAttempts($key, $limit['attempts'])) {
             $seconds = RateLimiter::availableIn($key);
             $timeLeft = Carbon::now()->addSeconds($seconds)->diffForHumans(null, true);
             $this->addError('subject', "Too many attempts. Please try again in {$timeLeft}.");
+
             return;
         }
 
         try {
-            $inquiry = new Inquiry();
+            $inquiry = new Inquiry;
             $inquiry->name = Auth::user()?->name ?? '';
             $inquiry->email = Auth::user()?->email ?? '';
             $inquiry->message = $this->message;
@@ -69,7 +70,7 @@ class ContactForm extends Component
             Mail::to(Config::get('mail.contact_email'))->send(new InquiryReceived($inquiry));
 
             RateLimiter::hit($key, $limit['decay']);
-            
+
             $this->formKey = uniqid();
             $this->successMessage = 'Your inquiry has been submitted!';
             $this->reset(['subject', 'message']);
@@ -83,5 +84,3 @@ class ContactForm extends Component
         return view('livewire.contact-form');
     }
 }
-
-

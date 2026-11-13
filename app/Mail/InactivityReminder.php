@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
@@ -16,7 +16,11 @@ class InactivityReminder extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $user, $subject, $body;
+    public $user;
+
+    public $subject;
+
+    public $body;
 
     /**
      * Create a new message instance.
@@ -42,13 +46,13 @@ class InactivityReminder extends Mailable implements ShouldQueue
     {
 
         return $this->view('emails.inactivity-reminder')
-                    ->with(['user' => $this->user, 'body' => $this->body]);
+            ->with(['user' => $this->user, 'body' => $this->body]);
     }
 
     /**
      * Get the attachments for the message.
      *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * @return array<int, Attachment>
      */
     public function attachments(): array
     {

@@ -3,20 +3,18 @@
 namespace App\Providers;
 
 use App\Http\Middleware\AdminOnly;
-use App\Models\Module;
-use App\Observers\ModuleObserver;
 use App\Services\ProgressService;
-use Event;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Pagination\Paginator;
-use Livewire\Livewire;
 use League\CommonMark\CommonMarkConverter;
-use Illuminate\Support\Facades\Blade;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(ProgressService::class, function ($app) {
-            return new ProgressService();
+            return new ProgressService;
         });
 
         Paginator::useBootstrapFive();
@@ -45,13 +43,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if (app()->isLocal() && ($fakeNow = env('FAKE_NOW'))) {
-            $fake = \Illuminate\Support\Carbon::parse($fakeNow);
+            $fake = Carbon::parse($fakeNow);
             // Date-only like "2026-08-04" → don't use midnight
             if (! preg_match('/\d:\d/', $fakeNow)) {
-                $real = \Illuminate\Support\Carbon::now(); // real clock, before setTestNow
+                $real = Carbon::now(); // real clock, before setTestNow
                 $fake->setTime($real->hour, $real->minute, $real->second);
             }
-            \Illuminate\Support\Carbon::setTestNow($fake);
+            Carbon::setTestNow($fake);
         }
 
         $this->configureRateLimiters();
@@ -63,12 +61,12 @@ class AppServiceProvider extends ServiceProvider
         Auth::extend('custom-session', function ($app, $name, array $config) {
             $provider = Auth::createUserProvider($config['provider']);
             $guard = new SessionGuard($name, $provider, $app['session.store'], $app['request']);
-            //set cookie jar
+            // set cookie jar
             if (method_exists($guard, 'setCookieJar')) {
                 $guard->setCookieJar($app['cookie']);
             }
-            //remember duration - 8 weeks
-            $guard->setRememberDuration(60*24*7*8);
+            // remember duration - 8 weeks
+            $guard->setRememberDuration(60 * 24 * 7 * 8);
 
             return $guard;
         });
@@ -80,7 +78,7 @@ class AppServiceProvider extends ServiceProvider
         // markdown directive - secured against XSS
         Blade::directive('markdown', function ($expression) {
             return '<?php
-                $content_for_markdown = is_string(' . $expression . ') ? ' . $expression . ' : "";
+                $content_for_markdown = is_string('.$expression.') ? '.$expression.' : "";
 
                 // secure CommonMark configuration
                 $config = [

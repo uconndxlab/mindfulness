@@ -10,13 +10,11 @@ class TruncateSeeder extends Seeder
 {
     /**
      * Truncate all seeded tables in the correct order.
-     *
-     * @return void
      */
     public function run(): void
     {
         DB::statement('PRAGMA foreign_keys=OFF;');
-    
+
         // Tables to truncate in order (child tables first, then parent tables)
         $tables = [
             'quiz_answers',      // Depends on quizzes
@@ -42,4 +40,4 @@ class TruncateSeeder extends Seeder
 
         DB::statement('PRAGMA foreign_keys=ON;');
     }
-} 
+}

@@ -21,7 +21,7 @@ class MilestoneAchievedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Milestone Achieved: ' . $this->type->label(),
+            subject: 'Milestone Achieved: '.$this->type->label(),
         );
     }
 

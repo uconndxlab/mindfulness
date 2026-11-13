@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\Module;
 use App\Models\QuizAnswers;
 use App\Services\QuizAnswerFormatter;
 use Illuminate\Support\Collection;
@@ -17,7 +18,7 @@ class ReflectionsExport implements FromCollection, WithHeadings, WithMapping
             'user:id,hh_id',
             'quiz:id,title',
             'activity:id,title',
-            'subject'
+            'subject',
         ])->get();
     }
 
@@ -40,14 +41,14 @@ class ReflectionsExport implements FromCollection, WithHeadings, WithMapping
         $subjectName = '-';
         if ($reflection->subject) {
             if (isset($reflection->subject->title)) {
-                $subjectName = 'Activity: ' . $reflection->subject->title;
-            } elseif ($reflection->subject instanceof \App\Models\Module) {
-                $subjectName = 'Module: ' . $reflection->subject->partName();
+                $subjectName = 'Activity: '.$reflection->subject->title;
+            } elseif ($reflection->subject instanceof Module) {
+                $subjectName = 'Module: '.$reflection->subject->partName();
             }
         }
 
         // format reflection type
-        $reflectionType = match($reflection->reflection_type) {
+        $reflectionType = match ($reflection->reflection_type) {
             'check_in' => 'Quick Check-In',
             'self_rating' => 'Self Rating',
             default => 'Other',
@@ -67,5 +68,3 @@ class ReflectionsExport implements FromCollection, WithHeadings, WithMapping
         ];
     }
 }
-
-

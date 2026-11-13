@@ -2,13 +2,15 @@
 
 namespace App\Livewire;
 
-use App\Models\User;
 use App\Enums\MilestoneType;
+use App\Mail\InactivityReminder;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Mail;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\Url;
 
 class UserTable extends Component
 {
@@ -16,13 +18,18 @@ class UserTable extends Component
 
     #[Url(except: '')]
     public $search = '';
+
     public $sortColumn = 'created_at';
+
     public $sortDirection = 'desc';
+
     public $editingPidUserId = null;
+
     public $editingPid = '';
 
     #[Url(except: [])]
     public $milestones = [];
+
     public $showFilters = false;
 
     public $columns = [
@@ -58,7 +65,7 @@ class UserTable extends Component
 
     public function toggleFilters()
     {
-        $this->showFilters = !$this->showFilters;
+        $this->showFilters = ! $this->showFilters;
     }
 
     public function applyFilters()
@@ -76,18 +83,18 @@ class UserTable extends Component
     {
         // query
         $usersQuery = User::select('id', 'hh_id', 'pid', 'name', 'email', 'role', 'created_at', 'lock_access', 'email_verified_at', 'last_active_at', 'last_reminded_at')
-            ->with(['favoritedActivities' => fn($query) => $query->orderBy('order', 'asc'), 'favoritedActivities.day.module', 'milestones'])
+            ->with(['favoritedActivities' => fn ($query) => $query->orderBy('order', 'asc'), 'favoritedActivities.day.module', 'milestones'])
             ->orderBy($this->sortColumn, $this->sortDirection);
 
         // apply filters
-        if (!empty($this->milestones)) {
-            $usersQuery->whereHas('milestones', function($query) {
+        if (! empty($this->milestones)) {
+            $usersQuery->whereHas('milestones', function ($query) {
                 $query->whereIn('type', $this->milestones);
             });
         }
 
         // search - cannot query search because of current activity
-        if (!empty($this->search)) {
+        if (! empty($this->search)) {
             $allUsers = $usersQuery->get();
             $filteredUsers = $allUsers->filter(function ($user) {
                 $currentActivity = $user->currentActivity();
@@ -101,7 +108,7 @@ class UserTable extends Component
                     str_contains(strtolower($user->role), $search) ||
                     str_contains(strtolower($activityTitle), $search);
             });
-            $users = new \Illuminate\Pagination\LengthAwarePaginator(
+            $users = new LengthAwarePaginator(
                 $filteredUsers->forPage($this->getPage(), 10),
                 $filteredUsers->count(),
                 10,
@@ -114,7 +121,7 @@ class UserTable extends Component
 
         return view('livewire.user-table', [
             'users' => $users,
-            'milestoneTypes' => MilestoneType::cases()
+            'milestoneTypes' => MilestoneType::cases(),
         ]);
     }
 
@@ -135,7 +142,7 @@ class UserTable extends Component
 
     public function savePid(): void
     {
-        if (!$this->editingPidUserId) {
+        if (! $this->editingPidUserId) {
             return;
         }
 
@@ -150,7 +157,7 @@ class UserTable extends Component
             $user->pid = filled($this->editingPid) ? trim($this->editingPid) : null;
             $user->save();
 
-            session()->flash('message', 'PID updated for ' . $user->email);
+            session()->flash('message', 'PID updated for '.$user->email);
             $this->cancelPidEdit();
         } catch (\Throwable $e) {
             session()->flash('error', 'Failed to update PID.');
@@ -161,9 +168,9 @@ class UserTable extends Component
     {
         try {
             $user = User::findOrFail($userId);
-            $user->lock_access = !$user->lock_access;
+            $user->lock_access = ! $user->lock_access;
             $user->save();
-            session()->flash('message', 'Access updated for ' . $user->email);
+            session()->flash('message', 'Access updated for '.$user->email);
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to change access.');
         }
@@ -176,15 +183,17 @@ class UserTable extends Component
 
             if ($user->lock_access) {
                 session()->flash('error', 'User access is locked.');
+
                 return;
             }
 
-            if (!$user->canSendReminder()) {
+            if (! $user->canSendReminder()) {
                 session()->flash('error', 'Reminder not available.');
+
                 return;
             }
 
-            Mail::to($user->email)->send(new \App\Mail\InactivityReminder($user));
+            Mail::to($user->email)->send(new InactivityReminder($user));
 
             // update last reminder day if goes through and has not been sent
             $updates = ['last_reminded_at' => Carbon::now()];
@@ -200,7 +209,7 @@ class UserTable extends Component
 
             $user->update($updates);
 
-            session()->flash('message', 'Reminder email sent to ' . $user->email);
+            session()->flash('message', 'Reminder email sent to '.$user->email);
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to send reminder email.');
         }

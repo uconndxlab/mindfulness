@@ -6,17 +6,19 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Password as PasswordRule;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class AccountUpdateForm extends Component
 {
     // validation done dynamically
     public string $name = '';
+
     public string $password = '';
+
     public string $oldPass = '';
 
     public ?string $successMessage = null;
+
     public string $formKey;
 
     public function mount(): void
@@ -29,8 +31,9 @@ class AccountUpdateForm extends Component
     public function update(): void
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             $this->addError('name', 'Not authenticated.');
+
             return;
         }
 
@@ -38,8 +41,9 @@ class AccountUpdateForm extends Component
         $nameChanged = $this->name !== ($user->name ?? '');
         $passwordChanging = $this->password !== '';
 
-        if (!$nameChanged && !$passwordChanging) {
+        if (! $nameChanged && ! $passwordChanging) {
             $this->successMessage = 'No changes were made.';
+
             return;
         }
 

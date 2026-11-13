@@ -17,7 +17,7 @@ return new class extends Migration
             ->whereNotNull('media_path')
             ->orderBy('id')
             ->each(function (object $day) {
-                if (!preg_match('/(\d+)\.svg$/', $day->media_path, $matches)) {
+                if (! preg_match('/(\d+)\.svg$/', $day->media_path, $matches)) {
                     return;
                 }
 

@@ -58,7 +58,7 @@ class QuizRadioQuestion {
         this.handleOtherInput(clickedRadio);
         // notify QuizController that answer changed
         this.onAnswerChange(this.questionNumber, this.isAnswered());
-        console.log(`Radio question ${this.questionNumber} answered:`, this.selectedValue);
+        console.log('Radio question %s answered:', this.questionNumber, this.selectedValue);
     }
 
     showFeedback(radio) {

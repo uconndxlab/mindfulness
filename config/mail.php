@@ -16,7 +16,7 @@ return [
 
     'default' => env('MAIL_MAILER', 'log'),
 
-    //contact info
+    // contact info
     'contact_email' => env('CONTACT_EMAIL'),
     'contact_phone' => env('CONTACT_PHONE'),
 

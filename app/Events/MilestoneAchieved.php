@@ -12,6 +12,7 @@ class MilestoneAchieved
     use Dispatchable, SerializesModels;
 
     public User $user;
+
     public string $milestoneType;
 
     public function __construct(User $user, MilestoneType $type)

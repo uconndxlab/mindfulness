@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\FlowerAssets;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -41,7 +42,7 @@ class Module extends Model
 
     public function numberDaysCompletedBy(?User $user)
     {
-        if (!$user) {
+        if (! $user) {
             return 0;
         }
         $completedDays = 0;
@@ -52,7 +53,7 @@ class Module extends Model
 
         $days = $this->days->load(['activities', 'activities.quiz']);
         foreach ($days as $day) {
-            if ($day->isCompletedBy($user) && !$day->is_check_in) {
+            if ($day->isCompletedBy($user) && ! $day->is_check_in) {
                 $completedDays++;
             }
 
@@ -63,8 +64,7 @@ class Module extends Model
                         if ($activity->isCompletedBy($user)) {
                             $completedCheckInActivities++;
                         }
-                    }
-                    else if ($activity->quiz?->type == 'self_rating') {
+                    } elseif ($activity->quiz?->type == 'self_rating') {
                         $totalSelfRatings++;
                         if ($activity->isCompletedBy($user)) {
                             $completedSelfRatings++;
@@ -73,6 +73,7 @@ class Module extends Model
                 }
             }
         }
+
         return [$completedDays, $totalSelfRatings, $completedSelfRatings, $totalCheckInActivities, $completedCheckInActivities];
     }
 
@@ -109,7 +110,8 @@ class Module extends Model
         return $this->days()->orderBy('order', 'desc')->first()->activities()->where('optional', false)->orderBy('order', 'desc')->first();
     }
 
-    public function partName(): string {
+    public function partName(): string
+    {
         return 'Part '.$this->order.($this->name ? ' - '.$this->name : '');
     }
 
@@ -142,6 +144,6 @@ class Module extends Model
 
     public function flowerFrameUrl(int $petals): string
     {
-        return \App\Support\FlowerAssets::moduleFrameUrl($this, $petals);
+        return FlowerAssets::moduleFrameUrl($this, $petals);
     }
 }

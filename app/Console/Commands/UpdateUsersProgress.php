@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Services\ProgressService;
+use Illuminate\Console\Command;
 
 class UpdateUsersProgress extends Command
 {
@@ -23,6 +23,7 @@ class UpdateUsersProgress extends Command
 
     // progress service
     protected $progressService;
+
     public function __construct(ProgressService $progressService)
     {
         parent::__construct();

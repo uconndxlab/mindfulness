@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Storage;
 class FlowerAssets
 {
     public const MAX_PETALS = 5;
+
     public const DEFAULT_COLOR = 'default';
+
     public const COLORS = ['blue', 'purple', 'orange', 'pink', 'default'];
 
     public static function colorSlug(Module $module): string
@@ -67,13 +69,13 @@ class FlowerAssets
     {
         $path = storage_path('app/public/flowers/animations/'.self::resolveColor($color).'/config.json');
 
-        if (!is_readable($path)) {
+        if (! is_readable($path)) {
             return self::defaultAnimationConfig();
         }
 
         $config = json_decode(file_get_contents($path), true);
 
-        if (!is_array($config)) {
+        if (! is_array($config)) {
             return self::defaultAnimationConfig();
         }
 

@@ -8,9 +8,9 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\Url;
 
 class InvitationTable extends Component
 {
@@ -18,12 +18,14 @@ class InvitationTable extends Component
 
     #[Url(except: '')]
     public $search = '';
-    
+
     #[Url(except: [])]
     public $statuses = [];
+
     public $showFilters = false;
-    
+
     public $sortColumn = 'last_sent_at';
+
     public $sortDirection = 'desc';
 
     public $columns = [
@@ -52,7 +54,7 @@ class InvitationTable extends Component
 
     public function toggleFilters()
     {
-        $this->showFilters = !$this->showFilters;
+        $this->showFilters = ! $this->showFilters;
     }
 
     public function applyFilters()
@@ -84,24 +86,24 @@ class InvitationTable extends Component
                 'invitations.*',
                 'user_exists' => User::select(DB::raw(1))
                     ->whereColumn('users.email', 'invitations.email')
-                    ->limit(1)
+                    ->limit(1),
             ])
             ->orderBy($this->sortColumn, $this->sortDirection);
 
         // filter by status
-        if (!empty($this->statuses)) {
+        if (! empty($this->statuses)) {
             $invitationsQuery->whereIn('status', $this->statuses);
         }
 
         // search
-        if (!empty($this->search)) {
+        if (! empty($this->search)) {
             $invitationsQuery->where(function ($query) {
-                $query->where('email', 'like', '%' . $this->search . '%')
+                $query->where('email', 'like', '%'.$this->search.'%')
                     ->orWhereHas('invitedBy', function ($q) {
-                        $q->where('name', 'like', '%' . $this->search . '%')
-                          ->orWhere('email', 'like', '%' . $this->search . '%');
+                        $q->where('name', 'like', '%'.$this->search.'%')
+                            ->orWhere('email', 'like', '%'.$this->search.'%');
                     })
-                    ->orWhere('status', 'like', '%' . $this->search . '%');
+                    ->orWhere('status', 'like', '%'.$this->search.'%');
             });
         }
 
@@ -113,8 +115,8 @@ class InvitationTable extends Component
                 'pending' => 'Pending',
                 'accepted' => 'Accepted',
                 'expired' => 'Expired',
-                'revoked' => 'Revoked'
-            ]
+                'revoked' => 'Revoked',
+            ],
         ]);
     }
 
@@ -126,6 +128,7 @@ class InvitationTable extends Component
             // only resend pending invitations
             if ($invitation->status !== 'pending' && $invitation->status !== 'expired') {
                 session()->flash('error', 'Can only resend pending invitations.');
+
                 return;
             }
 
@@ -138,11 +141,11 @@ class InvitationTable extends Component
                     ->count();
                 if ($activePendingInvitations > 0) {
                     session()->flash('error', 'An active invitation already exists for this email.');
+
                     return;
                 }
                 $invitation->markAsPending();
-            }
-            else {
+            } else {
                 $invitation->update([
                     'last_sent_at' => Carbon::now(),
                     'resend_count' => $invitation->resend_count + 1,
@@ -152,7 +155,7 @@ class InvitationTable extends Component
             // resend the email
             Mail::to($invitation->email)->send(new InvitationEmail($invitation));
 
-            session()->flash('message', 'Invitation resent to ' . $invitation->email);
+            session()->flash('message', 'Invitation resent to '.$invitation->email);
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to resend invitation.');
         }
@@ -166,12 +169,13 @@ class InvitationTable extends Component
             // only revoke pending invitations
             if ($invitation->status !== 'pending') {
                 session()->flash('error', 'Can only revoke pending invitations.');
+
                 return;
             }
 
             $invitation->revoke();
 
-            session()->flash('message', 'Invitation revoked for ' . $invitation->email);
+            session()->flash('message', 'Invitation revoked for '.$invitation->email);
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to revoke invitation.');
         }

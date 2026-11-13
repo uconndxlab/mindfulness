@@ -18,7 +18,7 @@ class InvitationController extends Controller
     {
         $registration_locked = getConfig('registration_locked', false);
         $invitation_only_mode = getConfig('invitation_only_mode', false);
-        
+
         return view('admin.invitations', compact('registration_locked', 'invitation_only_mode'));
     }
 
@@ -71,7 +71,7 @@ class InvitationController extends Controller
             // send invitation email
             Mail::to($invitation->email)->send(new InvitationEmail($invitation));
 
-            return back()->with('success', 'Invitation sent successfully to ' . $invitation->email . '!');
+            return back()->with('success', 'Invitation sent successfully to '.$invitation->email.'!');
         } catch (\Exception $e) {
             return back()->withErrors(['email' => 'Failed to send invitation. Please try again.'])->withInput();
         }
@@ -81,9 +81,10 @@ class InvitationController extends Controller
     {
         try {
             $invitationMode = getConfig('invitation_only_mode', false);
-            updateConfig('invitation_only_mode', !$invitationMode);
-            $msg = !$invitationMode ? 'enabled' : 'disabled';
-            return response()->json(['success' => 'Invitation-only mode has been ' . $msg . '!', 'status' => !$invitationMode], 200);
+            updateConfig('invitation_only_mode', ! $invitationMode);
+            $msg = ! $invitationMode ? 'enabled' : 'disabled';
+
+            return response()->json(['success' => 'Invitation-only mode has been '.$msg.'!', 'status' => ! $invitationMode], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to toggle invitation mode.'], 500);
         }

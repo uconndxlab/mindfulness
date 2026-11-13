@@ -9,6 +9,7 @@ use Illuminate\View\Component;
 class JournalSearchResults extends Component
 {
     public $notes;
+
     /**
      * Create a new component instance.
      */

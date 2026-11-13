@@ -9,6 +9,7 @@ use Illuminate\View\Component;
 class quiz extends Component
 {
     public $quiz;
+
     /**
      * Create a new component instance.
      */

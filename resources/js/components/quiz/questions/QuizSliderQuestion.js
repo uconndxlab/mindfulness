@@ -300,7 +300,7 @@ class QuizSliderQuestion {
             // average is already set on init
         }
         
-        console.log(`Slider question ${this.questionNumber} values set to:`, JSON.stringify(values));
+        console.log('Slider question %s values set to:', this.questionNumber, JSON.stringify(values));
     }
 
     setSingleSliderValue(optionId, value) {

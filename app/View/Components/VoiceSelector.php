@@ -9,8 +9,11 @@ use Illuminate\View\Component;
 class VoiceSelector extends Component
 {
     public $voices;
+
     public $defaultVoice;
+
     public $showDropdown;
+
     public $multipleVoices;
 
     /**

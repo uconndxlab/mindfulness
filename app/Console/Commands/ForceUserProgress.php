@@ -42,8 +42,9 @@ class ForceUserProgress extends Command
 
         $user = User::where('email', $email)->first();
 
-        if (!$user) {
+        if (! $user) {
             $this->error("User with email {$email} not found.");
+
             return;
         }
 
@@ -68,6 +69,6 @@ class ForceUserProgress extends Command
             $this->progressService->completeActivity($user, $activity);
         }
 
-        $this->info("Progress forced successfully.");
+        $this->info('Progress forced successfully.');
     }
 }

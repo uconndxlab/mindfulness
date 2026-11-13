@@ -95,7 +95,7 @@ class QuizCheckboxQuestion {
         
         // notify QuizController
         this.onAnswerChange(this.questionNumber, this.isAnswered());
-        console.log(`Checkbox question ${this.questionNumber} selection changed:`, Array.from(this.selectedValues));
+        console.log('Checkbox question %s selection changed:', this.questionNumber, Array.from(this.selectedValues));
     }
 
     setCheckboxState(checkbox, checked) {
@@ -193,7 +193,7 @@ class QuizCheckboxQuestion {
             }
         }
         
-        console.log(`Checkbox question ${this.questionNumber} values set to:`, valuesToSet);
+        console.log('Checkbox question %s values set to:', this.questionNumber, valuesToSet);
     }
 
     reset() {

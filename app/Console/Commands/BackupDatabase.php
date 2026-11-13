@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use ZipArchive;
-use Illuminate\Support\Carbon;
 
 class BackupDatabase extends Command
 {
@@ -34,12 +34,12 @@ class BackupDatabase extends Command
         $backupDir = database_path('backups');
         $maxBackups = config('database.num_backups');
 
-        if (!File::exists($backupDir)) {
+        if (! File::exists($backupDir)) {
             File::makeDirectory($backupDir, 0755, true);
         }
 
         // rotate backups
-        $backups = collect(File::glob($backupDir . '/backup-*.zip'))
+        $backups = collect(File::glob($backupDir.'/backup-*.zip'))
             ->sortByDesc(function ($file) {
                 return filemtime($file);
             });
@@ -55,16 +55,17 @@ class BackupDatabase extends Command
         // new backup
         $timestamp = Carbon::now()->format('Ymd-His');
         $backupFileName = "data-{$timestamp}.zip";
-        $backupFilePath = $backupDir . '/' . $backupFileName;
+        $backupFilePath = $backupDir.'/'.$backupFileName;
 
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
 
-        if ($zip->open($backupFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+        if ($zip->open($backupFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
             $files = File::allFiles($sourceDir);
             if (empty($files)) {
                 $this->info("Source directory '{$sourceDir}' is empty. No backup created.");
                 $zip->close();
                 File::delete($backupFilePath);
+
                 return 0;
             }
 
@@ -76,7 +77,8 @@ class BackupDatabase extends Command
             $zip->close();
             $this->info("Backup created successfully: {$backupFilePath}");
         } else {
-            $this->error("Failed to create backup zip file.");
+            $this->error('Failed to create backup zip file.');
+
             return 1;
         }
 

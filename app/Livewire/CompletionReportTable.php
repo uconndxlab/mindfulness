@@ -20,10 +20,13 @@ class CompletionReportTable extends Component
     public $hh_id = '';
 
     public $sortColumn = 'completed_at';
+
     public $sortDirection = 'desc';
 
     public $sendConfirmHhId = null;
+
     public $sendConfirmEmail = null;
+
     public $sendConfirmLastSent = null;
 
     public $columns = [
@@ -69,7 +72,7 @@ class CompletionReportTable extends Component
 
     public function confirmSendReport(CompletionReportService $completionReportService)
     {
-        if (!$this->sendConfirmHhId) {
+        if (! $this->sendConfirmHhId) {
             return;
         }
 
@@ -81,7 +84,7 @@ class CompletionReportTable extends Component
 
             $completionReportService->sendToUser($report);
 
-            session()->flash('message', 'Journey report sent to ' . $report->user->email . '.');
+            session()->flash('message', 'Journey report sent to '.$report->user->email.'.');
         } catch (\Throwable $e) {
             session()->flash('error', 'Failed to send report. Please try again.');
         }
@@ -105,11 +108,11 @@ class CompletionReportTable extends Component
                 'user_milestones.achieved_at as completed_at',
             );
 
-        if (!empty($this->search)) {
-            $query->where('users.hh_id', 'like', '%' . $this->search . '%');
+        if (! empty($this->search)) {
+            $query->where('users.hh_id', 'like', '%'.$this->search.'%');
         }
 
-        if (!empty($this->hh_id)) {
+        if (! empty($this->hh_id)) {
             $query->where('users.hh_id', $this->hh_id);
         }
 

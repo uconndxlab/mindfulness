@@ -5,7 +5,7 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "barryvdh/laravel-dompdf": "^3.1",
         "doctrine/dbal": "^4.2",
         "laravel/framework": "^13.0",
@@ -14,16 +14,18 @@
         "league/commonmark": "^2.7",
         "livewire/livewire": "^4.0",
         "maatwebsite/excel": "^4.0",
-        "spatie/laravel-activitylog": "^4.10"
+        "spatie/laravel-activitylog": "^5.1"
     },
     "require-dev": {
-        "fakerphp/faker": "^1.23",
-        "laravel/breeze": "^2.0",
-        "laravel/pint": "^1.13",
+        "fakerphp/faker": "^1.24",
+        "larastan/larastan": "^3.12",
+        "laravel/breeze": "^2.4",
+        "laravel/pint": "^1.32",
         "mockery/mockery": "^1.6",
-        "nunomaduro/collision": "^8.0",
-        "phpunit/phpunit": "^12.0",
-        "spatie/laravel-ignition": "^2.4"
+        "nunomaduro/collision": "^8.9",
+        "pestphp/pest": "^5.2",
+        "phpunit/phpunit": "^13.4",
+        "spatie/laravel-ignition": "^2.13"
     },
     "autoload": {
         "psr-4": {
@@ -61,6 +63,17 @@
             "@php artisan key:generate --ansi",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --ansi"
+        ],
+        "lint": "pint",
+        "lint:check": "pint --test",
+        "analyse": "phpstan analyse --memory-limit=2G",
+        "security": "semgrep scan --config p/default --config p/php --error",
+        "test": "@php artisan test",
+        "check": [
+            "@composer audit",
+            "@lint:check",
+            "@analyse",
+            "@test"
         ]
     },
     "extra": {
@@ -80,7 +93,7 @@
             "php-http/discovery": true
         },
         "platform": {
-            "php": "8.3.0"
+            "php": "8.4.23"
         }
     },
     "minimum-stability": "stable",

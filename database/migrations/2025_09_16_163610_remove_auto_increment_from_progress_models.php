@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         DB::statement('PRAGMA foreign_keys = OFF');
-        
+
         try {
             $this->recreateTableWithoutAutoIncrement('modules');
             $this->recreateTableWithoutAutoIncrement('days');
@@ -32,15 +32,15 @@ return new class extends Migration
         // This is complex in SQLite, better to restore from backup
         echo "WARNING: Cannot easily reverse this migration in SQLite. Restore from backup if needed.\n";
     }
-    
+
     private function recreateTableWithoutAutoIncrement(string $tableName): void
     {
-        $tempTableName = $tableName . '_temp';
-        
+        $tempTableName = $tableName.'_temp';
+
         // get current schema
         $columns = Schema::getColumnListing($tableName);
         $data = DB::table($tableName)->get();
-        
+
         // create new table, without auto-increment
         if ($tableName === 'activities') {
             $this->createActivitiesTable($tempTableName);
@@ -49,17 +49,17 @@ return new class extends Migration
         } elseif ($tableName === 'modules') {
             $this->createModulesTable($tempTableName);
         }
-        
+
         // copy data
         foreach ($data as $row) {
             DB::table($tempTableName)->insert((array) $row);
         }
-        
+
         // drop table, rename temp
         Schema::dropIfExists($tableName);
         Schema::rename($tempTableName, $tableName);
     }
-    
+
     private function createActivitiesTable(string $tableName): void
     {
         Schema::create($tableName, function (Blueprint $table) {
@@ -75,7 +75,7 @@ return new class extends Migration
             $table->timestamps();
         });
     }
-    
+
     private function createDaysTable(string $tableName): void
     {
         Schema::create($tableName, function (Blueprint $table) {
@@ -90,7 +90,7 @@ return new class extends Migration
             $table->timestamps();
         });
     }
-    
+
     private function createModulesTable(string $tableName): void
     {
         Schema::create($tableName, function (Blueprint $table) {

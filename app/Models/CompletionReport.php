@@ -24,6 +24,6 @@ class CompletionReport extends Model
 
     public static function pdfPathForHhId(string $hhId): string
     {
-        return 'completion-reports/' . hash('sha256', $hhId) . '.pdf';
+        return 'completion-reports/'.hash('sha256', $hhId).'.pdf';
     }
 }

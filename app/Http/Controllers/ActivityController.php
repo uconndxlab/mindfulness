@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activity;
-use App\Models\User;
 use App\Models\EventLog;
+use App\Models\User;
 use App\Services\ProgressService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,13 +12,15 @@ use Illuminate\Support\Facades\Auth;
 class ActivityController extends Controller
 {
     protected $progressService;
-    
-    public function __construct(ProgressService $progressService) {
+
+    public function __construct(ProgressService $progressService)
+    {
         $this->progressService = $progressService;
     }
 
     // complete activity
-    public function complete(Request $request) {
+    public function complete(Request $request)
+    {
         /** @var ?User $user */
         $user = Auth::user() ?? null;
         $activity = Activity::findOrFail($request->activity_id) ?? null;
@@ -26,18 +28,18 @@ class ActivityController extends Controller
             ? EventLog::find($request->start_log_id)
             : null;
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
-        
+
         // check if unlocked
-        if (!$user->canAccessActivity($activity)) {
-            return response()->json(['succcess' => false,'message' => 'Activity locked'], 403);
+        if (! $user->canAccessActivity($activity)) {
+            return response()->json(['succcess' => false, 'message' => 'Activity locked'], 403);
         }
 
         $already_completed = $user->isActivityCompleted($activity);
 
-        if (!$already_completed) {
+        if (! $already_completed) {
             $properties = [
                 'activity' => $activity->title,
                 'day' => $activity->day->name,
@@ -62,8 +64,7 @@ class ActivityController extends Controller
         $next_activity = $activity->nextActivity();
         $last_activity_in_module = $activity->day->module->lastActivity();
         // slider questions follow practice, or are last activity in module
-        if ($next_activity?->is_check_in) 
-        {
+        if ($next_activity?->is_check_in) {
             $redirect_url = route('explore.activity', ['activity_id' => $next_activity->id]);
         }
 
@@ -72,13 +73,13 @@ class ActivityController extends Controller
             // potential for debugging in case the next day did not unlock
             return response()->json(['success' => true, 'message' => 'Activity already completed'], 200);
         }
-        
+
         // complete activity
         $result = $this->progressService->completeActivity($user, $activity);
-        
+
         // return full result as json
         $day_completed = false;
-        
+
         // build response
         $message = 'Activity completed';
         if (isset($result['optional_unlocked']) && $result['optional_unlocked']) {
@@ -108,27 +109,28 @@ class ActivityController extends Controller
     }
 
     // skip activity
-    public function skip(Request $request) {
+    public function skip(Request $request)
+    {
         /** @var ?User $user */
         $user = Auth::user() ?? null;
         $activity = Activity::findOrFail($request->activity_id) ?? null;
 
         // block skip on example activities
-        if (!$activity->type) {
+        if (! $activity->type) {
             // send user to 403 page
             abort(403, 'Example activities cannot be skipped');
         }
 
-        if (!$user) {
+        if (! $user) {
             abort(404, 'User not found');
         }
 
         // check if unlocked
-        if (!$user->canAccessActivity($activity)) {
+        if (! $user->canAccessActivity($activity)) {
             abort(403, 'Activity locked');
         }
         // check if skippable
-        if (!$activity->skippable) {
+        if (! $activity->skippable) {
             abort(403, 'Activity not skippable');
         }
 
@@ -140,8 +142,7 @@ class ActivityController extends Controller
             ->first();
         if ($nextAct) {
             $this->progressService->unlockActivity($user, $nextAct);
-        }
-        else {
+        } else {
             abort(404, 'No next activity found');
         }
 
@@ -166,15 +167,15 @@ class ActivityController extends Controller
             'module' => $activity->day->module->partName(),
             'activity_type' => $activity->type,
         ];
-        
+
         if ($validated['event_type'] === 'started') {
             $properties['already_completed'] = $activity->isCompletedBy($user);
         }
-        
+
         // if the event is summary (was exited), check start log for auth
         if ($validated['event_type'] === 'summary' && isset($validated['start_log_id'])) {
             $startLog = EventLog::find($validated['start_log_id']);
-            if (!$startLog || $startLog->causer_id !== $user->id) {
+            if (! $startLog || $startLog->causer_id !== $user->id) {
                 return response()->json(['status' => 'unauthorized'], 403);
             }
         }
@@ -186,13 +187,13 @@ class ActivityController extends Controller
                 $properties[$key] = $value;
             }
         }
-        
+
         $log = activity('activity')
-            ->event('activity_' . $validated['event_type'])
+            ->event('activity_'.$validated['event_type'])
             ->performedOn($activity)
             ->causedBy($user)
             ->withProperties($properties)
-            ->log('Activity ' . $validated['event_type']);
+            ->log('Activity '.$validated['event_type']);
         $log_id = $log->id;
 
         return response()->json(['status' => 'success', 'log_id' => $log_id], 200);

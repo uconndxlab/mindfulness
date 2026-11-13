@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         DB::statement('PRAGMA foreign_keys = OFF');
-        
+
         try {
             // note, this migration might drop the days table...
             $this->recreateTableWithoutAutoIncrement('content');
@@ -36,12 +36,12 @@ return new class extends Migration
 
     private function recreateTableWithoutAutoIncrement(string $tableName): void
     {
-        $tempTableName = $tableName . '_temp';
-        
+        $tempTableName = $tableName.'_temp';
+
         // get current schema
         $columns = Schema::getColumnListing($tableName);
         $data = DB::table($tableName)->get();
-        
+
         // create new table, without auto-increment
         if ($tableName === 'content') {
             $this->createContentTable($tempTableName);
@@ -50,12 +50,12 @@ return new class extends Migration
         } elseif ($tableName === 'journals') {
             $this->createJournalsTable($tempTableName);
         }
-        
+
         // copy data
         foreach ($data as $row) {
             DB::table($tempTableName)->insert((array) $row);
         }
-        
+
         // drop table, rename temp
         Schema::dropIfExists($tableName);
         Schema::rename($tempTableName, $tableName);

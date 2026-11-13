@@ -48,7 +48,7 @@ class Invitation extends Model
         return $query->where('status', 'expired')
             ->orWhere(function ($q) {
                 $q->where('status', 'pending')
-                  ->where('expires_at', '<', Carbon::now());
+                    ->where('expires_at', '<', Carbon::now());
             });
     }
 

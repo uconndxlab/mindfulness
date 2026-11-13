@@ -14,18 +14,18 @@ return [
     'user' => env('DEPLOYMENT_USER'),
     'host' => env('DEPLOYMENT_HOST'),
     'driver' => env('DEPLOYMENT_SYNC_DRIVER', 'auto'),
-    
+
     'winscp_path' => env('DEPLOYMENT_WINSCP_PATH'),
     'rsync_path' => env('DEPLOYMENT_RSYNC_PATH', 'rsync'),
     'key' => env('DEPLOYMENT_KEY_PATH'),
 
     'sync' => [
         'content' => [
-            'local' => env('DEPLOYMENT_LOCAL_PATH') . '/storage/app/public',
+            'local' => env('DEPLOYMENT_LOCAL_PATH').'/storage/app/public',
             'remote' => env('DEPLOYMENT_PATH_CONTENT'),
         ],
         'data' => [
-            'local' => env('DEPLOYMENT_LOCAL_PATH') . '/database/data',
+            'local' => env('DEPLOYMENT_LOCAL_PATH').'/database/data',
             'remote' => env('DEPLOYMENT_PATH_DATA'),
         ],
     ],

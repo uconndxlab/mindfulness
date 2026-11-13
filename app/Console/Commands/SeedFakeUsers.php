@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\User;
+use Illuminate\Console\Command;
 
 class SeedFakeUsers extends Command
 {
@@ -35,7 +35,7 @@ class SeedFakeUsers extends Command
         }
 
         $this->info("Seeding {$count} fake users...");
-        
+
         $progressBar = $this->output->createProgressBar($count);
         $progressBar->start();
 

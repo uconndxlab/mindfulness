@@ -27,7 +27,7 @@ class RecordMilestone
         );
 
         // if it was not just created, return
-        if (!$milestone->wasRecentlyCreated) {
+        if (! $milestone->wasRecentlyCreated) {
             Log::info('Milestone email skipped; already recorded.', [
                 'user_id' => $event->user->id,
                 'type' => $type->value,

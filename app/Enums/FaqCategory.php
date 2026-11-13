@@ -35,7 +35,8 @@ enum FaqCategory: string
     public static function sorted(): array
     {
         $cases = self::cases();
-        usort($cases, fn($a, $b) => $a->order() <=> $b->order());
+        usort($cases, fn ($a, $b) => $a->order() <=> $b->order());
+
         return $cases;
     }
 }

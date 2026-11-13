@@ -24,16 +24,19 @@ class SyncFiles extends Command
         // validate config
         if (empty($config['user']) || empty($config['host'])) {
             $this->error('Deployment user or host not set.');
+
             return self::FAILURE;
         }
 
         if (empty($config['key'])) {
             $this->error('Deployment SSH key path not set.');
+
             return self::FAILURE;
         }
 
         if ($driver === 'winscp' && empty($config['winscp_path'])) {
             $this->error('WinSCP path not set for Windows sync.');
+
             return self::FAILURE;
         }
 
@@ -56,7 +59,7 @@ class SyncFiles extends Command
             $command = $this->buildCommand($config, $driver, $direction, $localPath, $remotePath, $target);
 
             if ($this->getOutput()->isVerbose()) {
-                $this->info("Running command: " . $command);
+                $this->info('Running command: '.$command);
             }
 
             // run command
@@ -64,12 +67,13 @@ class SyncFiles extends Command
                 $this->output->write($output);
             });
 
-            if (!$process->successful()) {
+            if (! $process->successful()) {
                 $this->error("Failed to sync '{$target}'. Check command output above for details.");
             }
         }
 
         $this->info('Synchronization complete.');
+
         return self::SUCCESS;
     }
 
@@ -164,7 +168,7 @@ class SyncFiles extends Command
             '--compress',
             '--delete',
             '--itemize-changes',
-            '--rsh=' . escapeshellarg($sshCommand),
+            '--rsh='.escapeshellarg($sshCommand),
         ];
 
         if ($this->option('dry-run')) {
@@ -189,6 +193,6 @@ class SyncFiles extends Command
 
     private function ensureTrailingSlash(string $path): string
     {
-        return rtrim($path, '/\\') . DIRECTORY_SEPARATOR;
+        return rtrim($path, '/\\').DIRECTORY_SEPARATOR;
     }
 }

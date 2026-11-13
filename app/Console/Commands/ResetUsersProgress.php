@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\User;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class ResetUsersProgress extends Command
@@ -42,7 +42,8 @@ class ResetUsersProgress extends Command
             $user->save();
         }
 
-        $this->info("Progress reset for all users");
+        $this->info('Progress reset for all users');
+
         return 0;
     }
 }

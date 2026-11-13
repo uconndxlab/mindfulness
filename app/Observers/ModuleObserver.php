@@ -70,7 +70,7 @@ class ModuleObserver
             'name',
             'description',
             'workbook_path',
-            'order'
+            'order',
         ])->toArray();
 
         // encode the array into a nicely formatted JSON string

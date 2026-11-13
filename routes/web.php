@@ -1,29 +1,26 @@
 <?php
 
-use App\Models\Email_Body;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 use App\Http\Controllers\ActivityController;
-use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Admin\EventController as AdminEventController;
-use App\Http\Controllers\Admin\ReflectionController as AdminReflectionController;
-use App\Http\Controllers\Admin\NoteController as AdminNoteController;
-use App\Http\Controllers\Admin\InvitationController as AdminInvitationController;
 use App\Http\Controllers\Admin\CompletionReportController as AdminCompletionReportController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\EventController as AdminEventController;
+use App\Http\Controllers\Admin\InvitationController as AdminInvitationController;
+use App\Http\Controllers\Admin\NoteController as AdminNoteController;
+use App\Http\Controllers\Admin\ReflectionController as AdminReflectionController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PageNavController;
 use App\Http\Controllers\UserController;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
-
-use App\Models\QuizAnswers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('web')->group(function () {
-    //default
-    Route::redirect("/","/home");
+    // default
+    Route::redirect('/', '/home');
     Route::redirect('/study', config('app.study_url'));
     Route::redirect('/testimonial', config('app.testimonial_url'));
     Route::redirect('/screener', config('app.screener_url'));
@@ -45,27 +42,28 @@ Route::middleware('web')->group(function () {
         ]);
     })->name('pdfjs.worker');
 
-    //AUTHENTICATION
-    //login page
+    // AUTHENTICATION
+    // login page
     Route::get('/login', [AuthController::class, 'loginPage'])->name('login');
-    //login request
-    Route::post('/login', [AuthController::class,'authenticate'])->middleware('throttle:login')->name('login.submit');
+    // login request
+    Route::post('/login', [AuthController::class, 'authenticate'])->middleware('throttle:login')->name('login.submit');
 
-    //REGISTRATION
+    // REGISTRATION
     Route::middleware(['registration.lock', 'invitation.required'])->group(function () {
-        //registration page
+        // registration page
         Route::get('/account-creation', [AuthController::class, 'registrationPage'])->name('register');
-        //registration request
-        Route::post('/account-creation', [AuthController::class,'register'])->middleware('throttle:register')->name('register.submit');
+        // registration request
+        Route::post('/account-creation', [AuthController::class, 'register'])->middleware('throttle:register')->name('register.submit');
     });
 
-    //EMAIL VERIFICATION
+    // EMAIL VERIFICATION
     Route::middleware('auth')->group(function () {
-        //BUILT IN VERIFICATION FUNCTIONS
+        // BUILT IN VERIFICATION FUNCTIONS
         Route::get('/email/verify', function () {
             if (Auth::user()->email_verified_at) {
                 return redirect()->back();
             }
+
             return view('auth.verify');
         })->name('verification.notice');
         Route::post('/email/verification-notification', [AuthController::class, 'sendVerifyEmail'])->middleware('throttle:verify-email')->name('verification.send');
@@ -79,12 +77,12 @@ Route::middleware('web')->group(function () {
             $user = User::findOrFail($request->id);
 
             // check hash
-            if (!hash_equals((string) $request->hash, sha1($user->email))) {
+            if (! hash_equals((string) $request->hash, sha1($user->email))) {
                 abort(403, 'Invalid verification link');
             }
 
             // verify the user
-            if (!$user->hasVerifiedEmail()) {
+            if (! $user->hasVerifiedEmail()) {
                 $user->markEmailAsVerified();
                 event(new Verified($user));
                 // log email verification
@@ -102,24 +100,23 @@ Route::middleware('web')->group(function () {
             // otherwise redirect to login
             return redirect('/login')->with('success', 'Email verified successfully. Please login.');
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect('/login')->with('error', 'Verification failed. Please try again.');
         }
     })->middleware('signed')->name('verification.verify');
 
-    //FORGOT PASSWORD
+    // FORGOT PASSWORD
     Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
     Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:password-reset')->name('password.email');
     Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
     Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
 
-
-    //AUTH protected routes
+    // AUTH protected routes
     Route::middleware(['auth', 'verified', 'update.last.active', 'check.account.lock', 'session.policy'])->group(function () {
-        //logout
-        Route::post('/logout', [AuthController::class,'logout'])->name('logout');
+        // logout
+        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-        //NEW EXPLORE
+        // NEW EXPLORE
         Route::get('/home', [PageNavController::class, 'exploreHome'])->name('explore.home');
         Route::get('/explore/module/{module_id}/{activity_id?}', [PageNavController::class, 'exploreModule'])->name('explore.module');
         Route::get('/explore/bonus/{activity_id?}', [PageNavController::class, 'exploreBonus'])->name('explore.bonus');
@@ -127,15 +124,15 @@ Route::middleware('web')->group(function () {
         Route::get('/explore/activity/{activity_id}', [PageNavController::class, 'exploreActivity'])->name('explore.activity');
         // use for when skipping warning modal
         Route::get('/explore/activity/{activity_id}/fast', [PageNavController::class, 'exploreActivityBypass'])->name('explore.activity.bypass');
-        Route::post('/quiz/{quiz_id}', [PageNavController::class,'submitQuiz'])->name('quiz.submit');
+        Route::post('/quiz/{quiz_id}', [PageNavController::class, 'submitQuiz'])->name('quiz.submit');
         Route::get('/exploreBtn', [PageNavController::class, 'exploreBrowseButton'])->name('explore.browse');
 
         Route::post('/activities/complete', [ActivityController::class, 'complete'])->name('activities.complete');
         Route::post('/activities/skip', [ActivityController::class, 'skip'])->name('activities.skip');
         Route::post('/activities/log-interaction', [ActivityController::class, 'logInteraction'])->name('activities.log_interaction');
 
-        //NAVIGATION
-        //Page Navigation - the controller is not totally necessary
+        // NAVIGATION
+        // Page Navigation - the controller is not totally necessary
         Route::get('/welcome', [PageNavController::class, 'welcomePage'])->name('welcome');
         Route::post('/welcome/complete', [PageNavController::class, 'completeWelcome'])->name('welcome.complete');
         Route::get('/start', [PageNavController::class, 'continueInApp'])->name('app.start');
@@ -150,21 +147,21 @@ Route::middleware('web')->group(function () {
         Route::get('/profile', [PageNavController::class, 'accountPage'])->name('account');
         Route::get('/about', [PageNavController::class, 'helpPage'])->name('help');
 
-        //LIBRARY
+        // LIBRARY
         Route::get('/librarytab', [PageNavController::class, 'library'])->name('library');
         Route::get('/favorites', [PageNavController::class, 'favoritesLibrary'])->name('library.favorites');
         Route::get('/library', [PageNavController::class, 'mainLibrary'])->name('library.main');
         // throttle??
         Route::get('/search', [PageNavController::class, 'librarySearch'])->name('library.search');
 
-        //User updates
+        // User updates
         Route::put('/user/update/voice', [UserController::class, 'updateVoice'])->name('user.update.voice');
 
         Route::post('/togggleFavorite', [UserController::class, 'toggleFavorite'])->name('favorite.toggle');
 
         Route::resource('note', NoteController::class);
 
-        //ADMIN ONLY
+        // ADMIN ONLY
         Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
             Route::get('/dashboard', [AdminUserController::class, 'dashboard'])->name('dashboard');
             Route::post('/lock-registration-access', [AdminUserController::class, 'lockRegistrationAccess'])->name('lock-registration-access');

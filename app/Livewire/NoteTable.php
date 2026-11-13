@@ -3,9 +3,9 @@
 namespace App\Livewire;
 
 use App\Models\Note;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\Url;
 
 class NoteTable extends Component
 {
@@ -13,7 +13,9 @@ class NoteTable extends Component
 
     #[Url(except: '')]
     public $search = '';
+
     public $sortColumn = 'created_at';
+
     public $sortDirection = 'desc';
 
     public $columns = [
@@ -26,7 +28,7 @@ class NoteTable extends Component
 
     public function sortBy($column)
     {
-        \Log::info('Sorting by column: ' . $column);
+        \Log::info('Sorting by column: '.$column);
         if (isset($this->columns[$column]['sortable']) && $this->columns[$column]['sortable']) {
             if ($this->sortColumn === $column) {
                 $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
@@ -45,14 +47,14 @@ class NoteTable extends Component
             ->orderBy($this->sortColumn, $this->sortDirection);
 
         // search
-        if (!empty($this->search)) {
+        if (! empty($this->search)) {
             $query->where(function ($q) {
-                $q->where('topic', 'like', '%' . $this->search . '%')
+                $q->where('topic', 'like', '%'.$this->search.'%')
                     ->orWhereHas('activity', function ($q) {
-                        $q->where('title', 'like', '%' . $this->search . '%');
+                        $q->where('title', 'like', '%'.$this->search.'%');
                     })
                     ->orWhereHas('user', function ($q) {
-                        $q->where('hh_id', 'like', '%' . $this->search . '%');
+                        $q->where('hh_id', 'like', '%'.$this->search.'%');
                     });
             });
         }
@@ -60,8 +62,7 @@ class NoteTable extends Component
         $notes = $query->paginate(10);
 
         return view('livewire.note-table', [
-            'notes' => $notes
+            'notes' => $notes,
         ]);
     }
 }
-

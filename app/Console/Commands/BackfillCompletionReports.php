@@ -27,13 +27,14 @@ class BackfillCompletionReports extends Command
             $existing = $user->completionReport()->exists();
             if ($existing) {
                 $skipped++;
+
                 continue;
             }
 
             $report = $completionReportService->createForUser($user, notifyAdmin: false);
             $created++;
 
-            if (!$report->pdf_path) {
+            if (! $report->pdf_path) {
                 $failedPdf++;
                 $this->warn("Report created without PDF for {$user->hh_id} (may lack survey data).");
             } else {

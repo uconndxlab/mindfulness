@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Crypt;
 
 class Note extends Model
 {
@@ -13,7 +12,6 @@ class Note extends Model
     protected $casts = [
         'note' => 'encrypted',
     ];
-
 
     public function user()
     {
@@ -24,7 +22,7 @@ class Note extends Model
         'note',
         'user_id',
         'topic',
-        'activity_id'
+        'activity_id',
     ];
 
     public function activity()

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('quizzes', function (Blueprint $table) {
             $table->unsignedBigInteger('subject_id')->nullable();
             $table->string('subject_type')->nullable();
-            
+
             $table->index(['subject_id', 'subject_type']);
         });
     }

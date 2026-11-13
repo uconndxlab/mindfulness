@@ -12,7 +12,7 @@ class CheckInvitationRequired
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -24,7 +24,7 @@ class CheckInvitationRequired
 
         // if invitation-only mode is disabled, still process any token present
         // so invited users get email verification skipped during registration
-        if (!$invitationOnlyMode) {
+        if (! $invitationOnlyMode) {
             if ($token) {
                 $invitation = Invitation::where('token', $token)->first();
                 if ($invitation && $invitation->isValid()) {
@@ -32,43 +32,45 @@ class CheckInvitationRequired
                     $request->session()->put('invitation_email', $invitation->email);
                 }
             }
+
             return $next($request);
         }
 
         // invitation-only mode is ON — token is required to proceed
-        if (!$token) {
+        if (! $token) {
             return redirect()->route('login')->withErrors([
-                'credentials' => 'Registration is currently invitation-only. Please check your email for an invitation link.'
+                'credentials' => 'Registration is currently invitation-only. Please check your email for an invitation link.',
             ]);
         }
 
         // validate the token
         $invitation = Invitation::where('token', $token)->first();
 
-        if (!$invitation) {
+        if (! $invitation) {
             $request->session()->forget(['invitation_token', 'invitation_email']);
+
             return redirect()->route('login')->withErrors([
-                'credentials' => 'Invalid invitation link.'
+                'credentials' => 'Invalid invitation link.',
             ]);
         }
 
         // check if invitation is valid
-        if (!$invitation->isValid()) {
+        if (! $invitation->isValid()) {
             // clear session data for invalid cases
             $request->session()->forget(['invitation_token', 'invitation_email']);
 
             if ($invitation->status === 'accepted') {
                 return redirect()->route('login')->withErrors([
-                    'credentials' => 'This invitation has already been used.'
+                    'credentials' => 'This invitation has already been used.',
                 ]);
             } elseif ($invitation->status === 'revoked') {
                 return redirect()->route('login')->withErrors([
-                    'credentials' => 'This invitation has been revoked.'
+                    'credentials' => 'This invitation has been revoked.',
                 ]);
             } else {
                 // covers expired status and any future states
                 return redirect()->route('login')->withErrors([
-                    'credentials' => 'This invitation has expired.'
+                    'credentials' => 'This invitation has expired.',
                 ]);
             }
         }

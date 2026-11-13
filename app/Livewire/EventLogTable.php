@@ -11,7 +11,9 @@ class EventLogTable extends Component
     use WithPagination;
 
     public $sortColumn = 'created_at';
+
     public $sortDirection = 'desc';
+
     public $search = '';
 
     public $columns = [
@@ -43,17 +45,17 @@ class EventLogTable extends Component
             'subject',
         ])->orderBy($this->sortColumn, $this->sortDirection)->orderBy('id', $this->sortDirection);
 
-        if (!empty($this->search)) {
+        if (! empty($this->search)) {
             $query->where(function ($q) {
-                $q->where('description', 'like', '%' . $this->search . '%')
-                    ->orWhere('event', 'like', '%' . $this->search . '%')
-                    ->orWhere('log_name', 'like', '%' . $this->search . '%')
+                $q->where('description', 'like', '%'.$this->search.'%')
+                    ->orWhere('event', 'like', '%'.$this->search.'%')
+                    ->orWhere('log_name', 'like', '%'.$this->search.'%')
                     ->orWhereHas('subject', function ($q) {
-                        $q->where('title', 'like', '%' . $this->search . '%');
-                        $q->orWhere('name', 'like', '%' . $this->search . '%');
+                        $q->where('title', 'like', '%'.$this->search.'%');
+                        $q->orWhere('name', 'like', '%'.$this->search.'%');
                     })
                     ->orWhereHas('causer', function ($q) {
-                        $q->where('hh_id', 'like', '%' . $this->search . '%');
+                        $q->where('hh_id', 'like', '%'.$this->search.'%');
                     });
             });
         }

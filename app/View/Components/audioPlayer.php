@@ -9,12 +9,19 @@ use Illuminate\View\Component;
 class audioPlayer extends Component
 {
     public $file;
+
     public $id;
+
     public $allowSeek;
+
     public $allowPlaybackRate;
+
     public $title;
+
     public $artist;
+
     public $artwork;
+
     public $voiceDisplay;
 
     /**

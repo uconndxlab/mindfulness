@@ -9,7 +9,9 @@ use Illuminate\View\Component;
 class PdfViewer extends Component
 {
     public $fpath;
+
     public $wbName;
+
     /**
      * Create a new component instance.
      */

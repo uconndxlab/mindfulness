@@ -5,8 +5,8 @@ namespace App\Http\Requests;
 use App\Models\Quiz;
 use App\Rules\QuizAccessRule;
 use App\Rules\QuizAnswersValidRule;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class SubmitQuizRequest extends FormRequest
@@ -30,13 +30,12 @@ class SubmitQuizRequest extends FormRequest
             } else {
                 $averageRule = ['prohibited'];
             }
-        }
-        else {
+        } else {
             $averageRule = ['prohibited'];
         }
 
         return [
-            'quiz_id' => ['required', 'integer', new QuizAccessRule()],
+            'quiz_id' => ['required', 'integer', new QuizAccessRule],
             'answers' => ['required', 'json', new QuizAnswersValidRule($quizId)],
             'average' => $averageRule,
         ];
@@ -59,7 +58,7 @@ class SubmitQuizRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         // get quiz_id from route parameter if not in request body
-        if (!$this->has('quiz_id') && $this->route('quiz_id')) {
+        if (! $this->has('quiz_id') && $this->route('quiz_id')) {
             $this->merge([
                 'quiz_id' => $this->route('quiz_id'),
             ]);
@@ -78,7 +77,7 @@ class SubmitQuizRequest extends FormRequest
         throw new HttpResponseException(
             response()->json([
                 'error_message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422)
         );
     }
@@ -90,4 +89,3 @@ class SubmitQuizRequest extends FormRequest
         return QuizAnswersValidRule::normalizeAnswers(is_array($answers) ? $answers : []);
     }
 }
-

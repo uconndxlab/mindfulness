@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Invitation;
+use Illuminate\Console\Command;
 
 class BackfillInvitationSentDates extends Command
 {
@@ -28,10 +28,10 @@ class BackfillInvitationSentDates extends Command
     {
         $invitations = Invitation::all();
         foreach ($invitations as $invitation) {
-            if (!$invitation->last_sent_at) {
+            if (! $invitation->last_sent_at) {
                 $invitation->last_sent_at = $invitation->created_at;
             }
-            if (!$invitation->resend_count) {
+            if (! $invitation->resend_count) {
                 $invitation->resend_count = 0;
             }
             $invitation->save();

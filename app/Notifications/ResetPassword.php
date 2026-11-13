@@ -4,7 +4,6 @@ namespace App\Notifications;
 
 use Illuminate\Auth\Notifications\ResetPassword as BaseResetPassword;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
 class ResetPassword extends BaseResetPassword
@@ -15,7 +14,7 @@ class ResetPassword extends BaseResetPassword
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
@@ -28,7 +27,7 @@ class ResetPassword extends BaseResetPassword
             ->subject('Reset Your Password')
             ->view('emails.reset-password', [
                 'user' => $notifiable,
-                'resetUrl' => $resetUrl
+                'resetUrl' => $resetUrl,
             ]);
     }
-} 
+}

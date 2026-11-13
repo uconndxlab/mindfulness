@@ -37,4 +37,3 @@ class NotesExport implements FromCollection, WithHeadings, WithMapping
         ];
     }
 }
-

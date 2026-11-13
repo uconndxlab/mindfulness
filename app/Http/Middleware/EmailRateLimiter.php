@@ -12,7 +12,7 @@ class EmailRateLimiter
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     protected $limiter;
 
@@ -20,7 +20,7 @@ class EmailRateLimiter
     {
         $this->limiter = $limiter;
     }
-    
+
     public function handle(Request $request, Closure $next): Response
     {
         // make key
@@ -40,7 +40,7 @@ class EmailRateLimiter
         if ($this->limiter->tooManyAttempts($key, $limit['attempts'])) {
             return response()->json([
                 'message' => 'Too many email attempts. Please try again later.',
-                'retry_after' => $this->limiter->availableIn($key)
+                'retry_after' => $this->limiter->availableIn($key),
             ], 429);
         }
 
@@ -54,7 +54,7 @@ class EmailRateLimiter
     {
         // make unique key with ip, email type, and email
         return sha1(
-            $request->ip().'|'. $request->input('email_type', 'default').'|'.($request->input('email') ?? '')
+            $request->ip().'|'.$request->input('email_type', 'default').'|'.($request->input('email') ?? '')
         );
     }
 }

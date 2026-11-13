@@ -9,6 +9,7 @@ use Illuminate\View\Component;
 class journal extends Component
 {
     public $journal;
+
     /**
      * Create a new component instance.
      */

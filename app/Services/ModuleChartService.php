@@ -52,7 +52,7 @@ class ModuleChartService
     {
         $charts = [];
 
-        if (!empty($report['emotions']['sections'])) {
+        if (! empty($report['emotions']['sections'])) {
             $pleasantChart = $this->renderEmotionSeriesChart(
                 $report['emotions']['sections'],
                 'pleasant'
@@ -70,11 +70,11 @@ class ModuleChartService
             }
         }
 
-        if (!empty($report['presence']['sections'])) {
+        if (! empty($report['presence']['sections'])) {
             $charts['presence'] = $this->renderSectionSeriesChart($report['presence']['sections']);
         }
 
-        if (!empty($report['awareness']['sections'])) {
+        if (! empty($report['awareness']['sections'])) {
             $charts['awareness'] = $this->renderSectionSeriesChart($report['awareness']['sections']);
         }
 

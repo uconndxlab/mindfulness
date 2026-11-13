@@ -4,9 +4,9 @@ namespace App\Livewire;
 
 use App\Models\QuizAnswers;
 use App\Services\QuizAnswerFormatter;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\Url;
 
 class ReflectionTable extends Component
 {
@@ -14,7 +14,9 @@ class ReflectionTable extends Component
 
     #[Url(except: '')]
     public $search = '';
+
     public $sortColumn = 'created_at';
+
     public $sortDirection = 'desc';
 
     public $columns = [
@@ -49,43 +51,43 @@ class ReflectionTable extends Component
             'user:id,hh_id',
             'quiz:id,title,question_options',
             'activity:id,title',
-            'subject'
+            'subject',
         ]);
 
         // apply search filter
-        if (!empty($this->search)) {
+        if (! empty($this->search)) {
             $searchTerm = $this->search;
-            
+
             $query->where(function ($q) use ($searchTerm) {
                 $q->whereHas('quiz', function ($q) use ($searchTerm) {
-                    $q->where('title', 'like', '%' . $searchTerm . '%');
+                    $q->where('title', 'like', '%'.$searchTerm.'%');
                 })
-                ->orWhere(function ($q) use ($searchTerm) {
-                    $q->where('reflection_type', 'like', '%' . $searchTerm . '%');
-                    if (stripos('other', $searchTerm) !== false) {
-                        $q->orWhereNull('reflection_type');
-                    }
-                })
-                ->orWhereHas('user', function ($q) use ($searchTerm) {
-                    $q->where('hh_id', 'like', '%' . $searchTerm . '%');
-                })
-                ->orWhereHas('activity', function ($q) use ($searchTerm) {
-                    $q->where('title', 'like', '%' . $searchTerm . '%');
-                })
-                ->orWhereHasMorph('subject', ['App\Models\Activity', 'App\Models\Module'], function ($q, $type) use ($searchTerm) {
-                    if ($type === 'App\Models\Activity') {
-                        $q->where('title', 'like', '%' . $searchTerm . '%');
-                    } elseif ($type === 'App\Models\Module') {
-                        $q->where('name', 'like', '%' . $searchTerm . '%');
-                    }
-                })
-                ->orWhere(function ($q) use ($searchTerm) {
-                    if (stripos('activity', $searchTerm) !== false) {
-                        $q->where('subject_type', 'App\Models\Activity');
-                    } elseif (stripos('module', $searchTerm) !== false) {
-                        $q->where('subject_type', 'App\Models\Module');
-                    }
-                });
+                    ->orWhere(function ($q) use ($searchTerm) {
+                        $q->where('reflection_type', 'like', '%'.$searchTerm.'%');
+                        if (stripos('other', $searchTerm) !== false) {
+                            $q->orWhereNull('reflection_type');
+                        }
+                    })
+                    ->orWhereHas('user', function ($q) use ($searchTerm) {
+                        $q->where('hh_id', 'like', '%'.$searchTerm.'%');
+                    })
+                    ->orWhereHas('activity', function ($q) use ($searchTerm) {
+                        $q->where('title', 'like', '%'.$searchTerm.'%');
+                    })
+                    ->orWhereHasMorph('subject', ['App\Models\Activity', 'App\Models\Module'], function ($q, $type) use ($searchTerm) {
+                        if ($type === 'App\Models\Activity') {
+                            $q->where('title', 'like', '%'.$searchTerm.'%');
+                        } elseif ($type === 'App\Models\Module') {
+                            $q->where('name', 'like', '%'.$searchTerm.'%');
+                        }
+                    })
+                    ->orWhere(function ($q) use ($searchTerm) {
+                        if (stripos('activity', $searchTerm) !== false) {
+                            $q->where('subject_type', 'App\Models\Activity');
+                        } elseif (stripos('module', $searchTerm) !== false) {
+                            $q->where('subject_type', 'App\Models\Module');
+                        }
+                    });
             });
         }
 
@@ -102,7 +104,7 @@ class ReflectionTable extends Component
         $reflections = $query->paginate(10);
 
         return view('livewire.reflection-table', [
-            'reflections' => $reflections
+            'reflections' => $reflections,
         ]);
     }
 
@@ -111,5 +113,3 @@ class ReflectionTable extends Component
         return QuizAnswerFormatter::formatAnswers($answers, 300);
     }
 }
-
-

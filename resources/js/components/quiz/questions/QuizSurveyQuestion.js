@@ -90,7 +90,7 @@ class QuizSurveyQuestion {
             this.clearValidationErrors();
         }
         this.onAnswerChange(this.questionNumber, nowAnswered);
-        console.log(`Survey question ${this.questionNumber} option ${optionId} answered:`, radio.value);
+        console.log('Survey question %s option %s answered:', this.questionNumber, optionId, radio.value);
     }
 
     handleNoteInput(optionId) {
@@ -262,7 +262,7 @@ class QuizSurveyQuestion {
         }
         this.answered = this.isAnswered();
         this.updateAverage();
-        console.log(`Survey question ${this.questionNumber} values set to:`, JSON.stringify(values));
+        console.log('Survey question %s values set to:', this.questionNumber, JSON.stringify(values));
     }
 
     setNotes(notesArray) {
@@ -280,7 +280,7 @@ class QuizSurveyQuestion {
         }
 
         this.answered = this.isAnswered();
-        console.log(`Survey question ${this.questionNumber} notes set to:`, JSON.stringify(notesArray));
+        console.log('Survey question %s notes set to:', this.questionNumber, JSON.stringify(notesArray));
     }
 
     setSingleSurveyValue(optionId, value) {

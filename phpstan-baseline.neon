@@ -1,0 +1,745 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Relation ''milestones'' is not found in App\\Models\\User model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Console/Commands/BackfillCompletionReports.php
+
+		-
+			message: '#^Relation ''day'' is not found in App\\Models\\Activity model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Console/Commands/BackfillModuleSchedules.php
+
+		-
+			message: '#^Relation ''users'' is not found in App\\Models\\Activity model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Console/Commands/BackfillModuleSchedules.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAnswers\:\:\$quiz\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/BackfillQuizAnswerTypes.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAnswers\:\:\$quiz\.$#'
+			identifier: property.notFound
+			count: 5
+			path: app/Console/Commands/BackfillQuizAnswers.php
+
+		-
+			message: '#^Relation ''activity'' is not found in App\\Models\\QuizAnswers model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Console/Commands/BackfillQuizAnswers.php
+
+		-
+			message: '#^Relation ''quiz'' is not found in App\\Models\\QuizAnswers model\.$#'
+			identifier: larastan.relationExistence
+			count: 3
+			path: app/Console/Commands/BackfillQuizAnswers.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\:\:\$day\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/InsertSliderActivities.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 1
+			path: app/Console/Commands/ListOrphanedContentFiles.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAnswers\:\:\$quiz\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/MigrateQuizAnswers.php
+
+		-
+			message: '#^Call to function is_string\(\) with array will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 2
+			path: app/Console/Commands/MigrateQuizAnswers.php
+
+		-
+			message: '#^Relation ''quiz'' is not found in App\\Models\\QuizAnswers model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Console/Commands/MigrateQuizAnswers.php
+
+		-
+			message: '#^Parameter \#1 \$max of method Symfony\\Component\\Console\\Style\\SymfonyStyle\:\:createProgressBar\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/SeedFakeUsers.php
+
+		-
+			message: '#^Cannot call method copy\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Console/Commands/SendInactivityReminderEmails.php
+
+		-
+			message: '#^Relation ''modules'' is not found in App\\Models\\User model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Console/Commands/SendInactivityReminderEmails.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>hh_id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Exports/EventsExport.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\Note model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Exports/NotesExport.php
+
+		-
+			message: '#^Relation ''activity'' is not found in App\\Models\\QuizAnswers model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Exports/ReflectionsExport.php
+
+		-
+			message: '#^Relation ''quiz'' is not found in App\\Models\\QuizAnswers model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Exports/ReflectionsExport.php
+
+		-
+			message: '#^Relation ''subject'' is not found in App\\Models\\QuizAnswers model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Exports/ReflectionsExport.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\QuizAnswers model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Exports/ReflectionsExport.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Exports/UsersExport.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>title" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Exports/UsersExport.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Activity\>\:\:\$day\.$#'
+			identifier: property.notFound
+			count: 6
+			path: app/Http/Controllers/ActivityController.php
+
+		-
+			message: '#^Access to an undefined property Spatie\\Activitylog\\Contracts\\Activity\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/ActivityController.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 2
+			path: app/Http/Controllers/ActivityController.php
+
+		-
+			message: '#^Relation ''day'' is not found in App\\Models\\Activity model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/ActivityController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/ErrorLogController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Activity\>\:\:\$day\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/NoteController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\:\:\$completed\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\:\:\$day\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\:\:\$unlocked\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Activity\>\:\:\$completed\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Activity\>\:\:\$content\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Activity\>\:\:\$day\.$#'
+			identifier: property.notFound
+			count: 6
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Activity\>\:\:\$favorited\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Activity\>\:\:\$final\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Activity\>\:\:\$journal\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Activity\>\:\:\$quiz\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Activity\>\:\:\$unlocked\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$completed\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$completedCheckInActivities\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$completedSelfRatings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$daysCompleted\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$scheduleCompletion\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$scheduleStart\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$scheduleStarted\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$statusText\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$totalCheckInActivities\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$totalDays\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$totalSelfRatings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$unlocked\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Module\>\:\:\$completed\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Module\>\:\:\$completedCheckInActivities\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Module\>\:\:\$completedSelfRatings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Module\>\:\:\$days\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Module\>\:\:\$daysCompleted\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Module\>\:\:\$totalCheckInActivities\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Module\>\:\:\$totalDays\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Module\>\:\:\$totalSelfRatings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Module\>\:\:\$unlocked\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Note\:\:\$formatted_date\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$notes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 2
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\),Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Activity\>\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Relation ''day'' is not found in App\\Models\\Activity model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Relation ''days'' is not found in App\\Models\\Module model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/PageNavController.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: app/Http/Controllers/UserController.php
+
+		-
+			message: '#^Parameter \#2 \$default of method Illuminate\\Http\\Request\:\:boolean\(\) expects bool, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/UserController.php
+
+		-
+			message: '#^Call to function method_exists\(\) with App\\Models\\User and ''isAdmin'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/Http/Middleware/SessionPolicy.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Http/Middleware/SessionPolicy.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\Auth\\MustVerifyEmail\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/SendWelcomeEmail.php
+
+		-
+			message: '#^Parameter \#1 \$user of class App\\Mail\\WelcomeEmail constructor expects App\\Models\\User, Illuminate\\Contracts\\Auth\\MustVerifyEmail given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/SendWelcomeEmail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Day\:\:\$activities\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Listeners/ShowDayCompletedModal.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Day\:\:\$module\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Listeners/ShowDayCompletedModal.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Day\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Day\>\:\:\$activities\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/ShowDayCompletedModal.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Day\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Day\>\:\:\$module\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/ShowDayCompletedModal.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Livewire/AccountUpdateForm.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/CompletionReportTable.php
+
+		-
+			message: '#^Parameter \#2 \$syntax of method Carbon\\Carbon\:\:diffForHumans\(\) expects array\|int\|null, true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Livewire/ContactForm.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>email" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Livewire/ContactForm.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Livewire/ContactForm.php
+
+		-
+			message: '#^Relation ''invitedBy'' is not found in App\\Models\\Invitation model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Livewire/InvitationTable.php
+
+		-
+			message: '#^Relation ''registeredUser'' is not found in App\\Models\\Invitation model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Livewire/InvitationTable.php
+
+		-
+			message: '#^Relation ''activity'' is not found in App\\Models\\Note model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Livewire/NoteTable.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\Note model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Livewire/NoteTable.php
+
+		-
+			message: '#^Relation ''activity'' is not found in App\\Models\\QuizAnswers model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Livewire/ReflectionTable.php
+
+		-
+			message: '#^Relation ''quiz'' is not found in App\\Models\\QuizAnswers model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Livewire/ReflectionTable.php
+
+		-
+			message: '#^Relation ''subject'' is not found in App\\Models\\QuizAnswers model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Livewire/ReflectionTable.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\QuizAnswers model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Livewire/ReflectionTable.php
+
+		-
+			message: '#^Cannot call method diffInDays\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Livewire/UserTable.php
+
+		-
+			message: '#^Relation ''favoritedActivities'' is not found in App\\Models\\User model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Livewire/UserTable.php
+
+		-
+			message: '#^Relation ''milestones'' is not found in App\\Models\\User model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Livewire/UserTable.php
+
+		-
+			message: '#^Parameter \$view of class Illuminate\\Mail\\Mailables\\Content constructor expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Mail/TestMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\:\:\$day\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Activity.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Day\:\:\$module\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/Day.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\EventLog\:\:\$local_timestamp\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/EventLog.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$days\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/Module.php
+
+		-
+			message: '#^Cannot call method diffInDays\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property App\\Models\\User\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property App\\Models\\User\:\:\$hidden is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$hidden\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Call to function method_exists\(\) with Illuminate\\Auth\\SessionGuard and ''setCookieJar'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/Providers/AppServiceProvider.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Providers/AppServiceProvider.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Quiz\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Quiz\>\:\:\$activity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Rules/QuizAccessRule.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/Rules/QuizAnswersValidRule.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: app/Rules/QuizAnswersValidRule.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/CompletionReportService.php
+
+		-
+			message: '#^Parameter \#1 \$user of class App\\Mail\\ModuleCompletedMail constructor expects App\\Models\\User, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/CompletionReportService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAnswers\:\:\$quiz\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ModuleEmailReportService.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/Services/ModuleEmailReportService.php
+
+		-
+			message: '#^Relation ''activities'' is not found in App\\Models\\Day model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/ModuleScheduleService.php
+
+		-
+			message: '#^Relation ''day'' is not found in App\\Models\\Activity model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Services/ModuleScheduleService.php
+
+		-
+			message: '#^Relation ''users'' is not found in App\\Models\\Activity model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Services/ModuleScheduleService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\:\:\$day\.$#'
+			identifier: property.notFound
+			count: 8
+			path: app/Services/ProgressService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Day\:\:\$module\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Services/ProgressService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$days\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ProgressService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAnswers\:\:\$quiz\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/QuizAnswerFormatter.php
+
+		-
+			message: '#^Method App\\Services\\QuizAnswerFormatter\:\:getAnswerItem\(\) should return array but returns null\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/QuizAnswerFormatter.php
+
+		-
+			message: '#^Undefined variable\: \$optionId$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Services/QuizAnswerFormatter.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$completed\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Support/HomeDateFormatter.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 1
+			path: app/Support/HomeDateFormatter.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Activity\:\:\$day\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/helpers.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Module\:\:\$days\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/helpers.php
+
+		-
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
+			count: 1
+			path: app/helpers.php

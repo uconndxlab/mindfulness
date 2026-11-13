@@ -48,7 +48,7 @@ class QuizAnswers extends Model
         return $this->morphTo();
     }
 
-    // get checkins 
+    // get checkins
     public function scopeCheckIns($query)
     {
         return $query->where('reflection_type', 'check_in');

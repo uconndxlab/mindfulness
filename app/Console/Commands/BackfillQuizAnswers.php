@@ -2,10 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\QuizAnswers;
-use App\Models\Activity;
-use App\Models\Module;
+use Illuminate\Console\Command;
 
 class BackfillQuizAnswers extends Command
 {
@@ -39,7 +37,7 @@ class BackfillQuizAnswers extends Command
                 $quizAnswer->subject_id = $subject->id;
                 $quizAnswer->subject_type = get_class($subject);
             }
-            
+
             $quizAnswer->activity_id = $quizAnswer->quiz->activity_id;
 
             $this->info($quizAnswer->quiz->activity->title);

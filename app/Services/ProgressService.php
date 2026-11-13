@@ -38,12 +38,13 @@ class ProgressService
         $result = [
             'activity_completed' => false,
             'optional_unlocked' => false,
-            'error' => null
+            'error' => null,
         ];
 
         // check user
-        if (!$user || !$activity) {
+        if (! $user || ! $activity) {
             $result['error'] = 'User or activity not found';
+
             return $result;
         }
 
@@ -63,7 +64,7 @@ class ProgressService
         }
 
         // if activity is not optional
-        if (!$activity->optional) {
+        if (! $activity->optional) {
             // find next activity in day
             $nextAct = $activity->day->activities()
                 ->where('order', '>', $activity->order)
@@ -77,7 +78,7 @@ class ProgressService
             // means skip check is arbitrary
 
             // if next act is completed, check day completion
-            if ($nextAct && !$nextAct->isCompletedBy($user)) {
+            if ($nextAct && ! $nextAct->isCompletedBy($user)) {
                 // unlock next activity within day
                 $actResult = $this->unlockActivity($user, $nextAct);
                 $result = array_merge($result, $actResult);
@@ -87,6 +88,7 @@ class ProgressService
                 $result = array_merge($result, $dayResult);
             }
         }
+
         return $result;
     }
 
@@ -108,7 +110,8 @@ class ProgressService
         return $result;
     }
 
-    public function checkDayCompletion(User $user, Day $day) {
+    public function checkDayCompletion(User $user, Day $day)
+    {
         // init result array
         $result = [];
 
@@ -116,7 +119,7 @@ class ProgressService
         $requiredActs = $day->activities()->where('optional', false)->get();
         $completed = true;
         foreach ($requiredActs as $act) {
-            if (!$user->isActivityCompleted($act)) {
+            if (! $user->isActivityCompleted($act)) {
                 $completed = false;
                 break;
             }
@@ -126,13 +129,15 @@ class ProgressService
             $completeResult = $this->completeDay($user, $day);
             $result = array_merge($result, $completeResult);
         }
+
         return $result;
     }
 
-    public function completeDay(User $user, Day $day) {
+    public function completeDay(User $user, Day $day)
+    {
         // init result array
         $result = [
-            'day_completed' => false
+            'day_completed' => false,
         ];
 
         // complete day
@@ -173,7 +178,7 @@ class ProgressService
 
         // completion warning for quick completion
         // ignore check in days
-        if (!$day->is_check_in) {
+        if (! $day->is_check_in) {
             $user->quick_progress_warning = true;
             $user->last_day_completed_id = $day->id;
             $user->save();
@@ -194,10 +199,12 @@ class ProgressService
             $moduleResult = $this->checkModuleCompletion($user, $day->module);
             $result = array_merge($result, $moduleResult);
         }
+
         return $result;
     }
 
-    public function unlockDay(User $user, Day $day) {
+    public function unlockDay(User $user, Day $day)
+    {
         $result = [
             'next_day_unlocked' => false,
             'next_day' => null,
@@ -218,10 +225,12 @@ class ProgressService
             $actResult = $this->unlockActivity($user, $nextAct);
             $result = array_merge($result, $actResult);
         }
+
         return $result;
     }
 
-    public function checkModuleCompletion(User $user, Module $module) {
+    public function checkModuleCompletion(User $user, Module $module)
+    {
         // init result array
         $result = [];
 
@@ -229,7 +238,7 @@ class ProgressService
         $requiredDays = $module->days;
         $completed = true;
         foreach ($requiredDays as $day) {
-            if (!$user->isDayCompleted($day)) {
+            if (! $user->isDayCompleted($day)) {
                 $completed = false;
                 break;
             }
@@ -239,14 +248,16 @@ class ProgressService
             $completeResult = $this->completeModule($user, $module);
             $result = array_merge($result, $completeResult);
         }
+
         return $result;
     }
 
-    public function completeModule(User $user, Module $module) {
+    public function completeModule(User $user, Module $module)
+    {
         // init result array
         $result = [
             'module_completed' => false,
-            'course_completed' => false
+            'course_completed' => false,
         ];
 
         // complete module
@@ -276,13 +287,12 @@ class ProgressService
             // unlock module
             $moduleResult = $this->unlockModule($user, $nextModule);
             $result = array_merge($result, $moduleResult);
-        }
-        else {
+        } else {
             // check course completion
             $completed = true;
             $requiredModules = Module::all();
             foreach ($requiredModules as $mod) {
-                if (!$user->isModuleCompleted($mod)) {
+                if (! $user->isModuleCompleted($mod)) {
                     $completed = false;
                     break;
                 }
@@ -291,10 +301,12 @@ class ProgressService
                 $result['course_completed'] = true;
             }
         }
+
         return $result;
     }
 
-    public function unlockModule(User $user, Module $module) {
+    public function unlockModule(User $user, Module $module)
+    {
         $result = [
             'next_module_unlocked' => false,
             'next_module' => null,
@@ -315,9 +327,9 @@ class ProgressService
             $dayResult = $this->unlockDay($user, $nextDay);
             $result = array_merge($result, $dayResult);
         }
+
         return $result;
     }
-
 
     // PROGRESS EVALUATION - functions to run after content management actions
     /**
@@ -352,8 +364,7 @@ class ProgressService
             // check day and module completion up to latest completion
             $this->checkDayCompletionUpTo($user, $latestCompleted->day);
             $this->checkModuleCompletionUpTo($user, $latestCompleted->day->module);
-        }
-        else {
+        } else {
             // unlock first activity
             unlockFirst($user->id);
         }
@@ -390,13 +401,13 @@ class ProgressService
             // unlock day and module if they are not unlocked
             // should only run once for each day and module if not already unlocked
             // handles case where there is a new day or module
-            if (!$act->day->canBeAccessedBy($user)) {
+            if (! $act->day->canBeAccessedBy($user)) {
                 $user->days()->syncWithoutDetaching([
                     $act->day_id => [
                         'unlocked' => true,
                     ],
                 ]);
-                if (!$act->day->module->canBeAccessedBy($user)) {
+                if (! $act->day->module->canBeAccessedBy($user)) {
                     $user->modules()->syncWithoutDetaching([
                         $act->day->module_id => [
                             'unlocked' => true,
@@ -433,6 +444,7 @@ class ProgressService
                     'unlocked' => true,
                 ],
             ]);
+
             return $nextActivity;
         }
 
@@ -455,7 +467,7 @@ class ProgressService
 
             $completed = true;
             foreach ($day->activities()->where('optional', false)->get() as $activity) {
-                if (!$user->isActivityCompleted($activity)) {
+                if (! $user->isActivityCompleted($activity)) {
                     $completed = false;
                     break;
                 }
@@ -502,7 +514,7 @@ class ProgressService
 
             $completed = true;
             foreach ($module->days()->get() as $day) {
-                if (!$user->isDayCompleted($day)) {
+                if (! $user->isDayCompleted($day)) {
                     $completed = false;
                     break;
                 }

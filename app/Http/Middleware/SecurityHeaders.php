@@ -26,7 +26,7 @@ class SecurityHeaders
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -39,13 +39,13 @@ class SecurityHeaders
         $response = $next($request);
 
         $isProd = config('app.env') === 'production';
-        
+
         // Core security headers
         $this->setSecurityHeaders($response, $isProd);
-        
+
         // CSP
         $this->setContentSecurityPolicy($response, $request, $nonce, $isProd);
-        
+
         // Additional security headers for production
         if ($isProd) {
             $this->setProductionSecurityHeaders($response);
@@ -61,24 +61,24 @@ class SecurityHeaders
     {
         // Prevent clickjacking
         $response->headers->set('X-Frame-Options', 'DENY');
-        
+
         // Prevent MIME type sniffing
         $response->headers->set('X-Content-Type-Options', 'nosniff');
-        
+
         // Control referrer information
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-        
+
         // Prevent cross-domain policy files
         $response->headers->set('X-Permitted-Cross-Domain-Policies', 'none');
-        
+
         // Remove server information
         $response->headers->remove('Server');
         $response->headers->remove('X-Powered-By');
-        
+
         // HSTS for production HTTPS
         if ($isProd) {
             $response->headers->set(
-                'Strict-Transport-Security', 
+                'Strict-Transport-Security',
                 'max-age=31536000; includeSubDomains; preload'
             );
         }
@@ -91,7 +91,7 @@ class SecurityHeaders
     {
         // Expect Certificate Transparency
         $response->headers->set('Expect-CT', 'max-age=86400, enforce');
-        
+
         // Cross-Origin policies
         $response->headers->set('Cross-Origin-Embedder-Policy', 'require-corp');
         $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
@@ -104,7 +104,7 @@ class SecurityHeaders
     private function setContentSecurityPolicy(Response $response, Request $request, string $nonce, bool $isProd): void
     {
         $viteHosts = $this->getViteHosts($isProd);
-        
+
         // CSP directives
         $directives = [
             'default-src' => ["'self'"],
@@ -128,19 +128,21 @@ class SecurityHeaders
         // Build CSP string
         $cspParts = [];
         foreach ($directives as $directive => $sources) {
-            if ($sources === null) continue; // skip null directives
-            
+            if ($sources === null) {
+                continue;
+            } // skip null directives
+
             if (empty($sources)) {
                 $cspParts[] = $directive;
             } else {
-                $cspParts[] = $directive . ' ' . implode(' ', $sources);
+                $cspParts[] = $directive.' '.implode(' ', $sources);
             }
         }
 
         $csp = implode('; ', $cspParts);
         $response->headers->set('Content-Security-Policy', $csp);
-        
-        if (!$isProd) {
+
+        if (! $isProd) {
             // uncomment to test CSP without breaking functionality
             // $response->headers->set('Content-Security-Policy-Report-Only', $csp);
         }
@@ -158,12 +160,12 @@ class SecurityHeaders
         $hosts = [];
         $vitePort = 5173; // Default Vite port
         $baseHosts = ['localhost', '127.0.0.1'];
-        
+
         // app domain - herd uses projname.test
         $appUrl = config('app.url');
         if ($appUrl) {
             $appHost = parse_url($appUrl, PHP_URL_HOST);
-            if ($appHost && !in_array($appHost, $baseHosts)) {
+            if ($appHost && ! in_array($appHost, $baseHosts)) {
                 $baseHosts[] = $appHost;
             }
         }
@@ -191,9 +193,9 @@ class SecurityHeaders
         if (in_array($routeName, self::LIVEWIRE_ROUTES)) {
             $sources[] = "'nonce-{$nonce}'";
         }
-        
+
         // vite hosts included in development
-        if (!$isProd) {
+        if (! $isProd) {
             $sources = array_merge($sources, $viteHosts);
         }
 
@@ -207,9 +209,9 @@ class SecurityHeaders
     {
         $sources = ["'self'", "'nonce-{$nonce}'"];
         // Allows the inline <style> from @livewireStyles.
-        
+
         // vite hosts included in development
-        if (!$isProd) {
+        if (! $isProd) {
             $sources = array_merge($sources, $viteHosts);
         }
 
@@ -241,12 +243,12 @@ class SecurityHeaders
         $sources = ["'self'"];
         // removed data, if issues can be added back
         // $sources[] = 'data:';
-        
+
         // add vite hosts
-        if (!$isProd) {
+        if (! $isProd) {
             $sources = array_merge($sources, $viteHosts);
         }
-        
+
         // can add font CDN
 
         return $sources;
@@ -258,12 +260,12 @@ class SecurityHeaders
     private function getConnectSrc(array $viteHosts, bool $isProd): array
     {
         $sources = ["'self'"];
-        
+
         // ws support for vite hosts in dev
-        if (!$isProd) {
+        if (! $isProd) {
             $sources = array_merge($sources, $viteHosts, ['ws:', 'wss:']);
         }
-        
+
         // can add API endpoints here
 
         return $sources;
@@ -275,9 +277,9 @@ class SecurityHeaders
     private function getWorkerSrc(array $viteHosts, bool $isProd): array
     {
         $sources = ["'self'", 'blob:'];
-        
+
         // add vite hosts in dev
-        if (!$isProd) {
+        if (! $isProd) {
             $sources = array_merge($sources, $viteHosts);
         }
 
@@ -292,7 +294,7 @@ class SecurityHeaders
         $sources = ["'self'", 'data:'];
         // data: URLs for inline media (if needed)
         // $sources[] = 'data:';
-        
+
         if ($isProd) {
             // can add media CDN hosts here
         }

@@ -4,7 +4,6 @@ namespace App\Notifications;
 
 use Illuminate\Auth\Notifications\VerifyEmail as BaseVerifyEmail;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
@@ -40,16 +39,17 @@ class VerifyEmail extends BaseVerifyEmail
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
         $verificationUrl = $this->verificationUrl($notifiable);
+
         return (new MailMessage)
             ->subject('Verify Your Email Address')
             ->view('emails.verify-email', [
                 'user' => $notifiable,
-                'verificationUrl' => $verificationUrl
+                'verificationUrl' => $verificationUrl,
             ]);
     }
-} 
+}

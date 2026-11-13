@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Config;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Seeder;
 
 class ConfigSeeder extends Seeder
 {
@@ -18,7 +16,7 @@ class ConfigSeeder extends Seeder
             ['key' => 'registration_locked'],
             ['value' => false]
         );
-        
+
         Config::updateOrCreate(
             ['key' => 'invitation_only_mode'],
             ['value' => false]

@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\DB;
 class ModuleScheduleService
 {
     public const IDEAL_GAP = 7;
+
     public const MIN_GAP = 5;
+
     public const MIN_MODULE_DAYS = 4;
 
     /** Total program length; day 1 = registration, last day = registration + (length - 1). */
@@ -296,6 +298,7 @@ class ModuleScheduleService
 
             if ($this->hasModuleStarted($user, $module($n))) {
                 $starts[$n] = $this->frozenStart($user, $module($n), $pivot($n), $tz);
+
                 continue;
             }
 

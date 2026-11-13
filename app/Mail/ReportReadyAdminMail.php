@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Enums\MilestoneType;
 use App\Models\CompletionReport;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -21,14 +22,14 @@ class ReportReadyAdminMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Completion report ready - ' . $this->user->hh_id,
+            subject: 'Completion report ready - '.$this->user->hh_id,
         );
     }
 
     public function build()
     {
         $completedAt = $this->user->milestones()
-            ->where('type', \App\Enums\MilestoneType::Module4)
+            ->where('type', MilestoneType::Module4)
             ->value('achieved_at');
 
         return $this->view('emails.report-ready-admin')

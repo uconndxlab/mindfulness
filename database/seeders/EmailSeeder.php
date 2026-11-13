@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Email_Body;
 use App\Models\Email_Subject;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class EmailSeeder extends Seeder

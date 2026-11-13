@@ -58,9 +58,9 @@ class AuditObsoleteActivityRecords extends Command
         );
 
         $this->newLine();
-        $this->line('Obsolete content IDs: ' . $this->formatIds($obsoleteContentIds));
-        $this->line('Obsolete quiz IDs: ' . $this->formatIds($obsoleteQuizIds));
-        $this->line('Obsolete journal IDs: ' . $this->formatIds($obsoleteJournalIds));
+        $this->line('Obsolete content IDs: '.$this->formatIds($obsoleteContentIds));
+        $this->line('Obsolete quiz IDs: '.$this->formatIds($obsoleteQuizIds));
+        $this->line('Obsolete journal IDs: '.$this->formatIds($obsoleteJournalIds));
 
         $this->newLine();
         $this->info('Ghost Activities (in DB but not in database/data/activities.json):');
@@ -70,7 +70,7 @@ class AuditObsoleteActivityRecords extends Command
         } elseif ($ghostActivities->isEmpty()) {
             $this->line('  None. All DB activities are accounted for in the seed file.');
         } else {
-            $this->warn('  Found ' . $ghostActivities->count() . ' activity record(s) not present in the seed file:');
+            $this->warn('  Found '.$ghostActivities->count().' activity record(s) not present in the seed file:');
             $this->table(
                 ['ID', 'Type', 'Title', 'Day ID'],
                 $ghostActivities
@@ -82,7 +82,7 @@ class AuditObsoleteActivityRecords extends Command
                     ])
                     ->all()
             );
-            $this->line('  Ghost Activity IDs: ' . $ghostActivities->pluck('id')->implode(', '));
+            $this->line('  Ghost Activity IDs: '.$ghostActivities->pluck('id')->implode(', '));
         }
 
         if (
@@ -102,7 +102,7 @@ class AuditObsoleteActivityRecords extends Command
     {
         $path = database_path('data/activities.json');
 
-        if (!is_file($path)) {
+        if (! is_file($path)) {
             return null;
         }
 
@@ -114,7 +114,7 @@ class AuditObsoleteActivityRecords extends Command
 
         $decoded = json_decode($contents, true);
 
-        if (!is_array($decoded)) {
+        if (! is_array($decoded)) {
             return null;
         }
 
@@ -151,7 +151,7 @@ class AuditObsoleteActivityRecords extends Command
                     return true;
                 }
 
-                return !in_array($activityType, $expectedTypes, true);
+                return ! in_array($activityType, $expectedTypes, true);
             })
             ->pluck('id')
             ->sort()

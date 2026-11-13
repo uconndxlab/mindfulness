@@ -4,26 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Enums\MilestoneType;
 use App\Events\MilestoneAchieved;
-use App\Rules\ValidEmail;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Http\Request;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Auth\Events\Verified;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rules\Password;
 use App\Models\Invitation;
 use App\Models\User;
 use App\Services\ModuleScheduleService;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     use AuthenticatesUsers;
-
 
     public function loginPage()
     {
@@ -37,23 +35,24 @@ class AuthController extends Controller
             'password' => 'required',
             'timezone' => ['string', 'nullable'],
         ], [
-            'email.required' => "Email address is required.",
-            'email.email' => "Not a valid email address.",
-            'password.required' => "Password is required."
+            'email.required' => 'Email address is required.',
+            'email.email' => 'Not a valid email address.',
+            'password.required' => 'Password is required.',
         ]);
 
-        //check if user exists first
+        // check if user exists first
         $credentials = $request->only('email', 'password');
-        
-        //check auth and remember
+
+        // check auth and remember
         $remember = $request->has('remember');
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             $request->session()->regenerateToken();
-            //if user is locked
+            // if user is locked
             if (Auth::user()->lock_access) {
-                //log user out
+                // log user out
                 Auth::logout();
+
                 return back()->withErrors([
                     'error' => 'Your account is locked. If you have any questions, feel free to contact us at <a href="mailto:'.config('mail.contact_email').'">'.config('mail.contact_email').'</a>.',
                 ])->with('account_locked', true);
@@ -65,28 +64,31 @@ class AuthController extends Controller
                 'timezone' => $request->input('timezone') ?? config('app.timezone'),
                 'last_inactivity_reminder_day' => null,
             ]);
-            
+
             // log login
             activity('auth')
                 ->event('login')
                 ->causedBy(Auth::user())
                 ->log('Authenticated');
 
-            if (!Auth::user()->has_seen_welcome) {
+            if (! Auth::user()->has_seen_welcome) {
                 return redirect()->route('welcome');
             }
+
             return redirect()->intended(route('explore.home'));
         }
-      
+
         return back()->withErrors(['login' => 'Invalid credentials.'])->withInput();
     }
 
-    public function logout(Request $request) {
+    public function logout(Request $request)
+    {
         $request->session()->invalidate();
         $request->session()->regenerate();
         $request->session()->regenerateToken();
         Cache::forget('user_'.Auth::id().'_progress_activities');
         Auth::logout();
+
         return redirect()->route('login');
     }
 
@@ -104,19 +106,19 @@ class AuthController extends Controller
                 ->where('expires_at', '>', now())
                 ->first();
         }
-        
+
         return view('auth.register', compact('invitation'));
     }
 
-    //account registration
-    public function register(Request $request) : RedirectResponse
+    // account registration
+    public function register(Request $request): RedirectResponse
     {
-        //validate inputs
+        // validate inputs
         try {
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'email:rfc,dns', 'max:255',  'unique:'.User::class],
-                'password'=> ['required', Password::min(8)->mixedCase()->numbers()],
+                'password' => ['required', Password::min(8)->mixedCase()->numbers()],
                 'timezone' => ['string', 'nullable'],
             ], [
                 'name.required' => 'Please enter a name.',
@@ -130,44 +132,44 @@ class AuthController extends Controller
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
         }
-        
+
         try {
             // check for invitation token (regardless of mode)
             $invitation = null;
             $skipEmailValidation = false;
             $invitationToken = $request->input('invitation_token');
-            
+
             if ($invitationToken) {
                 $invitation = Invitation::where('token', $invitationToken)
                     ->where('email', $request->input('email'))
                     ->first();
-                
+
                 // only validate/require if invitation-only mode is ON
                 if (getConfig('invitation_only_mode', false)) {
-                    if (!$invitation) {
+                    if (! $invitation) {
                         return back()->withErrors(['error' => 'Invalid invitation token.']);
                     }
-                    
-                    if (!$invitation->isValid()) {
+
+                    if (! $invitation->isValid()) {
                         return back()->withErrors(['error' => 'This invitation has expired or is no longer valid.']);
                     }
-                    
+
                     $skipEmailValidation = true;
                 }
             } elseif (getConfig('invitation_only_mode', false)) {
                 // invitation-only mode is ON but no token provided
                 return back()->withErrors(['error' => 'An invitation is required to register.']);
             }
-            
-            //create user
+
+            // create user
             $user = User::create([
                 'name' => $request->input('name'),
-                'email'=> $request->input('email'),
-                'password'=> Hash::make(value: $request->input('password')),
+                'email' => $request->input('email'),
+                'password' => Hash::make(value: $request->input('password')),
                 'timezone' => $request->timezone ?? config('app.timezone'),
                 'last_active_at' => Carbon::now(),
             ]);
-            
+
             // mark invitation as used if it exists and is valid
             // marks regardless of mode if invitation is used
             if ($invitation && $invitation->isValid()) {
@@ -178,23 +180,23 @@ class AuthController extends Controller
                 }
                 $skipEmailValidation = true;
             }
-            
-            //unlocking first module/day/activity
+
+            // unlocking first module/day/activity
             lockAll($user->id);
             unlockFirst($user->id);
             app(ModuleScheduleService::class)->initializeForUser($user);
-          
-            //login, redirect, event hits MustVerifyEmail which calls sendEmailVerificationNotification
-            if (!$skipEmailValidation) {
+
+            // login, redirect, event hits MustVerifyEmail which calls sendEmailVerificationNotification
+            if (! $skipEmailValidation) {
                 event(new Registered($user));
             }
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
             $request->session()->regenerateToken();
-            
+
             // clear invitation session data
             $request->session()->forget(['invitation_token', 'invitation_email']);
-          
+
             // log registration
             activity('auth')
                 ->event('registration')
@@ -203,10 +205,9 @@ class AuthController extends Controller
 
             // record milestone
             event(new MilestoneAchieved($user, MilestoneType::Registered));
-            
+
             return $skipEmailValidation ? redirect()->route('welcome') : redirect()->route('verification.notice');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return back()->withErrors(['error' => 'An error occurred. Please try again.']);
         }
     }
@@ -219,6 +220,7 @@ class AuthController extends Controller
         }
 
         $user->sendEmailVerificationNotification();
+
         return back()->with('message', 'Verification link sent!');
     }
 

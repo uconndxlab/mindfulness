@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ErrorLogController extends Controller
 {
@@ -15,12 +15,12 @@ class ErrorLogController extends Controller
             'message' => 'required|string|max:1000',
             'user_agent' => 'nullable|string|max:500',
             'url' => 'nullable|string|max:500',
-            'additional_data' => 'nullable|array'
+            'additional_data' => 'nullable|array',
         ]);
 
         $userId = Auth::id() ?? 'guest';
         $userName = Auth::user()?->name ?? 'Guest User';
-        
+
         $logData = [
             'user_id' => $userId,
             'user_name' => $userName,
@@ -30,11 +30,11 @@ class ErrorLogController extends Controller
             'url' => $request->url,
             // 'ip_address' => $request->ip(),
             'timestamp' => now()->toISOString(),
-            'additional_data' => $request->additional_data ?? []
+            'additional_data' => $request->additional_data ?? [],
         ];
 
         // log to laravel log with a specific prefix for easy filtering
-        Log::channel('single')->info('[CLIENT_ERROR] ' . $request->error_type . ': ' . $request->message, $logData);
+        Log::channel('single')->info('[CLIENT_ERROR] '.$request->error_type.': '.$request->message, $logData);
 
         return response()->json(['status' => 'logged'], 200);
     }

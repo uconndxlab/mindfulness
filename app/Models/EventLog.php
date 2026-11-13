@@ -10,19 +10,16 @@ class EventLog extends SpatieActivity
 {
     protected $table = 'event_log';
 
-    public function __construct(array $attributes = [])
+    protected function casts(): array
     {
-        parent::__construct($attributes);
-
-        $this->casts = array_merge($this->casts, [
+        return [
+            ...parent::casts(),
             'local_timestamp' => 'datetime',
-        ]);
+        ];
     }
 
     /**
      * The "booted" method of the model.
-     *
-     * @return void
      */
     protected static function booted(): void
     {
@@ -36,4 +33,4 @@ class EventLog extends SpatieActivity
             $activity->local_timestamp = Carbon::now($timezone);
         });
     }
-} 
+}

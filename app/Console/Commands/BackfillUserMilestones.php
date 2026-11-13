@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\User;
+use App\Enums\MilestoneType;
 use App\Models\Activity;
 use App\Models\Module;
-use App\Enums\MilestoneType;
+use App\Models\User;
+use Illuminate\Console\Command;
 
 class BackfillUserMilestones extends Command
 {

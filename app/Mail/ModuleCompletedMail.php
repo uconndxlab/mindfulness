@@ -30,7 +30,7 @@ class ModuleCompletedMail extends Mailable
         $report = $reportService->forUserAndPart($this->user, $partOrder);
         $chartData = $chartService->generateCharts($report);
 
-        $mail = $this->subject("Your ".config('app.name')." Journey Report")
+        $mail = $this->subject('Your '.config('app.name').' Journey Report')
             ->view('emails.module-completed')
             ->with([
                 'user' => $this->user,
@@ -42,7 +42,7 @@ class ModuleCompletedMail extends Mailable
 
         if ($this->pdfPath && Storage::exists($this->pdfPath)) {
             $mail->attach(Storage::path($this->pdfPath), [
-                'as' => 'journey-report-part-' . $partOrder . '.pdf',
+                'as' => 'journey-report-part-'.$partOrder.'.pdf',
                 'mime' => 'application/pdf',
             ]);
         }

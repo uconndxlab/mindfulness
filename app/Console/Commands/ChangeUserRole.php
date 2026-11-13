@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\User;
-use App\Models\Role;
+use Illuminate\Console\Command;
 
 class ChangeUserRole extends Command
 {
@@ -28,22 +27,25 @@ class ChangeUserRole extends Command
     public function handle()
     {
         $email = $this->argument('email');
-        $role = $this->argument('role');  
+        $role = $this->argument('role');
 
         $user = User::where('email', $email)->first();
-        if (!$user) {
+        if (! $user) {
             $this->error("User under '{$email}' not found");
+
             return 1;
         }
 
-        if (!in_array($role, ['admin', 'user'])) {
+        if (! in_array($role, ['admin', 'user'])) {
             $this->error("Role '{$role}' not found");
+
             return 1;
         }
-    
+
         $user->role = $role;
         $user->save();
         $this->info("Role '{$role}' assigned to user '{$user->email}'");
+
         return 0;
     }
 }

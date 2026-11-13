@@ -64,4 +64,4 @@ class EventsExport implements FromCollection, WithHeadings, WithMapping
             $event->properties,
         ];
     }
-} 
+}

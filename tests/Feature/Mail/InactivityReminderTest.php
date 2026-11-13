@@ -1,27 +1,15 @@
 <?php
 
-namespace Tests\Feature\Mail;
-
 use App\Mail\InactivityReminder;
+use App\Models\Email_Body;
 use App\Models\Email_Subject;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use App\Models\User;
 
-class InactivityReminderTest extends TestCase
-{
+test('the inactivity reminder uses a reminder subject', function () {
+    Email_Subject::forceCreate(['type' => 'reminder', 'subject' => 'We miss you']);
+    Email_Body::forceCreate(['type' => 'reminder', 'body' => 'Come back and practice.']);
 
-    public function test_inactivity_reminder_has_valid_subject(): void
-    {
-        $user = User::factory()->create();
-        $mail = new InactivityReminder($user);
+    $mail = new InactivityReminder(User::factory()->create());
 
-        $possibleSubjects = Email_Subject::where('type', 'reminder')->pluck('subject');
-        
-        $this->assertContains(
-            $mail->envelope()->subject,
-            $possibleSubjects
-        );
-    }
-}
+    expect($mail->envelope()->subject)->toBe('We miss you');
+});

@@ -16,11 +16,11 @@ class QuizAnswerFormatter
 
         try {
             $formatted = self::processAnswers($answers);
-            
+
             if ($maxLength && strlen($formatted) > $maxLength) {
-                return substr($formatted, 0, $maxLength) . '...';
+                return substr($formatted, 0, $maxLength).'...';
             }
-            
+
             return $formatted;
         } catch (\Exception $e) {
             return 'Error formatting answers';
@@ -31,7 +31,7 @@ class QuizAnswerFormatter
     {
         $parts = [];
         $questionNum = 1;
-        
+
         foreach ($answers as $key => $value) {
             if ($key === 'notes') {
                 continue;
@@ -39,42 +39,42 @@ class QuizAnswerFormatter
             $parts[] = "Q{$questionNum}: ".self::formatValue($value, $answers['notes'][$key] ?? null);
             $questionNum++;
         }
-        
+
         return implode(', ', $parts);
     }
 
     // examples of values (answers to a single question)
     // multiple select: [{"1":null},{"2":null},{"3":null},{"4":null},{"5":null},{"6":null}]
-    // radio {"2":null} 
+    // radio {"2":null}
     // slider: [{"1":77},{"2":75},{"3":75},{"4":75},{"5":18},{"6":18}]
     private static function formatValue($value, ?array $notes = null): string
     {
         if (is_null($value)) {
             return 'null';
         }
-        
+
         if (is_array($value)) {
             $formatted = [];
             $notesByOption = self::notesByOptionId($notes);
 
-            foreach($value as $optionKey => $optionData) {
+            foreach ($value as $optionKey => $optionData) {
                 // Handle direct values: {"1": null} or {"1": 77}
                 if (is_null($optionData)) {
                     // Multi-select or radio: null means selected, show option key
                     $formatted[] = $optionKey;
                 } elseif (is_array($optionData)) {
                     // Nested array like [{"7":"something"}] - iterate to get actual keys
-                    foreach($optionData as $innerKey => $innerValue) {
+                    foreach ($optionData as $innerKey => $innerValue) {
                         if (is_null($innerValue)) {
                             $formatted[] = $innerKey;
                         } elseif (is_numeric($innerValue)) {
                             $entry = (string) $innerValue;
                             if (isset($notesByOption[$innerKey])) {
-                                $entry .= ' (' . self::truncateNote($notesByOption[$innerKey]) . ')';
+                                $entry .= ' ('.self::truncateNote($notesByOption[$innerKey]).')';
                             }
                             $formatted[] = $entry;
                         } elseif (is_string($innerValue)) {
-                            $formatted[] = $innerKey . ': ' . $innerValue;
+                            $formatted[] = $innerKey.': '.$innerValue;
                         } else {
                             $formatted[] = 'n/a';
                         }
@@ -83,23 +83,24 @@ class QuizAnswerFormatter
                     // Direct numeric: {"1": 77}
                     $entry = (string) $optionData;
                     if (isset($notesByOption[$optionKey])) {
-                        $entry .= ' (' . self::truncateNote($notesByOption[$optionKey]) . ')';
+                        $entry .= ' ('.self::truncateNote($notesByOption[$optionKey]).')';
                     }
                     $formatted[] = $entry;
                 } elseif (is_string($optionData)) {
                     // Direct string: {"1": "answer"}
-                    $formatted[] = $optionKey . ': ' . $optionData;
+                    $formatted[] = $optionKey.': '.$optionData;
                 } else {
                     $formatted[] = 'n/a';
                 }
             }
-            return '[' . implode(', ', $formatted) . ']';
+
+            return '['.implode(', ', $formatted).']';
         }
-        
+
         if (is_numeric($value)) {
             return (string) $value;
         }
-        
+
         return (string) $value;
     }
 
@@ -107,8 +108,8 @@ class QuizAnswerFormatter
     public static function getQuestionsWithAnswers(QuizAnswers $reflection): array
     {
         $quiz = $reflection->quiz;
-        
-        if (!$quiz || !$quiz->question_options) {
+
+        if (! $quiz || ! $quiz->question_options) {
             return [];
         }
 
@@ -136,7 +137,7 @@ class QuizAnswerFormatter
                     $userAnswer,
                     $questionData['options'] ?? [],
                     $userNotes
-                )
+                ),
             ];
         }
 
@@ -149,7 +150,7 @@ class QuizAnswerFormatter
             return [
                 'type' => $type,
                 'display' => 'No answer provided',
-                'items' => []
+                'items' => [],
             ];
         }
 
@@ -160,18 +161,18 @@ class QuizAnswerFormatter
 
             case 'survey':
                 return self::formatSurveyAnswer($answer, $options, $notes);
-            
+
             case 'checkbox':
                 return self::formatCheckboxAnswer($answer, $options);
-            
+
             case 'radio':
                 return self::formatRadioAnswer($answer, $options);
-            
+
             default:
                 return [
                     'type' => $type,
                     'display' => 'Unknown question type',
-                    'items' => []
+                    'items' => [],
                 ];
         }
     }
@@ -180,30 +181,30 @@ class QuizAnswerFormatter
     {
         $items = [];
 
-        if (!is_array($answer)) {
+        if (! is_array($answer)) {
             return ['type' => 'survey', 'display' => 'Invalid answer format', 'items' => []];
         }
 
         foreach ($answer as $keyValuePair) {
-            $optionId = (string)array_key_first($keyValuePair);
+            $optionId = (string) array_key_first($keyValuePair);
             $value = $keyValuePair[$optionId];
 
             // get slider option
             $option = self::findOptionById($options, $optionId);
-            
+
             // get question and answer
             if ($option) {
                 $items[] = [
                     'text' => $option['text'] ?? 'Unknown',
-                    'value' => is_numeric($value) ? $value : 0
+                    'value' => is_numeric($value) ? $value : 0,
                 ];
             }
         }
 
         return [
             'type' => 'survey',
-            'display' => count($items) . ' survey response(s)',
-            'items' => $items
+            'display' => count($items).' survey response(s)',
+            'items' => $items,
         ];
     }
 
@@ -211,7 +212,7 @@ class QuizAnswerFormatter
     {
         $items = [];
 
-        if (!is_array($answer)) {
+        if (! is_array($answer)) {
             return ['type' => 'survey', 'display' => 'Invalid answer format', 'items' => []];
         }
 
@@ -219,7 +220,7 @@ class QuizAnswerFormatter
 
         foreach ($answer as $keyValuePair) {
             // option id pulls the question
-            $optionId = (string)array_key_first($keyValuePair);
+            $optionId = (string) array_key_first($keyValuePair);
             // value is the answer - can use to get the text answer
             $value = $keyValuePair[$optionId];
 
@@ -227,13 +228,13 @@ class QuizAnswerFormatter
             $option = self::findOptionById($options, $optionId);
 
             // get text answer
-            $textAnswer = $option['survey_config']['options'][(string)$value] ?? 'Unknown';
+            $textAnswer = $option['survey_config']['options'][(string) $value] ?? 'Unknown';
 
             // get question and answer
             if ($option) {
                 $item = [
                     'text' => $option['text'] ?? 'Unknown',
-                    'value' => $value.': '.$textAnswer
+                    'value' => $value.': '.$textAnswer,
                 ];
                 if (isset($notesByOption[$optionId])) {
                     $item['note'] = $notesByOption[$optionId];
@@ -244,8 +245,8 @@ class QuizAnswerFormatter
 
         return [
             'type' => 'survey',
-            'display' => count($items) . ' survey response(s)',
-            'items' => $items
+            'display' => count($items).' survey response(s)',
+            'items' => $items,
         ];
     }
 
@@ -253,7 +254,7 @@ class QuizAnswerFormatter
     {
         $items = [];
 
-        if (!is_array($answer)) {
+        if (! is_array($answer)) {
             return ['type' => 'checkbox', 'display' => 'Invalid answer format', 'items' => []];
         }
 
@@ -268,8 +269,8 @@ class QuizAnswerFormatter
 
         return [
             'type' => 'checkbox',
-            'display' => count($items) . ' option(s) selected',
-            'items' => $items
+            'display' => count($items).' option(s) selected',
+            'items' => $items,
         ];
     }
 
@@ -277,25 +278,25 @@ class QuizAnswerFormatter
     {
         $items = [];
 
-        if (!is_array($answer)) {
+        if (! is_array($answer)) {
             return ['type' => 'radio', 'display' => 'Invalid answer format', 'items' => []];
         }
 
         foreach ($answer as $optionId => $value) {
             $option = self::findOptionById($options, $optionId);
             $items[] = self::getAnswerItem($option, $value);
-            
+
             return [
                 'type' => 'radio',
                 'display' => $option['text'] ?? "Option $optionId",
-                'items' => $items
+                'items' => $items,
             ];
         }
 
         return [
             'type' => 'radio',
             'display' => 'No selection',
-            'items' => []
+            'items' => [],
         ];
     }
 
@@ -305,16 +306,16 @@ class QuizAnswerFormatter
             if (is_null($value)) {
                 return [
                     'text' => $option['text'] ?? "Option $optionId",
-                    'selected' => true
+                    'selected' => true,
                 ];
-            }
-            elseif ($option['allow_other']) {
+            } elseif ($option['allow_other']) {
                 return [
                     'text' => '**'.$option['text'].':** '.$value,
-                    'selected' => true
+                    'selected' => true,
                 ];
             }
         }
+
         return null;
     }
 
@@ -325,18 +326,19 @@ class QuizAnswerFormatter
                 return $option;
             }
         }
+
         return null;
     }
 
     private static function notesByOptionId(?array $notes): array
     {
-        if (!is_array($notes)) {
+        if (! is_array($notes)) {
             return [];
         }
 
         $byOption = [];
         foreach ($notes as $noteItem) {
-            if (!is_array($noteItem) || count($noteItem) !== 1) {
+            if (! is_array($noteItem) || count($noteItem) !== 1) {
                 continue;
             }
             $optionId = (string) array_key_first($noteItem);
@@ -353,8 +355,6 @@ class QuizAnswerFormatter
             return $note;
         }
 
-        return substr($note, 0, $maxLength) . '...';
+        return substr($note, 0, $maxLength).'...';
     }
 }
-
-

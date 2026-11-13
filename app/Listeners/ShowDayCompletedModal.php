@@ -4,8 +4,7 @@ namespace App\Listeners;
 
 use App\Events\DayCompleted;
 use App\Models\Day;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use League\CommonMark\CommonMarkConverter;
 
 class ShowDayCompletedModal
 {
@@ -33,13 +32,13 @@ class ShowDayCompletedModal
         $modalData = $this->buildModalData($day, $hasBonus, $nextDay);
 
         session([
-            'modal_data' => $modalData
+            'modal_data' => $modalData,
         ]);
     }
 
-    private function buildModalData(Day $day, bool $hasBonus, Day $nextDay = null): array
+    private function buildModalData(Day $day, bool $hasBonus, ?Day $nextDay = null): array
     {
-        $label = "Congrats on completing ".e($day->name)."! 🎉";
+        $label = 'Congrats on completing '.e($day->name).'! 🎉';
         $body = $this->buildModalBody($day, $hasBonus, $nextDay);
         $flowerAnimation = $day->flowerAnimationData();
         $route = '/home';
@@ -58,9 +57,8 @@ class ShowDayCompletedModal
         // check in has precedence over bonus
         if ($nextDay && $nextDay->is_check_in) {
             $modalData['route'] = route('explore.module', ['module_id' => $nextDay->module_id, 'activity_id' => $nextDay->activities->first()->id]);
-            $modalData['buttonLabel'] = "Go to ".e($nextDay->name);
-        }
-        else if ($hasBonus) {
+            $modalData['buttonLabel'] = 'Go to '.e($nextDay->name);
+        } elseif ($hasBonus) {
             $modalData['route'] = route('explore.bonus', ['activity_id' => $day->activities->where('optional', true)->first()->id]);
             $modalData['buttonLabel'] = 'View Bonus Activities';
         }
@@ -68,15 +66,15 @@ class ShowDayCompletedModal
         return $modalData;
     }
 
-    private function buildModalBody(Day $day, bool $hasBonus, Day $nextDay = null): string
+    private function buildModalBody(Day $day, bool $hasBonus, ?Day $nextDay = null): string
     {
-        $converter = app(\League\CommonMark\CommonMarkConverter::class);
-        
+        $converter = app(CommonMarkConverter::class);
+
         $moduleName = e($day->module->partName());
         $dayName = e($day->name);
-        
+
         $bodyMessage = $day->completion_message ?? "Congratulations on completing **{$moduleName}: {$dayName}**!";
-        $bodyMessage .= " Return [Home](/home) to view your progress!";
+        $bodyMessage .= ' Return [Home](/home) to view your progress!';
 
         if ($nextDay && $nextDay->is_check_in) {
             $order = $nextDay->module->order;

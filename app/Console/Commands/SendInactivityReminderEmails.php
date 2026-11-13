@@ -13,7 +13,9 @@ use Illuminate\Support\Facades\Mail;
 class SendInactivityReminderEmails extends Command
 {
     public const USER_MILESTONES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+
     public const CONTACT_MILESTONE = 15;
+
     public const ALL_MILESTONES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
     protected $signature = 'emails:send-inactivity-reminders';
@@ -66,6 +68,7 @@ class SendInactivityReminderEmails extends Command
 
             if ($nextMilestone === self::CONTACT_MILESTONE && $alertRecipients === []) {
                 Log::warning('Skipping day-15 inactivity alert for user '.$user->id.': no admin recipients configured.');
+
                 continue;
             }
 

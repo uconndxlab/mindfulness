@@ -17,7 +17,7 @@ return new class extends Migration
             $table->decimal('average', 6, 3)->nullable();
             $table->unsignedBigInteger('subject_id')->nullable();
             $table->string('subject_type')->nullable();
-            
+
             // better query performance
             $table->index('reflection_type');
             $table->index(['subject_id', 'subject_type']);

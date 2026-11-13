@@ -18,13 +18,13 @@ class CompletionReportController extends Controller
     {
         $report = $this->findReportByHhId($hhId);
 
-        if (!$report->pdf_path || !Storage::exists($report->pdf_path)) {
+        if (! $report->pdf_path || ! Storage::exists($report->pdf_path)) {
             abort(404, 'Report PDF not found.');
         }
 
         return response()->file(Storage::path($report->pdf_path), [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="completion-report-' . $hhId . '.pdf"',
+            'Content-Disposition' => 'inline; filename="completion-report-'.$hhId.'.pdf"',
         ]);
     }
 
@@ -32,11 +32,11 @@ class CompletionReportController extends Controller
     {
         $report = $this->findReportByHhId($hhId);
 
-        if (!$report->pdf_path || !Storage::exists($report->pdf_path)) {
+        if (! $report->pdf_path || ! Storage::exists($report->pdf_path)) {
             abort(404, 'Report PDF not found.');
         }
 
-        return Storage::download($report->pdf_path, 'completion-report-' . $hhId . '.pdf', [
+        return Storage::download($report->pdf_path, 'completion-report-'.$hhId.'.pdf', [
             'Content-Type' => 'application/pdf',
         ]);
     }

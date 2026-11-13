@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\User;
+use Illuminate\Console\Command;
 
 class BackfillUsersHhIds extends Command
 {
@@ -30,6 +30,7 @@ class BackfillUsersHhIds extends Command
 
         if ($users->isEmpty()) {
             $this->info('No users need a hh_id. All set!');
+
             return 0;
         }
 
@@ -39,7 +40,8 @@ class BackfillUsersHhIds extends Command
         });
 
         $this->newLine();
-        $this->info('Successfully backfilled public IDs for ' . $users->count() . ' users.');
+        $this->info('Successfully backfilled public IDs for '.$users->count().' users.');
+
         return 0;
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
+    AppServiceProvider::class,
     // App\Providers\Filament\AdminPanelProvider::class,  // disable filament for csp issues
 ];

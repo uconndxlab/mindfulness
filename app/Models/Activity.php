@@ -10,7 +10,7 @@ class Activity extends Model
     use HasFactory;
 
     protected $table = 'activities';
-    
+
     protected $casts = [
         'optional' => 'boolean',
         'skippable' => 'boolean',
@@ -44,7 +44,8 @@ class Activity extends Model
             ->withPivot('completed', 'unlocked', 'favorited');
     }
 
-    public function nextActivity() {
+    public function nextActivity()
+    {
         return $this->day->activities()->where('order', '>', $this->order)->orderBy('order')->first();
     }
 
@@ -55,7 +56,7 @@ class Activity extends Model
             ->wherePivot('completed', true)
             ->exists() : false;
     }
-    
+
     public function canBeAccessedBy(?User $user)
     {
         return $user ? $this->users()

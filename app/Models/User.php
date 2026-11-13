@@ -4,17 +4,15 @@ namespace App\Models;
 
 use App\Notifications\ResetPassword;
 use App\Notifications\VerifyEmail;
-use Carbon\Carbon;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 /**
  * @method static findOrFail(int $user_id)
  */
-
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
@@ -99,7 +97,8 @@ class User extends Authenticatable implements MustVerifyEmail
         return $id;
     }
 
-    public function isAdmin(): bool {
+    public function isAdmin(): bool
+    {
         return $this->role === 'admin';
     }
 
@@ -186,8 +185,8 @@ class User extends Authenticatable implements MustVerifyEmail
             $parts[] = [
                 'order' => $module->order,
                 'name' => $module->partName(),
-                'short_name' => 'Part ' . $module->order,
-                'display_name' => 'Part ' . $module->order . ': ' . $module->flowerColorName() . ' Flower',
+                'short_name' => 'Part '.$module->order,
+                'display_name' => 'Part '.$module->order.': '.$module->flowerColorName().' Flower',
                 'color_slug' => $module->flowerColorSlug(),
                 'days' => [
                     'completed' => $moduleProgress['daysCompleted'],
@@ -311,13 +310,13 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function toggleFavoriteActivity(?Activity $activity)
     {
-        if (!$activity) {
+        if (! $activity) {
             return;
         }
 
         // should exist if unlocked?
         $this->activities()->updateExistingPivot($activity->id, [
-            'favorited' => !$this->isActivityFavorited($activity)
+            'favorited' => ! $this->isActivityFavorited($activity),
         ]);
 
         return $this->isActivityFavorited($activity);
@@ -325,7 +324,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function setFavoriteActivity(?Activity $activity, bool $favorited): bool
     {
-        if (!$activity) {
+        if (! $activity) {
             return false;
         }
 
@@ -409,7 +408,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function canSendReminder(): bool
     {
-        if (!$this->last_active_at) {
+        if (! $this->last_active_at) {
             return false;
         }
 

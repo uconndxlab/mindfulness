@@ -32,7 +32,7 @@ class Quiz extends Model
         if ($user_id) {
             $query->where('user_id', $user_id);
         }
-        
+
         return $query;
     }
 }

@@ -223,7 +223,7 @@ async function initSlideAudioPlayers() {
                     navigator.mediaSession.playbackState = 'playing';
                 }
             }).catch(error => {
-                console.error(`[Player ${id}] Audio play() failed:`, error);
+                console.error('[Player %s] Audio play() failed:', id, error);
                 pauseAudio();
             });
         }
@@ -281,7 +281,7 @@ async function initSlideAudioPlayers() {
                         position: currentTime || 0
                     });
                 } catch (error) {
-                    console.error(`[Player ${id}] Media Session position state update failed:`, error);
+                    console.error('[Player %s] Media Session position state update failed:', id, error);
                 }
             }
         });
@@ -402,7 +402,7 @@ window.audioPlayerControls = {
                         position: audioEl.currentTime || 0
                     });
                 } catch (error) {
-                    console.error(`[Player ${playerId}] Media Session position state update failed:`, error);
+                    console.error('[Player %s] Media Session position state update failed:', playerId, error);
                 }
             }
         }

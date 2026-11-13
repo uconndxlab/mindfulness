@@ -18,11 +18,11 @@ class ModuleEmailReportService
             'part' => $completedPartOrder,
             'module' => $module,
             'emotions' => [
-                'chart_title' => "Rate My Emotions Measure",
+                'chart_title' => 'Rate My Emotions Measure',
                 'sections' => $this->emotionSections($user, $completedPartOrder),
             ],
             'presence' => [
-                'chart_title' => "Rate My Presence Measure",
+                'chart_title' => 'Rate My Presence Measure',
                 'sections' => $this->presenceSections($user, $completedPartOrder),
             ],
             'awareness' => [
@@ -133,7 +133,7 @@ class ModuleEmailReportService
             $query->whereHas('activity', fn ($q) => $q->where('day_id', self::BEGINNING_DAY_ID));
         } else {
             $module = Module::where('order', $partOrder)->first();
-            if (!$module) {
+            if (! $module) {
                 return null;
             }
 
@@ -147,7 +147,7 @@ class ModuleEmailReportService
 
     private function emotionScoresFromAnswer(?QuizAnswers $answer): ?array
     {
-        if (!$answer?->quiz) {
+        if (! $answer?->quiz) {
             return null;
         }
 
@@ -162,7 +162,7 @@ class ModuleEmailReportService
 
         foreach ($options as $option) {
             $optionId = (string) ($option['id'] ?? '');
-            if (!array_key_exists($optionId, $surveyAnswers)) {
+            if (! array_key_exists($optionId, $surveyAnswers)) {
                 continue;
             }
 
@@ -187,18 +187,18 @@ class ModuleEmailReportService
     private function extractSurveyAnswers(QuizAnswers $answer): ?array
     {
         $answers = $answer->answers;
-        if (!is_array($answers) || $answers === []) {
+        if (! is_array($answers) || $answers === []) {
             return null;
         }
 
         $surveyData = reset($answers);
-        if (!is_array($surveyData)) {
+        if (! is_array($surveyData)) {
             return null;
         }
 
         $parsed = [];
         foreach ($surveyData as $item) {
-            if (!is_array($item)) {
+            if (! is_array($item)) {
                 continue;
             }
 
@@ -224,7 +224,7 @@ class ModuleEmailReportService
     private function endOfPartSelfRatingAverage(User $user, string $activityTitle, int $partOrder): ?float
     {
         $module = Module::where('order', $partOrder)->first();
-        if (!$module) {
+        if (! $module) {
             return null;
         }
 
